@@ -1,0 +1,10 @@
+# ============================================================================
+# REMIT API - KUBERNETES NAMESPACE
+# ============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: remit
+  labels:
+    app: remit
+    environment: production

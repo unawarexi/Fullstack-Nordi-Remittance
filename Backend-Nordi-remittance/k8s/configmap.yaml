@@ -1,0 +1,44 @@
+# ============================================================================
+# REMIT API - KUBERNETES CONFIGMAP
+# Non-sensitive configuration values
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: remit-api-config
+  namespace: remit
+  labels:
+    app: remit-api
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  
+  # MongoDB settings
+  MONGODB_MAX_POOL_SIZE: "50"
+  MONGODB_SOCKET_TIMEOUT_MS: "45000"
+  MONGODB_SERVER_SELECTION_TIMEOUT_MS: "5000"
+  
+  # Rate limiting
+  RATE_LIMIT_WINDOW_MS: "900000"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  AUTH_RATE_LIMIT_MAX: "5"
+  TRANSACTION_RATE_LIMIT_MAX: "30"
+  
+  # Token expiry
+  JWT_ACCESS_EXPIRY: "15m"
+  JWT_REFRESH_EXPIRY: "7d"
+  
+  # Pagination
+  DEFAULT_PAGE_SIZE: "20"
+  MAX_PAGE_SIZE: "100"
+  
+  # File uploads
+  MAX_FILE_SIZE: "10485760"
+  ALLOWED_FILE_TYPES: "image/jpeg,image/png,image/webp,application/pdf"
+  
+  # Transaction limits (in cents)
+  DEFAULT_DAILY_LIMIT: "500000"
+  DEFAULT_MONTHLY_LIMIT: "5000000"
+  KYC_VERIFIED_DAILY_LIMIT: "2500000"
+  KYC_VERIFIED_MONTHLY_LIMIT: "25000000"

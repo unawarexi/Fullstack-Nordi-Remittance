@@ -1,0 +1,48 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "lib": ["ES2020"],                   
+    "baseUrl": "./",
+    "esModuleInterop": true,                 
+    "skipLibCheck": true,                     
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+   "paths": {
+      "@/*": ["./*"],
+      "@controllers/*": ["controllers/*"],
+      "@models/*": ["models/*"],
+      "@services/*": ["services/*"],
+      "@mail/*": ["core/mail/*"],
+      "@routes/*": ["routes/*"],
+      "@core/*": ["core/*"],
+      "@helpers/*": ["core/helpers/*"],
+      "@config/*": ["config/*"],
+      "@types/*": ["types/*"],
+    },
+    "types": ["vitest/globals"],
+
+
+  },
+
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  },
+  "include": [
+    "**/*.ts",
+    "index.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "temp",
+    "build",
+    "src/public/*"
+  ]
+}
