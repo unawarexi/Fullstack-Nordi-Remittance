@@ -1,0 +1,127 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic,900,900italic);
+
+@tailwind base;
+@tailwind components;
+* {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+  outline: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+}
+
+label {
+  width: 100%;
+}
+
+.form__div {
+  width: 100%;
+  border-radius: 0.375rem; /* This is the rounded class */
+  border: 1px solid #d1d5db; /* border-gray-300 */
+  background-color: rgba(
+    243,
+    244,
+    246,
+    0.5
+  ); /* bg-gray-100 and bg-opacity-50 */
+  padding-left: 0.75rem; /* px-3 */
+  padding-right: 0.75rem; /* px-3 */
+  padding-top: 0.25rem; /* py-1 */
+  padding-bottom: 0.25rem; /* py-1 */
+  font-size: 0.875rem; /* text-sm */
+  line-height: 2rem; /* leading-8 */
+  color: #4b5563; /* text-gray-700 */
+  outline: none;
+  transition: border-color 200ms ease-in-out;
+}
+
+.form__div:focus {
+  border-color: #6366f1; /* focus:border-indigo-500 */
+  background-color: transparent; /* focus:bg-transparent */
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+option {
+  padding: 1rem;
+}
+
+.error-class {
+  font-size: 10px;
+  color: red;
+  margin-top: 5px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.normal-class {
+  font-size: 10px;
+  color: green;
+  margin-top: 5px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+@media screen and (max-width: 1024px) {
+  .form__div {
+    width: 100%;
+    border-radius: 0.375rem; /* This is the rounded class */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    background-color: rgba(
+      243,
+      244,
+      246,
+      0.5
+    ); /* bg-gray-100 and bg-opacity-50 */
+    padding-left: 0.75rem; /* px-3 */
+    padding-right: 0.75rem; /* px-3 */
+    padding-top: 0.25rem; /* py-1 */
+    padding-bottom: 0.25rem; /* py-1 */
+    font-size: 0.875rem; /* text-sm */
+    line-height: 2rem; /* leading-8 */
+    color: #4b5563; /* text-gray-700 */
+    outline: none;
+    transition: border-color 200ms ease-in-out;
+  }
+
+  .form__div:focus {
+    border-color: #6366f1; /* focus:border-indigo-500 */
+    background-color: transparent; /* focus:bg-transparent */
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+}
+
+/* for mobile*/
+
+@media screen and (max-width: 600px) {
+  .form__div {
+    padding-left: 0.5rem; /* px-3 */
+    padding-right: 0.5rem; /* px-3 */
+    padding-top: 0.2rem; /* py-1 */
+    padding-bottom: 0.2rem; /* py-1 */
+    font-size: 0.675rem;
+    line-height: 1.5rem; /* leading-8 */
+  }
+
+  label {
+    font-size: 0.7rem;
+  }
+}
+
+@tailwind utilities;
