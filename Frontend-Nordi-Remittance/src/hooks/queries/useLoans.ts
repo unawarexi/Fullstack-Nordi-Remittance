@@ -1,3 +1,7 @@
+import { loansApi } from '../../core/api/endpoints/loans.api';
+import { useToastStore } from '../../store/toast.store';
+import { queryKeys } from '../../core/lib/queryClient';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 // ============================================================================
 // LOANS HOOKS - TanStack Query hooks for loan management
 // ============================================================================

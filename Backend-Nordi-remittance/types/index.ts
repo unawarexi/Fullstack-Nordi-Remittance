@@ -2,126 +2,126 @@
 // CORE TYPE DEFINITIONS FOR BANKING APPLICATION
 // ============================================================================
 
-import { Request } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
+import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
 // ============================================================================
 // ENUMS
 // ============================================================================
 
 export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-  SUPER_ADMIN = 'super_admin',
-  COMPLIANCE_OFFICER = 'compliance_officer',
-  SUPPORT_AGENT = 'support_agent',
-  ANALYST = 'analyst'
+  USER = "user",
+  ADMIN = "admin",
+  SUPER_ADMIN = "super_admin",
+  COMPLIANCE_OFFICER = "compliance_officer",
+  SUPPORT_AGENT = "support_agent",
+  ANALYST = "analyst",
 }
 
 export enum AccountStatus {
-  ACTIVE = 'active',
-  SUSPENDED = 'suspended',
-  FROZEN = 'frozen',
-  PENDING = 'pending',
-  CLOSED = 'closed'
+  ACTIVE = "active",
+  SUSPENDED = "suspended",
+  FROZEN = "frozen",
+  PENDING = "pending",
+  CLOSED = "closed",
 }
 
 export enum KycStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  EXPIRED = 'expired'
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  EXPIRED = "expired",
 }
 
 export enum TransactionType {
-  DEPOSIT = 'deposit',
-  WITHDRAWAL = 'withdrawal',
-  TRANSFER = 'transfer',
-  PAYMENT = 'payment',
-  REFUND = 'refund',
-  FEE = 'fee',
-  REVERSAL = 'reversal',
-  EXCHANGE = 'exchange'
+  DEPOSIT = "deposit",
+  WITHDRAWAL = "withdrawal",
+  TRANSFER = "transfer",
+  PAYMENT = "payment",
+  REFUND = "refund",
+  FEE = "fee",
+  REVERSAL = "reversal",
+  EXCHANGE = "exchange",
 }
 
 export enum TransactionStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
-  REVERSED = 'reversed'
+  PENDING = "pending",
+  PROCESSING = "processing",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  CANCELLED = "cancelled",
+  REVERSED = "reversed",
 }
 
 export enum TransactionCategory {
-  CARDS = 'cards',
-  BANK_ACCOUNTS = 'bankAccounts',
-  CRYPTO_WALLETS = 'cryptoWallets',
-  LOANS = 'loans',
-  INVESTMENTS = 'investments'
+  CARDS = "cards",
+  BANK_ACCOUNTS = "bankAccounts",
+  CRYPTO_WALLETS = "cryptoWallets",
+  LOANS = "loans",
+  INVESTMENTS = "investments",
 }
 
 export enum CardType {
-  DEBIT = 'debit',
-  CREDIT = 'credit',
-  PREPAID = 'prepaid',
-  VIRTUAL = 'virtual'
+  DEBIT = "debit",
+  CREDIT = "credit",
+  PREPAID = "prepaid",
+  VIRTUAL = "virtual",
 }
 
 export enum CardStatus {
-  ACTIVE = 'active',
-  BLOCKED = 'blocked',
-  EXPIRED = 'expired',
-  STOLEN = 'stolen',
-  LOST = 'lost',
-  PENDING_ACTIVATION = 'pending_activation'
+  ACTIVE = "active",
+  BLOCKED = "blocked",
+  EXPIRED = "expired",
+  STOLEN = "stolen",
+  LOST = "lost",
+  PENDING_ACTIVATION = "pending_activation",
 }
 
 export enum LoanStatus {
-  PENDING = 'pending',
-  ACTIVE = 'active',
-  PAID = 'paid',
-  DEFAULTED = 'defaulted',
-  WRITTEN_OFF = 'written_off',
-  PAUSED = 'paused'
+  PENDING = "pending",
+  ACTIVE = "active",
+  PAID = "paid",
+  DEFAULTED = "defaulted",
+  WRITTEN_OFF = "written_off",
+  PAUSED = "paused",
 }
 
 export enum LoanType {
-  PERSONAL = 'personal',
-  BUSINESS = 'business',
-  MORTGAGE = 'mortgage',
-  AUTO = 'auto',
-  STUDENT = 'student',
-  PAYDAY = 'payday',
-  LINE_OF_CREDIT = 'line_of_credit'
+  PERSONAL = "personal",
+  BUSINESS = "business",
+  MORTGAGE = "mortgage",
+  AUTO = "auto",
+  STUDENT = "student",
+  PAYDAY = "payday",
+  LINE_OF_CREDIT = "line_of_credit",
 }
 
 export enum NotificationType {
-  TRANSACTION = 'transaction',
-  SECURITY = 'security',
-  KYC = 'kyc',
-  CARD = 'card',
-  LOAN = 'loan',
-  INVESTMENT = 'investment',
-  ACCOUNT = 'account',
-  SYSTEM = 'system',
-  PROMOTIONAL = 'promotional'
+  TRANSACTION = "transaction",
+  SECURITY = "security",
+  KYC = "kyc",
+  CARD = "card",
+  LOAN = "loan",
+  INVESTMENT = "investment",
+  ACCOUNT = "account",
+  SYSTEM = "system",
+  PROMOTIONAL = "promotional",
 }
 
 export enum AuditEventType {
-  USER_ACTION = 'user_action',
-  SYSTEM_ACTION = 'system_action',
-  TRANSACTION = 'transaction',
-  SECURITY = 'security',
-  COMPLIANCE = 'compliance',
-  DATA_CHANGE = 'data_change'
+  USER_ACTION = "user_action",
+  SYSTEM_ACTION = "system_action",
+  TRANSACTION = "transaction",
+  SECURITY = "security",
+  COMPLIANCE = "compliance",
+  DATA_CHANGE = "data_change",
 }
 
 export enum FraudSeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 
 // ============================================================================
@@ -193,7 +193,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {
@@ -316,11 +316,19 @@ export interface UserRegistrationData {
 
   // Bank Account Details
   accountName: string;
+  externalAccountNumber: string;
   bankName: string;
   bankAddress: string;
   ibanNumber?: string;
   routingNumber?: string;
   swiftBic: string;
+
+  // File Uploads (Base64)
+  profilePicture?: string;
+  governmentId?: string;
+  proofOfAddress?: string;
+  selfieWithId?: string;
+  signature?: string;
 
   // Security Setup
   password: string;
@@ -348,7 +356,7 @@ export interface LoginCredentials {
 export interface TwoFactorVerification {
   userId: string;
   code: string;
-  method: 'email' | 'sms' | 'authenticator';
+  method: "email" | "sms" | "authenticator";
 }
 
 export interface PasswordResetRequest {
@@ -377,7 +385,7 @@ export interface WalletInfo {
   userId: string;
   balances: Map<string, number>;
   status: AccountStatus;
-  walletType: 'personal' | 'business';
+  walletType: "personal" | "business";
   isPrimary: boolean;
   limits: WalletLimits;
   createdAt: Date;
@@ -522,7 +530,7 @@ export interface NotificationPayload {
   type: NotificationType;
   title: string;
   message: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  priority?: "low" | "medium" | "high" | "urgent";
   actionUrl?: string;
   relatedResource?: {
     resourceType: string;
@@ -539,7 +547,7 @@ export interface AuditLogEntry {
   eventType: AuditEventType;
   action: string;
   actor: string;
-  actorType: 'user' | 'admin' | 'system';
+  actorType: "user" | "admin" | "system";
   resource: string;
   resourceId: string;
   changes?: {
@@ -548,8 +556,8 @@ export interface AuditLogEntry {
   };
   ipAddress?: string;
   userAgent?: string;
-  severity: 'info' | 'warning' | 'error' | 'critical';
-  status: 'success' | 'failed';
+  severity: "info" | "warning" | "error" | "critical";
+  status: "success" | "failed";
   metadata?: Record<string, unknown>;
 }
 
@@ -561,7 +569,7 @@ export interface FraudCheckResult {
   isAllowed: boolean;
   riskScore: number;
   signals: FraudSignal[];
-  action: 'allow' | 'review' | 'block' | 'challenge';
+  action: "allow" | "review" | "block" | "challenge";
 }
 
 export interface FraudSignal {
@@ -574,7 +582,7 @@ export interface FraudSignal {
 export interface SecurityEvent {
   eventType: string;
   userId: string;
-  severity: 'info' | 'warning' | 'critical';
+  severity: "info" | "warning" | "critical";
   ipAddress: string;
   userAgent: string;
   location?: {
@@ -607,4 +615,4 @@ export interface RateLimitInfo {
 // EXPORT ALL MAIL TYPES
 // ============================================================================
 
-export * from './Mail.types.js';
+export * from "./Mail.types.js";

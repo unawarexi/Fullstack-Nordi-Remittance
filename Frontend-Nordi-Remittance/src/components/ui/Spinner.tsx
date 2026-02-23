@@ -2,60 +2,47 @@
 // SPINNER / LOADER COMPONENTS - Loading state indicators
 // ============================================================================
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@utils/cn';
-import { Loader2 } from 'lucide-react';
-
-// ========================
-// TYPES
-// ========================
-export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type SpinnerVariant = 'default' | 'primary' | 'white';
-
-export interface SpinnerProps {
-  size?: SpinnerSize;
-  variant?: SpinnerVariant;
-  label?: string;
-  className?: string;
-}
+import React from "react";
+import { motion } from "framer-motion";
+import { cn } from "@utils/cn";
+import { Loader2 } from "lucide-react";
 
 // ========================
 // SIZE STYLES
 // ========================
 const sizeStyles: Record<SpinnerSize, { spinner: number; text: string }> = {
-  xs: { spinner: 14, text: 'text-xs' },
-  sm: { spinner: 18, text: 'text-sm' },
-  md: { spinner: 24, text: 'text-sm' },
-  lg: { spinner: 32, text: 'text-base' },
-  xl: { spinner: 48, text: 'text-lg' },
+  xs: { spinner: 14, text: "text-xs" },
+  sm: { spinner: 18, text: "text-sm" },
+  md: { spinner: 24, text: "text-sm" },
+  lg: { spinner: 32, text: "text-base" },
+  xl: { spinner: 48, text: "text-lg" },
 };
 
 // ========================
 // VARIANT STYLES
 // ========================
 const variantStyles: Record<SpinnerVariant, string> = {
-  default: 'text-neutral-500',
-  primary: 'text-primary-500',
-  white: 'text-white',
+  default: "text-neutral-500",
+  primary: "text-primary-500",
+  white: "text-white",
 };
 
 // ========================
 // SPINNER COMPONENT
 // ========================
 export const Spinner: React.FC<SpinnerProps> = ({
-  size = 'md',
-  variant = 'primary',
+  size = "md",
+  variant = "primary",
   label,
   className,
 }) => {
   const sizeConfig = sizeStyles[size];
 
   return (
-    <div className={cn('inline-flex flex-col items-center gap-2', className)}>
+    <div className={cn("inline-flex flex-col items-center gap-2", className)}>
       <Loader2
         size={sizeConfig.spinner}
-        className={cn('animate-spin', variantStyles[variant])}
+        className={cn("animate-spin", variantStyles[variant])}
       />
       {label && (
         <span className={cn(sizeConfig.text, variantStyles[variant])}>
@@ -69,31 +56,26 @@ export const Spinner: React.FC<SpinnerProps> = ({
 // ========================
 // DOTS LOADER
 // ========================
-export interface DotsLoaderProps {
-  size?: SpinnerSize;
-  variant?: SpinnerVariant;
-  className?: string;
-}
 
 export const DotsLoader: React.FC<DotsLoaderProps> = ({
-  size = 'md',
-  variant = 'primary',
+  size = "md",
+  variant = "primary",
   className,
 }) => {
   const dotSizes: Record<SpinnerSize, string> = {
-    xs: 'w-1 h-1',
-    sm: 'w-1.5 h-1.5',
-    md: 'w-2 h-2',
-    lg: 'w-3 h-3',
-    xl: 'w-4 h-4',
+    xs: "w-1 h-1",
+    sm: "w-1.5 h-1.5",
+    md: "w-2 h-2",
+    lg: "w-3 h-3",
+    xl: "w-4 h-4",
   };
 
   const gaps: Record<SpinnerSize, string> = {
-    xs: 'gap-1',
-    sm: 'gap-1',
-    md: 'gap-1.5',
-    lg: 'gap-2',
-    xl: 'gap-2.5',
+    xs: "gap-1",
+    sm: "gap-1",
+    md: "gap-1.5",
+    lg: "gap-2",
+    xl: "gap-2.5",
   };
 
   const dotVariants = {
@@ -103,13 +85,13 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
         duration: 0.6,
         repeat: Infinity,
         delay: i * 0.1,
-        ease: 'easeInOut',
+        ease: "easeInOut",
       },
     }),
   };
 
   return (
-    <div className={cn('flex items-center', gaps[size], className)}>
+    <div className={cn("flex items-center", gaps[size], className)}>
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
@@ -117,11 +99,11 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
           variants={dotVariants}
           animate="animate"
           className={cn(
-            'rounded-full',
+            "rounded-full",
             dotSizes[size],
-            variant === 'default' && 'bg-neutral-500',
-            variant === 'primary' && 'bg-primary-500',
-            variant === 'white' && 'bg-white',
+            variant === "default" && "bg-neutral-500",
+            variant === "primary" && "bg-primary-500",
+            variant === "white" && "bg-white",
           )}
         />
       ))}
@@ -132,33 +114,28 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
 // ========================
 // PULSE LOADER
 // ========================
-export interface PulseLoaderProps {
-  size?: SpinnerSize;
-  variant?: SpinnerVariant;
-  className?: string;
-}
 
 export const PulseLoader: React.FC<PulseLoaderProps> = ({
-  size = 'md',
-  variant = 'primary',
+  size = "md",
+  variant = "primary",
   className,
 }) => {
   const sizes: Record<SpinnerSize, string> = {
-    xs: 'w-4 h-4',
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
+    xs: "w-4 h-4",
+    sm: "w-6 h-6",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+    xl: "w-16 h-16",
   };
 
   return (
-    <div className={cn('relative', sizes[size], className)}>
+    <div className={cn("relative", sizes[size], className)}>
       <motion.div
         className={cn(
-          'absolute inset-0 rounded-full',
-          variant === 'default' && 'bg-neutral-400',
-          variant === 'primary' && 'bg-primary-400',
-          variant === 'white' && 'bg-white/70',
+          "absolute inset-0 rounded-full",
+          variant === "default" && "bg-neutral-400",
+          variant === "primary" && "bg-primary-400",
+          variant === "white" && "bg-white/70",
         )}
         animate={{
           scale: [1, 1.5, 1],
@@ -167,15 +144,15 @@ export const PulseLoader: React.FC<PulseLoaderProps> = ({
         transition={{
           duration: 1.5,
           repeat: Infinity,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         }}
       />
       <div
         className={cn(
-          'absolute inset-[25%] rounded-full',
-          variant === 'default' && 'bg-neutral-500',
-          variant === 'primary' && 'bg-primary-500',
-          variant === 'white' && 'bg-white',
+          "absolute inset-[25%] rounded-full",
+          variant === "default" && "bg-neutral-500",
+          variant === "primary" && "bg-primary-500",
+          variant === "white" && "bg-white",
         )}
       />
     </div>
@@ -185,45 +162,38 @@ export const PulseLoader: React.FC<PulseLoaderProps> = ({
 // ========================
 // SKELETON LOADER
 // ========================
-export interface SkeletonProps {
-  className?: string;
-  variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
-  width?: string | number;
-  height?: string | number;
-  animation?: 'pulse' | 'wave' | 'none';
-}
 
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,
-  variant = 'text',
+  variant = "text",
   width,
   height,
-  animation = 'pulse',
+  animation = "pulse",
 }) => {
   const variantStyles = {
-    text: 'h-4 rounded',
-    circular: 'rounded-full',
-    rectangular: 'rounded-none',
-    rounded: 'rounded-lg',
+    text: "h-4 rounded",
+    circular: "rounded-full",
+    rectangular: "rounded-none",
+    rounded: "rounded-lg",
   };
 
   const animationStyles = {
-    pulse: 'animate-pulse',
-    wave: 'skeleton-wave',
-    none: '',
+    pulse: "animate-pulse",
+    wave: "skeleton-wave",
+    none: "",
   };
 
   return (
     <div
       className={cn(
-        'bg-neutral-200',
+        "bg-neutral-200",
         variantStyles[variant],
         animationStyles[animation],
-        className
+        className,
       )}
       style={{
-        width: width || (variant === 'circular' ? height : '100%'),
-        height: height || (variant === 'text' ? undefined : 100),
+        width: width || (variant === "circular" ? height : "100%"),
+        height: height || (variant === "text" ? undefined : 100),
       }}
     />
   );
@@ -232,13 +202,9 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 // ========================
 // FULL PAGE LOADER
 // ========================
-export interface PageLoaderProps {
-  message?: string;
-  showLogo?: boolean;
-}
 
 export const PageLoader: React.FC<PageLoaderProps> = ({
-  message = 'Loading...',
+  message = "Loading...",
   showLogo = true,
 }) => {
   return (
@@ -256,7 +222,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <div className="w-16 h-16 mx-auto bg-primary-500 rounded-2xl flex items-center justify-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500">
               <span className="text-2xl font-bold text-white">N</span>
             </div>
           </motion.div>
@@ -280,10 +246,6 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
 // ========================
 // OVERLAY LOADER
 // ========================
-export interface OverlayLoaderProps {
-  isVisible: boolean;
-  message?: string;
-}
 
 export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
   isVisible,
@@ -298,10 +260,10 @@ export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div className="bg-white rounded-2xl p-8 shadow-2xl text-center">
+      <div className="rounded-2xl bg-white p-8 text-center shadow-2xl">
         <Spinner size="lg" variant="primary" />
         {message && (
-          <p className="mt-4 text-neutral-600 font-medium">{message}</p>
+          <p className="mt-4 font-medium text-neutral-600">{message}</p>
         )}
       </div>
     </motion.div>

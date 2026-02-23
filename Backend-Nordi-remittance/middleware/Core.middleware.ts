@@ -2,14 +2,22 @@
 // CORE MIDDLEWARE - REQUEST PROCESSING
 // ============================================================================
 
-import { Request, Response, NextFunction } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import type { AuthenticatedRequest, DeviceInfo } from '../types/index.js';
-import { constants } from '../config/env.config.js';
-import { AppError, isAppError, createErrorResponse } from '../core/errors/AppError.js';
-import { sendError, sendInternalError } from '../core/helpers/response.helper.js';
-import { AuditLogs } from '../models/AuditModels.js';
-import { env } from '../config/env.config.js';
+import { Request, Response, NextFunction } from "express";
+import { v4 as uuidv4 } from "uuid";
+import type { AuthenticatedRequest, DeviceInfo } from "../types/index.js";
+import { constants } from "../config/env.config.js";
+import {
+  AppError,
+  isAppError,
+  createErrorResponse,
+} from "../core/errors/AppError.js";
+import {
+  sendError,
+  sendInternalError,
+} from "../core/helpers/response.helper.js";
+import { AuditLogs } from "../models/AuditModels.js";
+import { env } from "../config/env.config.js";
+import onHeaders from "on-headers";
 
 // ============================================================================
 // REQUEST ID INJECTION
@@ -21,9 +29,10 @@ import { env } from '../config/env.config.js';
 export function requestIdMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
-  const requestId = req.headers[constants.REQUEST_ID_HEADER] as string || uuidv4();
+  const requestId =
+    (req.headers[constants.REQUEST_ID_HEADER] as string) || uuidv4();
   req.requestId = requestId;
   res.setHeader(constants.REQUEST_ID_HEADER, requestId);
   next();
@@ -39,17 +48,22 @@ export function requestIdMiddleware(
 export function requestTimingMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   req.startTime = Date.now();
 
-  res.on('finish', () => {
+  onHeaders(res, () => {
     const duration = Date.now() - (req.startTime || Date.now());
-    res.setHeader('X-Response-Time', `${duration}ms`);
-    
+    res.setHeader("X-Response-Time", `${duration}ms`);
+  });
+
+  res.on("finish", () => {
+    const duration = Date.now() - (req.startTime || Date.now());
     // Log slow requests
     if (duration > 3000) {
-      console.warn(`Slow request: ${req.method} ${req.originalUrl} - ${duration}ms`);
+      console.warn(
+        `Slow request: ${req.method} ${req.originalUrl} - ${duration}ms`,
+      );
     }
   });
 
@@ -66,14 +80,14 @@ export function requestTimingMiddleware(
 export function clientIpMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
-  const forwardedFor = req.headers['x-forwarded-for'];
-  const realIp = req.headers['x-real-ip'];
-  
-  if (typeof forwardedFor === 'string') {
-    req.clientIp = forwardedFor.split(',')[0].trim();
-  } else if (typeof realIp === 'string') {
+  const forwardedFor = req.headers["x-forwarded-for"];
+  const realIp = req.headers["x-real-ip"];
+
+  if (typeof forwardedFor === "string") {
+    req.clientIp = forwardedFor.split(",")[0].trim();
+  } else if (typeof realIp === "string") {
     req.clientIp = realIp;
   } else {
     req.clientIp = req.ip || req.socket.remoteAddress;
@@ -92,10 +106,10 @@ export function clientIpMiddleware(
 export function deviceInfoMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
-  const userAgent = req.headers['user-agent'] || '';
-  const deviceId = req.headers['x-device-id'] as string;
+  const userAgent = req.headers["user-agent"] || "";
+  const deviceId = req.headers["x-device-id"] as string;
 
   const deviceInfo: DeviceInfo = {
     deviceId,
@@ -110,29 +124,29 @@ export function deviceInfoMiddleware(
 }
 
 function detectDeviceType(userAgent: string): string {
-  if (/mobile/i.test(userAgent)) return 'mobile';
-  if (/tablet/i.test(userAgent)) return 'tablet';
-  return 'desktop';
+  if (/mobile/i.test(userAgent)) return "mobile";
+  if (/tablet/i.test(userAgent)) return "tablet";
+  return "desktop";
 }
 
 function detectOS(userAgent: string): string {
   // Check mobile OS first (more specific patterns)
-  if (/iphone|ipad|ipod/i.test(userAgent)) return 'iOS';
-  if (/android/i.test(userAgent)) return 'Android';
+  if (/iphone|ipad|ipod/i.test(userAgent)) return "iOS";
+  if (/android/i.test(userAgent)) return "Android";
   // Then check desktop OS
-  if (/windows/i.test(userAgent)) return 'Windows';
-  if (/macintosh|mac os x/i.test(userAgent)) return 'MacOS';
-  if (/linux/i.test(userAgent)) return 'Linux';
-  return 'Unknown';
+  if (/windows/i.test(userAgent)) return "Windows";
+  if (/macintosh|mac os x/i.test(userAgent)) return "MacOS";
+  if (/linux/i.test(userAgent)) return "Linux";
+  return "Unknown";
 }
 
 function detectBrowser(userAgent: string): string {
-  if (/chrome/i.test(userAgent) && !/edge/i.test(userAgent)) return 'Chrome';
-  if (/firefox/i.test(userAgent)) return 'Firefox';
-  if (/safari/i.test(userAgent) && !/chrome/i.test(userAgent)) return 'Safari';
-  if (/edge/i.test(userAgent)) return 'Edge';
-  if (/opera|opr/i.test(userAgent)) return 'Opera';
-  return 'Unknown';
+  if (/chrome/i.test(userAgent) && !/edge/i.test(userAgent)) return "Chrome";
+  if (/firefox/i.test(userAgent)) return "Firefox";
+  if (/safari/i.test(userAgent) && !/chrome/i.test(userAgent)) return "Safari";
+  if (/edge/i.test(userAgent)) return "Edge";
+  if (/opera|opr/i.test(userAgent)) return "Opera";
+  return "Unknown";
 }
 
 // ============================================================================
@@ -145,11 +159,11 @@ function detectBrowser(userAgent: string): string {
 export function requestLoggingMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   const startTime = Date.now();
 
-  res.on('finish', () => {
+  res.on("finish", () => {
     const duration = Date.now() - startTime;
     const logData = {
       requestId: req.requestId,
@@ -158,14 +172,14 @@ export function requestLoggingMiddleware(
       status: res.statusCode,
       duration: `${duration}ms`,
       ip: req.clientIp,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       userId: req.user?.userId,
     };
 
     if (res.statusCode >= 400) {
-      console.error('Request Error:', JSON.stringify(logData));
-    } else if (env.NODE_ENV === 'development') {
-      console.log('Request:', JSON.stringify(logData));
+      console.error("Request Error:", JSON.stringify(logData));
+    } else if (env.NODE_ENV === "development") {
+      console.log("Request:", JSON.stringify(logData));
     }
   });
 
@@ -183,13 +197,13 @@ export function errorHandler(
   error: Error,
   req: AuthenticatedRequest,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void {
   // Log the error
-  console.error('Error:', {
+  console.error("Error:", {
     requestId: req.requestId,
     message: error.message,
-    stack: env.NODE_ENV === 'development' ? error.stack : undefined,
+    stack: env.NODE_ENV === "development" ? error.stack : undefined,
     url: req.originalUrl,
     method: req.method,
     userId: req.user?.userId,
@@ -209,58 +223,45 @@ export function errorHandler(
   }
 
   // Handle Mongoose validation errors
-  if (error.name === 'ValidationError') {
-    sendError(
-      res,
-      'Validation failed',
-      'VALIDATION_ERROR',
-      400,
-      { details: (error as any).errors }
-    );
+  if (error.name === "ValidationError") {
+    sendError(res, "Validation failed", "VALIDATION_ERROR", 400, {
+      details: (error as any).errors,
+    });
     return;
   }
 
   // Handle Mongoose cast errors (invalid ObjectId, etc.)
-  if (error.name === 'CastError') {
-    sendError(
-      res,
-      'Invalid resource identifier',
-      'INVALID_ID',
-      400
-    );
+  if (error.name === "CastError") {
+    sendError(res, "Invalid resource identifier", "INVALID_ID", 400);
     return;
   }
 
   // Handle Mongoose duplicate key errors
   if ((error as any).code === 11000) {
-    const field = Object.keys((error as any).keyValue || {})[0] || 'field';
-    sendError(
-      res,
-      `Duplicate value for ${field}`,
-      'DUPLICATE_ENTRY',
-      409,
-      { field }
-    );
+    const field = Object.keys((error as any).keyValue || {})[0] || "field";
+    sendError(res, `Duplicate value for ${field}`, "DUPLICATE_ENTRY", 409, {
+      field,
+    });
     return;
   }
 
   // Handle JWT errors
-  if (error.name === 'JsonWebTokenError') {
-    sendError(res, 'Invalid token', 'TOKEN_INVALID', 401);
+  if (error.name === "JsonWebTokenError") {
+    sendError(res, "Invalid token", "TOKEN_INVALID", 401);
     return;
   }
 
-  if (error.name === 'TokenExpiredError') {
-    sendError(res, 'Token has expired', 'TOKEN_EXPIRED', 401);
+  if (error.name === "TokenExpiredError") {
+    sendError(res, "Token has expired", "TOKEN_EXPIRED", 401);
     return;
   }
 
   // Generic server error
   sendInternalError(
     res,
-    env.NODE_ENV === 'production' 
-      ? 'An unexpected error occurred' 
-      : error.message
+    env.NODE_ENV === "production"
+      ? "An unexpected error occurred"
+      : error.message,
   );
 }
 
@@ -274,13 +275,13 @@ export function errorHandler(
 export function notFoundHandler(
   req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void {
   sendError(
     res,
     `Route ${req.method} ${req.originalUrl} not found`,
-    'ROUTE_NOT_FOUND',
-    404
+    "ROUTE_NOT_FOUND",
+    404,
   );
 }
 
@@ -294,16 +295,16 @@ export function notFoundHandler(
 export async function auditLogMiddleware(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   // Only audit mutating requests
-  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+  if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
     return next();
   }
 
   // Skip certain paths
-  const skipPaths = ['/health', '/api/v1/auth/refresh'];
-  if (skipPaths.some(path => req.originalUrl.includes(path))) {
+  const skipPaths = ["/health", "/api/v1/auth/refresh"];
+  if (skipPaths.some((path) => req.originalUrl.includes(path))) {
     return next();
   }
 
@@ -315,22 +316,22 @@ export async function auditLogMiddleware(
     return originalJson(body);
   };
 
-  res.on('finish', async () => {
+  res.on("finish", async () => {
     try {
       // Determine action from URL and method
       const action = determineAction(req.method, req.originalUrl);
-      
+
       await AuditLogs.create({
-        eventType: 'user_action',
+        eventType: "user_action",
         action,
-        actor: req.user?.userId || 'anonymous',
-        actorType: req.user ? 'user' : 'system',
-        resource: req.originalUrl.split('/')[3] || 'unknown',
-        resourceId: req.params.id || req.body?.id || 'unknown',
+        actor: req.user?.userId || "anonymous",
+        actorType: req.user ? "user" : "system",
+        resource: req.originalUrl.split("/")[3] || "unknown",
+        resourceId: req.params.id || req.body?.id || "unknown",
         ipAddress: req.clientIp,
-        userAgent: req.headers['user-agent'],
-        severity: res.statusCode >= 400 ? 'warning' : 'info',
-        status: res.statusCode >= 400 ? 'failed' : 'success',
+        userAgent: req.headers["user-agent"],
+        severity: res.statusCode >= 400 ? "warning" : "info",
+        status: res.statusCode >= 400 ? "failed" : "success",
         metadata: {
           requestId: req.requestId,
           method: req.method,
@@ -338,7 +339,7 @@ export async function auditLogMiddleware(
         },
       });
     } catch (error) {
-      console.error('Failed to create audit log:', error);
+      console.error("Failed to create audit log:", error);
     }
   });
 
@@ -346,15 +347,19 @@ export async function auditLogMiddleware(
 }
 
 function determineAction(method: string, url: string): string {
-  const parts = url.split('/').filter(Boolean);
-  const resource = parts[2] || 'resource';
-  
+  const parts = url.split("/").filter(Boolean);
+  const resource = parts[2] || "resource";
+
   switch (method) {
-    case 'POST': return `create_${resource}`;
-    case 'PUT':
-    case 'PATCH': return `update_${resource}`;
-    case 'DELETE': return `delete_${resource}`;
-    default: return `${method.toLowerCase()}_${resource}`;
+    case "POST":
+      return `create_${resource}`;
+    case "PUT":
+    case "PATCH":
+      return `update_${resource}`;
+    case "DELETE":
+      return `delete_${resource}`;
+    default:
+      return `${method.toLowerCase()}_${resource}`;
   }
 }
 

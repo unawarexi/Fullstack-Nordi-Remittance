@@ -4,7 +4,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Globe, User, Building, ArrowRight, X } from "lucide-react";
 import { cn } from "@utils/cn";
 import { useNavbar } from "@contexts/navbar-context";
@@ -33,6 +33,19 @@ const sidebarVariants = {
 const InternetBankingSideBar: React.FC = () => {
   const { isSidebarOpen, closeSidebar } = useNavbar();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close sidebar automatically on route change (e.g., when reaching auth/login)
+  React.useEffect(() => {
+    if (isSidebarOpen) {
+      closeSidebar();
+    }
+  }, [location.pathname, closeSidebar]);
+
+  // Do not show the sidebar on authentication routes
+  if (location.pathname.startsWith("/auth")) {
+    return null;
+  }
 
   // Handle navigation with sidebar close
   const handleNavigate = (path: string) => {

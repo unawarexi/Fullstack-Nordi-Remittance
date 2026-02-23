@@ -2,14 +2,19 @@
 // API CLIENT - Axios instance with interceptors for authentication
 // ============================================================================
 
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
 
 // API Base URL - configured via environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 // Token storage keys
-const ACCESS_TOKEN_KEY = 'remit_access_token';
-const REFRESH_TOKEN_KEY = 'remit_refresh_token';
+const ACCESS_TOKEN_KEY = "remit_access_token";
+const REFRESH_TOKEN_KEY = "remit_refresh_token";
 
 // ============================================================================
 // TOKEN MANAGEMENT
@@ -49,7 +54,7 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: true,
 });
@@ -61,19 +66,19 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = TokenManager.getAccessToken();
-    
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     // Add request ID for tracking
-    config.headers['X-Request-ID'] = crypto.randomUUID();
+    config.headers["X-Request-ID"] = crypto.randomUUID();
 
     return config;
   },
   (error: AxiosError) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // ============================================================================
@@ -102,7 +107,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // Handle 401 Unauthorized - attempt token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -126,7 +133,7 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         TokenManager.clearTokens();
-        window.location.href = '/auth/login';
+        window.location.href = "/auth/login";
         return Promise.reject(error);
       }
 
@@ -135,7 +142,8 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+        const { accessToken, refreshToken: newRefreshToken } =
+          response.data.data;
         TokenManager.setTokens(accessToken, newRefreshToken);
 
         processQueue(null, accessToken);
@@ -148,7 +156,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as Error, null);
         TokenManager.clearTokens();
-        window.location.href = '/auth/login';
+        window.location.href = "/auth/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -156,7 +164,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // ============================================================================
@@ -195,12 +203,16 @@ export interface ApiError {
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<ApiError>;
-    return axiosError.response?.data?.message || axiosError.message || 'An unexpected error occurred';
+    return (
+      axiosError.response?.data?.message ||
+      axiosError.message ||
+      "An unexpected error occurred"
+    );
   }
   if (error instanceof Error) {
     return error.message;
   }
-  return 'An unexpected error occurred';
+  return "An unexpected error occurred";
 };
 
 // ============================================================================

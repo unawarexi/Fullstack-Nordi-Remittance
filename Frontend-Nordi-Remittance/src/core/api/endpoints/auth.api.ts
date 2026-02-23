@@ -2,9 +2,8 @@
 // AUTH API - Authentication endpoints
 // ============================================================================
 
-import apiClient, { ApiResponse, getErrorMessage } from '../client';
-
-const AUTH_BASE = '/auth';
+import apiClient, { ApiResponse, getErrorMessage } from "../client";
+const AUTH_BASE = "/auth";
 
 // ============================================================================
 // AUTH API FUNCTIONS
@@ -17,7 +16,7 @@ export const authApi = {
   login: async (data: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
       `${AUTH_BASE}/login`,
-      data
+      data,
     );
     return response.data;
   },
@@ -25,32 +24,36 @@ export const authApi = {
   /**
    * Register a new user
    */
-  register: async (data: RegisterRequest): Promise<ApiResponse<{ user: User; message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ user: User; message: string }>>(
-      `${AUTH_BASE}/register`,
-      data
-    );
+  register: async (
+    data: RegisterRequest,
+  ): Promise<ApiResponse<{ user: User; message: string }>> => {
+    const response = await apiClient.post<
+      ApiResponse<{ user: User; message: string }>
+    >(`${AUTH_BASE}/register`, data);
     return response.data;
   },
 
   /**
    * Register a new user with full KYC information
    */
-  registerFullKyc: async (data: FullKycRegisterRequest): Promise<ApiResponse<{ user: User; message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ user: User; message: string }>>(
-      `${AUTH_BASE}/register/full`,
-      data
-    );
+  registerFullKyc: async (
+    data: FullKycRegisterRequest,
+  ): Promise<ApiResponse<{ user: User; message: string }>> => {
+    const response = await apiClient.post<
+      ApiResponse<{ user: User; message: string }>
+    >(`${AUTH_BASE}/register/full`, data);
     return response.data;
   },
 
   /**
    * Verify two-factor authentication code
    */
-  verifyTwoFactor: async (data: TwoFactorAuthRequest): Promise<ApiResponse<LoginResponse>> => {
+  verifyTwoFactor: async (
+    data: TwoFactorAuthRequest,
+  ): Promise<ApiResponse<LoginResponse>> => {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      `${AUTH_BASE}/2fa/verify`,
-      data
+      `${AUTH_BASE}/verify-2fa`,
+      data,
     );
     return response.data;
   },
@@ -58,10 +61,12 @@ export const authApi = {
   /**
    * Resend two-factor authentication code
    */
-  resendTwoFactorCode: async (tempToken: string): Promise<ApiResponse<{ message: string }>> => {
+  resendTwoFactorCode: async (
+    tempToken: string,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/2fa/resend`,
-      { tempToken }
+      { tempToken },
     );
     return response.data;
   },
@@ -69,10 +74,12 @@ export const authApi = {
   /**
    * Request password reset email
    */
-  forgotPassword: async (data: ResetPasswordRequest): Promise<ApiResponse<{ message: string }>> => {
+  forgotPassword: async (
+    data: ResetPasswordRequest,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/forgot-password`,
-      data
+      data,
     );
     return response.data;
   },
@@ -80,10 +87,12 @@ export const authApi = {
   /**
    * Reset password with token
    */
-  resetPassword: async (data: ConfirmResetPasswordRequest): Promise<ApiResponse<{ message: string }>> => {
+  resetPassword: async (
+    data: ConfirmResetPasswordRequest,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/reset-password`,
-      data
+      data,
     );
     return response.data;
   },
@@ -91,10 +100,12 @@ export const authApi = {
   /**
    * Change password (authenticated)
    */
-  changePassword: async (data: ChangePasswordRequest): Promise<ApiResponse<{ message: string }>> => {
+  changePassword: async (
+    data: ChangePasswordRequest,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/change-password`,
-      data
+      data,
     );
     return response.data;
   },
@@ -102,10 +113,12 @@ export const authApi = {
   /**
    * Verify email with token
    */
-  verifyEmail: async (token: string): Promise<ApiResponse<{ message: string }>> => {
+  verifyEmail: async (
+    token: string,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/verify-email`,
-      { token }
+      { token },
     );
     return response.data;
   },
@@ -113,9 +126,11 @@ export const authApi = {
   /**
    * Resend email verification
    */
-  resendVerificationEmail: async (): Promise<ApiResponse<{ message: string }>> => {
+  resendVerificationEmail: async (): Promise<
+    ApiResponse<{ message: string }>
+  > => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${AUTH_BASE}/resend-verification`
+      `${AUTH_BASE}/resend-verification`,
     );
     return response.data;
   },
@@ -123,10 +138,12 @@ export const authApi = {
   /**
    * Verify phone number with OTP
    */
-  verifyPhone: async (otp: string): Promise<ApiResponse<{ message: string }>> => {
+  verifyPhone: async (
+    otp: string,
+  ): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
       `${AUTH_BASE}/verify-phone`,
-      { otp }
+      { otp },
     );
     return response.data;
   },
@@ -134,9 +151,11 @@ export const authApi = {
   /**
    * Resend phone verification OTP
    */
-  resendPhoneVerification: async (): Promise<ApiResponse<{ message: string }>> => {
+  resendPhoneVerification: async (): Promise<
+    ApiResponse<{ message: string }>
+  > => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${AUTH_BASE}/resend-phone-otp`
+      `${AUTH_BASE}/resend-phone-otp`,
     );
     return response.data;
   },
@@ -144,11 +163,12 @@ export const authApi = {
   /**
    * Refresh access token
    */
-  refreshToken: async (refreshToken: string): Promise<ApiResponse<{ accessToken: string; refreshToken: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string }>>(
-      `${AUTH_BASE}/refresh`,
-      { refreshToken }
-    );
+  refreshToken: async (
+    refreshToken: string,
+  ): Promise<ApiResponse<{ accessToken: string; refreshToken: string }>> => {
+    const response = await apiClient.post<
+      ApiResponse<{ accessToken: string; refreshToken: string }>
+    >(`${AUTH_BASE}/refresh`, { refreshToken });
     return response.data;
   },
 
@@ -157,7 +177,7 @@ export const authApi = {
    */
   logout: async (): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${AUTH_BASE}/logout`
+      `${AUTH_BASE}/logout`,
     );
     return response.data;
   },
@@ -166,9 +186,10 @@ export const authApi = {
    * Logout all sessions
    */
   logoutAll: async (): Promise<ApiResponse<{ message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${AUTH_BASE}/logout-all`
-    );
+    const response =
+      await apiClient.delete<ApiResponse<{ message: string }>>(
+        `/security/sessions`,
+      );
     return response.data;
   },
 
@@ -183,10 +204,12 @@ export const authApi = {
   /**
    * Check if email is available
    */
-  checkEmailAvailability: async (email: string): Promise<ApiResponse<{ available: boolean }>> => {
+  checkEmailAvailability: async (
+    email: string,
+  ): Promise<ApiResponse<{ available: boolean }>> => {
     const response = await apiClient.get<ApiResponse<{ available: boolean }>>(
       `${AUTH_BASE}/check-email`,
-      { params: { email } }
+      { params: { email } },
     );
     return response.data;
   },
@@ -194,10 +217,12 @@ export const authApi = {
   /**
    * Check if phone is available
    */
-  checkPhoneAvailability: async (phone: string): Promise<ApiResponse<{ available: boolean }>> => {
+  checkPhoneAvailability: async (
+    phone: string,
+  ): Promise<ApiResponse<{ available: boolean }>> => {
     const response = await apiClient.get<ApiResponse<{ available: boolean }>>(
       `${AUTH_BASE}/check-phone`,
-      { params: { phone } }
+      { params: { phone } },
     );
     return response.data;
   },

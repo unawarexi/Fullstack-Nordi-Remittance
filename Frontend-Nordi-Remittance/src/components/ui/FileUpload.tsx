@@ -2,27 +2,15 @@
 // FILE UPLOAD COMPONENT - Reusable file upload with preview
 // ============================================================================
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, Image as ImageIcon, FileText } from 'lucide-react';
-import { cn } from '@utils/cn';
-
-interface FileUploadProps {
-  id: string;
-  label: string;
-  accept?: string;
-  description?: string;
-  error?: string;
-  onChange: (file: File | null) => void;
-  value?: File | null;
-  required?: boolean;
-  maxSize?: number; // in MB
-}
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Upload, X, Image as ImageIcon, FileText } from "lucide-react";
+import { cn } from "@utils/cn";
 
 export const FileUpload = ({
   id,
   label,
-  accept = 'image/*',
+  accept = "image/*",
   description,
   error,
   onChange,
@@ -48,7 +36,7 @@ export const FileUpload = ({
     }
 
     // Create preview for images
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
@@ -64,9 +52,9 @@ export const FileUpload = ({
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -85,17 +73,17 @@ export const FileUpload = ({
     setPreview(null);
     onChange(null);
     if (inputRef.current) {
-      inputRef.current.value = '';
+      inputRef.current.value = "";
     }
   };
 
-  const isImage = value?.type.startsWith('image/') || preview;
+  const isImage = value?.type.startsWith("image/") || preview;
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+      <label className="mb-1.5 block text-sm font-medium text-neutral-700">
         {label}
-        {required && <span className="text-error-500 ml-1">*</span>}
+        {required && <span className="ml-1 text-error-500">*</span>}
       </label>
 
       <div
@@ -104,10 +92,12 @@ export const FileUpload = ({
         onDragOver={handleDrag}
         onDrop={handleDrop}
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-4 transition-colors cursor-pointer',
-          dragActive ? 'border-primary-500 bg-primary-50' : 'border-neutral-300 hover:border-primary-400',
-          error && 'border-error-500 bg-error-50',
-          (value || preview) && 'border-success-500 bg-success-50'
+          "relative cursor-pointer rounded-lg border-2 border-dashed p-4 transition-colors",
+          dragActive
+            ? "border-primary-500 bg-primary-50"
+            : "border-neutral-300 hover:border-primary-400",
+          error && "border-error-500 bg-error-50",
+          (value || preview) && "border-success-500 bg-success-50",
         )}
         onClick={() => inputRef.current?.click()}
       >
@@ -132,16 +122,16 @@ export const FileUpload = ({
                 <img
                   src={preview}
                   alt="Preview"
-                  className="w-16 h-16 object-cover rounded-lg"
+                  className="h-16 w-16 rounded-lg object-cover"
                 />
               ) : (
-                <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-8 h-8 text-neutral-400" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-neutral-100">
+                  <FileText className="h-8 w-8 text-neutral-400" />
                 </div>
               )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-neutral-900 truncate">
-                  {value?.name || 'File selected'}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-neutral-900">
+                  {value?.name || "File selected"}
                 </p>
                 {value && (
                   <p className="text-xs text-neutral-500">
@@ -155,9 +145,9 @@ export const FileUpload = ({
                   e.stopPropagation();
                   handleRemove();
                 }}
-                className="p-1.5 rounded-full hover:bg-neutral-100 transition-colors"
+                className="rounded-full p-1.5 transition-colors hover:bg-neutral-100"
               >
-                <X className="w-5 h-5 text-neutral-500" />
+                <X className="h-5 w-5 text-neutral-500" />
               </button>
             </motion.div>
           ) : (
@@ -167,21 +157,22 @@ export const FileUpload = ({
               exit={{ opacity: 0 }}
               className="flex flex-col items-center py-4"
             >
-              <Upload className="w-10 h-10 text-neutral-400 mb-2" />
-              <p className="text-sm text-neutral-600 text-center">
-                <span className="text-primary-600 font-medium">Click to upload</span> or drag and drop
+              <Upload className="mb-2 h-10 w-10 text-neutral-400" />
+              <p className="text-center text-sm text-neutral-600">
+                <span className="font-medium text-primary-600">
+                  Click to upload
+                </span>{" "}
+                or drag and drop
               </p>
               {description && (
-                <p className="text-xs text-neutral-500 mt-1">{description}</p>
+                <p className="mt-1 text-xs text-neutral-500">{description}</p>
               )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {error && (
-        <p className="mt-1.5 text-xs text-error-500">{error}</p>
-      )}
+      {error && <p className="mt-1.5 text-xs text-error-500">{error}</p>}
     </div>
   );
 };

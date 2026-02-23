@@ -2,43 +2,23 @@
 // MODAL COMPONENT - Animated dialog with backdrop
 // ============================================================================
 
-import React, { forwardRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
-import { cn } from '@utils/cn';
-import { X } from 'lucide-react';
-import { IconButton } from './Button';
-
-// ========================
-// TYPES
-// ========================
-export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
-
-export interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  size?: ModalSize;
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
-  showCloseButton?: boolean;
-  title?: string;
-  description?: string;
-  footer?: React.ReactNode;
-  className?: string;
-  overlayClassName?: string;
-}
+import React, { forwardRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
+import { cn } from "@utils/cn";
+import { X } from "lucide-react";
+import { IconButton } from "./Button";
 
 // ========================
 // SIZE STYLES
 // ========================
 const sizeStyles: Record<ModalSize, string> = {
-  xs: 'max-w-xs',
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
-  full: 'max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]',
+  xs: "max-w-xs",
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-lg",
+  xl: "max-w-xl",
+  full: "max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]",
 };
 
 // ========================
@@ -51,24 +31,24 @@ const overlayVariants = {
 };
 
 const modalVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.95, 
-    y: 20 
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+    y: 20,
   },
-  visible: { 
-    opacity: 1, 
-    scale: 1, 
+  visible: {
+    opacity: 1,
+    scale: 1,
     y: 0,
     transition: {
-      type: 'spring',
+      type: "spring",
       damping: 25,
       stiffness: 300,
     },
   },
-  exit: { 
-    opacity: 0, 
-    scale: 0.95, 
+  exit: {
+    opacity: 0,
+    scale: 0.95,
     y: 20,
     transition: {
       duration: 0.2,
@@ -85,7 +65,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       isOpen,
       onClose,
       children,
-      size = 'md',
+      size = "md",
       closeOnOverlayClick = true,
       closeOnEsc = true,
       showCloseButton = true,
@@ -95,28 +75,28 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       className,
       overlayClassName,
     },
-    ref
+    ref,
   ) => {
     // Handle ESC key
     const handleKeyDown = useCallback(
       (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && closeOnEsc) {
+        if (e.key === "Escape" && closeOnEsc) {
           onClose();
         }
       },
-      [closeOnEsc, onClose]
+      [closeOnEsc, onClose],
     );
 
     // Add/remove event listeners
     useEffect(() => {
       if (isOpen) {
-        document.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
+        document.addEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "hidden";
       }
-      
+
       return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = '';
+        document.removeEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "";
       };
     }, [isOpen, handleKeyDown]);
 
@@ -139,9 +119,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               exit="exit"
               onClick={handleOverlayClick}
               className={cn(
-                'fixed inset-0 bg-black/50 backdrop-blur-sm',
-                'flex items-center justify-center p-4',
-                overlayClassName
+                "fixed inset-0 bg-black/50 backdrop-blur-sm",
+                "flex items-center justify-center p-4",
+                overlayClassName,
               )}
             >
               {/* Modal */}
@@ -153,24 +133,24 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  'relative w-full bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl',
-                  'flex flex-col max-h-[90vh]',
+                  "relative w-full rounded-2xl bg-white shadow-2xl dark:bg-neutral-800",
+                  "flex max-h-[90vh] flex-col",
                   sizeStyles[size],
-                  className
+                  className,
                 )}
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby={title ? 'modal-title' : undefined}
-                aria-describedby={description ? 'modal-description' : undefined}
+                aria-labelledby={title ? "modal-title" : undefined}
+                aria-describedby={description ? "modal-description" : undefined}
               >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                  <div className="flex items-start justify-between p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-700">
-                    <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex items-start justify-between border-b border-neutral-100 p-4 dark:border-neutral-700 sm:p-6">
+                    <div className="min-w-0 flex-1 pr-4">
                       {title && (
                         <h2
                           id="modal-title"
-                          className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white"
+                          className="text-lg font-semibold text-neutral-900 dark:text-white sm:text-xl"
                         >
                           {title}
                         </h2>
@@ -178,7 +158,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       {description && (
                         <p
                           id="modal-description"
-                          className="text-sm text-neutral-500 dark:text-neutral-400 mt-1"
+                          className="mt-1 text-sm text-neutral-500 dark:text-neutral-400"
                         >
                           {description}
                         </p>
@@ -191,20 +171,20 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                         size="sm"
                         aria-label="Close modal"
                         onClick={onClose}
-                        className="flex-shrink-0 -mt-1 -mr-1"
+                        className="-mr-1 -mt-1 flex-shrink-0"
                       />
                     )}
                   </div>
                 )}
-                
+
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-neutral-900 dark:text-white">
+                <div className="flex-1 overflow-y-auto p-4 text-neutral-900 dark:text-white sm:p-6">
                   {children}
                 </div>
-                
+
                 {/* Footer */}
                 {footer && (
-                  <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-neutral-100 dark:border-neutral-700">
+                  <div className="flex items-center justify-end gap-3 border-t border-neutral-100 p-4 dark:border-neutral-700 sm:p-6">
                     {footer}
                   </div>
                 )}
@@ -216,33 +196,24 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     );
 
     // Portal to body
-    return typeof window !== 'undefined'
+    return typeof window !== "undefined"
       ? createPortal(modalContent, document.body)
       : null;
-  }
+  },
 );
 
-Modal.displayName = 'Modal';
+Modal.displayName = "Modal";
 
 // ========================
 // CONFIRM MODAL
 // ========================
-export interface ConfirmModalProps extends Omit<ModalProps, 'children' | 'footer'> {
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  variant?: 'default' | 'danger';
-  isLoading?: boolean;
-  children: React.ReactNode;
-}
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText = "Confirm",
+  cancelText = "Cancel",
   onConfirm,
   onCancel,
-  variant = 'default',
+  variant = "default",
   isLoading = false,
   onClose,
   children,
@@ -258,7 +229,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   // Import Button dynamically to avoid circular dependency
-  const Button = require('./Button').Button;
+  const Button = require("./Button").Button;
 
   return (
     <Modal
@@ -267,15 +238,11 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       onClose={onClose}
       footer={
         <>
-          <Button
-            variant="ghost"
-            onClick={handleCancel}
-            disabled={isLoading}
-          >
+          <Button variant="ghost" onClick={handleCancel} disabled={isLoading}>
             {cancelText}
           </Button>
           <Button
-            variant={variant === 'danger' ? 'danger' : 'primary'}
+            variant={variant === "danger" ? "danger" : "primary"}
             onClick={handleConfirm}
             isLoading={isLoading}
           >
@@ -292,26 +259,21 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 // ========================
 // ALERT MODAL
 // ========================
-export interface AlertModalProps extends Omit<ModalProps, 'children' | 'footer'> {
-  type?: 'info' | 'success' | 'warning' | 'error';
-  message: string;
-  buttonText?: string;
-}
 
 export const AlertModal: React.FC<AlertModalProps> = ({
-  type = 'info',
+  type = "info",
   message,
-  buttonText = 'OK',
+  buttonText = "OK",
   onClose,
   ...props
 }) => {
-  const Button = require('./Button').Button;
+  const Button = require("./Button").Button;
 
   const iconColors = {
-    info: 'text-info-500 bg-info-100',
-    success: 'text-success-500 bg-success-100',
-    warning: 'text-warning-500 bg-warning-100',
-    error: 'text-error-500 bg-error-100',
+    info: "text-info-500 bg-info-100",
+    success: "text-success-500 bg-success-100",
+    warning: "text-warning-500 bg-warning-100",
+    error: "text-error-500 bg-error-100",
   };
 
   return (
@@ -327,14 +289,16 @@ export const AlertModal: React.FC<AlertModalProps> = ({
       }
     >
       <div className="text-center">
-        <div className={cn(
-          'w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center',
-          iconColors[type]
-        )}>
-          {type === 'success' && '✓'}
-          {type === 'error' && '✕'}
-          {type === 'warning' && '!'}
-          {type === 'info' && 'i'}
+        <div
+          className={cn(
+            "mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full",
+            iconColors[type],
+          )}
+        >
+          {type === "success" && "✓"}
+          {type === "error" && "✕"}
+          {type === "warning" && "!"}
+          {type === "info" && "i"}
         </div>
         <p className="text-neutral-600">{message}</p>
       </div>

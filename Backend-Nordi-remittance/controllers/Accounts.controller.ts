@@ -2,16 +2,31 @@
 // ACCOUNTS CONTROLLER
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { Wallets, AccountBalances, LedgerEntries, AccountLimits } from '../models/AccountsModel.js';
-import Users from '../models/UserModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { generateWalletNumber } from '../core/helpers/generator.js';
-import { sendSuccess, sendCreated, sendPaginated, sendNotFound } from '../core/helpers/response.helper.js';
-import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
-import { constants } from '../config/env.config.js';
+import { Response, NextFunction } from "express";
+import mongoose from "mongoose";
+import type { AuthenticatedRequest } from "../types/index.js";
+import {
+  Wallets,
+  AccountBalances,
+  LedgerEntries,
+  AccountLimits,
+} from "../models/AccountsModel.js";
+import Users from "../models/UserModel.js";
+import Transactions from "../models/TransactionModel.js";
+import { generateWalletNumber } from "../core/helpers/generator.js";
+import {
+  sendSuccess,
+  sendCreated,
+  sendPaginated,
+  sendNotFound,
+} from "../core/helpers/response.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+  ForbiddenError,
+} from "../core/errors/AppError.js";
+import { constants } from "../config/env.config.js";
 
 // Redis caching imports
 import {
@@ -23,22 +38,25 @@ import {
   CACHE_TTL,
   cacheUserWallets,
   getCachedUserWallets,
-  invalidateUserWalletsCache,
-} from '../services/Redis.service.js';
+} from "../services/Redis.service.js";
 
 // WebSocket imports for real-time notifications
-import { emitToUser, broadcast, emitToRoom } from '../services/Websocket.service.js';
+import {
+  emitToUser,
+  broadcast,
+  emitToRoom,
+} from "../services/Websocket.service.js";
 
 // WebSocket event constants
 const WS_EVENTS = {
-  WALLET_CREATED: 'wallet:created',
-  WALLET_UPDATED: 'wallet:updated',
-  WALLET_CLOSED: 'wallet:closed',
-  WALLET_STATUS_CHANGED: 'wallet:status_changed',
-  BALANCE_UPDATED: 'balance:updated',
-  BENEFICIARY_ADDED: 'beneficiary:added',
-  BENEFICIARY_REMOVED: 'beneficiary:removed',
-  ACCOUNT_LIMITS_UPDATED: 'account:limits_updated',
+  WALLET_CREATED: "wallet:created",
+  WALLET_UPDATED: "wallet:updated",
+  WALLET_CLOSED: "wallet:closed",
+  WALLET_STATUS_CHANGED: "wallet:status_changed",
+  BALANCE_UPDATED: "balance:updated",
+  BENEFICIARY_ADDED: "beneficiary:added",
+  BENEFICIARY_REMOVED: "beneficiary:removed",
+  ACCOUNT_LIMITS_UPDATED: "account:limits_updated",
 } as const;
 
 // ============================================================================
@@ -49,25 +67,29 @@ const WS_EVENTS = {
  * Get user's wallets
  * GET /accounts/wallets
  */
-export async function getWallets(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getWallets(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = req.user.userId;
-    
+
     // Try to get from Redis cache first
     const cacheKey = `${CACHE_KEYS.USER_WALLETS}${userId}`;
     const cachedWallets = await cacheGet(cacheKey);
-    
+
     if (cachedWallets) {
       sendSuccess(res, { wallets: cachedWallets, cached: true });
       return;
     }
 
     const wallets = await Wallets.find({ user: userId })
-      .select('-__v')
+      .select("-__v")
       .sort({ walletType: 1, createdAt: 1 });
 
     const walletsWithStats = await Promise.all(
@@ -82,7 +104,7 @@ export async function getWallets(req: AuthenticatedRequest, res: Response, next:
           ...wallet.toObject(),
           recentTransactionsCount: recentTransactions,
         };
-      })
+      }),
     );
 
     // Cache the wallets data
@@ -98,19 +120,23 @@ export async function getWallets(req: AuthenticatedRequest, res: Response, next:
  * Get specific wallet
  * GET /accounts/wallets/:id
  */
-export async function getWalletById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getWalletById(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
     const userId = req.user.userId;
-    
+
     // Try cache first for individual wallet
     const cacheKey = `${CACHE_KEYS.WALLET}${userId}:${id}`;
     const cachedWallet = await cacheGet(cacheKey);
-    
+
     if (cachedWallet) {
       sendSuccess(res, { ...cachedWallet, cached: true });
       return;
@@ -124,7 +150,7 @@ export async function getWalletById(req: AuthenticatedRequest, res: Response, ne
     });
 
     if (!wallet) {
-      throw new NotFoundError('Wallet not found');
+      throw new NotFoundError("Wallet not found");
     }
 
     // Get limits
@@ -141,7 +167,7 @@ export async function getWalletById(req: AuthenticatedRequest, res: Response, ne
       limits,
       recentEntries,
     };
-    
+
     // Cache wallet details
     await cacheSet(cacheKey, walletData, CACHE_TTL.ACCOUNTS);
 
@@ -163,44 +189,62 @@ export async function getWalletById(req: AuthenticatedRequest, res: Response, ne
  * Create new wallet
  * POST /accounts/wallets
  */
-export async function createWallet(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createWallet(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = req.user.userId;
     const { currency, type, name } = req.body;
 
     // Validate currency
-    const supportedCurrencies = ['USD', 'EUR', 'GBP', 'NGN', 'KES', 'GHS', 'ZAR', 'CAD', 'AUD'];
+    const supportedCurrencies = [
+      "USD",
+      "EUR",
+      "GBP",
+      "NGN",
+      "KES",
+      "GHS",
+      "ZAR",
+      "CAD",
+      "AUD",
+    ];
     if (currency && !supportedCurrencies.includes(currency.toUpperCase())) {
-      throw new ValidationError(`Unsupported currency. Supported: ${supportedCurrencies.join(', ')}`);
+      throw new ValidationError(
+        `Unsupported currency. Supported: ${supportedCurrencies.join(", ")}`,
+      );
     }
 
     // Check wallet limit per user
     const existingWallets = await Wallets.countDocuments({ user: userId });
     if (existingWallets >= 5) {
-      throw new ForbiddenError('Maximum wallet limit reached (5 wallets per user)');
+      throw new ForbiddenError(
+        "Maximum wallet limit reached (5 wallets per user)",
+      );
     }
 
     // Check for duplicate currency wallet (unless it's a savings wallet)
-    if (type !== 'savings') {
+    if (type !== "savings") {
       const existingCurrencyWallet = await Wallets.findOne({
         user: userId,
-        walletType: { $ne: 'savings' },
+        walletType: { $ne: "savings" },
       });
 
       // Note: Wallet uses balances Map, so we check differently
     }
 
-    const walletCurrency = currency?.toUpperCase() || 'USD';
+    const walletCurrency = currency?.toUpperCase() || "USD";
     const wallet = new Wallets({
       user: userId,
       walletNumber: generateWalletNumber(),
       balances: new Map([[walletCurrency, 0]]),
-      status: 'active',
-      walletType: type || 'personal',
+      status: "active",
+      walletType: type || "personal",
       isPrimary: existingWallets === 0, // First wallet is primary
     });
 
@@ -209,8 +253,8 @@ export async function createWallet(req: AuthenticatedRequest, res: Response, nex
     // Create default limits
     await AccountLimits.create({
       wallet: wallet._id,
-      limitType: 'daily',
-      category: 'all',
+      limitType: "daily",
+      category: "all",
       amount: 5000,
       currency: walletCurrency,
       resetDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -218,15 +262,15 @@ export async function createWallet(req: AuthenticatedRequest, res: Response, nex
 
     // Invalidate user wallets cache
     await cacheDelete(`${CACHE_KEYS.USER_WALLETS}${userId}`);
-    
+
     // Emit WebSocket event for wallet creation
     emitToUser(userId, WS_EVENTS.WALLET_CREATED, {
       wallet: wallet.toObject(),
-      message: 'New wallet created successfully',
+      message: "New wallet created successfully",
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, { wallet }, 'Wallet created successfully');
+    sendCreated(res, { wallet }, "Wallet created successfully");
   } catch (error) {
     next(error);
   }
@@ -240,10 +284,14 @@ export async function createWallet(req: AuthenticatedRequest, res: Response, nex
  * Update wallet settings
  * PATCH /accounts/wallets/:id
  */
-export async function updateWallet(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateWallet(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = req.user.userId;
@@ -256,7 +304,7 @@ export async function updateWallet(req: AuthenticatedRequest, res: Response, nex
     });
 
     if (!wallet) {
-      throw new NotFoundError('Wallet not found');
+      throw new NotFoundError("Wallet not found");
     }
 
     if (name) {
@@ -268,7 +316,7 @@ export async function updateWallet(req: AuthenticatedRequest, res: Response, nex
       // Unset other wallets as primary
       await Wallets.updateMany(
         { user: userId, _id: { $ne: wallet._id } },
-        { isPrimary: false }
+        { isPrimary: false },
       );
       wallet.isPrimary = true;
     }
@@ -281,16 +329,16 @@ export async function updateWallet(req: AuthenticatedRequest, res: Response, nex
       cacheDelete(`${CACHE_KEYS.USER_WALLETS}${userId}`),
       cacheDelete(`${CACHE_KEYS.WALLET}${userId}:${id}`),
     ]);
-    
+
     // Emit WebSocket event for wallet update
     emitToUser(userId, WS_EVENTS.WALLET_UPDATED, {
       walletId: wallet._id,
       updates: { name, isDefault },
-      message: 'Wallet updated successfully',
+      message: "Wallet updated successfully",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { wallet }, 'Wallet updated successfully');
+    sendSuccess(res, { wallet }, "Wallet updated successfully");
   } catch (error) {
     next(error);
   }
@@ -304,10 +352,14 @@ export async function updateWallet(req: AuthenticatedRequest, res: Response, nex
  * Close/Deactivate wallet
  * POST /accounts/wallets/:id/close
  */
-export async function closeWallet(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function closeWallet(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = req.user.userId;
@@ -319,11 +371,11 @@ export async function closeWallet(req: AuthenticatedRequest, res: Response, next
     });
 
     if (!wallet) {
-      throw new NotFoundError('Wallet not found');
+      throw new NotFoundError("Wallet not found");
     }
 
     if (wallet.isPrimary) {
-      throw new ForbiddenError('Cannot close primary wallet');
+      throw new ForbiddenError("Cannot close primary wallet");
     }
 
     // Check if wallet has any balance
@@ -335,20 +387,24 @@ export async function closeWallet(req: AuthenticatedRequest, res: Response, next
     }
 
     if (hasBalance) {
-      throw new ValidationError('Please transfer or withdraw remaining balance before closing wallet');
+      throw new ValidationError(
+        "Please transfer or withdraw remaining balance before closing wallet",
+      );
     }
 
     // Check for pending transactions
     const pendingTransactions = await Transactions.countDocuments({
       wallet: wallet._id,
-      status: { $in: ['pending'] },
+      status: { $in: ["pending"] },
     });
 
     if (pendingTransactions > 0) {
-      throw new ValidationError('Cannot close wallet with pending transactions');
+      throw new ValidationError(
+        "Cannot close wallet with pending transactions",
+      );
     }
 
-    wallet.status = 'closed';
+    wallet.status = "closed";
     wallet.closedAt = new Date();
     wallet.updatedAt = new Date();
     await wallet.save();
@@ -358,16 +414,16 @@ export async function closeWallet(req: AuthenticatedRequest, res: Response, next
       cacheDelete(`${CACHE_KEYS.USER_WALLETS}${userId}`),
       cacheDelete(`${CACHE_KEYS.WALLET}${userId}:${id}`),
     ]);
-    
+
     // Emit WebSocket event for wallet closure
     emitToUser(userId, WS_EVENTS.WALLET_CLOSED, {
       walletId: wallet._id,
       walletNumber: wallet.walletNumber,
-      message: 'Wallet closed successfully',
+      message: "Wallet closed successfully",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { wallet }, 'Wallet closed successfully');
+    sendSuccess(res, { wallet }, "Wallet closed successfully");
   } catch (error) {
     next(error);
   }
@@ -381,10 +437,14 @@ export async function closeWallet(req: AuthenticatedRequest, res: Response, next
  * Get wallet balance history
  * GET /accounts/wallets/:id/history
  */
-export async function getBalanceHistory(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getBalanceHistory(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
@@ -398,7 +458,7 @@ export async function getBalanceHistory(req: AuthenticatedRequest, res: Response
     });
 
     if (!wallet) {
-      throw new NotFoundError('Wallet not found');
+      throw new NotFoundError("Wallet not found");
     }
 
     const filter: Record<string, any> = { wallet: wallet._id };
@@ -428,7 +488,12 @@ export async function getBalanceHistory(req: AuthenticatedRequest, res: Response
       LedgerEntries.countDocuments(filter),
     ]);
 
-    sendPaginated(res, entries, { page, limit, total }, 'Balance history retrieved');
+    sendPaginated(
+      res,
+      entries,
+      { page, limit, total },
+      "Balance history retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -442,19 +507,27 @@ export async function getBalanceHistory(req: AuthenticatedRequest, res: Response
  * Get account limits
  * GET /accounts/limits
  */
-export async function getAccountLimits(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAccountLimits(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
-    const user = await Users.findById(req.user.userId).select('kycStatus');
+    const user = await Users.findById(req.user.userId).select("kycStatus");
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Get limits for all wallets
-    const limits = await AccountLimits.find({ wallet: { $in: await Wallets.find({ user: req.user.userId }).distinct('_id') } }).lean();
+    const limits = await AccountLimits.find({
+      wallet: {
+        $in: await Wallets.find({ user: req.user.userId }).distinct("_id"),
+      },
+    }).lean();
 
     // Calculate used amounts for today/month
     const today = new Date();
@@ -468,14 +541,14 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
         {
           $match: {
             initiatedBy: req.user.userId,
-            status: 'completed',
+            status: "completed",
             createdAt: { $gte: today },
           },
         },
         {
           $group: {
-            _id: '$type',
-            total: { $sum: '$amount' },
+            _id: "$type",
+            total: { $sum: "$amount" },
           },
         },
       ]),
@@ -483,24 +556,28 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
         {
           $match: {
             initiatedBy: req.user.userId,
-            status: 'completed',
+            status: "completed",
             createdAt: { $gte: firstDayOfMonth },
           },
         },
         {
           $group: {
-            _id: '$type',
-            total: { $sum: '$amount' },
+            _id: "$type",
+            total: { $sum: "$amount" },
           },
         },
       ]),
     ]);
 
     // Parse usage
-    const todayTransfers = todayUsage.find(u => u._id === 'transfer')?.total || 0;
-    const todayWithdrawals = todayUsage.find(u => u._id === 'withdrawal')?.total || 0;
-    const monthTransfers = monthUsage.find(u => u._id === 'transfer')?.total || 0;
-    const monthWithdrawals = monthUsage.find(u => u._id === 'withdrawal')?.total || 0;
+    const todayTransfers =
+      todayUsage.find((u) => u._id === "transfer")?.total || 0;
+    const todayWithdrawals =
+      todayUsage.find((u) => u._id === "withdrawal")?.total || 0;
+    const monthTransfers =
+      monthUsage.find((u) => u._id === "transfer")?.total || 0;
+    const monthWithdrawals =
+      monthUsage.find((u) => u._id === "withdrawal")?.total || 0;
 
     // Base limits based on KYC status
     const baseLimits = {
@@ -520,7 +597,9 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
       },
     };
 
-    const kycLimits = baseLimits[user.kycStatus as keyof typeof baseLimits] || baseLimits.pending;
+    const kycLimits =
+      baseLimits[user.kycStatus as keyof typeof baseLimits] ||
+      baseLimits.pending;
 
     sendSuccess(res, {
       limits: {
@@ -533,7 +612,10 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
           withdrawal: {
             limit: kycLimits.dailyWithdrawal,
             used: todayWithdrawals,
-            remaining: Math.max(0, kycLimits.dailyWithdrawal - todayWithdrawals),
+            remaining: Math.max(
+              0,
+              kycLimits.dailyWithdrawal - todayWithdrawals,
+            ),
           },
         },
         monthly: {
@@ -545,7 +627,10 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
           withdrawal: {
             limit: kycLimits.monthlyWithdrawal,
             used: monthWithdrawals,
-            remaining: Math.max(0, kycLimits.monthlyWithdrawal - monthWithdrawals),
+            remaining: Math.max(
+              0,
+              kycLimits.monthlyWithdrawal - monthWithdrawals,
+            ),
           },
         },
         perTransaction: kycLimits.perTransaction,
@@ -566,22 +651,22 @@ export async function getAccountLimits(req: AuthenticatedRequest, res: Response,
  * Get account summary/dashboard data
  * GET /accounts/summary
  */
-export async function getAccountSummary(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAccountSummary(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = new mongoose.Types.ObjectId(req.user.userId);
 
-    const [
-      wallets,
-      recentTransactions,
-      monthlyStats,
-    ] = await Promise.all([
+    const [wallets, recentTransactions, monthlyStats] = await Promise.all([
       // Get all wallets
-      Wallets.find({ user: req.user.userId, status: 'active' })
-        .select('walletNumber balances walletType isPrimary')
+      Wallets.find({ user: req.user.userId, status: "active" })
+        .select("walletNumber balances walletType isPrimary")
         .lean(),
 
       // Recent transactions
@@ -597,8 +682,10 @@ export async function getAccountSummary(req: AuthenticatedRequest, res: Response
         {
           $match: {
             initiatedBy: req.user.userId,
-            status: 'completed',
-            createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+            status: "completed",
+            createdAt: {
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
           },
         },
         {
@@ -606,12 +693,20 @@ export async function getAccountSummary(req: AuthenticatedRequest, res: Response
             _id: null,
             totalIncoming: {
               $sum: {
-                $cond: [{ $in: ['$type', ['deposit', 'refund']] }, '$amount', 0],
+                $cond: [
+                  { $in: ["$type", ["deposit", "refund"]] },
+                  "$amount",
+                  0,
+                ],
               },
             },
             totalOutgoing: {
               $sum: {
-                $cond: [{ $in: ['$type', ['transfer', 'withdrawal', 'payment']] }, '$amount', 0],
+                $cond: [
+                  { $in: ["$type", ["transfer", "withdrawal", "payment"]] },
+                  "$amount",
+                  0,
+                ],
               },
             },
             transactionCount: { $sum: 1 },
@@ -622,33 +717,39 @@ export async function getAccountSummary(req: AuthenticatedRequest, res: Response
 
     // Calculate total balance across all wallets
     let totalBalance = 0;
-    wallets.forEach(w => {
+    wallets.forEach((w) => {
       if (w.balances) {
-        Object.values(Object.fromEntries(w.balances as any)).forEach((balance: any) => {
-          totalBalance += balance || 0;
-        });
+        Object.values(Object.fromEntries(w.balances as any)).forEach(
+          (balance: any) => {
+            totalBalance += balance || 0;
+          },
+        );
       }
     });
-    const primaryWallet = wallets.find(w => w.isPrimary);
+    const primaryWallet = wallets.find((w) => w.isPrimary);
 
     // Format recent transactions
-    const formattedTransactions = recentTransactions.map(tx => ({
+    const formattedTransactions = recentTransactions.map((tx) => ({
       id: tx._id,
       reference: tx.referenceNumber,
       type: tx.type,
       amount: tx.amount,
       currency: tx.currency,
       status: tx.status,
-      direction: tx.type === 'deposit' || tx.type === 'refund' ? 'in' : 'out',
+      direction: tx.type === "deposit" || tx.type === "refund" ? "in" : "out",
       createdAt: tx.createdAt,
     }));
 
-    const stats = monthlyStats[0] || { totalIncoming: 0, totalOutgoing: 0, transactionCount: 0 };
+    const stats = monthlyStats[0] || {
+      totalIncoming: 0,
+      totalOutgoing: 0,
+      transactionCount: 0,
+    };
 
     sendSuccess(res, {
       summary: {
         totalBalance,
-        primaryCurrency: 'USD', // Primary currency is derived from balances
+        primaryCurrency: "USD", // Primary currency is derived from balances
         walletsCount: wallets.length,
         monthlyStats: {
           incoming: stats.totalIncoming,
@@ -673,18 +774,22 @@ export async function getAccountSummary(req: AuthenticatedRequest, res: Response
  * Get saved beneficiaries
  * GET /accounts/beneficiaries
  */
-export async function getBeneficiaries(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getBeneficiaries(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const user = await Users.findById(req.user.userId)
-      .select('beneficiaries')
+      .select("beneficiaries")
       .lean();
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     sendSuccess(res, { beneficiaries: user.beneficiaries || [] });
@@ -697,25 +802,31 @@ export async function getBeneficiaries(req: AuthenticatedRequest, res: Response,
  * Add beneficiary
  * POST /accounts/beneficiaries
  */
-export async function addBeneficiary(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function addBeneficiary(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
-    const { accountNumber, email, name, nickname, bankName, bankCode, type } = req.body;
+    const { accountNumber, email, name, nickname, bankName, bankCode, type } =
+      req.body;
 
     if (!accountNumber && !email) {
-      throw new ValidationError('Account number or email is required');
+      throw new ValidationError("Account number or email is required");
     }
 
     // Verify beneficiary exists if internal
     if (accountNumber) {
-      const beneficiaryUser = await Users.findOne({ accountNumber })
-        .select('firstName lastName accountNumber');
-      
+      const beneficiaryUser = await Users.findOne({ accountNumber }).select(
+        "firstName lastName accountNumber",
+      );
+
       if (!beneficiaryUser) {
-        throw new NotFoundError('Beneficiary not found');
+        throw new NotFoundError("Beneficiary not found");
       }
     }
 
@@ -723,27 +834,27 @@ export async function addBeneficiary(req: AuthenticatedRequest, res: Response, n
       id: new mongoose.Types.ObjectId(),
       accountNumber,
       email,
-      name: name || 'Unknown',
+      name: name || "Unknown",
       nickname: nickname || name,
       bankName,
       bankCode,
-      type: type || 'internal',
+      type: type || "internal",
       createdAt: new Date(),
     };
 
     await Users.updateOne(
       { _id: req.user.userId },
-      { $push: { beneficiaries: beneficiary } }
+      { $push: { beneficiaries: beneficiary } },
     );
 
     // Emit WebSocket event for beneficiary added
     emitToUser(req.user.userId, WS_EVENTS.BENEFICIARY_ADDED, {
       beneficiary,
-      message: 'Beneficiary added successfully',
+      message: "Beneficiary added successfully",
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, { beneficiary }, 'Beneficiary added successfully');
+    sendCreated(res, { beneficiary }, "Beneficiary added successfully");
   } catch (error) {
     next(error);
   }
@@ -753,10 +864,14 @@ export async function addBeneficiary(req: AuthenticatedRequest, res: Response, n
  * Remove beneficiary
  * DELETE /accounts/beneficiaries/:id
  */
-export async function removeBeneficiary(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function removeBeneficiary(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
@@ -764,17 +879,17 @@ export async function removeBeneficiary(req: AuthenticatedRequest, res: Response
     const idStr = Array.isArray(id) ? id[0] : id;
     await Users.updateOne(
       { _id: req.user.userId },
-      { $pull: { beneficiaries: { id: new mongoose.Types.ObjectId(idStr) } } }
+      { $pull: { beneficiaries: { id: new mongoose.Types.ObjectId(idStr) } } },
     );
 
     // Emit WebSocket event for beneficiary removed
     emitToUser(req.user.userId, WS_EVENTS.BENEFICIARY_REMOVED, {
       beneficiaryId: idStr,
-      message: 'Beneficiary removed successfully',
+      message: "Beneficiary removed successfully",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Beneficiary removed successfully');
+    sendSuccess(res, null, "Beneficiary removed successfully");
   } catch (error) {
     next(error);
   }
@@ -788,10 +903,14 @@ export async function removeBeneficiary(req: AuthenticatedRequest, res: Response
  * Get all wallets (admin)
  * GET /accounts/admin/wallets
  */
-export async function getAllWallets(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAllWallets(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const page = parseInt(req.query.page as string) || 1;
@@ -799,13 +918,13 @@ export async function getAllWallets(req: AuthenticatedRequest, res: Response, ne
     const skip = (page - 1) * limit;
 
     const filter: Record<string, any> = {};
-    
+
     if (req.query.status) filter.status = req.query.status;
     if (req.query.userId) filter.user = req.query.userId;
 
     const [wallets, total] = await Promise.all([
       Wallets.find(filter)
-        .populate('user', 'firstName lastName email accountNumber')
+        .populate("user", "firstName lastName email accountNumber")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -823,18 +942,22 @@ export async function getAllWallets(req: AuthenticatedRequest, res: Response, ne
  * Update wallet status (admin)
  * PATCH /accounts/admin/wallets/:id/status
  */
-export async function updateWalletStatus(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateWalletStatus(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
     const { status, reason } = req.body;
 
-    const validStatuses = ['active', 'frozen', 'suspended', 'closed'];
+    const validStatuses = ["active", "frozen", "suspended", "closed"];
     if (!status || !validStatuses.includes(status)) {
-      throw new ValidationError('Invalid status');
+      throw new ValidationError("Invalid status");
     }
 
     const wallet = await Wallets.findByIdAndUpdate(
@@ -842,14 +965,14 @@ export async function updateWalletStatus(req: AuthenticatedRequest, res: Respons
       {
         status,
         updatedAt: new Date(),
-        ...(status === 'suspended' && { freezeReason: reason }),
-        ...(status === 'closed' && { closedAt: new Date() }),
+        ...(status === "suspended" && { freezeReason: reason }),
+        ...(status === "closed" && { closedAt: new Date() }),
       },
-      { new: true }
+      { new: true },
     );
 
     if (!wallet) {
-      throw new NotFoundError('Wallet not found');
+      throw new NotFoundError("Wallet not found");
     }
 
     sendSuccess(res, { wallet }, `Wallet status updated to ${status}`);

@@ -2,12 +2,16 @@
 // SECURITY MIDDLEWARE
 // ============================================================================
 
-import { Request, Response, NextFunction } from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { env, constants } from '../config/env.config.js';
-import { RateLimitExceededError, IpBlockedError, ValidationError } from '../core/errors/AppError.js';
+import { Request, Response, NextFunction } from "express";
+import helmet from "helmet";
+import cors from "cors";
+import type { AuthenticatedRequest } from "../types/index.js";
+import { env, constants } from "../config/env.config.js";
+import {
+  RateLimitExceededError,
+  IpBlockedError,
+  ValidationError,
+} from "../core/errors/AppError.js";
 
 // ============================================================================
 // CORS CONFIGURATION
@@ -20,26 +24,26 @@ export const corsMiddleware = cors({
       return callback(null, true);
     }
 
-    if (env.CORS_ORIGINS.includes(origin) || env.NODE_ENV === 'development') {
+    if (env.CORS_ORIGINS.includes(origin) || env.NODE_ENV === "development") {
       return callback(null, true);
     }
 
-    callback(new Error('Not allowed by CORS'));
+    callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Request-ID',
-    'X-Correlation-ID',
-    'X-Device-ID',
+    "Content-Type",
+    "Authorization",
+    "X-Request-ID",
+    "X-Correlation-ID",
+    "X-Device-ID",
   ],
   exposedHeaders: [
-    'X-Request-ID',
-    'X-RateLimit-Limit',
-    'X-RateLimit-Remaining',
-    'X-RateLimit-Reset',
+    "X-Request-ID",
+    "X-RateLimit-Limit",
+    "X-RateLimit-Remaining",
+    "X-RateLimit-Reset",
   ],
   maxAge: 86400, // 24 hours
 });
@@ -54,7 +58,7 @@ export const helmetMiddleware = helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
@@ -63,7 +67,7 @@ export const helmetMiddleware = helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
 });
 
 // ============================================================================
@@ -91,18 +95,20 @@ function cleanupRateLimitStore(): void {
 // Cleanup every 5 minutes
 setInterval(cleanupRateLimitStore, 5 * 60 * 1000);
 
-export function rateLimit(options: {
-  windowMs?: number;
-  maxRequests?: number;
-  keyGenerator?: (req: Request) => string;
-  message?: string;
-  skipSuccessfulRequests?: boolean;
-} = {}) {
+export function rateLimit(
+  options: {
+    windowMs?: number;
+    maxRequests?: number;
+    keyGenerator?: (req: Request) => string;
+    message?: string;
+    skipSuccessfulRequests?: boolean;
+  } = {},
+) {
   const {
     windowMs = env.RATE_LIMIT_WINDOW_MS,
     maxRequests = env.RATE_LIMIT_MAX_REQUESTS,
-    keyGenerator = (req: Request) => req.ip || 'unknown',
-    message = 'Too many requests, please try again later',
+    keyGenerator = (req: Request) => req.ip || "unknown",
+    message = "Too many requests, please try again later",
   } = options;
 
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -123,12 +129,12 @@ export function rateLimit(options: {
     const retryAfter = Math.ceil((resetAt - now) / 1000);
 
     // Set rate limit headers
-    res.setHeader('X-RateLimit-Limit', maxRequests.toString());
-    res.setHeader('X-RateLimit-Remaining', remaining.toString());
-    res.setHeader('X-RateLimit-Reset', new Date(resetAt).toISOString());
+    res.setHeader("X-RateLimit-Limit", maxRequests.toString());
+    res.setHeader("X-RateLimit-Remaining", remaining.toString());
+    res.setHeader("X-RateLimit-Reset", new Date(resetAt).toISOString());
 
     if (count > maxRequests) {
-      res.setHeader('Retry-After', retryAfter.toString());
+      res.setHeader("Retry-After", retryAfter.toString());
       return next(new RateLimitExceededError(retryAfter));
     }
 
@@ -141,7 +147,7 @@ export const authRateLimit = rateLimit({
   windowMs: constants.AUTH_RATE_LIMIT.windowMs,
   maxRequests: constants.AUTH_RATE_LIMIT.maxRequests,
   keyGenerator: (req) => `auth:${req.ip}`,
-  message: 'Too many authentication attempts, please try again later',
+  message: "Too many authentication attempts, please try again later",
 });
 
 export const transactionRateLimit = rateLimit({
@@ -151,7 +157,7 @@ export const transactionRateLimit = rateLimit({
     const authReq = req as AuthenticatedRequest;
     return `txn:${authReq.user?.userId || req.ip}`;
   },
-  message: 'Too many transaction requests, please slow down',
+  message: "Too many transaction requests, please slow down",
 });
 
 // ============================================================================
@@ -187,9 +193,9 @@ export function recordSuspiciousActivity(ip: string): void {
 export function ipBlockingMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
-  const ip = req.ip || req.socket.remoteAddress || '';
+  const ip = req.ip || req.socket.remoteAddress || "";
 
   if (isIPBlocked(ip)) {
     return next(new IpBlockedError(ip));
@@ -205,21 +211,31 @@ export function ipBlockingMiddleware(
 export function sanitizeInput(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   // Sanitize body
-  if (req.body && typeof req.body === 'object') {
+  if (req.body && typeof req.body === "object") {
     req.body = sanitizeObject(req.body);
   }
 
-  // Sanitize query params
-  if (req.query && typeof req.query === 'object') {
-    req.query = sanitizeObject(req.query as Record<string, unknown>) as typeof req.query;
+  // Sanitize query params (mutate instead of replace since it's a getter)
+  if (req.query && typeof req.query === "object") {
+    const sanitizedQuery = sanitizeObject(req.query as Record<string, unknown>);
+    for (const key in req.query) {
+      delete req.query[key];
+    }
+    Object.assign(req.query, sanitizedQuery);
   }
 
-  // Sanitize params
-  if (req.params && typeof req.params === 'object') {
-    req.params = sanitizeObject(req.params) as typeof req.params;
+  // Sanitize params (mutate instead of replace for consistency)
+  if (req.params && typeof req.params === "object") {
+    const sanitizedParams = sanitizeObject(
+      req.params as Record<string, unknown>,
+    );
+    for (const key in req.params) {
+      delete req.params[key];
+    }
+    Object.assign(req.params, sanitizedParams);
   }
 
   next();
@@ -231,13 +247,13 @@ function sanitizeObject(obj: Record<string, unknown>): Record<string, unknown> {
   for (const key in obj) {
     const value = obj[key];
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       sanitized[key] = sanitizeString(value);
     } else if (Array.isArray(value)) {
-      sanitized[key] = value.map(item => 
-        typeof item === 'string' ? sanitizeString(item) : item
+      sanitized[key] = value.map((item) =>
+        typeof item === "string" ? sanitizeString(item) : item,
       );
-    } else if (value && typeof value === 'object') {
+    } else if (value && typeof value === "object") {
       sanitized[key] = sanitizeObject(value as Record<string, unknown>);
     } else {
       sanitized[key] = value;
@@ -249,8 +265,8 @@ function sanitizeObject(obj: Record<string, unknown>): Record<string, unknown> {
 
 function sanitizeString(str: string): string {
   return str
-    .replace(/[<>]/g, '') // Remove potential HTML tags
-    .replace(/[\x00-\x1f\x7f]/g, '') // Remove control characters
+    .replace(/[<>]/g, "") // Remove potential HTML tags
+    .replace(/[\x00-\x1f\x7f]/g, "") // Remove control characters
     .trim();
 }
 
@@ -258,12 +274,17 @@ function sanitizeString(str: string): string {
 // REQUEST SIZE LIMITING
 // ============================================================================
 
-export function requestSizeLimit(maxSize: number = 10 * 1024 * 1024) { // 10MB default
+export function requestSizeLimit(maxSize: number = 10 * 1024 * 1024) {
+  // 10MB default
   return (req: Request, res: Response, next: NextFunction): void => {
-    const contentLength = parseInt(req.headers['content-length'] || '0', 10);
+    const contentLength = parseInt(req.headers["content-length"] || "0", 10);
 
     if (contentLength > maxSize) {
-      return next(new ValidationError(`Request body too large. Maximum size is ${maxSize / (1024 * 1024)}MB`));
+      return next(
+        new ValidationError(
+          `Request body too large. Maximum size is ${maxSize / (1024 * 1024)}MB`,
+        ),
+      );
     }
 
     next();
@@ -277,9 +298,12 @@ export function requestSizeLimit(maxSize: number = 10 * 1024 * 1024) { // 10MB d
 export function httpsRedirect(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
-  if (env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+  if (
+    env.NODE_ENV === "production" &&
+    req.headers["x-forwarded-proto"] !== "https"
+  ) {
     return res.redirect(301, `https://${req.headers.host}${req.url}`);
   }
   next();
@@ -289,15 +313,14 @@ export function httpsRedirect(
 // NO CACHE FOR SENSITIVE ENDPOINTS
 // ============================================================================
 
-export function noCache(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Surrogate-Control', 'no-store');
+export function noCache(req: Request, res: Response, next: NextFunction): void {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate",
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
   next();
 }
 

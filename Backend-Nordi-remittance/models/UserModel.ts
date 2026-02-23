@@ -47,7 +47,7 @@ const UserSchema: Schema = new Schema({
 
   // Step 5: Bank Account Details
   accountName: { type: String, required: true },
-  accountNumber: { type: String, required: true },
+  externalAccountNumber: { type: String, required: true },
   bankName: { type: String, required: true },
   bankAddress: { type: String, required: true },
   ibanNumber: {
@@ -113,45 +113,53 @@ const UserSchema: Schema = new Schema({
     },
   ],
   lastLogout: { type: Date },
-  
+
   // Active sessions for multi-device management
-  activeSessions: [{
-    sessionId: { type: String, required: true },
-    deviceId: { type: String },
-    deviceType: { type: String },
-    browser: { type: String },
-    os: { type: String },
-    ipAddress: { type: String },
-    location: { type: String },
-    createdAt: { type: Date, default: Date.now },
-    lastActiveAt: { type: Date, default: Date.now },
-  }],
-  
+  activeSessions: [
+    {
+      sessionId: { type: String, required: true },
+      deviceId: { type: String },
+      deviceType: { type: String },
+      browser: { type: String },
+      os: { type: String },
+      ipAddress: { type: String },
+      location: { type: String },
+      createdAt: { type: Date, default: Date.now },
+      lastActiveAt: { type: Date, default: Date.now },
+    },
+  ],
+
   // Two-factor authentication
   twoFactorSecret: { type: String },
   twoFactorEnabled: { type: Boolean, default: false },
   backupCodes: [{ type: String }],
-  
+
   // Trusted devices
-  trustedDevices: [{
-    deviceId: { type: String, required: true },
-    deviceName: { type: String },
-    deviceType: { type: String },
-    browser: { type: String },
-    os: { type: String },
-    trustedAt: { type: Date, default: Date.now },
-    lastUsedAt: { type: Date, default: Date.now },
-  }],
-  
+  trustedDevices: [
+    {
+      deviceId: { type: String, required: true },
+      deviceName: { type: String },
+      deviceType: { type: String },
+      browser: { type: String },
+      os: { type: String },
+      trustedAt: { type: Date, default: Date.now },
+      lastUsedAt: { type: Date, default: Date.now },
+    },
+  ],
+
   // Security settings
   securitySettings: {
     loginNotifications: { type: Boolean, default: true },
     transactionNotifications: { type: Boolean, default: true },
     marketingEmails: { type: Boolean, default: false },
   },
-  
+
   // Account status
-  accountStatus: { type: String, enum: ['active', 'suspended', 'banned', 'restricted'], default: 'active' },
+  accountStatus: {
+    type: String,
+    enum: ["active", "suspended", "banned", "restricted"],
+    default: "active",
+  },
 });
 
 // pre-save hook to validate that either iban or routing is provided.

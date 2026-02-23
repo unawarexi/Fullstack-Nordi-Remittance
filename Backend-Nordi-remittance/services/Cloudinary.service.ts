@@ -1,9 +1,11 @@
-import { v2 as cloudinary } from 'cloudinary';
-import * as dotenv from 'dotenv';
-import { Request } from 'express';
-import * as fs from 'fs';
-import multer from 'multer';
-import * as path from 'path';
+import { v2 as cloudinary } from "cloudinary";
+import * as dotenv from "dotenv";
+import multer from "multer";
+import {
+  extensionToMimeType,
+  allowedExtensions,
+} from "@core/utils/extentions.js";
+import path from "path";
 
 // Load environment variables
 dotenv.config();
@@ -13,89 +15,216 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
+  secure: true,
 });
 
-// Configure multer for temporary file storage
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    const uploadsDir = path.join(__dirname, '../uploads');
-    // Ensure uploads directory exists
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-    cb(null, uploadsDir);
-  },
-  filename: function(req, file, cb) {
-    // Create unique filename with original extension
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+// Configure multer for memory storage (no local files)
+const storage = multer.memoryStorage();
+
+// Enhanced file filter for all media types
+const fileFilter = (req, file, cb) => {
+  const fileExtension = path.extname(file.originalname).toLowerCase();
+  const allAllowedExtensions = Object.values(allowedExtensions).flat();
+  const allowedMimeTypes = Object.values(extensionToMimeType);
+
+  // Check if extension is valid
+  const isExtensionValid = allAllowedExtensions.includes(fileExtension);
+
+  if (!isExtensionValid) {
+    cb(
+      new Error(
+        `Invalid file extension: ${fileExtension}. Please upload a supported file type.`,
+      ),
+    );
+    return;
   }
-});
 
-// File filter for allowed image types
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'application/pdf'];
-  
-  if (allowedTypes.includes(file.mimetype)) {
+  // Check MIME type with fallback for application/octet-stream
+  const isMimeTypeValid = allowedMimeTypes.includes(file.mimetype);
+  const isGenericMimeType = file.mimetype === "application/octet-stream";
+  const expectedMimeType = extensionToMimeType[fileExtension];
+
+  if (isMimeTypeValid || (isGenericMimeType && expectedMimeType)) {
+    // Correct MIME type if it's generic but valid extension
+    if (isGenericMimeType && expectedMimeType) {
+      file.mimetype = expectedMimeType;
+    }
     cb(null, true);
   } else {
-    cb(new Error('Only .jpeg, .jpg, .png, .gif and .pdf formats are allowed'));
+    cb(
+      new Error(
+        `Invalid file type. Received: ${file.mimetype} (${fileExtension}). Expected: ${expectedMimeType || "valid file MIME type"}.`,
+      ),
+    );
   }
 };
 
-// Initialize multer upload
-export const upload = multer({ 
+// Initialize multer upload with memory storage
+export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  }
+    fileSize: 20 * 1024 * 1024, // 20MB limit
+  },
 });
 
-/**
- * Upload a file to Cloudinary
- * @param filePath - Path to the local file
- * @param folder - Cloudinary folder to upload to
- * @returns Promise resolving to the Cloudinary upload result
- */
+// Multer error handler middleware
+export function multerErrorHandler(err, req, res, next) {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        status: "error",
+        message: "File too large. Maximum size is 20MB.",
+      });
+    }
+    return res.status(400).json({
+      status: "error",
+      message: err.message,
+    });
+  } else if (err) {
+    return res.status(400).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+  next();
+}
+
+const getResourceType = (filename) => {
+  const ext = filename.toLowerCase().split(".").pop();
+
+  if (allowedExtensions.images.includes(ext)) return "image";
+  if (allowedExtensions.videos.includes(ext)) return "video";
+  if (allowedExtensions.audio.includes(ext)) return "audio"; // Cloudinary treats audio as video resource type
+  return "raw"; // For documents and other files
+};
+
+//Upload file buffer directly to Cloudinary
+
 export const uploadToCloudinary = async (
-  filePath: string, 
-  folder: string = '/projects/banking' // changed default folder
-): Promise<{ url: string; public_id: string }> => {
+  fileBuffer,
+  originalName,
+  folder = "/projects/brainbox",
+) => {
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder: folder,
-      resource_type: 'auto',
-      upload_preset: 'banking', 
+    const resourceType = getResourceType(originalName);
+    const fileExtension = originalName.split(".").pop();
+    const fileName = originalName.split(".").slice(0, -1).join(".");
+
+    console.log("Upload parameters:", {
+      originalName,
+      folder,
+      resourceType,
+      fileExtension,
+      fileName,
     });
 
-    // Delete local file after upload
-    fs.unlinkSync(filePath);
+    const uploadOptions = {
+      folder: folder, // This should be "projects/workspace"
+      resource_type: resourceType,
+      public_id: `${fileName}_${Date.now()}`,
+      use_filename: true,
+      unique_filename: true,
+    };
 
-    return { 
+    // Add transformations for images and videos
+    if (resourceType === "image") {
+      uploadOptions.transformation = [
+        { width: 1000, height: 1000, crop: "limit" },
+        { quality: "auto" },
+        { fetch_format: "auto" },
+      ];
+    } else if (resourceType === "video") {
+      uploadOptions.transformation = [
+        { quality: "auto" },
+        { fetch_format: "auto" },
+      ];
+    }
+
+    console.log("Cloudinary upload options:", uploadOptions);
+
+    // Upload buffer directly to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(uploadOptions, (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            reject(error);
+          } else {
+            console.log("Cloudinary upload success:", {
+              public_id: result.public_id,
+              secure_url: result.secure_url,
+              folder: result.folder,
+            });
+            resolve(result);
+          }
+        })
+        .end(fileBuffer);
+    });
+
+    // Validate that we got a secure_url
+    if (!result.secure_url) {
+      throw new Error("Cloudinary upload succeeded but no secure_url returned");
+    }
+
+    // Return comprehensive file information
+    return {
       url: result.secure_url,
-      public_id: result.public_id
+      public_id: result.public_id,
+      resource_type: result.resource_type,
+      format: result.format,
+      bytes: result.bytes,
+      width: result.width,
+      height: result.height,
+      duration: result.duration, // For video/audio files
+      original_filename: result.original_filename,
+      created_at: result.created_at,
+      type: resourceType,
+      filename: originalName,
     };
   } catch (error) {
-    // Delete local file if upload failed
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    console.error("Cloudinary upload error:", error);
     throw error;
   }
 };
 
-/**
- * Delete a file from Cloudinary
- * @param publicId - Public ID of the file to delete
- * @returns Promise resolving to the deletion result
- */
-export const deleteFromCloudinary = async (publicId: string): Promise<any> => {
+export const deleteFromCloudinary = async (
+  publicId,
+  resourceType = "image",
+) => {
   try {
-    return await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
+    });
+    return result;
   } catch (error) {
+    console.error("Error deleting from Cloudinary:", error);
+    throw error;
+  }
+};
+
+export const getOptimizedFileUrl = (
+  publicId,
+  resourceType = "image",
+  transformations = [],
+) => {
+  return cloudinary.url(publicId, {
+    resource_type: resourceType,
+    ...transformations,
+    secure: true,
+    quality: "auto",
+    fetch_format: "auto",
+  });
+};
+
+export const getFileMetadata = async (publicId, resourceType = "image") => {
+  try {
+    const result = await cloudinary.api.resource(publicId, {
+      resource_type: resourceType,
+    });
+    return result;
+  } catch (error) {
+    console.error("Error getting file metadata:", error);
     throw error;
   }
 };

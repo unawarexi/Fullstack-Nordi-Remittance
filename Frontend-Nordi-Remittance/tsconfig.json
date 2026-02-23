@@ -37,6 +37,6 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src", "../dashboards", "src/types/**/*.ts"],
+  "include": ["src", "src/types/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

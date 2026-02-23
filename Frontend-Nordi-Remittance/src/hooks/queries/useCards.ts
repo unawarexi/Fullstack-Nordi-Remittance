@@ -1,39 +1,14 @@
-// ============================================================================
-// CARDS HOOKS - TanStack Query hooks for card management
-// ============================================================================
-
-
-// ============================================================================
-// QUERY PARAMETER TYPES
-// ============================================================================
-
-interface CardFilters {
-  type?: CardType;
-  status?: CardStatus;
-  page?: number;
-  limit?: number;
-}
-
-interface CardTransactionFilters {
-  startDate?: string;
-  endDate?: string;
-  minAmount?: number;
-  maxAmount?: number;
-  merchantCategory?: string;
-  page?: number;
-  limit?: number;
-}
-
-// ============================================================================
-// QUERIES
-// ============================================================================
+import { cardsApi } from "../../core/api/endpoints/cards.api";
+import { useToastStore } from "../../store/toast.store";
+import { queryKeys } from "../../core/lib/queryClient";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 /**
  * Get all user cards
  */
 export const useCards = (filters?: CardFilters) => {
   return useQuery({
-    queryKey: queryKeys.cards.list(filters),
+    queryKey: queryKeys.cards.list(filters as any),
     queryFn: async () => {
       const response = await cardsApi.getAll(filters);
       return response;
@@ -91,7 +66,7 @@ export const useCardTransactions = (
   filters?: CardTransactionFilters,
 ) => {
   return useQuery({
-    queryKey: queryKeys.cards.transactions(cardId, filters),
+    queryKey: queryKeys.cards.transactions(cardId, filters as any),
     queryFn: async () => {
       const response = await cardsApi.getTransactions(cardId, filters);
       return response;

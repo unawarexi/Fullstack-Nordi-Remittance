@@ -2,585 +2,624 @@
 // UI COMPONENT TYPES - Types for all UI components (Button, Input, Card, etc.)
 // ============================================================================
 
-import { ReactNode, HTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
-import { HTMLMotionProps } from 'framer-motion';
-import type { BaseProps, SizeVariant, CompactSize } from './common.types';
+import { ReactNode } from "react";
+import { HTMLMotionProps } from "framer-motion";
 
-// ============================================================================
-// BUTTON TYPES
-// ============================================================================
+declare global {
+  // ============================================================================
+  // BUTTON TYPES
+  // ============================================================================
 
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'outline'
-  | 'ghost'
-  | 'danger'
-  | 'success'
-  | 'link';
+  type ButtonVariant =
+    | "primary"
+    | "secondary"
+    | "outline"
+    | "ghost"
+    | "danger"
+    | "success"
+    | "link";
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
-export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'size'> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  isLoading?: boolean;
-  isDisabled?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-  fullWidth?: boolean;
-  children: ReactNode;
-}
+  interface ButtonProps extends Omit<HTMLMotionProps<"button">, "size"> {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    isLoading?: boolean;
+    isDisabled?: boolean;
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
+    fullWidth?: boolean;
+    children: ReactNode;
+  }
 
-export interface IconButtonProps extends Omit<ButtonProps, 'children' | 'leftIcon' | 'rightIcon'> {
-  icon: ReactNode;
-  'aria-label': string;
-}
+  interface IconButtonProps
+    extends Omit<ButtonProps, "children" | "leftIcon" | "rightIcon"> {
+    icon: ReactNode;
+    "aria-label": string;
+  }
 
-// ============================================================================
-// INPUT TYPES
-// ============================================================================
+  // ============================================================================
+  // INPUT TYPES
+  // ============================================================================
 
-export type InputSize = 'sm' | 'md' | 'lg';
-export type InputVariant = 'outline' | 'filled' | 'flushed';
+  type InputSize = "sm" | "md" | "lg";
+  type InputVariant = "default" | "filled" | "flushed";
 
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  label?: string;
-  error?: string;
-  hint?: string;
-  size?: InputSize;
-  variant?: InputVariant;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-  leftAddon?: ReactNode;
-  rightAddon?: ReactNode;
-  isRequired?: boolean;
-  isDisabled?: boolean;
-  isReadOnly?: boolean;
-  isInvalid?: boolean;
-}
+  interface InputProps
+    extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+    label?: string;
+    helperText?: string;
+    error?: string;
+    success?: string;
+    size?: InputSize;
+    variant?: InputVariant;
+    leftIcon?: React.ReactNode;
+    rightIcon?: React.ReactNode;
+    isRequired?: boolean;
+    showPasswordToggle?: boolean;
+    fullWidth?: boolean;
+  }
 
-export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'> {
-  label?: string;
-  error?: string;
-  hint?: string;
-  size?: InputSize;
-  variant?: InputVariant;
-  isRequired?: boolean;
-  isDisabled?: boolean;
-  isReadOnly?: boolean;
-  isInvalid?: boolean;
-  resize?: 'none' | 'vertical' | 'horizontal' | 'both';
-}
+  interface TextareaProps
+    extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
+    label?: string;
+    helperText?: string;
+    error?: string;
+    size?: InputSize;
+    isRequired?: boolean;
+    resize?: "none" | "vertical" | "horizontal" | "both";
+  }
 
-// ============================================================================
-// CARD TYPES
-// ============================================================================
+  // ============================================================================
+  // CARD TYPES
+  // ============================================================================
 
-export type CardVariant = 'elevated' | 'outline' | 'filled' | 'ghost';
-export type CardSize = 'sm' | 'md' | 'lg';
+  type CardVariant = "elevated" | "outline" | "filled" | "ghost";
+  type CardSize = "sm" | "md" | "lg";
 
-export interface CardProps extends BaseProps {
-  variant?: CardVariant;
-  size?: CardSize;
-  isHoverable?: boolean;
-  isClickable?: boolean;
-  isPressable?: boolean;
-  children: ReactNode;
-  onClick?: () => void;
-}
+  interface CardProps extends BaseProps {
+    variant?: CardVariant;
+    size?: CardSize;
+    isHoverable?: boolean;
+    isClickable?: boolean;
+    isPressable?: boolean;
+    children: ReactNode;
+    onClick?: () => void;
+  }
 
-export interface CardHeaderProps extends BaseProps {
-  title?: string;
-  subtitle?: string;
-  action?: ReactNode;
-  avatar?: ReactNode;
-  children?: ReactNode;
-}
+  interface CardHeaderProps extends BaseProps {
+    title?: string;
+    subtitle?: string;
+    action?: ReactNode;
+    avatar?: ReactNode;
+    children?: ReactNode;
+  }
 
-export interface CardContentProps extends BaseProps {
-  children: ReactNode;
-  noPadding?: boolean;
-}
+  interface CardContentProps extends BaseProps {
+    children: ReactNode;
+    noPadding?: boolean;
+  }
 
-export interface CardFooterProps extends BaseProps {
-  children: ReactNode;
-  justify?: 'start' | 'center' | 'end' | 'between';
-}
+  interface CardFooterProps extends BaseProps {
+    children: ReactNode;
+    justify?: "start" | "center" | "end" | "between";
+  }
 
-export interface StatCardProps extends BaseProps {
-  title: string;
-  value: string | number;
-  change?: number;
-  changeLabel?: string;
-  icon?: ReactNode;
-  trend?: 'up' | 'down' | 'neutral';
-  isLoading?: boolean;
-}
+  interface StatCardProps extends BaseProps {
+    title: string;
+    value: string | number;
+    change?: number;
+    changeLabel?: string;
+    icon?: ReactNode;
+    trend?: "up" | "down" | "neutral";
+    isLoading?: boolean;
+  }
 
-// ============================================================================
-// BADGE TYPES
-// ============================================================================
+  // ============================================================================
+  // BADGE TYPES
+  // ============================================================================
 
-export type BadgeVariant = 'solid' | 'subtle' | 'outline' | 'dot';
-export type BadgeSize = 'xs' | 'sm' | 'md' | 'lg';
-export type BadgeColorScheme = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
+  type BadgeVariant =
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error"
+    | "info"
+    | "outline";
 
-export interface BadgeProps extends BaseProps {
-  variant?: BadgeVariant;
-  size?: BadgeSize;
-  colorScheme?: BadgeColorScheme;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-  children: ReactNode;
-}
+  type BadgeSize = "xs" | "sm" | "md" | "lg";
+  type BadgeColorScheme =
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error"
+    | "info"
+    | "neutral";
 
-export type StatusBadgeType = 'success' | 'error' | 'warning' | 'info' | 'pending' | 'inactive';
+  interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+    variant?: BadgeVariant;
+    size?: BadgeSize;
+    dot?: boolean;
+    pulse?: boolean;
+    removable?: boolean;
+    onRemove?: () => void;
+    icon?: React.ReactNode;
+    children: React.ReactNode;
+  }
 
-export interface StatusBadgeProps extends BaseProps {
-  status: StatusBadgeType;
-  label?: string;
-  showDot?: boolean;
-}
+  type StatusBadgeType =
+    | "active"
+    | "inactive"
+    | "pending"
+    | "completed"
+    | "failed"
+    | "processing"
+    | "approved"
+    | "rejected";
 
-export interface NotificationBadgeProps extends BaseProps {
-  count: number;
-  max?: number;
-  showZero?: boolean;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
-  children: ReactNode;
-}
+  interface StatusBadgeProps extends Omit<BadgeProps, "variant" | "children"> {
+    status: StatusBadgeType;
+    showDot?: boolean;
+    customLabel?: string;
+  }
 
-// ============================================================================
-// AVATAR TYPES
-// ============================================================================
+  interface NotificationBadgeProps {
+    count: number;
+    max?: number;
+    showZero?: boolean;
+    children: React.ReactNode;
+  }
 
-export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  // ============================================================================
+  // AVATAR TYPES
+  // ============================================================================
 
-export interface AvatarProps extends BaseProps {
-  src?: string;
-  alt?: string;
-  name?: string;
-  size?: AvatarSize;
-  fallback?: ReactNode;
-  showBorder?: boolean;
-  isOnline?: boolean;
-  onClick?: () => void;
-}
+  type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 
-export interface AvatarGroupProps extends BaseProps {
-  children: ReactNode;
-  max?: number;
-  size?: AvatarSize;
-  spacing?: 'tight' | 'normal' | 'loose';
-}
+  interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+    src?: string;
+    alt?: string;
+    name?: string;
+    size?: AvatarSize;
+    status?: "online" | "offline" | "away" | "busy";
+    shape?: "circle" | "square";
+    bordered?: boolean;
+    fallbackIcon?: React.ReactNode;
+  }
 
-// ============================================================================
-// MODAL TYPES
-// ============================================================================
+  interface AvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+    max?: number;
+    size?: AvatarSize;
+    spacing?: "tight" | "normal" | "loose";
+    children: React.ReactNode;
+  }
 
-export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  // ============================================================================
+  // MODAL TYPES
+  // ============================================================================
 
-export interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-  size?: ModalSize;
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
-  showCloseButton?: boolean;
-  children: ReactNode;
-  footer?: ReactNode;
-  className?: string;
-}
+  type ModalSize = "xs" | "sm" | "md" | "lg" | "xl" | "full";
 
-export interface ConfirmModalProps extends Omit<ModalProps, 'children' | 'footer'> {
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  onConfirm: () => void | Promise<void>;
-  onCancel?: () => void;
-  isDestructive?: boolean;
-  isLoading?: boolean;
-}
+  interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    size?: ModalSize;
+    closeOnOverlayClick?: boolean;
+    closeOnEsc?: boolean;
+    showCloseButton?: boolean;
+    title?: string;
+    description?: string;
+    footer?: React.ReactNode;
+    className?: string;
+    overlayClassName?: string;
+  }
 
-export interface AlertModalProps extends Omit<ModalProps, 'children' | 'footer'> {
-  type: 'success' | 'error' | 'warning' | 'info';
-  message: string;
-  description?: string;
-  buttonText?: string;
-}
+  interface ConfirmModalProps extends Omit<ModalProps, "children" | "footer"> {
+    confirmText?: string;
+    cancelText?: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+    variant?: "default" | "danger";
+    isLoading?: boolean;
+    children: React.ReactNode;
+  }
 
-// ============================================================================
-// LOADING/SPINNER TYPES
-// ============================================================================
+  interface AlertModalProps extends Omit<ModalProps, "children" | "footer"> {
+    type?: "info" | "success" | "warning" | "error";
+    message: string;
+    buttonText?: string;
+  }
 
-export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type SpinnerVariant = 'circle' | 'dots' | 'bars' | 'pulse';
+  // ============================================================================
+  // LOADING/SPINNER TYPES
+  // ============================================================================
 
-export interface SpinnerProps extends BaseProps {
-  size?: SpinnerSize;
-  variant?: SpinnerVariant;
-  color?: string;
-  thickness?: number;
-  speed?: 'slow' | 'normal' | 'fast';
-  label?: string;
-}
+  type SpinnerSize = "xs" | "sm" | "md" | "lg" | "xl";
+  type SpinnerVariant = "default" | "primary" | "white";
 
-export interface DotsLoaderProps extends BaseProps {
-  size?: SpinnerSize;
-  color?: string;
-}
+  interface SpinnerProps {
+    size?: SpinnerSize;
+    variant?: SpinnerVariant;
+    label?: string;
+    className?: string;
+  }
 
-export interface PulseLoaderProps extends BaseProps {
-  size?: CompactSize;
-  color?: string;
-}
+  interface DotsLoaderProps {
+    size?: SpinnerSize;
+    variant?: SpinnerVariant;
+    className?: string;
+  }
 
-export interface SkeletonProps extends BaseProps {
-  width?: string | number;
-  height?: string | number;
-  borderRadius?: string | number;
-  isLoaded?: boolean;
-  children?: ReactNode;
-}
+  interface PulseLoaderProps {
+    size?: SpinnerSize;
+    variant?: SpinnerVariant;
+    className?: string;
+  }
 
-export interface PageLoaderProps extends BaseProps {
-  message?: string;
-  showLogo?: boolean;
-}
+  interface SkeletonProps {
+    className?: string;
+    variant?: "text" | "circular" | "rectangular" | "rounded";
+    width?: string | number;
+    height?: string | number;
+    animation?: "pulse" | "wave" | "none";
+  }
 
-export interface OverlayLoaderProps extends BaseProps {
-  isVisible: boolean;
-  message?: string;
-  blur?: boolean;
-}
+  interface PageLoaderProps {
+    message?: string;
+    showLogo?: boolean;
+  }
 
-// ============================================================================
-// SELECT TYPES
-// ============================================================================
+  interface OverlayLoaderProps {
+    isVisible: boolean;
+    message?: string;
+  }
 
-export type SelectSize = 'sm' | 'md' | 'lg';
+  // ============================================================================
+  // SELECT TYPES
+  // ============================================================================
 
-export interface SelectOption<T = string> {
-  label: string;
-  value: T;
-  disabled?: boolean;
-  icon?: ReactNode;
-  description?: string;
-}
+  type SelectSize = "sm" | "md" | "lg";
 
-export interface SelectProps<T = string> extends Omit<BaseProps, 'onChange'> {
-  options: SelectOption<T>[];
-  value?: T;
-  defaultValue?: T;
-  onChange?: (value: T) => void;
-  placeholder?: string;
-  label?: string;
-  error?: string;
-  hint?: string;
-  size?: SelectSize;
-  isDisabled?: boolean;
-  isRequired?: boolean;
-  isSearchable?: boolean;
-  isClearable?: boolean;
-  isMulti?: boolean;
-  isLoading?: boolean;
-  menuPlacement?: 'auto' | 'top' | 'bottom';
-}
-
-// ============================================================================
-// TOAST TYPES
-// ============================================================================
-
-export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
-export type ToastPosition = 
-  | 'top-right' 
-  | 'top-left' 
-  | 'top-center' 
-  | 'bottom-right' 
-  | 'bottom-left' 
-  | 'bottom-center';
-
-export interface ToastProps {
-  id: string;
-  variant: ToastVariant;
-  title: string;
-  description?: string;
-  duration?: number;
-  isClosable?: boolean;
-  action?: {
+  interface SelectOption {
+    value: string;
     label: string;
-    onClick: () => void;
-  };
-}
+    disabled?: boolean;
+    icon?: React.ReactNode;
+    description?: string;
+  }
 
-export interface ToastContainerProps {
-  position?: ToastPosition;
-  maxToasts?: number;
-}
+  interface SelectProps {
+    options: SelectOption[];
+    value?: string;
+    defaultValue?: string;
+    onChange?: (value: string) => void;
+    placeholder?: string;
+    label?: string;
+    helperText?: string;
+    error?: string;
+    size?: SelectSize;
+    disabled?: boolean;
+    isRequired?: boolean;
+    searchable?: boolean;
+    clearable?: boolean;
+    fullWidth?: boolean;
+    className?: string;
+  }
 
-// ============================================================================
-// TOOLTIP TYPES
-// ============================================================================
+  // ============================================================================
+  // FILE UPLOAD TYPES
+  // ============================================================================
 
-export type TooltipPlacement = 
-  | 'top' 
-  | 'right' 
-  | 'bottom' 
-  | 'left' 
-  | 'top-start' 
-  | 'top-end'
-  | 'right-start'
-  | 'right-end'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left-start'
-  | 'left-end';
+  interface FileUploadProps {
+    id: string;
+    label: string;
+    accept?: string;
+    description?: string;
+    error?: string;
+    onChange: (file: File | null) => void;
+    value?: File | null;
+    required?: boolean;
+    maxSize?: number; // in MB
+  }
 
-export interface TooltipProps {
-  content: ReactNode;
-  children: ReactNode;
-  placement?: TooltipPlacement;
-  delay?: number;
-  isDisabled?: boolean;
-  className?: string;
-}
+  // ============================================================================
+  // TOAST TYPES
+  // ============================================================================
 
-// ============================================================================
-// TABS TYPES
-// ============================================================================
+  type ToastVariant = "success" | "error" | "warning" | "info";
+  type ToastPosition =
+    | "top-right"
+    | "top-left"
+    | "top-center"
+    | "bottom-right"
+    | "bottom-left"
+    | "bottom-center";
 
-export interface TabItem {
-  id: string;
-  label: string;
-  icon?: ReactNode;
-  disabled?: boolean;
-  badge?: string | number;
-}
+  interface ToastProps {
+    id: string;
+    variant: ToastVariant;
+    title: string;
+    description?: string;
+    duration?: number;
+    isClosable?: boolean;
+    action?: {
+      label: string;
+      onClick: () => void;
+    };
+  }
 
-export interface TabsProps extends BaseProps {
-  items: TabItem[];
-  activeTab: string;
-  onChange: (tabId: string) => void;
-  variant?: 'line' | 'enclosed' | 'soft-rounded' | 'solid-rounded';
-  size?: CompactSize;
-  isFullWidth?: boolean;
-}
+  interface ToastContainerProps {
+    position?: ToastPosition;
+    maxToasts?: number;
+  }
 
-export interface TabPanelProps extends BaseProps {
-  children: ReactNode;
-  isSelected?: boolean;
-}
+  // ============================================================================
+  // TOOLTIP TYPES
+  // ============================================================================
 
-// ============================================================================
-// DROPDOWN/MENU TYPES
-// ============================================================================
+  type TooltipPlacement =
+    | "top"
+    | "right"
+    | "bottom"
+    | "left"
+    | "top-start"
+    | "top-end"
+    | "right-start"
+    | "right-end"
+    | "bottom-start"
+    | "bottom-end"
+    | "left-start"
+    | "left-end";
 
-export interface MenuItem {
-  id: string;
-  label: string;
-  icon?: ReactNode;
-  onClick?: () => void;
-  href?: string;
-  disabled?: boolean;
-  danger?: boolean;
-  children?: MenuItem[];
-}
+  interface TooltipProps {
+    content: ReactNode;
+    children: ReactNode;
+    placement?: TooltipPlacement;
+    delay?: number;
+    isDisabled?: boolean;
+    className?: string;
+  }
 
-export interface DropdownProps extends BaseProps {
-  trigger: ReactNode;
-  items: MenuItem[];
-  placement?: TooltipPlacement;
-  closeOnSelect?: boolean;
-}
+  // ============================================================================
+  // TABS TYPES
+  // ============================================================================
 
-// ============================================================================
-// TABLE TYPES
-// ============================================================================
+  interface TabItem {
+    id: string;
+    label: string;
+    icon?: ReactNode;
+    disabled?: boolean;
+    badge?: string | number;
+  }
 
-export interface TableColumn<T = unknown> {
-  key: string;
-  header: string;
-  width?: string | number;
-  minWidth?: string | number;
-  maxWidth?: string | number;
-  align?: 'left' | 'center' | 'right';
-  sortable?: boolean;
-  render?: (value: unknown, row: T, index: number) => ReactNode;
-}
+  interface TabsProps extends BaseProps {
+    items: TabItem[];
+    activeTab: string;
+    onChange: (tabId: string) => void;
+    variant?: "line" | "enclosed" | "soft-rounded" | "solid-rounded";
+    size?: CompactSize;
+    isFullWidth?: boolean;
+  }
 
-export interface TableProps<T = unknown> extends BaseProps {
-  columns: TableColumn<T>[];
-  data: T[];
-  isLoading?: boolean;
-  emptyMessage?: string;
-  onRowClick?: (row: T, index: number) => void;
-  selectedRows?: number[];
-  onSelectionChange?: (selectedIndexes: number[]) => void;
-  sortConfig?: {
+  interface TabPanelProps extends BaseProps {
+    children: ReactNode;
+    isSelected?: boolean;
+  }
+
+  // ============================================================================
+  // DROPDOWN/MENU TYPES
+  // ============================================================================
+
+  interface MenuItem {
+    id: string;
+    label: string;
+    icon?: ReactNode;
+    onClick?: () => void;
+    href?: string;
+    disabled?: boolean;
+    danger?: boolean;
+    children?: MenuItem[];
+  }
+
+  interface DropdownProps extends BaseProps {
+    trigger: ReactNode;
+    items: MenuItem[];
+    placement?: TooltipPlacement;
+    closeOnSelect?: boolean;
+  }
+
+  // ============================================================================
+  // TABLE TYPES
+  // ============================================================================
+
+  interface TableColumn<T = unknown> {
     key: string;
-    direction: 'asc' | 'desc';
-  };
-  onSort?: (key: string) => void;
-  stickyHeader?: boolean;
-  striped?: boolean;
-  bordered?: boolean;
-  hoverable?: boolean;
+    header: string;
+    width?: string | number;
+    minWidth?: string | number;
+    maxWidth?: string | number;
+    align?: "left" | "center" | "right";
+    sortable?: boolean;
+    render?: (value: unknown, row: T, index: number) => ReactNode;
+  }
+
+  interface TableProps<T = unknown> extends BaseProps {
+    columns: TableColumn<T>[];
+    data: T[];
+    isLoading?: boolean;
+    emptyMessage?: string;
+    onRowClick?: (row: T, index: number) => void;
+    selectedRows?: number[];
+    onSelectionChange?: (selectedIndexes: number[]) => void;
+    sortConfig?: {
+      key: string;
+      direction: "asc" | "desc";
+    };
+    onSort?: (key: string) => void;
+    stickyHeader?: boolean;
+    striped?: boolean;
+    bordered?: boolean;
+    hoverable?: boolean;
+  }
+
+  // ============================================================================
+  // PROGRESS TYPES
+  // ============================================================================
+
+  type ProgressSize = "xs" | "sm" | "md" | "lg";
+  type ProgressVariant = "line" | "circle";
+
+  interface ProgressProps extends BaseProps {
+    value: number;
+    max?: number;
+    size?: ProgressSize;
+    variant?: ProgressVariant;
+    colorScheme?: BadgeColorScheme;
+    showValue?: boolean;
+    isIndeterminate?: boolean;
+    label?: string;
+  }
+
+  // ============================================================================
+  // SWITCH/TOGGLE TYPES
+  // ============================================================================
+
+  type SwitchSize = "sm" | "md" | "lg";
+
+  interface SwitchProps extends BaseProps {
+    checked?: boolean;
+    defaultChecked?: boolean;
+    onChange?: (checked: boolean) => void;
+    size?: SwitchSize;
+    colorScheme?: BadgeColorScheme;
+    isDisabled?: boolean;
+    label?: string;
+    "aria-label"?: string;
+  }
+
+  // ============================================================================
+  // CHECKBOX & RADIO TYPES
+  // ============================================================================
+
+  interface CheckboxProps extends BaseProps {
+    checked?: boolean;
+    defaultChecked?: boolean;
+    onChange?: (checked: boolean) => void;
+    size?: CompactSize;
+    colorScheme?: BadgeColorScheme;
+    isDisabled?: boolean;
+    isInvalid?: boolean;
+    isIndeterminate?: boolean;
+    label?: string;
+    children?: ReactNode;
+  }
+
+  interface RadioProps extends Omit<CheckboxProps, "isIndeterminate"> {
+    value: string;
+  }
+
+  interface RadioGroupProps extends BaseProps {
+    value?: string;
+    defaultValue?: string;
+    onChange?: (value: string) => void;
+    name: string;
+    orientation?: "horizontal" | "vertical";
+    spacing?: CompactSize;
+    children: ReactNode;
+  }
+
+  // ============================================================================
+  // ACCORDION TYPES
+  // ============================================================================
+
+  interface AccordionItem {
+    id: string;
+    title: string;
+    content: ReactNode;
+    icon?: ReactNode;
+    disabled?: boolean;
+  }
+
+  interface AccordionProps extends BaseProps {
+    items: AccordionItem[];
+    allowMultiple?: boolean;
+    defaultExpandedItems?: string[];
+    variant?: "outline" | "filled" | "separated";
+  }
+
+  // ============================================================================
+  // ALERT TYPES
+  // ============================================================================
+
+  type AlertStatus = "success" | "error" | "warning" | "info";
+  type AlertVariant = "subtle" | "solid" | "left-accent" | "top-accent";
+
+  interface AlertProps extends BaseProps {
+    status: AlertStatus;
+    variant?: AlertVariant;
+    title?: string;
+    description?: string;
+    icon?: ReactNode;
+    isClosable?: boolean;
+    onClose?: () => void;
+    children?: ReactNode;
+  }
+
+  // ============================================================================
+  // POPOVER TYPES
+  // ============================================================================
+
+  interface PopoverProps {
+    isOpen: boolean;
+    onClose: () => void;
+    trigger: ReactNode;
+    children: ReactNode;
+    placement?: TooltipPlacement;
+    closeOnBlur?: boolean;
+    closeOnEsc?: boolean;
+    className?: string;
+  }
+
+  // ============================================================================
+  // DRAWER TYPES
+  // ============================================================================
+
+  type DrawerPlacement = "left" | "right" | "top" | "bottom";
+  type DrawerSize = "xs" | "sm" | "md" | "lg" | "xl" | "full";
+
+  interface DrawerProps {
+    isOpen: boolean;
+    onClose: () => void;
+    placement?: DrawerPlacement;
+    size?: DrawerSize;
+    title?: string;
+    showCloseButton?: boolean;
+    closeOnOverlayClick?: boolean;
+    closeOnEsc?: boolean;
+    children: ReactNode;
+    footer?: ReactNode;
+    className?: string;
+  }
+
+  // ============================================================================
+  // PAGINATION TYPES
+  // ============================================================================
+
+  interface PaginationProps extends BaseProps {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    siblingCount?: number;
+    boundaryCount?: number;
+    showFirstLast?: boolean;
+    showPrevNext?: boolean;
+    size?: CompactSize;
+    variant?: "solid" | "outline" | "ghost";
+    isDisabled?: boolean;
+  }
 }
-
-// ============================================================================
-// PROGRESS TYPES
-// ============================================================================
-
-export type ProgressSize = 'xs' | 'sm' | 'md' | 'lg';
-export type ProgressVariant = 'line' | 'circle';
-
-export interface ProgressProps extends BaseProps {
-  value: number;
-  max?: number;
-  size?: ProgressSize;
-  variant?: ProgressVariant;
-  colorScheme?: BadgeColorScheme;
-  showValue?: boolean;
-  isIndeterminate?: boolean;
-  label?: string;
-}
-
-// ============================================================================
-// SWITCH/TOGGLE TYPES
-// ============================================================================
-
-export type SwitchSize = 'sm' | 'md' | 'lg';
-
-export interface SwitchProps extends BaseProps {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onChange?: (checked: boolean) => void;
-  size?: SwitchSize;
-  colorScheme?: BadgeColorScheme;
-  isDisabled?: boolean;
-  label?: string;
-  'aria-label'?: string;
-}
-
-// ============================================================================
-// CHECKBOX & RADIO TYPES
-// ============================================================================
-
-export interface CheckboxProps extends BaseProps {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onChange?: (checked: boolean) => void;
-  size?: CompactSize;
-  colorScheme?: BadgeColorScheme;
-  isDisabled?: boolean;
-  isInvalid?: boolean;
-  isIndeterminate?: boolean;
-  label?: string;
-  children?: ReactNode;
-}
-
-export interface RadioProps extends Omit<CheckboxProps, 'isIndeterminate'> {
-  value: string;
-}
-
-export interface RadioGroupProps extends BaseProps {
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
-  name: string;
-  orientation?: 'horizontal' | 'vertical';
-  spacing?: CompactSize;
-  children: ReactNode;
-}
-
-// ============================================================================
-// ACCORDION TYPES
-// ============================================================================
-
-export interface AccordionItem {
-  id: string;
-  title: string;
-  content: ReactNode;
-  icon?: ReactNode;
-  disabled?: boolean;
-}
-
-export interface AccordionProps extends BaseProps {
-  items: AccordionItem[];
-  allowMultiple?: boolean;
-  defaultExpandedItems?: string[];
-  variant?: 'outline' | 'filled' | 'separated';
-}
-
-// ============================================================================
-// ALERT TYPES
-// ============================================================================
-
-export type AlertStatus = 'success' | 'error' | 'warning' | 'info';
-export type AlertVariant = 'subtle' | 'solid' | 'left-accent' | 'top-accent';
-
-export interface AlertProps extends BaseProps {
-  status: AlertStatus;
-  variant?: AlertVariant;
-  title?: string;
-  description?: string;
-  icon?: ReactNode;
-  isClosable?: boolean;
-  onClose?: () => void;
-  children?: ReactNode;
-}
-
-// ============================================================================
-// POPOVER TYPES
-// ============================================================================
-
-export interface PopoverProps {
-  isOpen: boolean;
-  onClose: () => void;
-  trigger: ReactNode;
-  children: ReactNode;
-  placement?: TooltipPlacement;
-  closeOnBlur?: boolean;
-  closeOnEsc?: boolean;
-  className?: string;
-}
-
-// ============================================================================
-// DRAWER TYPES
-// ============================================================================
-
-export type DrawerPlacement = 'left' | 'right' | 'top' | 'bottom';
-export type DrawerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
-
-export interface DrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  placement?: DrawerPlacement;
-  size?: DrawerSize;
-  title?: string;
-  showCloseButton?: boolean;
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
-  children: ReactNode;
-  footer?: ReactNode;
-  className?: string;
-}
-
-// ============================================================================
-// PAGINATION TYPES
-// ============================================================================
-
-export interface PaginationProps extends BaseProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  siblingCount?: number;
-  boundaryCount?: number;
-  showFirstLast?: boolean;
-  showPrevNext?: boolean;
-  size?: CompactSize;
-  variant?: 'solid' | 'outline' | 'ghost';
-  isDisabled?: boolean;
-}
+export {};

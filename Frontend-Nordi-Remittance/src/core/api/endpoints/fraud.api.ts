@@ -2,182 +2,165 @@
 // FRAUD API - Fraud monitoring and alerts endpoints
 // ============================================================================
 
-import apiClient, { ApiResponse, PaginatedResponse } from '../client';
+import apiClient, { ApiResponse, PaginatedResponse } from "../client";
 
-const FRAUD_BASE = '/fraud';
-
-// ============================================================================
-// REQUEST TYPES
-// ============================================================================
-
-export interface FraudAlertFilters {
-  severity?: FraudAlertSeverity;
-  status?: FraudAlertStatus;
-  startDate?: string;
-  endDate?: string;
-  page?: number;
-  limit?: number;
-}
-
+const FRAUD_BASE = "/fraud";
 // ============================================================================
 // FRAUD API FUNCTIONS
 // ============================================================================
 
 export const fraudApi = {
-  // ==========================================================================
-  // ALERTS
-  // ==========================================================================
-
-  /**
-   * Get all fraud alerts
-   */
-  getAlerts: async (params?: FraudAlertFilters): Promise<PaginatedResponse<FraudAlert>> => {
-    const response = await apiClient.get<PaginatedResponse<FraudAlert>>(
-      `${FRAUD_BASE}/alerts`,
-      { params }
+  // USER: Behavior Profile
+  getBehaviorProfile: async (): Promise<ApiResponse<BehaviorProfile>> => {
+    const response = await apiClient.get<ApiResponse<BehaviorProfile>>(
+      `${FRAUD_BASE}/behavior-profile`,
     );
     return response.data;
   },
 
-  /**
-   * Get alert by ID
-   */
-  getAlertById: async (alertId: UUID): Promise<ApiResponse<FraudAlert>> => {
-    const response = await apiClient.get<ApiResponse<FraudAlert>>(
-      `${FRAUD_BASE}/alerts/${alertId}`
+  // ADMIN: Fraud Signals
+  getSignals: async (): Promise<PaginatedResponse<FraudSignal>> => {
+    const response = await apiClient.get<PaginatedResponse<FraudSignal>>(
+      `${FRAUD_BASE}/signals`,
+    );
+    return response.data;
+  },
+  getSignalById: async (signalId: UUID): Promise<ApiResponse<FraudSignal>> => {
+    const response = await apiClient.get<ApiResponse<FraudSignal>>(
+      `${FRAUD_BASE}/signals/${signalId}`,
+    );
+    return response.data;
+  },
+  updateSignal: async (
+    signalId: UUID,
+    data: Partial<FraudSignal>,
+  ): Promise<ApiResponse<FraudSignal>> => {
+    const response = await apiClient.put<ApiResponse<FraudSignal>>(
+      `${FRAUD_BASE}/signals/${signalId}`,
+      data,
     );
     return response.data;
   },
 
-  /**
-   * Get unresolved alerts count
-   */
-  getUnresolvedCount: async (): Promise<ApiResponse<{
-    total: number;
-    bySeverity: Record<FraudAlertSeverity, number>;
-  }>> => {
-    const response = await apiClient.get<ApiResponse<{
-      total: number;
-      bySeverity: Record<FraudAlertSeverity, number>;
-    }>>(`${FRAUD_BASE}/alerts/unresolved/count`);
+  // ADMIN: Fraud Cases
+  getCases: async (): Promise<PaginatedResponse<FraudCase>> => {
+    const response = await apiClient.get<PaginatedResponse<FraudCase>>(
+      `${FRAUD_BASE}/cases`,
+    );
     return response.data;
   },
-
-  /**
-   * Acknowledge an alert
-   */
-  acknowledgeAlert: async (alertId: UUID): Promise<ApiResponse<FraudAlert>> => {
-    const response = await apiClient.patch<ApiResponse<FraudAlert>>(
-      `${FRAUD_BASE}/alerts/${alertId}/acknowledge`
+  createCase: async (
+    data: Partial<FraudCase>,
+  ): Promise<ApiResponse<FraudCase>> => {
+    const response = await apiClient.post<ApiResponse<FraudCase>>(
+      `${FRAUD_BASE}/cases`,
+      data,
+    );
+    return response.data;
+  },
+  getCaseById: async (caseId: UUID): Promise<ApiResponse<FraudCase>> => {
+    const response = await apiClient.get<ApiResponse<FraudCase>>(
+      `${FRAUD_BASE}/cases/${caseId}`,
+    );
+    return response.data;
+  },
+  updateCase: async (
+    caseId: UUID,
+    data: Partial<FraudCase>,
+  ): Promise<ApiResponse<FraudCase>> => {
+    const response = await apiClient.put<ApiResponse<FraudCase>>(
+      `${FRAUD_BASE}/cases/${caseId}`,
+      data,
+    );
+    return response.data;
+  },
+  addCaseComment: async (
+    caseId: UUID,
+    comment: { author: string; content: string },
+  ): Promise<ApiResponse<FraudCase>> => {
+    const response = await apiClient.post<ApiResponse<FraudCase>>(
+      `${FRAUD_BASE}/cases/${caseId}/comments`,
+      comment,
     );
     return response.data;
   },
 
-  /**
-   * Mark alert as false positive
-   */
-  markAsFalsePositive: async (
-    alertId: UUID,
-    reason: string
-  ): Promise<ApiResponse<FraudAlert>> => {
-    const response = await apiClient.patch<ApiResponse<FraudAlert>>(
-      `${FRAUD_BASE}/alerts/${alertId}/false-positive`,
-      { reason }
+  // ADMIN: Velocity Rules
+  getVelocityRules: async (): Promise<PaginatedResponse<VelocityRule>> => {
+    const response = await apiClient.get<PaginatedResponse<VelocityRule>>(
+      `${FRAUD_BASE}/velocity-rules`,
+    );
+    return response.data;
+  },
+  createVelocityRule: async (
+    data: Partial<VelocityRule>,
+  ): Promise<ApiResponse<VelocityRule>> => {
+    const response = await apiClient.post<ApiResponse<VelocityRule>>(
+      `${FRAUD_BASE}/velocity-rules`,
+      data,
+    );
+    return response.data;
+  },
+  updateVelocityRule: async (
+    ruleId: UUID,
+    data: Partial<VelocityRule>,
+  ): Promise<ApiResponse<VelocityRule>> => {
+    const response = await apiClient.put<ApiResponse<VelocityRule>>(
+      `${FRAUD_BASE}/velocity-rules/${ruleId}`,
+      data,
+    );
+    return response.data;
+  },
+  deleteVelocityRule: async (
+    ruleId: UUID,
+  ): Promise<ApiResponse<{ message: string }>> => {
+    const response = await apiClient.delete<ApiResponse<{ message: string }>>(
+      `${FRAUD_BASE}/velocity-rules/${ruleId}`,
     );
     return response.data;
   },
 
-  // ==========================================================================
-  // REPORTING
-  // ==========================================================================
-
-  /**
-   * Report suspicious activity
-   */
-  reportSuspiciousActivity: async (data: {
-    type: 'unauthorized_access' | 'suspicious_transaction' | 'phishing' | 'other';
-    description: string;
-    transactionId?: UUID;
-    attachments?: UUID[];
-  }): Promise<ApiResponse<{
-    reportId: UUID;
-    message: string;
-  }>> => {
-    const response = await apiClient.post<ApiResponse<{
-      reportId: UUID;
-      message: string;
-    }>>(`${FRAUD_BASE}/report`, data);
+  // ADMIN: Behavior Profiles
+  getAdminBehaviorProfile: async (
+    userId: UUID,
+  ): Promise<ApiResponse<BehaviorProfile>> => {
+    const response = await apiClient.get<ApiResponse<BehaviorProfile>>(
+      `${FRAUD_BASE}/users/${userId}/behavior-profile`,
+    );
     return response.data;
   },
-
-  /**
-   * Get my fraud reports
-   */
-  getMyReports: async (params?: {
-    page?: number;
-    limit?: number;
-  }): Promise<PaginatedResponse<{
-    id: UUID;
-    type: string;
-    status: 'open' | 'investigating' | 'resolved';
-    description: string;
-    createdAt: string;
-    resolvedAt?: string;
-    resolution?: string;
-  }>> => {
-    const response = await apiClient.get<PaginatedResponse<{
-      id: UUID;
-      type: string;
-      status: 'open' | 'investigating' | 'resolved';
-      description: string;
-      createdAt: string;
-      resolvedAt?: string;
-      resolution?: string;
-    }>>(`${FRAUD_BASE}/reports`, { params });
-    return response.data;
-  },
-
-  // ==========================================================================
-  // ACCOUNT PROTECTION
-  // ==========================================================================
-
-  /**
-   * Lock account (emergency)
-   */
-  lockAccount: async (reason: string): Promise<ApiResponse<{ message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${FRAUD_BASE}/lock-account`,
-      { reason }
+  updateAdminBehaviorProfile: async (
+    userId: UUID,
+    data: Partial<BehaviorProfile>,
+  ): Promise<ApiResponse<BehaviorProfile>> => {
+    const response = await apiClient.put<ApiResponse<BehaviorProfile>>(
+      `${FRAUD_BASE}/users/${userId}/behavior-profile`,
+      data,
     );
     return response.data;
   },
 
-  /**
-   * Request account unlock
-   */
-  requestUnlock: async (data: {
-    reason: string;
-    verificationMethod: 'email' | 'phone' | 'document';
-  }): Promise<ApiResponse<{
-    requestId: UUID;
-    message: string;
-    nextSteps: string[];
-  }>> => {
-    const response = await apiClient.post<ApiResponse<{
-      requestId: UUID;
-      message: string;
-      nextSteps: string[];
-    }>>(`${FRAUD_BASE}/unlock-request`, data);
+  // ADMIN/SYSTEM: Security Events
+  getSecurityEvents: async (): Promise<PaginatedResponse<SecurityEvent>> => {
+    const response = await apiClient.get<PaginatedResponse<SecurityEvent>>(
+      `${FRAUD_BASE}/security-events`,
+    );
+    return response.data;
+  },
+  logSecurityEvent: async (
+    data: Partial<SecurityEvent>,
+  ): Promise<ApiResponse<SecurityEvent>> => {
+    const response = await apiClient.post<ApiResponse<SecurityEvent>>(
+      `${FRAUD_BASE}/security-events`,
+      data,
+    );
     return response.data;
   },
 
-  /**
-   * Block card (emergency)
-   */
-  blockCard: async (cardId: UUID, reason: string): Promise<ApiResponse<{ message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      `${FRAUD_BASE}/block-card`,
-      { cardId, reason }
+  // ADMIN: Analytics
+  getAnalytics: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(
+      `${FRAUD_BASE}/analytics`,
     );
     return response.data;
   },

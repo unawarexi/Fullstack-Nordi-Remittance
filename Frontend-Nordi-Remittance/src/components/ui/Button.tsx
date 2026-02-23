@@ -151,11 +151,6 @@ Button.displayName = "Button";
 // ========================
 // ICON BUTTON VARIANT
 // ========================
-export interface IconButtonProps
-  extends Omit<ButtonProps, "leftIcon" | "rightIcon" | "children"> {
-  icon: React.ReactNode;
-  "aria-label": string;
-}
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ icon, size = "md", className, ...props }, ref) => {

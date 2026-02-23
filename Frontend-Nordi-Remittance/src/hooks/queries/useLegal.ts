@@ -1,3 +1,7 @@
+import { legalApi } from '../../core/api/endpoints/legal.api';
+import { useToastStore } from '../../store/toast.store';
+import { queryKeys } from '../../core/lib/queryClient';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 // ============================================================================
 // LEGAL HOOKS - TanStack Query hooks for disputes, reports, and legal documents
 // ============================================================================

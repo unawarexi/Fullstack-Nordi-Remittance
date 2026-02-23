@@ -1,335 +1,236 @@
-// ============================================================================
-// ACCOUNTS HOOKS - TanStack Query hooks for account management
-// ============================================================================
-
-
-// ============================================================================
-// QUERY PARAMETER TYPES
-// ============================================================================
-
-interface AccountFilters {
-  type?: AccountType;
-  status?: string;
-  currency?: Currency;
-  page?: number;
-  limit?: number;
-}
-
-interface TransactionFilters {
-  startDate?: string;
-  endDate?: string;
-  type?: string;
-  page?: number;
-  limit?: number;
-}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { accountsApi } from "../../core/api/endpoints/accounts.api";
+declare const useToastStore: any; // Fallback if auto-imported
+declare const queryKeys: any; // Fallback if auto-imported
 
 // ============================================================================
-// QUERIES
+// WALLET QUERIES
 // ============================================================================
 
-/**
- * Get account summary with all accounts and recent transactions
- */
-export const useAccountSummary = () => {
+export const useWallets = () => {
   return useQuery({
-    queryKey: queryKeys.accounts.summary(),
+    queryKey: ["accounts", "wallets"],
     queryFn: async () => {
-      const response = await accountsApi.getSummary();
+      const response = await accountsApi.getWallets();
+      return response.data || [];
+    },
+  });
+};
+
+export const useWallet = (walletId: UUID) => {
+  return useQuery({
+    queryKey: ["accounts", "wallets", walletId],
+    queryFn: async () => {
+      const response = await accountsApi.getWalletById(walletId);
       return response.data;
     },
+    enabled: !!walletId,
   });
 };
 
-/**
- * Get all user accounts
- */
-export const useAccounts = (filters?: AccountFilters) => {
-  return useQuery({
-    queryKey: queryKeys.accounts.list(filters as Record<string, unknown>),
-    queryFn: async () => {
-      const response = await accountsApi.getAll(filters);
-      return response;
-    },
-  });
-};
-
-/**
- * Get account by ID
- */
-export const useAccount = (accountId: UUID) => {
-  return useQuery({
-    queryKey: queryKeys.accounts.detail(accountId),
-    queryFn: async () => {
-      const response = await accountsApi.getById(accountId);
-      return response.data;
-    },
-    enabled: !!accountId,
-  });
-};
-
-/**
- * Get default account
- */
-export const useDefaultAccount = () => {
-  return useQuery({
-    queryKey: [...queryKeys.accounts.all, "default"],
-    queryFn: async () => {
-      const response = await accountsApi.getDefault();
-      return response.data;
-    },
-  });
-};
-
-/**
- * Get account balance
- */
-export const useAccountBalance = (accountId: UUID) => {
-  return useQuery({
-    queryKey: queryKeys.accounts.balance(accountId),
-    queryFn: async () => {
-      const response = await accountsApi.getBalance(accountId);
-      return response.data;
-    },
-    enabled: !!accountId,
-    refetchInterval: 30000, // Refresh every 30 seconds
-  });
-};
-
-/**
- * Get account transactions
- */
-export const useAccountTransactions = (
-  accountId: UUID,
-  filters?: TransactionFilters,
+export const useBalanceHistory = (
+  walletId: UUID,
+  params?: { page?: number; limit?: number },
 ) => {
   return useQuery({
-    queryKey: queryKeys.accounts.transactions(
-      accountId,
-      filters as Record<string, unknown>,
-    ),
+    queryKey: ["accounts", "wallets", walletId, "history", params],
     queryFn: async () => {
-      const response = await accountsApi.getTransactions(accountId, filters);
-      return response;
+      const response = await accountsApi.getBalanceHistory(walletId, params);
+      return response.data;
     },
-    enabled: !!accountId,
+    enabled: !!walletId,
   });
 };
 
-/**
- * Get account limits
- */
-export const useAccountLimits = (accountId: UUID) => {
+export const useAccountLimits = () => {
   return useQuery({
-    queryKey: queryKeys.accounts.limits(accountId),
+    queryKey: ["accounts", "limits"],
     queryFn: async () => {
-      const response = await accountsApi.getLimits(accountId);
-      return response.data;
+      const response = await accountsApi.getAccountLimits();
+      return response.data || [];
     },
-    enabled: !!accountId,
   });
 };
 
-/**
- * Get supported currencies
- */
-export const useSupportedCurrencies = () => {
+export const useAccountSummary = () => {
   return useQuery({
-    queryKey: queryKeys.accounts.currencies(),
+    queryKey: ["accounts", "summary"],
     queryFn: async () => {
-      const response = await accountsApi.getSupportedCurrencies();
+      const response = await accountsApi.getAccountSummary();
       return response.data;
     },
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours
-  });
-};
-
-/**
- * Get exchange rates
- */
-export const useExchangeRates = (baseCurrency?: Currency) => {
-  return useQuery({
-    queryKey: queryKeys.accounts.exchangeRates(baseCurrency),
-    queryFn: async () => {
-      const response = await accountsApi.getExchangeRates(baseCurrency);
-      return response.data;
-    },
-    refetchInterval: 60000, // Refresh every minute
   });
 };
 
 // ============================================================================
-// MUTATIONS
+// BENEFICIARY QUERIES & MUTATIONS
 // ============================================================================
 
-/**
- * Create account mutation
- */
-export const useCreateAccount = () => {
+export const useBeneficiaries = () => {
+  return useQuery({
+    queryKey: ["accounts", "beneficiaries"],
+    queryFn: async () => {
+      const response = await accountsApi.getBeneficiaries();
+      return response.data || [];
+    },
+  });
+};
+
+export const useAddBeneficiary = () => {
   const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
 
   return useMutation({
-    mutationFn: async (data: {
-      accountType: AccountType;
-      currency: Currency;
-      name?: string;
-    }) => {
-      const response = await accountsApi.create(data);
+    mutationFn: async (data: any) => {
+      const response = await accountsApi.addBeneficiary(data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast("Account created successfully", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to create account", "error");
-    },
-  });
-};
-
-/**
- * Update account mutation
- */
-export const useUpdateAccount = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
-
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      data,
-    }: {
-      accountId: UUID;
-      data: { name?: string; dailyLimit?: number; monthlyLimit?: number };
-    }) => {
-      const response = await accountsApi.update(accountId, data);
-      return response.data;
-    },
-    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.accounts.detail(data.id),
+        queryKey: ["accounts", "beneficiaries"],
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.list() });
-      showToast("Account updated successfully", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to update account", "error");
+      showToast("Beneficiary added successfully", "success");
     },
   });
 };
 
-/**
- * Set default account mutation
- */
-export const useSetDefaultAccount = () => {
+export const useRemoveBeneficiary = () => {
   const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
 
   return useMutation({
-    mutationFn: async (accountId: UUID) => {
-      const response = await accountsApi.setDefault(accountId);
+    mutationFn: async (beneficiaryId: UUID) => {
+      const response = await accountsApi.removeBeneficiary(beneficiaryId);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast("Default account updated", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to set default account", "error");
+      queryClient.invalidateQueries({
+        queryKey: ["accounts", "beneficiaries"],
+      });
+      showToast("Beneficiary removed", "success");
     },
   });
 };
 
-/**
- * Close account mutation
- */
-export const useCloseAccount = () => {
+// ============================================================================
+// WALLET MUTATIONS
+// ============================================================================
+
+export const useCreateWallet = () => {
   const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
 
-  return useMutation({
-    mutationFn: async (accountId: UUID) => {
-      const response = await accountsApi.close(accountId);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast("Account closed successfully", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to close account", "error");
-    },
-  });
-};
-
-/**
- * Request limit increase mutation
- */
-export const useRequestLimitIncrease = () => {
-  const { showToast } = useToastStore();
-
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      data,
-    }: {
-      accountId: UUID;
-      data: {
-        limitType: "daily" | "monthly";
-        requestedLimit: number;
-        reason: string;
-      };
-    }) => {
-      const response = await accountsApi.requestLimitIncrease(accountId, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      showToast("Limit increase request submitted", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to submit request", "error");
-    },
-  });
-};
-
-/**
- * Get account statement mutation (returns download URL)
- */
-export const useGetAccountStatement = () => {
-  const { showToast } = useToastStore();
-
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      params,
-    }: {
-      accountId: UUID;
-      params: { startDate: string; endDate: string; format?: "pdf" | "csv" };
-    }) => {
-      const response = await accountsApi.getStatement(accountId, params);
-      return response.data;
-    },
-    onSuccess: () => {
-      showToast("Statement generated", "success");
-    },
-    onError: (error: Error) => {
-      showToast(error.message || "Failed to generate statement", "error");
-    },
-  });
-};
-
-/**
- * Convert currency mutation
- */
-export const useConvertCurrency = () => {
   return useMutation({
     mutationFn: async (data: {
-      fromCurrency: Currency;
-      toCurrency: Currency;
-      amount: number;
+      walletType?: "personal" | "business";
+      currency: Currency;
     }) => {
-      const response = await accountsApi.convertCurrency(data);
+      const response = await accountsApi.createWallet(data);
       return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "wallets"] });
+      showToast("Wallet created successfully", "success");
+    },
+  });
+};
+
+export const useUpdateWallet = () => {
+  const queryClient = useQueryClient();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async ({
+      walletId,
+      data,
+    }: {
+      walletId: UUID;
+      data: Partial<Wallet>;
+    }) => {
+      const response = await accountsApi.updateWallet(walletId, data);
+      return response.data;
+    },
+    onSuccess: (_, { walletId }) => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "wallets"] });
+      queryClient.invalidateQueries({
+        queryKey: ["accounts", "wallets", walletId],
+      });
+      showToast("Wallet updated successfully", "success");
+    },
+  });
+};
+
+export const useCloseWallet = () => {
+  const queryClient = useQueryClient();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async (walletId: UUID) => {
+      const response = await accountsApi.closeWallet(walletId);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "wallets"] });
+      showToast("Wallet closed successfully", "success");
+    },
+  });
+};
+
+// ============================================================================
+// ADMIN ROUTES
+// ============================================================================
+
+export const useAdminWallets = (params?: { page?: number; limit?: number }) => {
+  return useQuery({
+    queryKey: ["accounts", "admin", "wallets", params],
+    queryFn: async () => {
+      const response = await accountsApi.getAllWallets(params);
+      return response.data;
+    },
+  });
+};
+
+export const useAdminUpdateWalletStatus = () => {
+  const queryClient = useQueryClient();
+  const { showToast } =
+    typeof useToastStore === "function"
+      ? useToastStore()
+      : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async ({
+      walletId,
+      data,
+    }: {
+      walletId: UUID;
+      data: { status: "active" | "suspended" | "closed"; reason: string };
+    }) => {
+      const response = await accountsApi.updateWalletStatus(walletId, data);
+      return response.data;
+    },
+    onSuccess: (_, { walletId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["accounts", "admin", "wallets"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["accounts", "wallets", walletId],
+      });
+      showToast("Wallet status updated", "success");
     },
   });
 };
