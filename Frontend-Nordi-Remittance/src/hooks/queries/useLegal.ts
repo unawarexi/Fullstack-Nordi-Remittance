@@ -2,11 +2,6 @@
 // LEGAL HOOKS - TanStack Query hooks for disputes, reports, and legal documents
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { legalApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { DisputeStatus, UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -64,7 +59,7 @@ export const useDispute = (disputeId: UUID) => {
  */
 export const useDisputeMessages = (disputeId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.legal.dispute(disputeId), 'messages'],
+    queryKey: [...queryKeys.legal.dispute(disputeId), "messages"],
     queryFn: async () => {
       const response = await legalApi.getDisputeMessages(disputeId);
       return response.data;
@@ -79,7 +74,7 @@ export const useDisputeMessages = (disputeId: UUID) => {
  */
 export const useDisputeDocuments = (disputeId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.legal.dispute(disputeId), 'documents'],
+    queryKey: [...queryKeys.legal.dispute(disputeId), "documents"],
     queryFn: async () => {
       const response = await legalApi.getDisputeDocuments(disputeId);
       return response.data;
@@ -124,7 +119,7 @@ export const useReport = (reportId: UUID) => {
  */
 export const useReportTypes = () => {
   return useQuery({
-    queryKey: [...queryKeys.legal.all, 'report-types'],
+    queryKey: [...queryKeys.legal.all, "report-types"],
     queryFn: async () => {
       const response = await legalApi.getReportTypes();
       return response.data;
@@ -171,7 +166,7 @@ export const useLegalDocument = (documentType: string, version?: string) => {
  */
 export const useTermsAcceptanceHistory = () => {
   return useQuery({
-    queryKey: [...queryKeys.legal.all, 'terms-history'],
+    queryKey: [...queryKeys.legal.all, "terms-history"],
     queryFn: async () => {
       const response = await legalApi.getTermsAcceptanceHistory();
       return response.data;
@@ -192,7 +187,7 @@ export const useCreateDispute = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      type: 'transaction' | 'service' | 'fee' | 'other';
+      type: "transaction" | "service" | "fee" | "other";
       transactionId?: UUID;
       subject: string;
       description: string;
@@ -200,24 +195,26 @@ export const useCreateDispute = () => {
       attachments?: File[];
     }) => {
       const formData = new FormData();
-      formData.append('type', data.type);
-      if (data.transactionId) formData.append('transactionId', data.transactionId);
-      formData.append('subject', data.subject);
-      formData.append('description', data.description);
-      if (data.expectedResolution) formData.append('expectedResolution', data.expectedResolution);
+      formData.append("type", data.type);
+      if (data.transactionId)
+        formData.append("transactionId", data.transactionId);
+      formData.append("subject", data.subject);
+      formData.append("description", data.description);
+      if (data.expectedResolution)
+        formData.append("expectedResolution", data.expectedResolution);
       data.attachments?.forEach((file) => {
-        formData.append('attachments', file);
+        formData.append("attachments", file);
       });
-      
+
       const response = await legalApi.createDispute(formData);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.disputes() });
-      showToast('Dispute submitted successfully', 'success');
+      showToast("Dispute submitted successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit dispute', 'error');
+      showToast(error.message || "Failed to submit dispute", "error");
     },
   });
 };
@@ -230,30 +227,30 @@ export const useAddDisputeMessage = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      disputeId, 
-      data 
-    }: { 
-      disputeId: UUID; 
-      data: { message: string; attachments?: File[] } 
+    mutationFn: async ({
+      disputeId,
+      data,
+    }: {
+      disputeId: UUID;
+      data: { message: string; attachments?: File[] };
     }) => {
       const formData = new FormData();
-      formData.append('message', data.message);
+      formData.append("message", data.message);
       data.attachments?.forEach((file) => {
-        formData.append('attachments', file);
+        formData.append("attachments", file);
       });
-      
+
       const response = await legalApi.addDisputeMessage(disputeId, formData);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [...queryKeys.legal.dispute(variables.disputeId), 'messages'] 
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.legal.dispute(variables.disputeId), "messages"],
       });
-      showToast('Message sent', 'success');
+      showToast("Message sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send message', 'error');
+      showToast(error.message || "Failed to send message", "error");
     },
   });
 };
@@ -266,28 +263,34 @@ export const useUploadDisputeDocument = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      disputeId, 
-      data 
-    }: { 
-      disputeId: UUID; 
-      data: { document: File; description?: string } 
+    mutationFn: async ({
+      disputeId,
+      data,
+    }: {
+      disputeId: UUID;
+      data: { document: File; description?: string };
     }) => {
       const formData = new FormData();
-      formData.append('document', data.document);
-      if (data.description) formData.append('description', data.description);
-      
-      const response = await legalApi.uploadDisputeDocument(disputeId, formData);
+      formData.append("document", data.document);
+      if (data.description) formData.append("description", data.description);
+
+      const response = await legalApi.uploadDisputeDocument(
+        disputeId,
+        formData,
+      );
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [...queryKeys.legal.dispute(variables.disputeId), 'documents'] 
+      queryClient.invalidateQueries({
+        queryKey: [
+          ...queryKeys.legal.dispute(variables.disputeId),
+          "documents",
+        ],
       });
-      showToast('Document uploaded', 'success');
+      showToast("Document uploaded", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to upload document', 'error');
+      showToast(error.message || "Failed to upload document", "error");
     },
   });
 };
@@ -300,26 +303,28 @@ export const useCloseDispute = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      disputeId, 
-      data 
-    }: { 
-      disputeId: UUID; 
-      data: { 
-        reason: 'resolved' | 'withdrawn' | 'accepted_resolution'; 
-        feedback?: string 
-      } 
+    mutationFn: async ({
+      disputeId,
+      data,
+    }: {
+      disputeId: UUID;
+      data: {
+        reason: "resolved" | "withdrawn" | "accepted_resolution";
+        feedback?: string;
+      };
     }) => {
       const response = await legalApi.closeDispute(disputeId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.legal.dispute(variables.disputeId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.legal.dispute(variables.disputeId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.disputes() });
-      showToast('Dispute closed', 'success');
+      showToast("Dispute closed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to close dispute', 'error');
+      showToast(error.message || "Failed to close dispute", "error");
     },
   });
 };
@@ -332,23 +337,25 @@ export const useEscalateDispute = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      disputeId, 
-      data 
-    }: { 
-      disputeId: UUID; 
-      data: { reason: string; additionalInfo?: string } 
+    mutationFn: async ({
+      disputeId,
+      data,
+    }: {
+      disputeId: UUID;
+      data: { reason: string; additionalInfo?: string };
     }) => {
       const response = await legalApi.escalateDispute(disputeId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.legal.dispute(variables.disputeId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.legal.dispute(variables.disputeId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.disputes() });
-      showToast('Dispute escalated', 'success');
+      showToast("Dispute escalated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to escalate dispute', 'error');
+      showToast(error.message || "Failed to escalate dispute", "error");
     },
   });
 };
@@ -369,7 +376,7 @@ export const useRequestAccountStatement = () => {
       accountId: UUID;
       startDate: string;
       endDate: string;
-      format?: 'pdf' | 'csv' | 'xlsx';
+      format?: "pdf" | "csv" | "xlsx";
       includeDetails?: boolean;
     }) => {
       const response = await legalApi.requestAccountStatement(data);
@@ -377,10 +384,13 @@ export const useRequestAccountStatement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.reports() });
-      showToast('Statement requested. You will be notified when ready.', 'success');
+      showToast(
+        "Statement requested. You will be notified when ready.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request statement', 'error');
+      showToast(error.message || "Failed to request statement", "error");
     },
   });
 };
@@ -395,18 +405,25 @@ export const useRequestTaxReport = () => {
   return useMutation({
     mutationFn: async (data: {
       year: number;
-      type: 'annual_summary' | '1099' | 'interest_statement' | 'transaction_history';
-      format?: 'pdf' | 'csv';
+      type:
+        | "annual_summary"
+        | "1099"
+        | "interest_statement"
+        | "transaction_history";
+      format?: "pdf" | "csv";
     }) => {
       const response = await legalApi.requestTaxReport(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.reports() });
-      showToast('Tax report requested. You will be notified when ready.', 'success');
+      showToast(
+        "Tax report requested. You will be notified when ready.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request report', 'error');
+      showToast(error.message || "Failed to request report", "error");
     },
   });
 };
@@ -422,17 +439,17 @@ export const useRequestCustomReport = () => {
     mutationFn: async (data: {
       reportType: string;
       parameters: Record<string, unknown>;
-      format?: 'pdf' | 'csv' | 'xlsx';
+      format?: "pdf" | "csv" | "xlsx";
     }) => {
       const response = await legalApi.requestCustomReport(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.reports() });
-      showToast('Report requested', 'success');
+      showToast("Report requested", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request report', 'error');
+      showToast(error.message || "Failed to request report", "error");
     },
   });
 };
@@ -449,7 +466,7 @@ export const useDownloadReport = () => {
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to download report', 'error');
+      showToast(error.message || "Failed to download report", "error");
     },
   });
 };
@@ -471,11 +488,13 @@ export const useAcceptTerms = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...queryKeys.legal.all, 'terms-history'] });
-      showToast('Terms accepted', 'success');
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.legal.all, "terms-history"],
+      });
+      showToast("Terms accepted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to accept terms', 'error');
+      showToast(error.message || "Failed to accept terms", "error");
     },
   });
 };
@@ -488,16 +507,22 @@ export const useRequestDataExport = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data?: { includeTransactions?: boolean; includeDocuments?: boolean }) => {
+    mutationFn: async (data?: {
+      includeTransactions?: boolean;
+      includeDocuments?: boolean;
+    }) => {
       const response = await legalApi.requestDataExport(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.legal.reports() });
-      showToast('Data export requested. You will be notified when ready.', 'success');
+      showToast(
+        "Data export requested. You will be notified when ready.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request data export', 'error');
+      showToast(error.message || "Failed to request data export", "error");
     },
   });
 };
@@ -514,10 +539,10 @@ export const useRequestAccountDeletion = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Account deletion request submitted', 'info');
+      showToast("Account deletion request submitted", "info");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request account deletion', 'error');
+      showToast(error.message || "Failed to request account deletion", "error");
     },
   });
 };

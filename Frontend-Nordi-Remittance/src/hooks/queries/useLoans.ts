@@ -2,16 +2,6 @@
 // LOANS HOOKS - TanStack Query hooks for loan management
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { loansApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { 
-  LoanType, 
-  LoanStatus, 
-  LoanApplication,
-  UUID 
-} from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -66,7 +56,7 @@ export const useLoan = (loanId: UUID) => {
  */
 export const useLoanProducts = (filters?: LoanProductFilters) => {
   return useQuery({
-    queryKey: [...queryKeys.loans.all, 'products', filters],
+    queryKey: [...queryKeys.loans.all, "products", filters],
     queryFn: async () => {
       const response = await loansApi.getProducts(filters);
       return response.data;
@@ -83,7 +73,7 @@ export const useLoanEligibility = (data: {
   termMonths: number;
 }) => {
   return useQuery({
-    queryKey: [...queryKeys.loans.all, 'eligibility', data],
+    queryKey: [...queryKeys.loans.all, "eligibility", data],
     queryFn: async () => {
       const response = await loansApi.checkEligibility(data);
       return response.data;
@@ -109,7 +99,10 @@ export const useLoanSchedule = (loanId: UUID) => {
 /**
  * Get loan payment history
  */
-export const useLoanPayments = (loanId: UUID, params?: { page?: number; limit?: number }) => {
+export const useLoanPayments = (
+  loanId: UUID,
+  params?: { page?: number; limit?: number },
+) => {
   return useQuery({
     queryKey: queryKeys.loans.payments(loanId, params),
     queryFn: async () => {
@@ -125,7 +118,7 @@ export const useLoanPayments = (loanId: UUID, params?: { page?: number; limit?: 
  */
 export const useLoanDocuments = (loanId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.loans.detail(loanId), 'documents'],
+    queryKey: [...queryKeys.loans.detail(loanId), "documents"],
     queryFn: async () => {
       const response = await loansApi.getDocuments(loanId);
       return response.data;
@@ -139,7 +132,7 @@ export const useLoanDocuments = (loanId: UUID) => {
  */
 export const useNextLoanPayment = (loanId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.loans.detail(loanId), 'next-payment'],
+    queryKey: [...queryKeys.loans.detail(loanId), "next-payment"],
     queryFn: async () => {
       const response = await loansApi.getNextPayment(loanId);
       return response.data;
@@ -157,7 +150,7 @@ export const useCalculateEmi = (data: {
   termMonths: number;
 }) => {
   return useQuery({
-    queryKey: [...queryKeys.loans.all, 'emi-calculator', data],
+    queryKey: [...queryKeys.loans.all, "emi-calculator", data],
     queryFn: async () => {
       const response = await loansApi.calculateEmi(data);
       return response.data;
@@ -184,10 +177,10 @@ export const useApplyForLoan = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
-      showToast('Loan application submitted successfully', 'success');
+      showToast("Loan application submitted successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit loan application', 'error');
+      showToast(error.message || "Failed to submit loan application", "error");
     },
   });
 };
@@ -200,30 +193,36 @@ export const useMakeLoanPayment = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
-      data: { 
-        amount: number; 
-        accountId: UUID; 
-        paymentType?: 'regular' | 'extra' | 'payoff';
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
+      data: {
+        amount: number;
+        accountId: UUID;
+        paymentType?: "regular" | "extra" | "payoff";
         pin?: string;
-      } 
+      };
     }) => {
       const response = await loansApi.makePayment(loanId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.detail(variables.loanId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.schedule(variables.loanId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.payments(variables.loanId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.detail(variables.loanId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.schedule(variables.loanId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.payments(variables.loanId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Payment successful', 'success');
+      showToast("Payment successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to process payment', 'error');
+      showToast(error.message || "Failed to process payment", "error");
     },
   });
 };
@@ -236,26 +235,28 @@ export const useSetupAutoPay = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
       data: {
         accountId: UUID;
         paymentDay: number;
-        autoPayAmount?: 'minimum' | 'full';
-      }
+        autoPayAmount?: "minimum" | "full";
+      };
     }) => {
       const response = await loansApi.setupAutoPay(loanId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.detail(variables.loanId) });
-      showToast('Auto-pay enabled', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.detail(variables.loanId),
+      });
+      showToast("Auto-pay enabled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to setup auto-pay', 'error');
+      showToast(error.message || "Failed to setup auto-pay", "error");
     },
   });
 };
@@ -273,11 +274,13 @@ export const useCancelAutoPay = () => {
       return response.data;
     },
     onSuccess: (_, loanId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.detail(loanId) });
-      showToast('Auto-pay disabled', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.detail(loanId),
+      });
+      showToast("Auto-pay disabled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to cancel auto-pay', 'error');
+      showToast(error.message || "Failed to cancel auto-pay", "error");
     },
   });
 };
@@ -290,25 +293,27 @@ export const useRequestLoanExtension = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
       data: {
         extensionMonths: number;
         reason: string;
-      }
+      };
     }) => {
       const response = await loansApi.requestExtension(loanId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.detail(variables.loanId) });
-      showToast('Extension request submitted', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.detail(variables.loanId),
+      });
+      showToast("Extension request submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request extension', 'error');
+      showToast(error.message || "Failed to request extension", "error");
     },
   });
 };
@@ -321,26 +326,28 @@ export const useRequestPaymentDeferral = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
       data: {
         deferralMonths: number;
         reason: string;
         supportingDocuments?: string[];
-      }
+      };
     }) => {
       const response = await loansApi.requestDeferral(loanId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.loans.detail(variables.loanId) });
-      showToast('Deferral request submitted', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.loans.detail(variables.loanId),
+      });
+      showToast("Deferral request submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request deferral', 'error');
+      showToast(error.message || "Failed to request deferral", "error");
     },
   });
 };
@@ -353,25 +360,25 @@ export const useRefinanceLoan = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
       data: {
         newTermMonths: number;
         newInterestRate?: number;
-      }
+      };
     }) => {
       const response = await loansApi.refinance(loanId, data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
-      showToast('Refinance application submitted', 'success');
+      showToast("Refinance application submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to refinance', 'error');
+      showToast(error.message || "Failed to refinance", "error");
     },
   });
 };
@@ -384,22 +391,28 @@ export const useUploadLoanDocuments = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ loanId, documents }: { loanId: UUID; documents: File[] }) => {
+    mutationFn: async ({
+      loanId,
+      documents,
+    }: {
+      loanId: UUID;
+      documents: File[];
+    }) => {
       const formData = new FormData();
       documents.forEach((doc) => {
-        formData.append('documents', doc);
+        formData.append("documents", doc);
       });
       const response = await loansApi.uploadDocuments(loanId, formData);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [...queryKeys.loans.detail(variables.loanId), 'documents'] 
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.loans.detail(variables.loanId), "documents"],
       });
-      showToast('Documents uploaded successfully', 'success');
+      showToast("Documents uploaded successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to upload documents', 'error');
+      showToast(error.message || "Failed to upload documents", "error");
     },
   });
 };
@@ -411,12 +424,18 @@ export const useGetPayoffQuote = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ loanId, payoffDate }: { loanId: UUID; payoffDate?: string }) => {
+    mutationFn: async ({
+      loanId,
+      payoffDate,
+    }: {
+      loanId: UUID;
+      payoffDate?: string;
+    }) => {
       const response = await loansApi.getPayoffQuote(loanId, payoffDate);
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to get payoff quote', 'error');
+      showToast(error.message || "Failed to get payoff quote", "error");
     },
   });
 };
@@ -429,16 +448,22 @@ export const useCancelLoanApplication = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ loanId, reason }: { loanId: UUID; reason?: string }) => {
+    mutationFn: async ({
+      loanId,
+      reason,
+    }: {
+      loanId: UUID;
+      reason?: string;
+    }) => {
       const response = await loansApi.cancelApplication(loanId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
-      showToast('Application cancelled', 'success');
+      showToast("Application cancelled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to cancel application', 'error');
+      showToast(error.message || "Failed to cancel application", "error");
     },
   });
 };

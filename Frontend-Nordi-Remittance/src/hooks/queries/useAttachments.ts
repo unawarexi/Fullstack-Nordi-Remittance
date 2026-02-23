@@ -2,18 +2,13 @@
 // ATTACHMENTS HOOKS - TanStack Query hooks for file management
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { attachmentsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
 // ============================================================================
 
 interface AttachmentFilters {
-  category?: 'document' | 'image' | 'other';
+  category?: "document" | "image" | "other";
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -56,7 +51,7 @@ export const useAttachment = (attachmentId: UUID) => {
  */
 export const useAttachmentDownloadUrl = (attachmentId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.attachments.detail(attachmentId), 'download'],
+    queryKey: [...queryKeys.attachments.detail(attachmentId), "download"],
     queryFn: async () => {
       const response = await attachmentsApi.getDownloadUrl(attachmentId);
       return response.data;
@@ -96,7 +91,7 @@ export const useUploadAttachment = () => {
       metadata,
     }: {
       file: File;
-      category?: 'document' | 'image' | 'other';
+      category?: "document" | "image" | "other";
       metadata?: Record<string, unknown>;
     }) => {
       const response = await attachmentsApi.upload(file, category, metadata);
@@ -104,11 +99,13 @@ export const useUploadAttachment = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attachments.list() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.attachments.storage() });
-      showToast('File uploaded successfully', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attachments.storage(),
+      });
+      showToast("File uploaded successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to upload file', 'error');
+      showToast(error.message || "Failed to upload file", "error");
     },
   });
 };
@@ -126,18 +123,20 @@ export const useUploadMultipleAttachments = () => {
       category,
     }: {
       files: File[];
-      category?: 'document' | 'image' | 'other';
+      category?: "document" | "image" | "other";
     }) => {
       const response = await attachmentsApi.uploadMultiple(files, category);
       return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attachments.list() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.attachments.storage() });
-      showToast(`${data.length} files uploaded successfully`, 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attachments.storage(),
+      });
+      showToast(`${data.length} files uploaded successfully`, "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to upload files', 'error');
+      showToast(error.message || "Failed to upload files", "error");
     },
   });
 };
@@ -165,10 +164,10 @@ export const useUpdateAttachment = () => {
         queryKey: queryKeys.attachments.detail(variables.attachmentId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.attachments.list() });
-      showToast('Attachment updated', 'success');
+      showToast("Attachment updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update attachment', 'error');
+      showToast(error.message || "Failed to update attachment", "error");
     },
   });
 };
@@ -187,11 +186,13 @@ export const useDeleteAttachment = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attachments.list() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.attachments.storage() });
-      showToast('Attachment deleted', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attachments.storage(),
+      });
+      showToast("Attachment deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete attachment', 'error');
+      showToast(error.message || "Failed to delete attachment", "error");
     },
   });
 };
@@ -210,11 +211,13 @@ export const useDeleteMultipleAttachments = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attachments.list() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.attachments.storage() });
-      showToast(`${data.deleted} attachments deleted`, 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attachments.storage(),
+      });
+      showToast(`${data.deleted} attachments deleted`, "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete attachments', 'error');
+      showToast(error.message || "Failed to delete attachments", "error");
     },
   });
 };

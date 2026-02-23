@@ -2,16 +2,6 @@
 // INVESTMENTS HOOKS - TanStack Query hooks for investments and savings
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { investmentsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { 
-  InvestmentType, 
-  InvestmentStatus,
-  CreateInvestmentRequest,
-  UUID 
-} from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -27,7 +17,7 @@ interface InvestmentFilters {
 interface ProductFilters {
   type?: InvestmentType;
   minInvestment?: number;
-  riskLevel?: 'low' | 'medium' | 'high';
+  riskLevel?: "low" | "medium" | "high";
 }
 
 // ============================================================================
@@ -66,7 +56,7 @@ export const useInvestment = (investmentId: UUID) => {
  */
 export const useInvestmentPortfolio = () => {
   return useQuery({
-    queryKey: [...queryKeys.investments.all, 'portfolio'],
+    queryKey: [...queryKeys.investments.all, "portfolio"],
     queryFn: async () => {
       const response = await investmentsApi.getPortfolio();
       return response.data;
@@ -105,13 +95,20 @@ export const useInvestmentProduct = (productId: UUID) => {
  * Get investment performance
  */
 export const useInvestmentPerformance = (
-  investmentId: UUID, 
-  period?: '1M' | '3M' | '6M' | '1Y' | 'ALL'
+  investmentId: UUID,
+  period?: "1M" | "3M" | "6M" | "1Y" | "ALL",
 ) => {
   return useQuery({
-    queryKey: [...queryKeys.investments.detail(investmentId), 'performance', period],
+    queryKey: [
+      ...queryKeys.investments.detail(investmentId),
+      "performance",
+      period,
+    ],
     queryFn: async () => {
-      const response = await investmentsApi.getPerformance(investmentId, period);
+      const response = await investmentsApi.getPerformance(
+        investmentId,
+        period,
+      );
       return response.data;
     },
     enabled: !!investmentId,
@@ -123,12 +120,19 @@ export const useInvestmentPerformance = (
  */
 export const useInvestmentTransactions = (
   investmentId: UUID,
-  params?: { page?: number; limit?: number }
+  params?: { page?: number; limit?: number },
 ) => {
   return useQuery({
-    queryKey: [...queryKeys.investments.detail(investmentId), 'transactions', params],
+    queryKey: [
+      ...queryKeys.investments.detail(investmentId),
+      "transactions",
+      params,
+    ],
     queryFn: async () => {
-      const response = await investmentsApi.getTransactions(investmentId, params);
+      const response = await investmentsApi.getTransactions(
+        investmentId,
+        params,
+      );
       return response;
     },
     enabled: !!investmentId,
@@ -171,7 +175,7 @@ export const useSavingsGoal = (goalId: UUID) => {
  */
 export const useSavingsGoalProgress = (goalId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.investments.savingsGoal(goalId), 'progress'],
+    queryKey: [...queryKeys.investments.savingsGoal(goalId), "progress"],
     queryFn: async () => {
       const response = await investmentsApi.getSavingsGoalProgress(goalId);
       return response.data;
@@ -199,10 +203,10 @@ export const useCreateInvestment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.investments.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Investment created successfully', 'success');
+      showToast("Investment created successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create investment', 'error');
+      showToast(error.message || "Failed to create investment", "error");
     },
   });
 };
@@ -215,24 +219,26 @@ export const useTopUpInvestment = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      investmentId, 
-      data 
-    }: { 
-      investmentId: UUID; 
-      data: { amount: number; accountId: UUID; pin?: string } 
+    mutationFn: async ({
+      investmentId,
+      data,
+    }: {
+      investmentId: UUID;
+      data: { amount: number; accountId: UUID; pin?: string };
     }) => {
       const response = await investmentsApi.topUp(investmentId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.detail(variables.investmentId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.detail(variables.investmentId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.investments.list() });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Top-up successful', 'success');
+      showToast("Top-up successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to top up investment', 'error');
+      showToast(error.message || "Failed to top up investment", "error");
     },
   });
 };
@@ -245,24 +251,26 @@ export const useWithdrawInvestment = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      investmentId, 
-      data 
-    }: { 
-      investmentId: UUID; 
-      data: { amount: number; accountId: UUID; pin?: string } 
+    mutationFn: async ({
+      investmentId,
+      data,
+    }: {
+      investmentId: UUID;
+      data: { amount: number; accountId: UUID; pin?: string };
     }) => {
       const response = await investmentsApi.withdraw(investmentId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.detail(variables.investmentId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.detail(variables.investmentId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.investments.list() });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Withdrawal successful', 'success');
+      showToast("Withdrawal successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to withdraw', 'error');
+      showToast(error.message || "Failed to withdraw", "error");
     },
   });
 };
@@ -275,12 +283,12 @@ export const useCloseInvestment = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      investmentId, 
-      data 
-    }: { 
-      investmentId: UUID; 
-      data: { destinationAccountId: UUID; pin?: string; reason?: string } 
+    mutationFn: async ({
+      investmentId,
+      data,
+    }: {
+      investmentId: UUID;
+      data: { destinationAccountId: UUID; pin?: string; reason?: string };
     }) => {
       const response = await investmentsApi.close(investmentId, data);
       return response.data;
@@ -288,10 +296,10 @@ export const useCloseInvestment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.investments.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Investment closed', 'success');
+      showToast("Investment closed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to close investment', 'error');
+      showToast(error.message || "Failed to close investment", "error");
     },
   });
 };
@@ -304,29 +312,34 @@ export const useSetupRecurringInvestment = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      investmentId, 
-      data 
-    }: { 
-      investmentId: UUID; 
+    mutationFn: async ({
+      investmentId,
+      data,
+    }: {
+      investmentId: UUID;
       data: {
         amount: number;
         accountId: UUID;
-        frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+        frequency: "daily" | "weekly" | "biweekly" | "monthly";
         dayOfWeek?: number;
         dayOfMonth?: number;
         startDate?: string;
-      }
+      };
     }) => {
       const response = await investmentsApi.setupRecurring(investmentId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.detail(variables.investmentId) });
-      showToast('Recurring investment setup', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.detail(variables.investmentId),
+      });
+      showToast("Recurring investment setup", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to setup recurring investment', 'error');
+      showToast(
+        error.message || "Failed to setup recurring investment",
+        "error",
+      );
     },
   });
 };
@@ -344,11 +357,16 @@ export const useCancelRecurringInvestment = () => {
       return response.data;
     },
     onSuccess: (_, investmentId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.detail(investmentId) });
-      showToast('Recurring investment cancelled', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.detail(investmentId),
+      });
+      showToast("Recurring investment cancelled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to cancel recurring investment', 'error');
+      showToast(
+        error.message || "Failed to cancel recurring investment",
+        "error",
+      );
     },
   });
 };
@@ -375,18 +393,20 @@ export const useCreateSavingsGoal = () => {
       autoSave?: {
         enabled: boolean;
         amount: number;
-        frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+        frequency: "daily" | "weekly" | "biweekly" | "monthly";
       };
     }) => {
       const response = await investmentsApi.createSavingsGoal(data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoals() });
-      showToast('Savings goal created', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoals(),
+      });
+      showToast("Savings goal created", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create savings goal', 'error');
+      showToast(error.message || "Failed to create savings goal", "error");
     },
   });
 };
@@ -399,29 +419,33 @@ export const useUpdateSavingsGoal = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      goalId, 
-      data 
-    }: { 
-      goalId: UUID; 
+    mutationFn: async ({
+      goalId,
+      data,
+    }: {
+      goalId: UUID;
       data: Partial<{
         name: string;
         targetAmount: number;
         targetDate: string;
         category: string;
         imageUrl: string;
-      }>
+      }>;
     }) => {
       const response = await investmentsApi.updateSavingsGoal(goalId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoal(variables.goalId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoals() });
-      showToast('Savings goal updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoal(variables.goalId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoals(),
+      });
+      showToast("Savings goal updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update savings goal', 'error');
+      showToast(error.message || "Failed to update savings goal", "error");
     },
   });
 };
@@ -434,24 +458,28 @@ export const useAddToSavingsGoal = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      goalId, 
-      data 
-    }: { 
-      goalId: UUID; 
-      data: { amount: number; accountId: UUID; pin?: string }
+    mutationFn: async ({
+      goalId,
+      data,
+    }: {
+      goalId: UUID;
+      data: { amount: number; accountId: UUID; pin?: string };
     }) => {
       const response = await investmentsApi.addToSavingsGoal(goalId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoal(variables.goalId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoals() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoal(variables.goalId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoals(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Added to savings goal', 'success');
+      showToast("Added to savings goal", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to add to savings goal', 'error');
+      showToast(error.message || "Failed to add to savings goal", "error");
     },
   });
 };
@@ -464,24 +492,31 @@ export const useWithdrawFromSavingsGoal = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      goalId, 
-      data 
-    }: { 
-      goalId: UUID; 
-      data: { amount: number; accountId: UUID; pin?: string; reason?: string }
+    mutationFn: async ({
+      goalId,
+      data,
+    }: {
+      goalId: UUID;
+      data: { amount: number; accountId: UUID; pin?: string; reason?: string };
     }) => {
-      const response = await investmentsApi.withdrawFromSavingsGoal(goalId, data);
+      const response = await investmentsApi.withdrawFromSavingsGoal(
+        goalId,
+        data,
+      );
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoal(variables.goalId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoals() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoal(variables.goalId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoals(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Withdrawal successful', 'success');
+      showToast("Withdrawal successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to withdraw', 'error');
+      showToast(error.message || "Failed to withdraw", "error");
     },
   });
 };
@@ -494,17 +529,28 @@ export const useDeleteSavingsGoal = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ goalId, transferAccountId }: { goalId: UUID; transferAccountId: UUID }) => {
-      const response = await investmentsApi.deleteSavingsGoal(goalId, transferAccountId);
+    mutationFn: async ({
+      goalId,
+      transferAccountId,
+    }: {
+      goalId: UUID;
+      transferAccountId: UUID;
+    }) => {
+      const response = await investmentsApi.deleteSavingsGoal(
+        goalId,
+        transferAccountId,
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoals() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoals(),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Savings goal deleted', 'success');
+      showToast("Savings goal deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete savings goal', 'error');
+      showToast(error.message || "Failed to delete savings goal", "error");
     },
   });
 };
@@ -517,27 +563,32 @@ export const useUpdateAutoSave = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      goalId, 
-      data 
-    }: { 
-      goalId: UUID; 
+    mutationFn: async ({
+      goalId,
+      data,
+    }: {
+      goalId: UUID;
       data: {
         enabled: boolean;
         amount?: number;
-        frequency?: 'daily' | 'weekly' | 'biweekly' | 'monthly';
+        frequency?: "daily" | "weekly" | "biweekly" | "monthly";
         accountId?: UUID;
-      }
+      };
     }) => {
       const response = await investmentsApi.updateAutoSave(goalId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.investments.savingsGoal(variables.goalId) });
-      showToast(variables.data.enabled ? 'Auto-save enabled' : 'Auto-save disabled', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.investments.savingsGoal(variables.goalId),
+      });
+      showToast(
+        variables.data.enabled ? "Auto-save enabled" : "Auto-save disabled",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update auto-save', 'error');
+      showToast(error.message || "Failed to update auto-save", "error");
     },
   });
 };

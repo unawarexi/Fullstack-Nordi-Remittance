@@ -2,11 +2,6 @@
 // ACCOUNTS HOOKS - TanStack Query hooks for account management
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { accountsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { AccountType, Currency, UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -77,7 +72,7 @@ export const useAccount = (accountId: UUID) => {
  */
 export const useDefaultAccount = () => {
   return useQuery({
-    queryKey: [...queryKeys.accounts.all, 'default'],
+    queryKey: [...queryKeys.accounts.all, "default"],
     queryFn: async () => {
       const response = await accountsApi.getDefault();
       return response.data;
@@ -103,9 +98,15 @@ export const useAccountBalance = (accountId: UUID) => {
 /**
  * Get account transactions
  */
-export const useAccountTransactions = (accountId: UUID, filters?: TransactionFilters) => {
+export const useAccountTransactions = (
+  accountId: UUID,
+  filters?: TransactionFilters,
+) => {
   return useQuery({
-    queryKey: queryKeys.accounts.transactions(accountId, filters as Record<string, unknown>),
+    queryKey: queryKeys.accounts.transactions(
+      accountId,
+      filters as Record<string, unknown>,
+    ),
     queryFn: async () => {
       const response = await accountsApi.getTransactions(accountId, filters);
       return response;
@@ -168,16 +169,20 @@ export const useCreateAccount = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { accountType: AccountType; currency: Currency; name?: string }) => {
+    mutationFn: async (data: {
+      accountType: AccountType;
+      currency: Currency;
+      name?: string;
+    }) => {
       const response = await accountsApi.create(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Account created successfully', 'success');
+      showToast("Account created successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create account', 'error');
+      showToast(error.message || "Failed to create account", "error");
     },
   });
 };
@@ -190,23 +195,25 @@ export const useUpdateAccount = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      accountId, 
-      data 
-    }: { 
-      accountId: UUID; 
-      data: { name?: string; dailyLimit?: number; monthlyLimit?: number } 
+    mutationFn: async ({
+      accountId,
+      data,
+    }: {
+      accountId: UUID;
+      data: { name?: string; dailyLimit?: number; monthlyLimit?: number };
     }) => {
       const response = await accountsApi.update(accountId, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.detail(data.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.accounts.detail(data.id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.list() });
-      showToast('Account updated successfully', 'success');
+      showToast("Account updated successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update account', 'error');
+      showToast(error.message || "Failed to update account", "error");
     },
   });
 };
@@ -225,10 +232,10 @@ export const useSetDefaultAccount = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Default account updated', 'success');
+      showToast("Default account updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to set default account', 'error');
+      showToast(error.message || "Failed to set default account", "error");
     },
   });
 };
@@ -247,10 +254,10 @@ export const useCloseAccount = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-      showToast('Account closed successfully', 'success');
+      showToast("Account closed successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to close account', 'error');
+      showToast(error.message || "Failed to close account", "error");
     },
   });
 };
@@ -262,21 +269,25 @@ export const useRequestLimitIncrease = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      accountId, 
-      data 
-    }: { 
-      accountId: UUID; 
-      data: { limitType: 'daily' | 'monthly'; requestedLimit: number; reason: string } 
+    mutationFn: async ({
+      accountId,
+      data,
+    }: {
+      accountId: UUID;
+      data: {
+        limitType: "daily" | "monthly";
+        requestedLimit: number;
+        reason: string;
+      };
     }) => {
       const response = await accountsApi.requestLimitIncrease(accountId, data);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Limit increase request submitted', 'success');
+      showToast("Limit increase request submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit request', 'error');
+      showToast(error.message || "Failed to submit request", "error");
     },
   });
 };
@@ -288,21 +299,21 @@ export const useGetAccountStatement = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      accountId, 
-      params 
-    }: { 
-      accountId: UUID; 
-      params: { startDate: string; endDate: string; format?: 'pdf' | 'csv' } 
+    mutationFn: async ({
+      accountId,
+      params,
+    }: {
+      accountId: UUID;
+      params: { startDate: string; endDate: string; format?: "pdf" | "csv" };
     }) => {
       const response = await accountsApi.getStatement(accountId, params);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Statement generated', 'success');
+      showToast("Statement generated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to generate statement', 'error');
+      showToast(error.message || "Failed to generate statement", "error");
     },
   });
 };
@@ -312,7 +323,11 @@ export const useGetAccountStatement = () => {
  */
 export const useConvertCurrency = () => {
   return useMutation({
-    mutationFn: async (data: { fromCurrency: Currency; toCurrency: Currency; amount: number }) => {
+    mutationFn: async (data: {
+      fromCurrency: Currency;
+      toCurrency: Currency;
+      amount: number;
+    }) => {
       const response = await accountsApi.convertCurrency(data);
       return response.data;
     },

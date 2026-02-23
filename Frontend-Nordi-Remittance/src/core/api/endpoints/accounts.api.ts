@@ -3,15 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Account,
-  AccountSummary,
-  AccountType,
-  AccountStatus,
-  Currency,
-  Transaction,
-  UUID,
-} from '../../../types/api.types';
 
 const ACCOUNTS_BASE = '/accounts';
 

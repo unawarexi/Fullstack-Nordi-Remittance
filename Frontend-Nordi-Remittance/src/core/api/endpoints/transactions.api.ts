@@ -3,18 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Transaction,
-  TransactionFilters,
-  TransferRequest,
-  RemittanceRequest,
-  DepositRequest,
-  WithdrawalRequest,
-  Recipient,
-  CreateRecipientRequest,
-  Currency,
-  UUID,
-} from '../../../types/api.types';
 
 const TRANSACTIONS_BASE = '/transactions';
 const RECIPIENTS_BASE = '/recipients';

@@ -3,14 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Investment,
-  InvestmentType,
-  InvestmentStatus,
-  InvestmentProduct,
-  CreateInvestmentRequest,
-  UUID,
-} from '../../../types/api.types';
 
 const INVESTMENTS_BASE = '/investments';
 

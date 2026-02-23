@@ -3,22 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  User,
-  AdminUser,
-  DashboardStats,
-  AuditLog,
-  Account,
-  Transaction,
-  Loan,
-  Card,
-  FraudAlert,
-  KycDocument,
-  UserStatus,
-  KycStatus,
-  LoanStatus,
-  UUID,
-} from '../../../types/api.types';
 
 const ADMIN_BASE = '/admin';
 

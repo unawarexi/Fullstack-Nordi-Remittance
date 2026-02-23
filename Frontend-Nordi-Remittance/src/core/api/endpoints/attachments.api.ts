@@ -3,11 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Attachment,
-  UploadResponse,
-  UUID,
-} from '../../../types/api.types';
 
 const ATTACHMENTS_BASE = '/attachments';
 

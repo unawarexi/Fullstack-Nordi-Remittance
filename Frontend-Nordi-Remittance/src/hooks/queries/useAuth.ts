@@ -2,19 +2,6 @@
 // AUTH HOOKS - TanStack Query hooks for authentication
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authApi, TokenManager } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type {
-  LoginRequest,
-  RegisterRequest,
-  FullKycRegisterRequest,
-  TwoFactorAuthRequest,
-  ResetPasswordRequest,
-  ConfirmResetPasswordRequest,
-  ChangePasswordRequest,
-} from '../../types/api.types';
 
 // ============================================================================
 // QUERIES
@@ -40,12 +27,12 @@ export const useCurrentUser = () => {
  */
 export const useCheckEmailAvailability = (email: string) => {
   return useQuery({
-    queryKey: ['auth', 'checkEmail', email],
+    queryKey: ["auth", "checkEmail", email],
     queryFn: async () => {
       const response = await authApi.checkEmailAvailability(email);
       return response.data;
     },
-    enabled: !!email && email.includes('@'),
+    enabled: !!email && email.includes("@"),
   });
 };
 
@@ -54,7 +41,7 @@ export const useCheckEmailAvailability = (email: string) => {
  */
 export const useCheckPhoneAvailability = (phone: string) => {
   return useQuery({
-    queryKey: ['auth', 'checkPhone', phone],
+    queryKey: ["auth", "checkPhone", phone],
     queryFn: async () => {
       const response = await authApi.checkPhoneAvailability(phone);
       return response.data;
@@ -83,11 +70,11 @@ export const useLogin = () => {
       if (!data.requiresTwoFactor) {
         TokenManager.setTokens(data.accessToken, data.refreshToken);
         queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
-        showToast('Login successful', 'success');
+        showToast("Login successful", "success");
       }
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Login failed', 'error');
+      showToast(error.message || "Login failed", "error");
     },
   });
 };
@@ -104,10 +91,13 @@ export const useRegister = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Registration successful! Please verify your email.', 'success');
+      showToast(
+        "Registration successful! Please verify your email.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Registration failed', 'error');
+      showToast(error.message || "Registration failed", "error");
     },
   });
 };
@@ -124,10 +114,13 @@ export const useRegisterFullKyc = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Registration successful! Please verify your email.', 'success');
+      showToast(
+        "Registration successful! Please verify your email.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Registration failed', 'error');
+      showToast(error.message || "Registration failed", "error");
     },
   });
 };
@@ -147,10 +140,10 @@ export const useVerifyTwoFactor = () => {
     onSuccess: (data) => {
       TokenManager.setTokens(data.accessToken, data.refreshToken);
       queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
-      showToast('Login successful', 'success');
+      showToast("Login successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Invalid code', 'error');
+      showToast(error.message || "Invalid code", "error");
     },
   });
 };
@@ -167,10 +160,10 @@ export const useResendTwoFactorCode = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Verification code sent', 'success');
+      showToast("Verification code sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send code', 'error');
+      showToast(error.message || "Failed to send code", "error");
     },
   });
 };
@@ -187,10 +180,10 @@ export const useForgotPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Password reset email sent', 'success');
+      showToast("Password reset email sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send reset email', 'error');
+      showToast(error.message || "Failed to send reset email", "error");
     },
   });
 };
@@ -207,10 +200,10 @@ export const useResetPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Password reset successful', 'success');
+      showToast("Password reset successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Password reset failed', 'error');
+      showToast(error.message || "Password reset failed", "error");
     },
   });
 };
@@ -227,10 +220,10 @@ export const useChangePassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Password changed successfully', 'success');
+      showToast("Password changed successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to change password', 'error');
+      showToast(error.message || "Failed to change password", "error");
     },
   });
 };
@@ -249,10 +242,10 @@ export const useVerifyEmail = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() });
-      showToast('Email verified successfully', 'success');
+      showToast("Email verified successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Email verification failed', 'error');
+      showToast(error.message || "Email verification failed", "error");
     },
   });
 };
@@ -269,10 +262,10 @@ export const useResendVerificationEmail = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Verification email sent', 'success');
+      showToast("Verification email sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send verification email', 'error');
+      showToast(error.message || "Failed to send verification email", "error");
     },
   });
 };
@@ -291,10 +284,10 @@ export const useVerifyPhone = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.currentUser() });
-      showToast('Phone verified successfully', 'success');
+      showToast("Phone verified successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Phone verification failed', 'error');
+      showToast(error.message || "Phone verification failed", "error");
     },
   });
 };
@@ -311,10 +304,10 @@ export const useResendPhoneOtp = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('OTP sent to your phone', 'success');
+      showToast("OTP sent to your phone", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send OTP', 'error');
+      showToast(error.message || "Failed to send OTP", "error");
     },
   });
 };
@@ -334,7 +327,7 @@ export const useLogout = () => {
     onSuccess: () => {
       TokenManager.clearTokens();
       queryClient.clear();
-      showToast('Logged out successfully', 'success');
+      showToast("Logged out successfully", "success");
     },
     onError: () => {
       // Even if logout fails on server, clear local state
@@ -359,10 +352,10 @@ export const useLogoutAll = () => {
     onSuccess: () => {
       TokenManager.clearTokens();
       queryClient.clear();
-      showToast('Logged out from all devices', 'success');
+      showToast("Logged out from all devices", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to logout from all devices', 'error');
+      showToast(error.message || "Failed to logout from all devices", "error");
     },
   });
 };

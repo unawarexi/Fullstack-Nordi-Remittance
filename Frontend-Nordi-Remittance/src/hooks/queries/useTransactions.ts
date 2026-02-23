@@ -2,20 +2,6 @@
 // TRANSACTIONS HOOKS - TanStack Query hooks for transactions
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { transactionsApi, recipientsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type {
-  TransactionFilters,
-  TransferRequest,
-  RemittanceRequest,
-  DepositRequest,
-  WithdrawalRequest,
-  CreateRecipientRequest,
-  Currency,
-  UUID,
-} from '../../types/api.types';
 
 // ============================================================================
 // TRANSACTION QUERIES
@@ -121,10 +107,10 @@ export const useTransfer = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Transfer successful', 'success');
+      showToast("Transfer successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Transfer failed', 'error');
+      showToast(error.message || "Transfer failed", "error");
     },
   });
 };
@@ -151,10 +137,10 @@ export const useTransferToUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Transfer successful', 'success');
+      showToast("Transfer successful", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Transfer failed', 'error');
+      showToast(error.message || "Transfer failed", "error");
     },
   });
 };
@@ -167,20 +153,22 @@ export const useScheduleTransfer = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: TransferRequest & {
-      scheduledDate: string;
-      frequency?: 'once' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
-      endDate?: string;
-    }) => {
+    mutationFn: async (
+      data: TransferRequest & {
+        scheduledDate: string;
+        frequency?: "once" | "daily" | "weekly" | "biweekly" | "monthly";
+        endDate?: string;
+      },
+    ) => {
       const response = await transactionsApi.scheduleTransfer(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Transfer scheduled successfully', 'success');
+      showToast("Transfer scheduled successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to schedule transfer', 'error');
+      showToast(error.message || "Failed to schedule transfer", "error");
     },
   });
 };
@@ -194,15 +182,16 @@ export const useCancelScheduledTransfer = () => {
 
   return useMutation({
     mutationFn: async (scheduleId: UUID) => {
-      const response = await transactionsApi.cancelScheduledTransfer(scheduleId);
+      const response =
+        await transactionsApi.cancelScheduledTransfer(scheduleId);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Scheduled transfer cancelled', 'success');
+      showToast("Scheduled transfer cancelled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to cancel transfer', 'error');
+      showToast(error.message || "Failed to cancel transfer", "error");
     },
   });
 };
@@ -222,10 +211,10 @@ export const useSendRemittance = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Remittance sent successfully', 'success');
+      showToast("Remittance sent successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Remittance failed', 'error');
+      showToast(error.message || "Remittance failed", "error");
     },
   });
 };
@@ -240,7 +229,7 @@ export const useRemittanceQuote = () => {
       sourceCurrency: Currency;
       destinationCurrency: Currency;
       destinationCountry: string;
-      deliveryMethod: 'bank_transfer' | 'mobile_money' | 'cash_pickup';
+      deliveryMethod: "bank_transfer" | "mobile_money" | "cash_pickup";
     }) => {
       const response = await transactionsApi.getRemittanceQuote(data);
       return response.data;
@@ -263,10 +252,10 @@ export const useDeposit = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Deposit initiated', 'success');
+      showToast("Deposit initiated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Deposit failed', 'error');
+      showToast(error.message || "Deposit failed", "error");
     },
   });
 };
@@ -286,10 +275,10 @@ export const useWithdraw = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      showToast('Withdrawal initiated', 'success');
+      showToast("Withdrawal initiated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Withdrawal failed', 'error');
+      showToast(error.message || "Withdrawal failed", "error");
     },
   });
 };
@@ -300,7 +289,7 @@ export const useWithdraw = () => {
 export const useCalculateFee = () => {
   return useMutation({
     mutationFn: async (data: {
-      type: 'transfer' | 'withdrawal' | 'remittance';
+      type: "transfer" | "withdrawal" | "remittance";
       amount: number;
       currency: Currency;
       destinationCurrency?: Currency;
@@ -324,7 +313,7 @@ export const useGetReceipt = () => {
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to get receipt', 'error');
+      showToast(error.message || "Failed to get receipt", "error");
     },
   });
 };
@@ -336,15 +325,21 @@ export const useEmailReceipt = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ transactionId, email }: { transactionId: UUID; email?: string }) => {
+    mutationFn: async ({
+      transactionId,
+      email,
+    }: {
+      transactionId: UUID;
+      email?: string;
+    }) => {
       const response = await transactionsApi.emailReceipt(transactionId, email);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Receipt sent to email', 'success');
+      showToast("Receipt sent to email", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send receipt', 'error');
+      showToast(error.message || "Failed to send receipt", "error");
     },
   });
 };
@@ -430,10 +425,10 @@ export const useCreateRecipient = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.recipients.all });
-      showToast('Recipient added successfully', 'success');
+      showToast("Recipient added successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to add recipient', 'error');
+      showToast(error.message || "Failed to add recipient", "error");
     },
   });
 };
@@ -446,17 +441,25 @@ export const useUpdateRecipient = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ recipientId, data }: { recipientId: UUID; data: Partial<CreateRecipientRequest> }) => {
+    mutationFn: async ({
+      recipientId,
+      data,
+    }: {
+      recipientId: UUID;
+      data: Partial<CreateRecipientRequest>;
+    }) => {
       const response = await recipientsApi.update(recipientId, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.recipients.detail(data.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.recipients.detail(data.id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.recipients.list() });
-      showToast('Recipient updated successfully', 'success');
+      showToast("Recipient updated successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update recipient', 'error');
+      showToast(error.message || "Failed to update recipient", "error");
     },
   });
 };
@@ -475,10 +478,10 @@ export const useDeleteRecipient = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.recipients.all });
-      showToast('Recipient deleted', 'success');
+      showToast("Recipient deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete recipient', 'error');
+      showToast(error.message || "Failed to delete recipient", "error");
     },
   });
 };

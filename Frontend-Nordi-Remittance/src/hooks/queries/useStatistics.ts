@@ -2,10 +2,6 @@
 // STATISTICS HOOKS - TanStack Query hooks for analytics and dashboard
 // ============================================================================
 
-import { useQuery } from '@tanstack/react-query';
-import { statisticsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import type { UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -14,7 +10,7 @@ import type { UUID } from '../../types/api.types';
 interface DateRangeParams {
   startDate?: string;
   endDate?: string;
-  period?: '1D' | '1W' | '1M' | '3M' | '6M' | '1Y' | 'ALL';
+  period?: "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 }
 
 interface StatisticsFilters extends DateRangeParams {
@@ -45,7 +41,7 @@ export const useDashboardOverview = () => {
  */
 export const useBalanceHistory = (params?: StatisticsFilters) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'balance-history', params],
+    queryKey: [...queryKeys.statistics.all, "balance-history", params],
     queryFn: async () => {
       const response = await statisticsApi.getBalanceHistory(params);
       return response.data;
@@ -58,7 +54,7 @@ export const useBalanceHistory = (params?: StatisticsFilters) => {
  */
 export const useNetWorthHistory = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'net-worth', params],
+    queryKey: [...queryKeys.statistics.all, "net-worth", params],
     queryFn: async () => {
       const response = await statisticsApi.getNetWorthHistory(params);
       return response.data;
@@ -86,9 +82,11 @@ export const useTransactionStats = (params?: StatisticsFilters) => {
 /**
  * Get transaction volume chart data
  */
-export const useTransactionVolumeChart = (params?: DateRangeParams & { groupBy?: 'day' | 'week' | 'month' }) => {
+export const useTransactionVolumeChart = (
+  params?: DateRangeParams & { groupBy?: "day" | "week" | "month" },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.transactions(), 'volume-chart', params],
+    queryKey: [...queryKeys.statistics.transactions(), "volume-chart", params],
     queryFn: async () => {
       const response = await statisticsApi.getTransactionVolumeChart(params);
       return response.data;
@@ -101,7 +99,7 @@ export const useTransactionVolumeChart = (params?: DateRangeParams & { groupBy?:
  */
 export const useTransactionsByType = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.transactions(), 'by-type', params],
+    queryKey: [...queryKeys.statistics.transactions(), "by-type", params],
     queryFn: async () => {
       const response = await statisticsApi.getTransactionsByType(params);
       return response.data;
@@ -114,7 +112,7 @@ export const useTransactionsByType = (params?: DateRangeParams) => {
  */
 export const useTransactionsByStatus = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.transactions(), 'by-status', params],
+    queryKey: [...queryKeys.statistics.transactions(), "by-status", params],
     queryFn: async () => {
       const response = await statisticsApi.getTransactionsByStatus(params);
       return response.data;
@@ -142,9 +140,11 @@ export const useSpendingByCategory = (params?: DateRangeParams) => {
 /**
  * Get spending trends
  */
-export const useSpendingTrends = (params?: DateRangeParams & { categoryId?: string }) => {
+export const useSpendingTrends = (
+  params?: DateRangeParams & { categoryId?: string },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.spending(), 'trends', params],
+    queryKey: [...queryKeys.statistics.spending(), "trends", params],
     queryFn: async () => {
       const response = await statisticsApi.getSpendingTrends(params);
       return response.data;
@@ -155,9 +155,11 @@ export const useSpendingTrends = (params?: DateRangeParams & { categoryId?: stri
 /**
  * Get top spending categories
  */
-export const useTopSpendingCategories = (params?: DateRangeParams & { limit?: number }) => {
+export const useTopSpendingCategories = (
+  params?: DateRangeParams & { limit?: number },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.spending(), 'top-categories', params],
+    queryKey: [...queryKeys.statistics.spending(), "top-categories", params],
     queryFn: async () => {
       const response = await statisticsApi.getTopSpendingCategories(params);
       return response.data;
@@ -168,9 +170,11 @@ export const useTopSpendingCategories = (params?: DateRangeParams & { limit?: nu
 /**
  * Get spending vs income
  */
-export const useSpendingVsIncome = (params?: DateRangeParams & { groupBy?: 'day' | 'week' | 'month' }) => {
+export const useSpendingVsIncome = (
+  params?: DateRangeParams & { groupBy?: "day" | "week" | "month" },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'spending-vs-income', params],
+    queryKey: [...queryKeys.statistics.all, "spending-vs-income", params],
     queryFn: async () => {
       const response = await statisticsApi.getSpendingVsIncome(params);
       return response.data;
@@ -183,7 +187,7 @@ export const useSpendingVsIncome = (params?: DateRangeParams & { groupBy?: 'day'
  */
 export const useBudgetProgress = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'budget-progress'],
+    queryKey: [...queryKeys.statistics.all, "budget-progress"],
     queryFn: async () => {
       const response = await statisticsApi.getBudgetProgress();
       return response.data;
@@ -213,7 +217,7 @@ export const useIncomeBySource = (params?: DateRangeParams) => {
  */
 export const useIncomeTrends = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.income(), 'trends', params],
+    queryKey: [...queryKeys.statistics.income(), "trends", params],
     queryFn: async () => {
       const response = await statisticsApi.getIncomeTrends(params);
       return response.data;
@@ -230,7 +234,7 @@ export const useIncomeTrends = (params?: DateRangeParams) => {
  */
 export const useRemittanceStats = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'remittance', params],
+    queryKey: [...queryKeys.statistics.all, "remittance", params],
     queryFn: async () => {
       const response = await statisticsApi.getRemittanceStats(params);
       return response.data;
@@ -243,7 +247,7 @@ export const useRemittanceStats = (params?: DateRangeParams) => {
  */
 export const useRemittanceByCountry = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'remittance-by-country', params],
+    queryKey: [...queryKeys.statistics.all, "remittance-by-country", params],
     queryFn: async () => {
       const response = await statisticsApi.getRemittanceByCountry(params);
       return response.data;
@@ -254,9 +258,11 @@ export const useRemittanceByCountry = (params?: DateRangeParams) => {
 /**
  * Get remittance by recipient
  */
-export const useRemittanceByRecipient = (params?: DateRangeParams & { limit?: number }) => {
+export const useRemittanceByRecipient = (
+  params?: DateRangeParams & { limit?: number },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'remittance-by-recipient', params],
+    queryKey: [...queryKeys.statistics.all, "remittance-by-recipient", params],
     queryFn: async () => {
       const response = await statisticsApi.getRemittanceByRecipient(params);
       return response.data;
@@ -271,9 +277,12 @@ export const useRemittanceByRecipient = (params?: DateRangeParams & { limit?: nu
 /**
  * Get card spending statistics
  */
-export const useCardSpendingStats = (cardId?: UUID, params?: DateRangeParams) => {
+export const useCardSpendingStats = (
+  cardId?: UUID,
+  params?: DateRangeParams,
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'card-spending', cardId, params],
+    queryKey: [...queryKeys.statistics.all, "card-spending", cardId, params],
     queryFn: async () => {
       const response = await statisticsApi.getCardSpendingStats(cardId, params);
       return response.data;
@@ -284,11 +293,22 @@ export const useCardSpendingStats = (cardId?: UUID, params?: DateRangeParams) =>
 /**
  * Get card spending by merchant category
  */
-export const useCardSpendingByMerchant = (cardId?: UUID, params?: DateRangeParams) => {
+export const useCardSpendingByMerchant = (
+  cardId?: UUID,
+  params?: DateRangeParams,
+) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'card-spending-by-merchant', cardId, params],
+    queryKey: [
+      ...queryKeys.statistics.all,
+      "card-spending-by-merchant",
+      cardId,
+      params,
+    ],
     queryFn: async () => {
-      const response = await statisticsApi.getCardSpendingByMerchant(cardId, params);
+      const response = await statisticsApi.getCardSpendingByMerchant(
+        cardId,
+        params,
+      );
       return response.data;
     },
   });
@@ -303,7 +323,7 @@ export const useCardSpendingByMerchant = (cardId?: UUID, params?: DateRangeParam
  */
 export const useInvestmentPerformanceStats = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'investment-performance', params],
+    queryKey: [...queryKeys.statistics.all, "investment-performance", params],
     queryFn: async () => {
       const response = await statisticsApi.getInvestmentPerformance(params);
       return response.data;
@@ -316,7 +336,7 @@ export const useInvestmentPerformanceStats = (params?: DateRangeParams) => {
  */
 export const usePortfolioAllocation = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'portfolio-allocation'],
+    queryKey: [...queryKeys.statistics.all, "portfolio-allocation"],
     queryFn: async () => {
       const response = await statisticsApi.getPortfolioAllocation();
       return response.data;
@@ -333,7 +353,7 @@ export const usePortfolioAllocation = () => {
  */
 export const useSavingsProgress = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'savings-progress'],
+    queryKey: [...queryKeys.statistics.all, "savings-progress"],
     queryFn: async () => {
       const response = await statisticsApi.getSavingsProgress();
       return response.data;
@@ -346,7 +366,7 @@ export const useSavingsProgress = () => {
  */
 export const useSavingsRateTrend = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'savings-rate', params],
+    queryKey: [...queryKeys.statistics.all, "savings-rate", params],
     queryFn: async () => {
       const response = await statisticsApi.getSavingsRateTrend(params);
       return response.data;
@@ -363,7 +383,7 @@ export const useSavingsRateTrend = (params?: DateRangeParams) => {
  */
 export const useFinancialInsights = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'insights'],
+    queryKey: [...queryKeys.statistics.all, "insights"],
     queryFn: async () => {
       const response = await statisticsApi.getFinancialInsights();
       return response.data;
@@ -377,7 +397,7 @@ export const useFinancialInsights = () => {
  */
 export const useSpendingAlerts = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'spending-alerts'],
+    queryKey: [...queryKeys.statistics.all, "spending-alerts"],
     queryFn: async () => {
       const response = await statisticsApi.getSpendingAlerts();
       return response.data;
@@ -390,7 +410,7 @@ export const useSpendingAlerts = () => {
  */
 export const useActivitySummary = (params?: DateRangeParams) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'activity-summary', params],
+    queryKey: [...queryKeys.statistics.all, "activity-summary", params],
     queryFn: async () => {
       const response = await statisticsApi.getActivitySummary(params);
       return response.data;
@@ -411,7 +431,7 @@ export const usePeriodComparison = (params: {
   metrics?: string[];
 }) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'period-comparison', params],
+    queryKey: [...queryKeys.statistics.all, "period-comparison", params],
     queryFn: async () => {
       const response = await statisticsApi.getPeriodComparison(params);
       return response.data;
@@ -425,7 +445,7 @@ export const usePeriodComparison = (params: {
  */
 export const useYearOverYearComparison = (year?: number) => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'yoy-comparison', year],
+    queryKey: [...queryKeys.statistics.all, "yoy-comparison", year],
     queryFn: async () => {
       const response = await statisticsApi.getYearOverYearComparison(year);
       return response.data;
@@ -442,7 +462,7 @@ export const useYearOverYearComparison = (year?: number) => {
  */
 export const useAvailableExports = () => {
   return useQuery({
-    queryKey: [...queryKeys.statistics.all, 'available-exports'],
+    queryKey: [...queryKeys.statistics.all, "available-exports"],
     queryFn: async () => {
       const response = await statisticsApi.getAvailableExports();
       return response.data;

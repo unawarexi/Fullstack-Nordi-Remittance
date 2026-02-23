@@ -2,11 +2,6 @@
 // KYC HOOKS - TanStack Query hooks for KYC verification
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { kycApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { KycDocumentType, UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERIES
@@ -57,7 +52,7 @@ export const useKycDocument = (documentId: UUID) => {
  */
 export const useKycRequirements = () => {
   return useQuery({
-    queryKey: [...queryKeys.kyc.all, 'requirements'],
+    queryKey: [...queryKeys.kyc.all, "requirements"],
     queryFn: async () => {
       const response = await kycApi.getRequirements();
       return response.data;
@@ -70,7 +65,7 @@ export const useKycRequirements = () => {
  */
 export const useKycVerificationHistory = () => {
   return useQuery({
-    queryKey: [...queryKeys.kyc.all, 'history'],
+    queryKey: [...queryKeys.kyc.all, "history"],
     queryFn: async () => {
       const response = await kycApi.getVerificationHistory();
       return response.data;
@@ -83,7 +78,7 @@ export const useKycVerificationHistory = () => {
  */
 export const useSupportedDocumentTypes = () => {
   return useQuery({
-    queryKey: [...queryKeys.kyc.all, 'supported-types'],
+    queryKey: [...queryKeys.kyc.all, "supported-types"],
     queryFn: async () => {
       const response = await kycApi.getSupportedDocumentTypes();
       return response.data;
@@ -97,7 +92,7 @@ export const useSupportedDocumentTypes = () => {
  */
 export const useVerificationLimits = () => {
   return useQuery({
-    queryKey: [...queryKeys.kyc.all, 'limits'],
+    queryKey: [...queryKeys.kyc.all, "limits"],
     queryFn: async () => {
       const response = await kycApi.getVerificationLimits();
       return response.data;
@@ -122,7 +117,7 @@ export const useSubmitPersonalInfo = () => {
       lastName: string;
       middleName?: string;
       dateOfBirth: string;
-      gender?: 'male' | 'female' | 'other';
+      gender?: "male" | "female" | "other";
       nationality: string;
       countryOfResidence: string;
       taxResidency?: string;
@@ -133,10 +128,13 @@ export const useSubmitPersonalInfo = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Personal information submitted', 'success');
+      showToast("Personal information submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit personal information', 'error');
+      showToast(
+        error.message || "Failed to submit personal information",
+        "error",
+      );
     },
   });
 };
@@ -171,10 +169,13 @@ export const useSubmitAddressInfo = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Address information submitted', 'success');
+      showToast("Address information submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit address information', 'error');
+      showToast(
+        error.message || "Failed to submit address information",
+        "error",
+      );
     },
   });
 };
@@ -196,23 +197,25 @@ export const useUploadKycDocument = () => {
       backImage?: File;
     }) => {
       const formData = new FormData();
-      formData.append('documentType', data.documentType);
-      if (data.documentNumber) formData.append('documentNumber', data.documentNumber);
-      if (data.expiryDate) formData.append('expiryDate', data.expiryDate);
-      if (data.issuingCountry) formData.append('issuingCountry', data.issuingCountry);
-      formData.append('frontImage', data.frontImage);
-      if (data.backImage) formData.append('backImage', data.backImage);
-      
+      formData.append("documentType", data.documentType);
+      if (data.documentNumber)
+        formData.append("documentNumber", data.documentNumber);
+      if (data.expiryDate) formData.append("expiryDate", data.expiryDate);
+      if (data.issuingCountry)
+        formData.append("issuingCountry", data.issuingCountry);
+      formData.append("frontImage", data.frontImage);
+      if (data.backImage) formData.append("backImage", data.backImage);
+
       const response = await kycApi.uploadDocument(formData);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.documents() });
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Document uploaded successfully', 'success');
+      showToast("Document uploaded successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to upload document', 'error');
+      showToast(error.message || "Failed to upload document", "error");
     },
   });
 };
@@ -232,10 +235,10 @@ export const useDeleteKycDocument = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.documents() });
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Document deleted', 'success');
+      showToast("Document deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete document', 'error');
+      showToast(error.message || "Failed to delete document", "error");
     },
   });
 };
@@ -248,16 +251,18 @@ export const useStartVerification = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (verificationLevel?: 'basic' | 'standard' | 'enhanced') => {
+    mutationFn: async (
+      verificationLevel?: "basic" | "standard" | "enhanced",
+    ) => {
       const response = await kycApi.startVerification(verificationLevel);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Verification process started', 'success');
+      showToast("Verification process started", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to start verification', 'error');
+      showToast(error.message || "Failed to start verification", "error");
     },
   });
 };
@@ -272,18 +277,19 @@ export const useSubmitSelfieVerification = () => {
   return useMutation({
     mutationFn: async (data: { selfie: File; livenessVideo?: File }) => {
       const formData = new FormData();
-      formData.append('selfie', data.selfie);
-      if (data.livenessVideo) formData.append('livenessVideo', data.livenessVideo);
-      
+      formData.append("selfie", data.selfie);
+      if (data.livenessVideo)
+        formData.append("livenessVideo", data.livenessVideo);
+
       const response = await kycApi.submitSelfie(formData);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Selfie submitted for verification', 'success');
+      showToast("Selfie submitted for verification", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit selfie', 'error');
+      showToast(error.message || "Failed to submit selfie", "error");
     },
   });
 };
@@ -297,7 +303,12 @@ export const useSubmitEmploymentInfo = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      employmentStatus: 'employed' | 'self_employed' | 'unemployed' | 'retired' | 'student';
+      employmentStatus:
+        | "employed"
+        | "self_employed"
+        | "unemployed"
+        | "retired"
+        | "student";
       employer?: string;
       occupation?: string;
       industry?: string;
@@ -310,10 +321,13 @@ export const useSubmitEmploymentInfo = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Employment information submitted', 'success');
+      showToast("Employment information submitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit employment information', 'error');
+      showToast(
+        error.message || "Failed to submit employment information",
+        "error",
+      );
     },
   });
 };
@@ -332,10 +346,10 @@ export const useRequestManualReview = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Manual review requested', 'success');
+      showToast("Manual review requested", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request review', 'error');
+      showToast(error.message || "Failed to request review", "error");
     },
   });
 };
@@ -355,22 +369,22 @@ export const useUpdateKycInfo = () => {
       supportingDocument?: File;
     }) => {
       const formData = new FormData();
-      formData.append('field', data.field);
-      formData.append('value', data.value);
-      formData.append('reason', data.reason);
+      formData.append("field", data.field);
+      formData.append("value", data.value);
+      formData.append("reason", data.reason);
       if (data.supportingDocument) {
-        formData.append('supportingDocument', data.supportingDocument);
+        formData.append("supportingDocument", data.supportingDocument);
       }
-      
+
       const response = await kycApi.updateInfo(formData);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.all });
-      showToast('Information updated successfully', 'success');
+      showToast("Information updated successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update information', 'error');
+      showToast(error.message || "Failed to update information", "error");
     },
   });
 };
@@ -383,27 +397,27 @@ export const useResubmitDocument = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      documentId, 
-      data 
-    }: { 
-      documentId: UUID; 
-      data: { frontImage: File; backImage?: File } 
+    mutationFn: async ({
+      documentId,
+      data,
+    }: {
+      documentId: UUID;
+      data: { frontImage: File; backImage?: File };
     }) => {
       const formData = new FormData();
-      formData.append('frontImage', data.frontImage);
-      if (data.backImage) formData.append('backImage', data.backImage);
-      
+      formData.append("frontImage", data.frontImage);
+      if (data.backImage) formData.append("backImage", data.backImage);
+
       const response = await kycApi.resubmitDocument(documentId, formData);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.documents() });
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.status() });
-      showToast('Document resubmitted', 'success');
+      showToast("Document resubmitted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to resubmit document', 'error');
+      showToast(error.message || "Failed to resubmit document", "error");
     },
   });
 };
@@ -420,7 +434,10 @@ export const useGetVerificationSession = () => {
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to start verification session', 'error');
+      showToast(
+        error.message || "Failed to start verification session",
+        "error",
+      );
     },
   });
 };
@@ -433,16 +450,19 @@ export const useCompleteThirdPartyVerification = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { sessionId: string; verificationResult: string }) => {
+    mutationFn: async (data: {
+      sessionId: string;
+      verificationResult: string;
+    }) => {
       const response = await kycApi.completeThirdPartyVerification(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.kyc.all });
-      showToast('Verification completed', 'success');
+      showToast("Verification completed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Verification failed', 'error');
+      showToast(error.message || "Verification failed", "error");
     },
   });
 };

@@ -153,7 +153,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 exit="exit"
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                  'relative w-full bg-white rounded-2xl shadow-2xl',
+                  'relative w-full bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl',
                   'flex flex-col max-h-[90vh]',
                   sizeStyles[size],
                   className
@@ -165,12 +165,12 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                  <div className="flex items-start justify-between p-4 sm:p-6 border-b border-neutral-100">
+                  <div className="flex items-start justify-between p-4 sm:p-6 border-b border-neutral-100 dark:border-neutral-700">
                     <div className="flex-1 min-w-0 pr-4">
                       {title && (
                         <h2
                           id="modal-title"
-                          className="text-lg sm:text-xl font-semibold text-neutral-900"
+                          className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white"
                         >
                           {title}
                         </h2>
@@ -178,7 +178,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                       {description && (
                         <p
                           id="modal-description"
-                          className="text-sm text-neutral-500 mt-1"
+                          className="text-sm text-neutral-500 dark:text-neutral-400 mt-1"
                         >
                           {description}
                         </p>
@@ -198,13 +198,13 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 )}
                 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 text-neutral-900 dark:text-white">
                   {children}
                 </div>
                 
                 {/* Footer */}
                 {footer && (
-                  <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-neutral-100">
+                  <div className="flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-neutral-100 dark:border-neutral-700">
                     {footer}
                   </div>
                 )}

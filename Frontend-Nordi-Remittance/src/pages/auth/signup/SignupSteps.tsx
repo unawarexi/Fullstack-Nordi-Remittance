@@ -2,15 +2,6 @@
 // SIGNUP STEPS - Individual step components for signup form
 // ============================================================================
 
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-
-// Components
-import { Input, Textarea, Select, FileUpload } from '@components/ui';
-
-// Types
-import type { SignupFormValues, SelectOption } from '@types';
 
 // Helpers
 import { datePickerConfig } from '@utils/helpers/date.helpers';

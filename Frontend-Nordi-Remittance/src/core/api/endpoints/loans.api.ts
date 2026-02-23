@@ -3,15 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Loan,
-  LoanType,
-  LoanStatus,
-  LoanApplication,
-  LoanPayment,
-  LoanSchedule,
-  UUID,
-} from '../../../types/api.types';
 
 const LOANS_BASE = '/loans';
 

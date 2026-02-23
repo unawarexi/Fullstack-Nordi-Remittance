@@ -2,18 +2,6 @@
 // CARDS HOOKS - TanStack Query hooks for card management
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { cardsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { 
-  CardType, 
-  CardStatus, 
-  CreateCardRequest,
-  CardLimitsUpdateRequest,
-  CardSettingsUpdateRequest,
-  UUID 
-} from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -98,7 +86,10 @@ export const useCardSettings = (cardId: UUID) => {
 /**
  * Get card transactions
  */
-export const useCardTransactions = (cardId: UUID, filters?: CardTransactionFilters) => {
+export const useCardTransactions = (
+  cardId: UUID,
+  filters?: CardTransactionFilters,
+) => {
   return useQuery({
     queryKey: queryKeys.cards.transactions(cardId, filters),
     queryFn: async () => {
@@ -127,10 +118,10 @@ export const useCreateCard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.all });
-      showToast('Card created successfully', 'success');
+      showToast("Card created successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create card', 'error');
+      showToast(error.message || "Failed to create card", "error");
     },
   });
 };
@@ -143,23 +134,30 @@ export const useActivateCard = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      cardId, 
-      data 
-    }: { 
-      cardId: UUID; 
-      data: { cvv: string; expiryMonth: number; expiryYear: number; pin: string } 
+    mutationFn: async ({
+      cardId,
+      data,
+    }: {
+      cardId: UUID;
+      data: {
+        cvv: string;
+        expiryMonth: number;
+        expiryYear: number;
+        pin: string;
+      };
     }) => {
       const response = await cardsApi.activate(cardId, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.detail(data.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.detail(data.id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.list() });
-      showToast('Card activated successfully', 'success');
+      showToast("Card activated successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to activate card', 'error');
+      showToast(error.message || "Failed to activate card", "error");
     },
   });
 };
@@ -177,12 +175,17 @@ export const useToggleFreezeCard = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.detail(data.id) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.detail(data.id),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.list() });
-      showToast(data.status === 'frozen' ? 'Card frozen' : 'Card unfrozen', 'success');
+      showToast(
+        data.status === "frozen" ? "Card frozen" : "Card unfrozen",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update card', 'error');
+      showToast(error.message || "Failed to update card", "error");
     },
   });
 };
@@ -195,16 +198,22 @@ export const useCancelCard = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ cardId, reason }: { cardId: UUID; reason?: string }) => {
+    mutationFn: async ({
+      cardId,
+      reason,
+    }: {
+      cardId: UUID;
+      reason?: string;
+    }) => {
       const response = await cardsApi.cancel(cardId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.all });
-      showToast('Card cancelled', 'success');
+      showToast("Card cancelled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to cancel card', 'error');
+      showToast(error.message || "Failed to cancel card", "error");
     },
   });
 };
@@ -217,16 +226,22 @@ export const useRequestReplacementCard = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ cardId, reason }: { cardId: UUID; reason: string }) => {
+    mutationFn: async ({
+      cardId,
+      reason,
+    }: {
+      cardId: UUID;
+      reason: string;
+    }) => {
       const response = await cardsApi.requestReplacement(cardId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.all });
-      showToast('Replacement card requested', 'success');
+      showToast("Replacement card requested", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request replacement', 'error');
+      showToast(error.message || "Failed to request replacement", "error");
     },
   });
 };
@@ -243,7 +258,7 @@ export const useGetCardDetails = () => {
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to get card details', 'error');
+      showToast(error.message || "Failed to get card details", "error");
     },
   });
 };
@@ -256,17 +271,27 @@ export const useUpdateCardLimits = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ cardId, data }: { cardId: UUID; data: CardLimitsUpdateRequest }) => {
+    mutationFn: async ({
+      cardId,
+      data,
+    }: {
+      cardId: UUID;
+      data: CardLimitsUpdateRequest;
+    }) => {
       const response = await cardsApi.updateLimits(cardId, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.limits(data.id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.detail(data.id) });
-      showToast('Card limits updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.limits(data.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.detail(data.id),
+      });
+      showToast("Card limits updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update limits', 'error');
+      showToast(error.message || "Failed to update limits", "error");
     },
   });
 };
@@ -279,17 +304,27 @@ export const useUpdateCardSettings = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ cardId, data }: { cardId: UUID; data: CardSettingsUpdateRequest }) => {
+    mutationFn: async ({
+      cardId,
+      data,
+    }: {
+      cardId: UUID;
+      data: CardSettingsUpdateRequest;
+    }) => {
       const response = await cardsApi.updateSettings(cardId, data);
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.settings(data.id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.cards.detail(data.id) });
-      showToast('Card settings updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.settings(data.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.cards.detail(data.id),
+      });
+      showToast("Card settings updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update settings', 'error');
+      showToast(error.message || "Failed to update settings", "error");
     },
   });
 };
@@ -301,21 +336,21 @@ export const useChangeCardPin = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      cardId, 
-      data 
-    }: { 
-      cardId: UUID; 
-      data: { currentPin: string; newPin: string; confirmPin: string } 
+    mutationFn: async ({
+      cardId,
+      data,
+    }: {
+      cardId: UUID;
+      data: { currentPin: string; newPin: string; confirmPin: string };
     }) => {
       const response = await cardsApi.changePin(cardId, data);
       return response.data;
     },
     onSuccess: () => {
-      showToast('PIN changed successfully', 'success');
+      showToast("PIN changed successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to change PIN', 'error');
+      showToast(error.message || "Failed to change PIN", "error");
     },
   });
 };
@@ -332,10 +367,10 @@ export const useResetCardPin = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('PIN reset code sent', 'success');
+      showToast("PIN reset code sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reset PIN', 'error');
+      showToast(error.message || "Failed to reset PIN", "error");
     },
   });
 };
@@ -347,21 +382,21 @@ export const useSetNewCardPin = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      cardId, 
-      data 
-    }: { 
-      cardId: UUID; 
-      data: { otp: string; newPin: string; confirmPin: string } 
+    mutationFn: async ({
+      cardId,
+      data,
+    }: {
+      cardId: UUID;
+      data: { otp: string; newPin: string; confirmPin: string };
     }) => {
       const response = await cardsApi.setNewPin(cardId, data);
       return response.data;
     },
     onSuccess: () => {
-      showToast('New PIN set successfully', 'success');
+      showToast("New PIN set successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to set PIN', 'error');
+      showToast(error.message || "Failed to set PIN", "error");
     },
   });
 };
@@ -373,23 +408,27 @@ export const useDisputeCardTransaction = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      cardId, 
-      transactionId, 
-      data 
-    }: { 
-      cardId: UUID; 
-      transactionId: UUID; 
-      data: { reason: string; description: string } 
+    mutationFn: async ({
+      cardId,
+      transactionId,
+      data,
+    }: {
+      cardId: UUID;
+      transactionId: UUID;
+      data: { reason: string; description: string };
     }) => {
-      const response = await cardsApi.disputeTransaction(cardId, transactionId, data);
+      const response = await cardsApi.disputeTransaction(
+        cardId,
+        transactionId,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
-      showToast('Dispute submitted successfully', 'success');
+      showToast("Dispute submitted successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit dispute', 'error');
+      showToast(error.message || "Failed to submit dispute", "error");
     },
   });
 };
@@ -404,7 +443,7 @@ export const useRequestPhysicalCard = () => {
   return useMutation({
     mutationFn: async (data: {
       accountId: UUID;
-      brand?: 'visa' | 'mastercard';
+      brand?: "visa" | "mastercard";
       deliveryAddress: {
         street: string;
         city: string;
@@ -419,10 +458,10 @@ export const useRequestPhysicalCard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.all });
-      showToast('Physical card requested', 'success');
+      showToast("Physical card requested", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request card', 'error');
+      showToast(error.message || "Failed to request card", "error");
     },
   });
 };
@@ -432,7 +471,7 @@ export const useRequestPhysicalCard = () => {
  */
 export const useTrackCardDelivery = (cardId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.cards.detail(cardId), 'delivery'],
+    queryKey: [...queryKeys.cards.detail(cardId), "delivery"],
     queryFn: async () => {
       const response = await cardsApi.trackDelivery(cardId);
       return response.data;

@@ -2,11 +2,6 @@
 // ADMIN HOOKS - TanStack Query hooks for admin panel operations
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { UUID, UserStatus, KycStatus, LoanStatus } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES (matching admin.api.ts)
@@ -205,7 +200,10 @@ export const useAdminLoanDetails = (loanId: UUID) => {
 /**
  * Get pending KYC verifications
  */
-export const usePendingKycVerifications = (filters?: { page?: number; limit?: number }) => {
+export const usePendingKycVerifications = (filters?: {
+  page?: number;
+  limit?: number;
+}) => {
   return useQuery({
     queryKey: queryKeys.admin.pendingKyc(filters as Record<string, unknown>),
     queryFn: async () => {
@@ -283,26 +281,28 @@ export const useUpdateUserStatus = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      userId, 
-      data 
-    }: { 
-      userId: UUID; 
-      data: { 
-        status: UserStatus; 
-        reason?: string 
-      } 
+    mutationFn: async ({
+      userId,
+      data,
+    }: {
+      userId: UUID;
+      data: {
+        status: UserStatus;
+        reason?: string;
+      };
     }) => {
       const response = await adminApi.updateUserStatus(userId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.userDetail(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.userDetail(variables.userId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() });
-      showToast('User status updated', 'success');
+      showToast("User status updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update user status', 'error');
+      showToast(error.message || "Failed to update user status", "error");
     },
   });
 };
@@ -315,27 +315,29 @@ export const useUpdateUserKycStatus = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      userId, 
-      data 
-    }: { 
-      userId: UUID; 
-      data: { 
-        status: KycStatus; 
+    mutationFn: async ({
+      userId,
+      data,
+    }: {
+      userId: UUID;
+      data: {
+        status: KycStatus;
         level?: string;
-        reason?: string 
-      } 
+        reason?: string;
+      };
     }) => {
       const response = await adminApi.updateUserKycStatus(userId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.userDetail(variables.userId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.userDetail(variables.userId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.pendingKyc() });
-      showToast('KYC status updated', 'success');
+      showToast("KYC status updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update KYC status', 'error');
+      showToast(error.message || "Failed to update KYC status", "error");
     },
   });
 };
@@ -352,10 +354,10 @@ export const useAdminResetUserPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Password reset email sent', 'success');
+      showToast("Password reset email sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reset password', 'error');
+      showToast(error.message || "Failed to reset password", "error");
     },
   });
 };
@@ -373,11 +375,13 @@ export const useForceLogoutUser = () => {
       return response.data;
     },
     onSuccess: (_, userId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.userDetail(userId) });
-      showToast('User logged out from all devices', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.userDetail(userId),
+      });
+      showToast("User logged out from all devices", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to logout user', 'error');
+      showToast(error.message || "Failed to logout user", "error");
     },
   });
 };
@@ -407,10 +411,10 @@ export const useCreateAdminUser = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.admins() });
-      showToast('Admin user created', 'success');
+      showToast("Admin user created", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create admin user', 'error');
+      showToast(error.message || "Failed to create admin user", "error");
     },
   });
 };
@@ -423,27 +427,27 @@ export const useUpdateAdminUser = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      adminId, 
-      data 
-    }: { 
-      adminId: UUID; 
+    mutationFn: async ({
+      adminId,
+      data,
+    }: {
+      adminId: UUID;
       data: Partial<{
         role: string;
         permissions: string[];
         department: string;
         status: string;
-      }> 
+      }>;
     }) => {
       const response = await adminApi.updateAdminUser(adminId, data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.admins() });
-      showToast('Admin user updated', 'success');
+      showToast("Admin user updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update admin user', 'error');
+      showToast(error.message || "Failed to update admin user", "error");
     },
   });
 };
@@ -462,10 +466,10 @@ export const useDeleteAdminUser = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.admins() });
-      showToast('Admin user deleted', 'success');
+      showToast("Admin user deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete admin user', 'error');
+      showToast(error.message || "Failed to delete admin user", "error");
     },
   });
 };
@@ -482,16 +486,24 @@ export const useApproveTransaction = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ transactionId, note }: { transactionId: UUID; note?: string }) => {
+    mutationFn: async ({
+      transactionId,
+      note,
+    }: {
+      transactionId: UUID;
+      note?: string;
+    }) => {
       const response = await adminApi.approveTransaction(transactionId, note);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.transactions() });
-      showToast('Transaction approved', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.transactions(),
+      });
+      showToast("Transaction approved", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to approve transaction', 'error');
+      showToast(error.message || "Failed to approve transaction", "error");
     },
   });
 };
@@ -504,16 +516,24 @@ export const useRejectTransaction = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ transactionId, reason }: { transactionId: UUID; reason: string }) => {
+    mutationFn: async ({
+      transactionId,
+      reason,
+    }: {
+      transactionId: UUID;
+      reason: string;
+    }) => {
       const response = await adminApi.rejectTransaction(transactionId, reason);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.transactions() });
-      showToast('Transaction rejected', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.transactions(),
+      });
+      showToast("Transaction rejected", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reject transaction', 'error');
+      showToast(error.message || "Failed to reject transaction", "error");
     },
   });
 };
@@ -526,16 +546,24 @@ export const useReverseTransaction = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ transactionId, reason }: { transactionId: UUID; reason: string }) => {
+    mutationFn: async ({
+      transactionId,
+      reason,
+    }: {
+      transactionId: UUID;
+      reason: string;
+    }) => {
       const response = await adminApi.reverseTransaction(transactionId, reason);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.transactions() });
-      showToast('Transaction reversed', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.transactions(),
+      });
+      showToast("Transaction reversed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reverse transaction', 'error');
+      showToast(error.message || "Failed to reverse transaction", "error");
     },
   });
 };
@@ -552,27 +580,27 @@ export const useApproveLoan = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      loanId, 
-      data 
-    }: { 
-      loanId: UUID; 
+    mutationFn: async ({
+      loanId,
+      data,
+    }: {
+      loanId: UUID;
       data: {
         approvedAmount: number;
         interestRate: number;
         term: number;
         note?: string;
-      }
+      };
     }) => {
       const response = await adminApi.approveLoan(loanId, data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.loans() });
-      showToast('Loan approved', 'success');
+      showToast("Loan approved", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to approve loan', 'error');
+      showToast(error.message || "Failed to approve loan", "error");
     },
   });
 };
@@ -585,16 +613,22 @@ export const useRejectLoan = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ loanId, reason }: { loanId: UUID; reason: string }) => {
+    mutationFn: async ({
+      loanId,
+      reason,
+    }: {
+      loanId: UUID;
+      reason: string;
+    }) => {
       const response = await adminApi.rejectLoan(loanId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.loans() });
-      showToast('Loan rejected', 'success');
+      showToast("Loan rejected", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reject loan', 'error');
+      showToast(error.message || "Failed to reject loan", "error");
     },
   });
 };
@@ -613,10 +647,10 @@ export const useDisburseLoan = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.loans() });
-      showToast('Loan disbursed', 'success');
+      showToast("Loan disbursed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to disburse loan', 'error');
+      showToast(error.message || "Failed to disburse loan", "error");
     },
   });
 };
@@ -639,10 +673,10 @@ export const useApproveKycDocument = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.pendingKyc() });
-      showToast('KYC document approved', 'success');
+      showToast("KYC document approved", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to approve document', 'error');
+      showToast(error.message || "Failed to approve document", "error");
     },
   });
 };
@@ -655,16 +689,22 @@ export const useRejectKycDocument = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ documentId, reason }: { documentId: UUID; reason: string }) => {
+    mutationFn: async ({
+      documentId,
+      reason,
+    }: {
+      documentId: UUID;
+      reason: string;
+    }) => {
       const response = await adminApi.rejectKycDocument(documentId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.pendingKyc() });
-      showToast('KYC document rejected', 'success');
+      showToast("KYC document rejected", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reject document', 'error');
+      showToast(error.message || "Failed to reject document", "error");
     },
   });
 };
@@ -681,25 +721,27 @@ export const useResolveFraudAlert = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      alertId, 
-      data 
-    }: { 
-      alertId: UUID; 
-      data: { 
-        resolution: string; 
-        action?: 'none' | 'warn' | 'suspend' | 'block' 
-      } 
+    mutationFn: async ({
+      alertId,
+      data,
+    }: {
+      alertId: UUID;
+      data: {
+        resolution: string;
+        action?: "none" | "warn" | "suspend" | "block";
+      };
     }) => {
       const response = await adminApi.resolveFraudAlert(alertId, data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.fraudAlerts() });
-      showToast('Fraud alert resolved', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.fraudAlerts(),
+      });
+      showToast("Fraud alert resolved", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to resolve alert', 'error');
+      showToast(error.message || "Failed to resolve alert", "error");
     },
   });
 };
@@ -716,35 +758,37 @@ export const useUpdateSystemSettings = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: Partial<{
-      maintenance: boolean;
-      maintenanceMessage: string;
-      registrationEnabled: boolean;
-      withdrawalsEnabled: boolean;
-      depositsEnabled: boolean;
-      remittanceEnabled: boolean;
-      kycRequired: boolean;
-      minKycLevel: string;
-      transactionLimits: {
-        daily: number;
-        monthly: number;
-        perTransaction: number;
-      };
-      fees: {
-        transfer: number;
-        withdrawal: number;
-        remittance: number;
-      };
-    }>) => {
+    mutationFn: async (
+      data: Partial<{
+        maintenance: boolean;
+        maintenanceMessage: string;
+        registrationEnabled: boolean;
+        withdrawalsEnabled: boolean;
+        depositsEnabled: boolean;
+        remittanceEnabled: boolean;
+        kycRequired: boolean;
+        minKycLevel: string;
+        transactionLimits: {
+          daily: number;
+          monthly: number;
+          perTransaction: number;
+        };
+        fees: {
+          transfer: number;
+          withdrawal: number;
+          remittance: number;
+        };
+      }>,
+    ) => {
       const response = await adminApi.updateSystemSettings(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.admin.settings() });
-      showToast('Settings updated', 'success');
+      showToast("Settings updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update settings', 'error');
+      showToast(error.message || "Failed to update settings", "error");
     },
   });
 };

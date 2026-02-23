@@ -3,11 +3,6 @@
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { cn } from '@utils/cn';
-import { useNavbar } from '@contexts/navbar-context';
-import type { NavItem, MobileNavItemProps } from '@types/navigation.types';
 import { 
   X, 
   ChevronDown, 
@@ -25,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '@components/shared/Logo';
 import { Button } from '@components/ui/Button';
+import { ThemeToggle } from '@components/shared/ThemeToggle';
 import Countries from '@core/data/Countries';
 
 // ========================
@@ -173,7 +169,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
     <motion.div
       custom={index}
       variants={itemVariants}
-      className="border-b border-neutral-100 last:border-b-0"
+      className="border-b border-neutral-100 dark:border-neutral-800 last:border-b-0"
     >
       <div className="flex items-center">
         {hasChildren ? (
@@ -183,13 +179,13 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
           >
             <span className="flex items-center gap-3">
               {item.icon && <span className="text-primary-500">{item.icon}</span>}
-              <span className="font-medium text-neutral-800">{item.label}</span>
+              <span className="font-medium text-neutral-800 dark:text-neutral-200">{item.label}</span>
             </span>
             <motion.span
               animate={{ rotate: isExpanded ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown size={18} className="text-neutral-400" />
+              <ChevronDown size={18} className="text-neutral-400 dark:text-neutral-500" />
             </motion.span>
           </button>
         ) : (
@@ -199,7 +195,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
             className="flex items-center gap-3 w-full py-4 px-4"
           >
             {item.icon && <span className="text-primary-500">{item.icon}</span>}
-            <span className="font-medium text-neutral-800">{item.label}</span>
+            <span className="font-medium text-neutral-800 dark:text-neutral-200">{item.label}</span>
           </Link>
         )}
       </div>
@@ -212,14 +208,14 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
             initial="closed"
             animate="open"
             exit="closed"
-            className="overflow-hidden bg-neutral-50"
+            className="overflow-hidden bg-neutral-50 dark:bg-neutral-800/50"
           >
             {item.children!.map((child, childIndex) => (
               <Link
                 key={childIndex}
                 to={child.href}
                 onClick={closeMobileMenu}
-                className="flex items-center gap-2 py-3 px-8 text-sm text-neutral-600 hover:text-primary-600 hover:bg-neutral-100 transition-colors"
+                className="flex items-center gap-2 py-3 px-8 text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
               >
                 <ChevronRight size={14} />
                 {child.label}
@@ -269,32 +265,35 @@ export const MobileNavbar: React.FC = () => {
             initial="closed"
             animate="open"
             exit="closed"
-            className="fixed top-0 right-0 z-[101] h-full w-[85%] max-w-sm bg-white shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 z-[101] h-full w-[85%] max-w-sm bg-white dark:bg-neutral-900 shadow-2xl flex flex-col transition-colors duration-300"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-neutral-200">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-800">
               <Logo size="sm" />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  closeMobileMenu();
-                }}
-                className="p-2 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer z-10"
-                aria-label="Close menu"
-              >
-                <X size={24} className="text-neutral-600" />
-              </button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle size="sm" />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeMobileMenu();
+                  }}
+                  className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer z-10"
+                  aria-label="Close menu"
+                >
+                  <X size={24} className="text-neutral-600 dark:text-neutral-400" />
+                </button>
+              </div>
             </div>
 
             {/* Search */}
-            <div className="p-4 border-b border-neutral-100">
+            <div className="p-4 border-b border-neutral-100 dark:border-neutral-800">
               <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-neutral-100 border-none outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border-none outline-none focus:ring-2 focus:ring-primary-500 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                 />
               </div>
             </div>
@@ -315,10 +314,10 @@ export const MobileNavbar: React.FC = () => {
             </motion.nav>
 
             {/* Country Selector */}
-            <div className="p-4 border-t border-neutral-200">
+            <div className="p-4 border-t border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-2 mb-4">
-                <Globe size={18} className="text-neutral-500" />
-                <select className="flex-1 py-2 px-3 rounded-lg bg-neutral-100 border-none text-sm outline-none">
+                <Globe size={18} className="text-neutral-500 dark:text-neutral-400" />
+                <select className="flex-1 py-2 px-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border-none text-sm outline-none text-neutral-900 dark:text-white">
                   {Countries.slice(0, 10).map((country, index) => (
                     <option key={index} value={country.code}>
                       {country.flag} {country.name}

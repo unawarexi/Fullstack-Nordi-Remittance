@@ -3,12 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Dispute,
-  Report,
-  Currency,
-  UUID,
-} from '../../../types/api.types';
 
 const LEGAL_BASE = '/legal';
 

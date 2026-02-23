@@ -3,12 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Notification,
-  NotificationType,
-  NotificationPreferences,
-  UUID,
-} from '../../../types/api.types';
 
 const NOTIFICATIONS_BASE = '/notifications';
 

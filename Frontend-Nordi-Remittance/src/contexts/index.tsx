@@ -3,7 +3,6 @@
 // ============================================================================
 
 import React from 'react';
-import type { ProviderComponent, ProviderWithProps, ContextStoreProps } from '@types/context.types';
 import { NavbarProvider } from './navbar-context';
 
 // ========================

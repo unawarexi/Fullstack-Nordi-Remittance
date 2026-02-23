@@ -2,36 +2,6 @@
 // SIGNUP PAGE - Multi-step registration with react-hook-form and Zod
 // ============================================================================
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
-
-// Components
-import { Button, Spinner, Modal } from '@components/ui';
-import FormContainer from '@container/FormContainer';
-
-// Step Components
-import {
-  PersonalDetailsStep,
-  IdentityVerificationStep,
-  ContactInfoStep,
-  BankingPreferencesStep,
-  BankAccountStep,
-  SecuritySetupStep,
-  TermsVerificationStep,
-} from './SignupSteps';
-
-// Auth hooks
-import { useRegisterFullKyc } from '@hooks/queries/useAuth';
-
-// Validation
-import { signupSchema, getStepSchema } from '@utils/validators/auth.validators';
-
-// Types
-import type { SignupFormValues, SelectOption } from '@types';
-import { signupInitialValues } from '../../../types/auth.types';
 
 // Data
 import Banks from '@core/data/Banks';
@@ -242,18 +212,18 @@ const Signup = () => {
 
   return (
     <FormContainer step={step} totalSteps={TOTAL_STEPS}>
-      <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-slate-50 lg:w-[50%]">
+      <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-white shadow-sm">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full rounded-md bg-white p-6 md:w-[80%] lg:w-full"
+          className="w-full rounded-lg bg-white p-4 md:p-6"
         >
           {/* Step Content */}
-          <div className="w-full lg:p-6">
+          <div className="w-full">
             {renderStep()}
           </div>
 
           {/* Navigation Buttons */}
-          <div className="mt-8 flex items-center justify-between gap-4 p-4">
+          <div className="mt-6 flex items-center justify-between gap-4 pt-4 border-t border-neutral-100">
             <Button
               type="button"
               variant="outline"
@@ -261,6 +231,7 @@ const Signup = () => {
               onClick={handlePrevious}
               disabled={step === 1}
               leftIcon={<ArrowLeft className="w-4 h-4" />}
+              className="flex-1 max-w-[140px]"
             >
               Previous
             </Button>
@@ -272,6 +243,7 @@ const Signup = () => {
                 size="lg"
                 disabled={isSubmitting || registerMutation.isPending}
                 rightIcon={!isSubmitting && <Check className="w-4 h-4" />}
+                className="flex-1 max-w-[200px] bg-blue-600 hover:bg-blue-700"
               >
                 {isSubmitting || registerMutation.isPending ? (
                   <span className="flex items-center gap-2">
@@ -289,6 +261,7 @@ const Signup = () => {
                 size="lg"
                 onClick={handleNext}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="flex-1 max-w-[140px] bg-blue-600 hover:bg-blue-700"
               >
                 Next
               </Button>
@@ -297,20 +270,11 @@ const Signup = () => {
 
           {/* Error Display */}
           {registerMutation.error && (
-            <div className="mx-4 mb-4 rounded-lg bg-error-50 p-3 text-sm text-error-600">
+            <div className="mt-4 rounded-lg bg-error-50 border border-error-200 p-3 text-sm text-error-600">
               {registerMutation.error.message || 'Registration failed. Please try again.'}
             </div>
           )}
         </form>
-
-        {/* Back to home link */}
-        <Link
-          to="/"
-          className="m-6 flex items-center gap-2 rounded-md bg-primary-100 px-4 py-2 text-sm font-medium text-primary-700 hover:bg-primary-200 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Homepage
-        </Link>
       </div>
 
       {/* Success Modal */}

@@ -3,15 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  User,
-  UserProfile,
-  Address,
-  EmploymentInfo,
-  BankAccount,
-  NotificationPreferences,
-  UUID,
-} from '../../../types/api.types';
 
 const USERS_BASE = '/users';
 

@@ -3,11 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse } from '../client';
-import type {
-  TransactionStats,
-  Currency,
-  TransactionType,
-} from '../../../types/api.types';
 
 const STATISTICS_BASE = '/statistics';
 

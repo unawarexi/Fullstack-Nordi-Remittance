@@ -2,11 +2,6 @@
 // FRAUD HOOKS - TanStack Query hooks for fraud monitoring and alerts
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fraudApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { UUID, FraudAlertSeverity, FraudAlertStatus } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -69,7 +64,10 @@ export const useUnresolvedAlertsCount = () => {
 /**
  * Get my fraud reports
  */
-export const useMyFraudReports = (params?: { page?: number; limit?: number }) => {
+export const useMyFraudReports = (params?: {
+  page?: number;
+  limit?: number;
+}) => {
   return useQuery({
     queryKey: queryKeys.fraud.reports(params as Record<string, unknown>),
     queryFn: async () => {
@@ -92,7 +90,11 @@ export const useReportSuspiciousActivity = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      type: 'unauthorized_access' | 'suspicious_transaction' | 'phishing' | 'other';
+      type:
+        | "unauthorized_access"
+        | "suspicious_transaction"
+        | "phishing"
+        | "other";
       description: string;
       transactionId?: UUID;
       attachments?: UUID[];
@@ -102,10 +104,13 @@ export const useReportSuspiciousActivity = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.fraud.reports() });
-      showToast('Suspicious activity reported. We will investigate.', 'success');
+      showToast(
+        "Suspicious activity reported. We will investigate.",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit report', 'error');
+      showToast(error.message || "Failed to submit report", "error");
     },
   });
 };
@@ -123,13 +128,17 @@ export const useAcknowledgeAlert = () => {
       return response.data;
     },
     onSuccess: (_, alertId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.fraud.alertDetail(alertId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fraud.alertDetail(alertId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.fraud.alerts() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.fraud.unresolvedCount() });
-      showToast('Alert acknowledged', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fraud.unresolvedCount(),
+      });
+      showToast("Alert acknowledged", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to acknowledge alert', 'error');
+      showToast(error.message || "Failed to acknowledge alert", "error");
     },
   });
 };
@@ -142,18 +151,28 @@ export const useMarkAsFalsePositive = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ alertId, reason }: { alertId: UUID; reason: string }) => {
+    mutationFn: async ({
+      alertId,
+      reason,
+    }: {
+      alertId: UUID;
+      reason: string;
+    }) => {
       const response = await fraudApi.markAsFalsePositive(alertId, reason);
       return response.data;
     },
     onSuccess: (_, { alertId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.fraud.alertDetail(alertId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fraud.alertDetail(alertId),
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.fraud.alerts() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.fraud.unresolvedCount() });
-      showToast('Alert marked as false positive', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.fraud.unresolvedCount(),
+      });
+      showToast("Alert marked as false positive", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update alert', 'error');
+      showToast(error.message || "Failed to update alert", "error");
     },
   });
 };
@@ -172,10 +191,13 @@ export const useLockAccount = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() });
-      showToast('Account locked for security. Contact support to unlock.', 'warning');
+      showToast(
+        "Account locked for security. Contact support to unlock.",
+        "warning",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to lock account', 'error');
+      showToast(error.message || "Failed to lock account", "error");
     },
   });
 };
@@ -189,16 +211,16 @@ export const useRequestUnlock = () => {
   return useMutation({
     mutationFn: async (data: {
       reason: string;
-      verificationMethod: 'email' | 'phone' | 'document';
+      verificationMethod: "email" | "phone" | "document";
     }) => {
       const response = await fraudApi.requestUnlock(data);
       return response.data;
     },
     onSuccess: (data) => {
-      showToast(`Unlock request submitted. ${data.nextSteps[0]}`, 'info');
+      showToast(`Unlock request submitted. ${data.nextSteps[0]}`, "info");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to submit unlock request', 'error');
+      showToast(error.message || "Failed to submit unlock request", "error");
     },
   });
 };
@@ -211,16 +233,22 @@ export const useBlockCard = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ cardId, reason }: { cardId: UUID; reason: string }) => {
+    mutationFn: async ({
+      cardId,
+      reason,
+    }: {
+      cardId: UUID;
+      reason: string;
+    }) => {
       const response = await fraudApi.blockCard(cardId, reason);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.cards.list() });
-      showToast('Card blocked for security', 'warning');
+      showToast("Card blocked for security", "warning");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to block card', 'error');
+      showToast(error.message || "Failed to block card", "error");
     },
   });
 };

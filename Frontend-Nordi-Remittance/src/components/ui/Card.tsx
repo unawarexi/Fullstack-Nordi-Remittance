@@ -26,22 +26,22 @@ export interface CardProps extends HTMLMotionProps<'div'> {
 // ========================
 const variantStyles: Record<CardVariant, string> = {
   default: cn(
-    'bg-white border border-neutral-200',
-    'shadow-card',
+    'bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700',
+    'shadow-card dark:shadow-none',
   ),
   elevated: cn(
-    'bg-white',
-    'shadow-lg',
+    'bg-white dark:bg-neutral-800',
+    'shadow-lg dark:shadow-neutral-900/20',
   ),
   outlined: cn(
-    'bg-transparent border-2 border-neutral-200',
+    'bg-transparent border-2 border-neutral-200 dark:border-neutral-700',
   ),
   filled: cn(
-    'bg-neutral-50 border border-neutral-100',
+    'bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700',
   ),
   glass: cn(
-    'bg-white/70 backdrop-blur-lg border border-white/20',
-    'shadow-lg',
+    'bg-white/70 dark:bg-neutral-900/70 backdrop-blur-lg border border-white/20 dark:border-neutral-700/50',
+    'shadow-lg dark:shadow-neutral-900/20',
   ),
 };
 

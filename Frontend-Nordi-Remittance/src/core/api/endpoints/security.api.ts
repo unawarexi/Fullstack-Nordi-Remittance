@@ -3,12 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse } from '../client';
-import type {
-  SecuritySession,
-  SecuritySettings,
-  TrustedDevice,
-  UUID,
-} from '../../../types/api.types';
 
 const SECURITY_BASE = '/security';
 

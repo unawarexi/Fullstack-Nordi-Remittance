@@ -3,11 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Webhook,
-  ApiKey,
-  UUID,
-} from '../../../types/api.types';
 
 const INTEGRATIONS_BASE = '/integrations';
 

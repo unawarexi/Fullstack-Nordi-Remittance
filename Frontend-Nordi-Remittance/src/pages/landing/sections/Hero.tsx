@@ -168,7 +168,7 @@ const HeroCarousel: React.FC = () => {
                   {/* CTA Button */}
                   <Button
                     size={isMobile ? "sm" : "md"}
-                    className="bg-amber-500 hover:bg-amber-600 text-white"
+                    className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500 text-white"
                   >
                     Nordea Access
                     <ArrowRight className="ml-2 w-4 h-4" />
@@ -226,7 +226,7 @@ const HeroCarousel: React.FC = () => {
               className={cn(
                 "h-1.5 sm:h-2 rounded-full transition-all duration-300",
                 currentIndex === index
-                  ? "w-8 sm:w-10 bg-amber-500"
+                  ? "w-8 sm:w-10 bg-primary-500"
                   : "w-2 sm:w-3 bg-white/40 hover:bg-white/60"
               )}
               aria-label={`Go to slide ${index + 1}`}

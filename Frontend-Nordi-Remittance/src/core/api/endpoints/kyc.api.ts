@@ -3,12 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse } from '../client';
-import type {
-  KycDocument,
-  KycStatus,
-  KycLevel,
-  UUID,
-} from '../../../types/api.types';
 
 const KYC_BASE = '/kyc';
 

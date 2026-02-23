@@ -56,15 +56,15 @@ const sizeStyles: Record<InputSize, { input: string; label: string; helper: stri
 // ========================
 const variantStyles: Record<InputVariant, { base: string; focus: string }> = {
   default: {
-    base: 'border border-neutral-300 rounded-lg bg-white',
+    base: 'border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white',
     focus: 'focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
   },
   filled: {
-    base: 'border-0 rounded-lg bg-neutral-100',
-    focus: 'focus:bg-neutral-50 focus:ring-2 focus:ring-primary-500/20',
+    base: 'border-0 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white',
+    focus: 'focus:bg-neutral-50 dark:focus:bg-neutral-700 focus:ring-2 focus:ring-primary-500/20',
   },
   flushed: {
-    base: 'border-0 border-b-2 border-neutral-300 rounded-none bg-transparent px-0',
+    base: 'border-0 border-b-2 border-neutral-300 dark:border-neutral-600 rounded-none bg-transparent px-0 text-neutral-900 dark:text-white',
     focus: 'focus:border-primary-500',
   },
 };
@@ -121,7 +121,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={inputId}
             className={cn(
-              'block font-medium text-neutral-700',
+              'block font-medium text-neutral-700 dark:text-neutral-300',
               sizeConfig.label,
               disabled && 'opacity-50',
             )}
@@ -152,7 +152,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               // Base styles
               'w-full outline-none transition-all duration-200',
-              'placeholder:text-neutral-400',
+              'placeholder:text-neutral-400 dark:placeholder:text-neutral-500',
               // Size & Variant
               sizeConfig.input,
               variantConfig.base,
@@ -160,7 +160,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // States
               hasError && 'border-error-500 focus:border-error-500 focus:ring-error-500/20',
               hasSuccess && 'border-success-500 focus:border-success-500 focus:ring-success-500/20',
-              disabled && 'opacity-50 cursor-not-allowed bg-neutral-100',
+              disabled && 'opacity-50 cursor-not-allowed bg-neutral-100 dark:bg-neutral-900',
               // Icons padding
               leftIcon && 'pl-10',
               (rightIcon || isPassword || hasError || hasSuccess) && 'pr-10',
@@ -184,7 +184,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-neutral-400 hover:text-neutral-600 transition-colors focus:outline-none"
+                className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 transition-colors focus:outline-none"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -197,7 +197,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             
             {/* Custom right icon */}
             {rightIcon && !isPassword && !hasError && !hasSuccess && (
-              <span className={cn('text-neutral-400', sizeConfig.icon)}>
+              <span className={cn('text-neutral-400 dark:text-neutral-500', sizeConfig.icon)}>
                 {rightIcon}
               </span>
             )}
@@ -214,7 +214,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 sizeConfig.helper,
                 error && 'text-error-500',
                 success && !error && 'text-success-500',
-                !error && !success && 'text-neutral-500',
+                !error && !success && 'text-neutral-500 dark:text-neutral-400',
               )}
             >
               {error || success || helperText}

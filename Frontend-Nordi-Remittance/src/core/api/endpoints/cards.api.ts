@@ -3,16 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  Card,
-  CardType,
-  CardStatus,
-  CardTransaction,
-  CreateCardRequest,
-  CardLimitsUpdateRequest,
-  CardSettingsUpdateRequest,
-  UUID,
-} from '../../../types/api.types';
 
 const CARDS_BASE = '/cards';
 

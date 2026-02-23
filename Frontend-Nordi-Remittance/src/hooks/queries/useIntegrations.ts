@@ -2,25 +2,20 @@
 // INTEGRATIONS HOOKS - TanStack Query hooks for webhooks and API keys
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { integrationsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
 // ============================================================================
 
 interface WebhookFilters {
-  status?: 'active' | 'inactive' | 'failed';
+  status?: "active" | "inactive" | "failed";
   eventType?: string;
   page?: number;
   limit?: number;
 }
 
 interface ApiKeyFilters {
-  status?: 'active' | 'revoked' | 'expired';
+  status?: "active" | "revoked" | "expired";
   page?: number;
   limit?: number;
 }
@@ -61,7 +56,7 @@ export const useWebhook = (webhookId: UUID) => {
  */
 export const useWebhookEvents = () => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.all, 'webhook-events'],
+    queryKey: [...queryKeys.integrations.all, "webhook-events"],
     queryFn: async () => {
       const response = await integrationsApi.getWebhookEvents();
       return response.data;
@@ -73,11 +68,21 @@ export const useWebhookEvents = () => {
 /**
  * Get webhook delivery history
  */
-export const useWebhookDeliveries = (webhookId: UUID, params?: { page?: number; limit?: number }) => {
+export const useWebhookDeliveries = (
+  webhookId: UUID,
+  params?: { page?: number; limit?: number },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.webhook(webhookId), 'deliveries', params],
+    queryKey: [
+      ...queryKeys.integrations.webhook(webhookId),
+      "deliveries",
+      params,
+    ],
     queryFn: async () => {
-      const response = await integrationsApi.getWebhookDeliveries(webhookId, params);
+      const response = await integrationsApi.getWebhookDeliveries(
+        webhookId,
+        params,
+      );
       return response;
     },
     enabled: !!webhookId,
@@ -89,7 +94,7 @@ export const useWebhookDeliveries = (webhookId: UUID, params?: { page?: number; 
  */
 export const useWebhookSecret = (webhookId: UUID) => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.webhook(webhookId), 'secret'],
+    queryKey: [...queryKeys.integrations.webhook(webhookId), "secret"],
     queryFn: async () => {
       const response = await integrationsApi.getWebhookSecret(webhookId);
       return response.data;
@@ -133,9 +138,12 @@ export const useApiKey = (keyId: UUID) => {
 /**
  * Get API key usage statistics
  */
-export const useApiKeyUsage = (keyId: UUID, params?: { startDate?: string; endDate?: string }) => {
+export const useApiKeyUsage = (
+  keyId: UUID,
+  params?: { startDate?: string; endDate?: string },
+) => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.apiKey(keyId), 'usage', params],
+    queryKey: [...queryKeys.integrations.apiKey(keyId), "usage", params],
     queryFn: async () => {
       const response = await integrationsApi.getApiKeyUsage(keyId, params);
       return response.data;
@@ -149,7 +157,7 @@ export const useApiKeyUsage = (keyId: UUID, params?: { startDate?: string; endDa
  */
 export const useApiScopes = () => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.all, 'api-scopes'],
+    queryKey: [...queryKeys.integrations.all, "api-scopes"],
     queryFn: async () => {
       const response = await integrationsApi.getApiScopes();
       return response.data;
@@ -180,7 +188,7 @@ export const useConnectedIntegrations = () => {
  */
 export const useAvailableIntegrations = () => {
   return useQuery({
-    queryKey: [...queryKeys.integrations.all, 'available'],
+    queryKey: [...queryKeys.integrations.all, "available"],
     queryFn: async () => {
       const response = await integrationsApi.getAvailableIntegrations();
       return response.data;
@@ -214,11 +222,13 @@ export const useCreateWebhook = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhooks() });
-      showToast('Webhook created successfully', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhooks(),
+      });
+      showToast("Webhook created successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create webhook', 'error');
+      showToast(error.message || "Failed to create webhook", "error");
     },
   });
 };
@@ -231,11 +241,11 @@ export const useUpdateWebhook = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      webhookId, 
-      data 
-    }: { 
-      webhookId: UUID; 
+    mutationFn: async ({
+      webhookId,
+      data,
+    }: {
+      webhookId: UUID;
       data: Partial<{
         name: string;
         url: string;
@@ -243,18 +253,22 @@ export const useUpdateWebhook = () => {
         description: string;
         headers: Record<string, string>;
         active: boolean;
-      }>
+      }>;
     }) => {
       const response = await integrationsApi.updateWebhook(webhookId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhook(variables.webhookId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhooks() });
-      showToast('Webhook updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhook(variables.webhookId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhooks(),
+      });
+      showToast("Webhook updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update webhook', 'error');
+      showToast(error.message || "Failed to update webhook", "error");
     },
   });
 };
@@ -272,11 +286,13 @@ export const useDeleteWebhook = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhooks() });
-      showToast('Webhook deleted', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhooks(),
+      });
+      showToast("Webhook deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete webhook', 'error');
+      showToast(error.message || "Failed to delete webhook", "error");
     },
   });
 };
@@ -294,12 +310,19 @@ export const useToggleWebhookStatus = () => {
       return response.data;
     },
     onSuccess: (data, webhookId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhook(webhookId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.webhooks() });
-      showToast(data.active ? 'Webhook activated' : 'Webhook deactivated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhook(webhookId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.webhooks(),
+      });
+      showToast(
+        data.active ? "Webhook activated" : "Webhook deactivated",
+        "success",
+      );
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update webhook', 'error');
+      showToast(error.message || "Failed to update webhook", "error");
     },
   });
 };
@@ -311,15 +334,21 @@ export const useTestWebhook = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ webhookId, eventType }: { webhookId: UUID; eventType?: string }) => {
+    mutationFn: async ({
+      webhookId,
+      eventType,
+    }: {
+      webhookId: UUID;
+      eventType?: string;
+    }) => {
       const response = await integrationsApi.testWebhook(webhookId, eventType);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Test event sent', 'success');
+      showToast("Test event sent", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send test event', 'error');
+      showToast(error.message || "Failed to send test event", "error");
     },
   });
 };
@@ -337,11 +366,13 @@ export const useRegenerateWebhookSecret = () => {
       return response.data;
     },
     onSuccess: (_, webhookId) => {
-      queryClient.invalidateQueries({ queryKey: [...queryKeys.integrations.webhook(webhookId), 'secret'] });
-      showToast('Secret regenerated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: [...queryKeys.integrations.webhook(webhookId), "secret"],
+      });
+      showToast("Secret regenerated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to regenerate secret', 'error');
+      showToast(error.message || "Failed to regenerate secret", "error");
     },
   });
 };
@@ -354,18 +385,30 @@ export const useRetryWebhookDelivery = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ webhookId, deliveryId }: { webhookId: UUID; deliveryId: UUID }) => {
-      const response = await integrationsApi.retryWebhookDelivery(webhookId, deliveryId);
+    mutationFn: async ({
+      webhookId,
+      deliveryId,
+    }: {
+      webhookId: UUID;
+      deliveryId: UUID;
+    }) => {
+      const response = await integrationsApi.retryWebhookDelivery(
+        webhookId,
+        deliveryId,
+      );
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: [...queryKeys.integrations.webhook(variables.webhookId), 'deliveries'] 
+      queryClient.invalidateQueries({
+        queryKey: [
+          ...queryKeys.integrations.webhook(variables.webhookId),
+          "deliveries",
+        ],
       });
-      showToast('Delivery retried', 'success');
+      showToast("Delivery retried", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to retry delivery', 'error');
+      showToast(error.message || "Failed to retry delivery", "error");
     },
   });
 };
@@ -393,11 +436,13 @@ export const useCreateApiKey = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKeys() });
-      showToast('API key created. Make sure to copy it now!', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKeys(),
+      });
+      showToast("API key created. Make sure to copy it now!", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to create API key', 'error');
+      showToast(error.message || "Failed to create API key", "error");
     },
   });
 };
@@ -410,28 +455,32 @@ export const useUpdateApiKey = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      keyId, 
-      data 
-    }: { 
-      keyId: UUID; 
+    mutationFn: async ({
+      keyId,
+      data,
+    }: {
+      keyId: UUID;
       data: Partial<{
         name: string;
         description: string;
         scopes: string[];
         ipWhitelist: string[];
-      }>
+      }>;
     }) => {
       const response = await integrationsApi.updateApiKey(keyId, data);
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKey(variables.keyId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKeys() });
-      showToast('API key updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKey(variables.keyId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKeys(),
+      });
+      showToast("API key updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update API key', 'error');
+      showToast(error.message || "Failed to update API key", "error");
     },
   });
 };
@@ -449,11 +498,13 @@ export const useRevokeApiKey = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKeys() });
-      showToast('API key revoked', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKeys(),
+      });
+      showToast("API key revoked", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to revoke API key', 'error');
+      showToast(error.message || "Failed to revoke API key", "error");
     },
   });
 };
@@ -471,12 +522,16 @@ export const useRegenerateApiKey = () => {
       return response.data;
     },
     onSuccess: (_, keyId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKey(keyId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.apiKeys() });
-      showToast('New API key generated. Make sure to copy it now!', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKey(keyId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.apiKeys(),
+      });
+      showToast("New API key generated. Make sure to copy it now!", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to regenerate API key', 'error');
+      showToast(error.message || "Failed to regenerate API key", "error");
     },
   });
 };
@@ -502,11 +557,13 @@ export const useConnectIntegration = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.connected() });
-      showToast('Integration connected', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.connected(),
+      });
+      showToast("Integration connected", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to connect integration', 'error');
+      showToast(error.message || "Failed to connect integration", "error");
     },
   });
 };
@@ -520,15 +577,18 @@ export const useDisconnectIntegration = () => {
 
   return useMutation({
     mutationFn: async (integrationId: UUID) => {
-      const response = await integrationsApi.disconnectIntegration(integrationId);
+      const response =
+        await integrationsApi.disconnectIntegration(integrationId);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.connected() });
-      showToast('Integration disconnected', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.connected(),
+      });
+      showToast("Integration disconnected", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to disconnect integration', 'error');
+      showToast(error.message || "Failed to disconnect integration", "error");
     },
   });
 };
@@ -541,22 +601,27 @@ export const useUpdateIntegrationSettings = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ 
-      integrationId, 
-      settings 
-    }: { 
-      integrationId: UUID; 
-      settings: Record<string, unknown> 
+    mutationFn: async ({
+      integrationId,
+      settings,
+    }: {
+      integrationId: UUID;
+      settings: Record<string, unknown>;
     }) => {
-      const response = await integrationsApi.updateIntegrationSettings(integrationId, settings);
+      const response = await integrationsApi.updateIntegrationSettings(
+        integrationId,
+        settings,
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.connected() });
-      showToast('Integration settings updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.connected(),
+      });
+      showToast("Integration settings updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update settings', 'error');
+      showToast(error.message || "Failed to update settings", "error");
     },
   });
 };
@@ -574,11 +639,13 @@ export const useRefreshIntegration = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.integrations.connected() });
-      showToast('Integration refreshed', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.integrations.connected(),
+      });
+      showToast("Integration refreshed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to refresh integration', 'error');
+      showToast(error.message || "Failed to refresh integration", "error");
     },
   });
 };

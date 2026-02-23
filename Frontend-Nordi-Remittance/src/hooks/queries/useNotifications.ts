@@ -2,11 +2,6 @@
 // NOTIFICATIONS HOOKS - TanStack Query hooks for notifications
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { notificationsApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { NotificationType, UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERY PARAMETER TYPES
@@ -57,7 +52,7 @@ export const useNotification = (notificationId: UUID) => {
  */
 export const useUnreadNotificationsCount = () => {
   return useQuery({
-    queryKey: [...queryKeys.notifications.all, 'unread-count'],
+    queryKey: [...queryKeys.notifications.all, "unread-count"],
     queryFn: async () => {
       const response = await notificationsApi.getUnreadCount();
       return response.data;
@@ -84,7 +79,7 @@ export const useNotificationPreferences = () => {
  */
 export const useNotificationCategories = () => {
   return useQuery({
-    queryKey: [...queryKeys.notifications.all, 'categories'],
+    queryKey: [...queryKeys.notifications.all, "categories"],
     queryFn: async () => {
       const response = await notificationsApi.getCategories();
       return response.data;
@@ -122,7 +117,8 @@ export const useMarkMultipleAsRead = () => {
 
   return useMutation({
     mutationFn: async (notificationIds: UUID[]) => {
-      const response = await notificationsApi.markMultipleAsRead(notificationIds);
+      const response =
+        await notificationsApi.markMultipleAsRead(notificationIds);
       return response.data;
     },
     onSuccess: () => {
@@ -145,10 +141,13 @@ export const useMarkAllAsRead = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
-      showToast('All notifications marked as read', 'success');
+      showToast("All notifications marked as read", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to mark notifications as read', 'error');
+      showToast(
+        error.message || "Failed to mark notifications as read",
+        "error",
+      );
     },
   });
 };
@@ -184,10 +183,10 @@ export const useDeleteMultipleNotifications = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
-      showToast('Notifications deleted', 'success');
+      showToast("Notifications deleted", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to delete notifications', 'error');
+      showToast(error.message || "Failed to delete notifications", "error");
     },
   });
 };
@@ -206,10 +205,10 @@ export const useClearAllNotifications = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
-      showToast('All notifications cleared', 'success');
+      showToast("All notifications cleared", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to clear notifications', 'error');
+      showToast(error.message || "Failed to clear notifications", "error");
     },
   });
 };
@@ -225,7 +224,7 @@ export const useUpdateNotificationPreferences = () => {
     mutationFn: async (data: {
       email?: {
         enabled: boolean;
-        frequency?: 'instant' | 'daily' | 'weekly';
+        frequency?: "instant" | "daily" | "weekly";
         categories?: NotificationType[];
       };
       push?: {
@@ -245,11 +244,13 @@ export const useUpdateNotificationPreferences = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.preferences() });
-      showToast('Preferences updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.preferences(),
+      });
+      showToast("Preferences updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update preferences', 'error');
+      showToast(error.message || "Failed to update preferences", "error");
     },
   });
 };
@@ -263,7 +264,7 @@ export const useRegisterPushToken = () => {
   return useMutation({
     mutationFn: async (data: {
       token: string;
-      deviceType: 'ios' | 'android' | 'web';
+      deviceType: "ios" | "android" | "web";
       deviceId?: string;
       deviceName?: string;
     }) => {
@@ -271,10 +272,13 @@ export const useRegisterPushToken = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Push notifications enabled', 'success');
+      showToast("Push notifications enabled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to enable push notifications', 'error');
+      showToast(
+        error.message || "Failed to enable push notifications",
+        "error",
+      );
     },
   });
 };
@@ -291,10 +295,13 @@ export const useUnregisterPushToken = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('Push notifications disabled', 'success');
+      showToast("Push notifications disabled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to disable push notifications', 'error');
+      showToast(
+        error.message || "Failed to disable push notifications",
+        "error",
+      );
     },
   });
 };
@@ -306,15 +313,15 @@ export const useSendTestNotification = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (channel: 'email' | 'push' | 'sms') => {
+    mutationFn: async (channel: "email" | "push" | "sms") => {
       const response = await notificationsApi.sendTestNotification(channel);
       return response.data;
     },
     onSuccess: (_, channel) => {
-      showToast(`Test ${channel} notification sent`, 'success');
+      showToast(`Test ${channel} notification sent`, "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to send test notification', 'error');
+      showToast(error.message || "Failed to send test notification", "error");
     },
   });
 };
@@ -332,11 +339,13 @@ export const useSubscribeToTopic = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.preferences() });
-      showToast('Subscribed to notifications', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.preferences(),
+      });
+      showToast("Subscribed to notifications", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to subscribe', 'error');
+      showToast(error.message || "Failed to subscribe", "error");
     },
   });
 };
@@ -354,11 +363,13 @@ export const useUnsubscribeFromTopic = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.preferences() });
-      showToast('Unsubscribed from notifications', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.preferences(),
+      });
+      showToast("Unsubscribed from notifications", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to unsubscribe', 'error');
+      showToast(error.message || "Failed to unsubscribe", "error");
     },
   });
 };

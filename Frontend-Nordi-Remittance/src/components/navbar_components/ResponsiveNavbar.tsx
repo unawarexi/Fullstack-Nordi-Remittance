@@ -2,42 +2,43 @@
 // RESPONSIVE NAVBAR - Main navbar with mobile/desktop switching
 // ============================================================================
 
-import React, { useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { cn } from '@utils/cn';
-import { Menu, Search, Lock, Globe, ChevronDown, X } from 'lucide-react';
-import { Button } from '@components/ui/Button';
-import { useIsMobile, useBreakpoint } from '@hooks/index';
-import { useNavbar } from '@contexts/navbar-context';
-import MobileNavbar from './MobileNavbar';
-import MegaNavbar from './MegaNavbar';
-import InternetBankingSideBar from './InternetBankingSideBar';
-import Countries from '@core/data/Countries';
-import Images from '@utils/constants/Image_strings';
+import React, { useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { cn } from "@utils/cn";
+import { Menu, Search, Lock, Globe, ChevronDown, X } from "lucide-react";
+import { Button } from "@components/ui/Button";
+import { useIsMobile, useBreakpoint } from "@hooks/index";
+import { useNavbar } from "@contexts/navbar-context";
+import MobileNavbar from "./MobileNavbar";
+import MegaNavbar from "./MegaNavbar";
+import InternetBankingSideBar from "./InternetBankingSideBar";
+import { ThemeToggle } from "@components/shared/ThemeToggle";
+import Countries from "@core/data/Countries";
+import Images from "@utils/constants/Image_strings";
 
 // ========================
 // NAV ITEMS DATA
 // ========================
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Personal', href: '/personal' },
-  { label: 'Business', href: '/business' },
-  { label: 'Corporate', href: '/corporate' },
-  { label: 'Private', href: '/private-banking' },
-  { label: 'Ways to Bank', href: '/ways-to-bank' },
-  { label: 'Contact Us', href: '/contact' },
+  { label: "Home", href: "/" },
+  { label: "Personal", href: "/personal" },
+  { label: "Business", href: "/business" },
+  { label: "Corporate", href: "/corporate" },
+  { label: "Private", href: "/private-banking" },
+  { label: "Ways to Bank", href: "/ways-to-bank" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 const topNavItems = [
-  'About Us',
-  'Sustainable Banking',
-  'Investor Relations',
-  'Media',
-  'Careers',
-  'Branch & ATM Locator',
-  'Market Rates',
-  'HELP',
+  "About Us",
+  "Sustainable Banking",
+  "Investor Relations",
+  "Media",
+  "Careers",
+  "Branch & ATM Locator",
+  "Market Rates",
+  "HELP",
 ];
 
 // ========================
@@ -47,19 +48,21 @@ const SubNavBar: React.FC = () => {
   const { isMdUp } = useBreakpoint();
 
   return (
-    <div className="w-full bg-slate-200 border-b border-neutral-200">
+    <div className="w-full border-b border-border-primary bg-surface-secondary dark:bg-neutral-900">
       <div className="container mx-auto px-4 py-2 sm:py-3">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
           {/* Nav Items - Hidden on mobile, visible on md+ */}
-          <div className={cn(
-            'flex-wrap items-center gap-4 text-xs sm:text-sm',
-            isMdUp ? 'flex' : 'hidden'
-          )}>
+          <div
+            className={cn(
+              "flex-wrap items-center gap-4 text-xs sm:text-sm",
+              isMdUp ? "flex" : "hidden",
+            )}
+          >
             {topNavItems.map((item, index) => (
               <a
                 key={index}
-                href={`#${item.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-neutral-600 hover:text-primary-600 transition-colors whitespace-nowrap"
+                href={`#${item.replace(/\s+/g, "-").toLowerCase()}`}
+                className="whitespace-nowrap text-foreground-secondary transition-colors hover:text-primary-600 dark:hover:text-primary-400"
               >
                 {item}
               </a>
@@ -68,8 +71,8 @@ const SubNavBar: React.FC = () => {
 
           {/* Country Selector - Always visible but smaller on mobile */}
           <div className="flex items-center gap-2">
-            <Globe size={16} className="text-neutral-500" />
-            <select className="bg-transparent border border-neutral-300 rounded-md px-2 py-1 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary-500">
+            <Globe size={16} className="text-foreground-muted" />
+            <select className="rounded-md border border-border-primary bg-surface-primary px-2 py-1 text-xs text-foreground-primary outline-none focus:ring-2 focus:ring-primary-500 dark:bg-neutral-800 sm:text-sm">
               {Countries.slice(0, 10).map((country, index) => (
                 <option key={index} value={country.code}>
                   {country.flag} {country.name}
@@ -90,7 +93,7 @@ const DesktopNavItems: React.FC = () => {
   const { activeMegaMenuItem, handleMegaMenuMouseEnter } = useNavbar();
 
   return (
-    <nav className="hidden lg:flex items-center gap-1">
+    <nav className="hidden items-center gap-1 lg:flex">
       {navItems.map((item, index) => (
         <div
           key={index}
@@ -100,14 +103,14 @@ const DesktopNavItems: React.FC = () => {
           <Link
             to={item.href}
             className={cn(
-              'px-3 py-2 text-sm font-medium rounded-md transition-all',
-              'hover:bg-neutral-100 hover:text-primary-600',
-              activeMegaMenuItem === item.label && 'text-amber-500 bg-amber-50'
+              "rounded-md px-3 py-2 text-sm font-medium transition-all",
+              "hover:bg-neutral-100 hover:text-primary-600",
+              activeMegaMenuItem === item.label && "bg-amber-50 text-amber-500",
             )}
           >
             {item.label}
-            {item.label !== 'Home' && (
-              <ChevronDown size={14} className="inline ml-1" />
+            {item.label !== "Home" && (
+              <ChevronDown size={14} className="ml-1 inline" />
             )}
           </Link>
         </div>
@@ -130,7 +133,7 @@ const SearchBar: React.FC<{ className?: string }> = ({ className }) => {
   }, [isExpanded]);
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn("relative", className)}>
       <AnimatePresence>
         {isExpanded ? (
           <motion.div
@@ -144,13 +147,13 @@ const SearchBar: React.FC<{ className?: string }> = ({ className }) => {
               ref={inputRef}
               type="text"
               placeholder="Search..."
-              className="w-full pl-10 pr-8 py-2 rounded-full bg-neutral-100 border border-neutral-200 text-sm outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full rounded-full border border-neutral-200 bg-neutral-100 py-2 pl-10 pr-8 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-primary-500"
               onBlur={() => setIsExpanded(false)}
             />
             <Search size={16} className="absolute left-3 text-neutral-400" />
             <button
               onClick={() => setIsExpanded(false)}
-              className="absolute right-2 p-1 hover:bg-neutral-200 rounded-full"
+              className="absolute right-2 rounded-full p-1 hover:bg-neutral-200"
             >
               <X size={14} className="text-neutral-500" />
             </button>
@@ -160,7 +163,7 @@ const SearchBar: React.FC<{ className?: string }> = ({ className }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={() => setIsExpanded(true)}
-            className="p-2.5 rounded-full bg-neutral-100 hover:bg-neutral-200 transition-colors"
+            className="rounded-full bg-neutral-100 p-2.5 transition-colors hover:bg-neutral-200"
           >
             <Search size={18} className="text-neutral-600" />
           </motion.button>
@@ -182,7 +185,7 @@ export const ResponsiveNavbar: React.FC = () => {
     handleMegaMenuContentLeave,
     openMobileMenu,
     isSidebarOpen,
-    handleSidebarMouseEnter,
+    toggleSidebar,
   } = useNavbar();
 
   const navRef = useRef<HTMLDivElement>(null);
@@ -191,27 +194,29 @@ export const ResponsiveNavbar: React.FC = () => {
 
   return (
     <>
-      <header 
+      <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[90] transition-all duration-300',
-          isScrolled ? 'shadow-lg' : ''
+          "fixed left-0 right-0 top-0 z-[90] transition-all duration-300",
+          isScrolled ? "shadow-lg" : "",
         )}
       >
         {/* Sub NavBar - Hidden on scroll on mobile */}
-        <div className={cn(
-          'transition-all duration-300',
-          isScrolled && isMobile ? 'h-0 overflow-hidden' : ''
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300",
+            isScrolled && isMobile ? "h-0 overflow-hidden" : "",
+          )}
+        >
           <SubNavBar />
         </div>
 
         {/* Main NavBar */}
-        <div 
+        <div
           ref={navRef}
           onMouseLeave={handleMegaMenuMouseLeave}
           className={cn(
-            'bg-white/95 backdrop-blur-md border-b border-neutral-100',
-            isScrolled ? 'py-2' : 'py-3 sm:py-4'
+            "bg-surface-primary/95 border-b border-border-primary backdrop-blur-md dark:bg-neutral-900/95",
+            isScrolled ? "py-2" : "py-3 sm:py-4",
           )}
         >
           <div className="container mx-auto px-4">
@@ -222,21 +227,24 @@ export const ResponsiveNavbar: React.FC = () => {
                   src={Images.headerLogo}
                   alt="Nordea"
                   className={cn(
-                    'transition-all duration-300',
-                    isScrolled ? 'w-28 sm:w-32' : 'w-32 sm:w-40'
+                    "transition-all duration-300",
+                    isScrolled ? "w-28 sm:w-32" : "w-32 sm:w-40",
                   )}
                 />
               </Link>
 
               {/* Desktop Navigation */}
               {isLgUp && (
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex flex-1 items-center justify-center">
                   <DesktopNavItems />
                 </div>
               )}
 
               {/* Right Section */}
               <div className="flex items-center gap-2 sm:gap-3">
+                {/* Theme Toggle */}
+                <ThemeToggle size="md" className="hidden sm:flex" />
+
                 {/* Search - Hidden on very small screens */}
                 <div className="hidden sm:block">
                   <SearchBar />
@@ -245,10 +253,11 @@ export const ResponsiveNavbar: React.FC = () => {
                 {/* Internet Banking Button */}
                 <Button
                   variant="primary"
-                  size={isMobile ? 'sm' : 'md'}
-                  onMouseEnter={() => !isMobile && handleSidebarMouseEnter()}
-                  onClick={() => isMobile && openMobileMenu()}
-                  className="hidden sm:flex bg-blue-700 hover:bg-blue-800"
+                  size={isMobile ? "sm" : "md"}
+                  onClick={() =>
+                    isMobile ? openMobileMenu() : toggleSidebar()
+                  }
+                  className="hidden bg-blue-700 hover:bg-blue-800 sm:flex"
                 >
                   <Lock size={16} className="mr-1 sm:mr-2" />
                   <span className="hidden md:inline">Internet Banking</span>
@@ -258,7 +267,7 @@ export const ResponsiveNavbar: React.FC = () => {
                 {/* Mobile Menu Button */}
                 <button
                   onClick={openMobileMenu}
-                  className="lg:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+                  className="rounded-lg p-2 transition-colors hover:bg-neutral-100 lg:hidden"
                   aria-label="Open menu"
                 >
                   <Menu size={24} className="text-neutral-700" />
@@ -266,18 +275,17 @@ export const ResponsiveNavbar: React.FC = () => {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Mega Menu - Desktop only, Fixed below navbar */}
         <AnimatePresence>
-          {isLgUp && activeMegaMenuItem && activeMegaMenuItem !== 'Home' && (
-            <motion.div 
+          {isLgUp && activeMegaMenuItem && activeMegaMenuItem !== "Home" && (
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="w-full bg-white border-t border-neutral-100 shadow-lg"
+              className="w-full border-t border-neutral-100 bg-white shadow-lg"
               onMouseEnter={handleMegaMenuContentEnter}
               onMouseLeave={handleMegaMenuContentLeave}
             >
@@ -291,17 +299,15 @@ export const ResponsiveNavbar: React.FC = () => {
       <MobileNavbar />
 
       {/* Internet Banking Sidebar */}
-      <AnimatePresence>
-        {isSidebarOpen && !isMobile && (
-          <InternetBankingSideBar />
-        )}
-      </AnimatePresence>
+      {!isMobile && <InternetBankingSideBar />}
 
       {/* Spacer for fixed header */}
-      <div className={cn(
-        'transition-all duration-300',
-        isScrolled ? 'h-16 sm:h-20' : 'h-24 sm:h-32 lg:h-36'
-      )} />
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isScrolled ? "h-16 sm:h-20" : "h-24 sm:h-32 lg:h-36",
+        )}
+      />
     </>
   );
 };

@@ -3,17 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, getErrorMessage } from '../client';
-import type {
-  User,
-  LoginRequest,
-  LoginResponse,
-  RegisterRequest,
-  FullKycRegisterRequest,
-  TwoFactorAuthRequest,
-  ResetPasswordRequest,
-  ConfirmResetPasswordRequest,
-  ChangePasswordRequest,
-} from '../../../types/api.types';
 
 const AUTH_BASE = '/auth';
 

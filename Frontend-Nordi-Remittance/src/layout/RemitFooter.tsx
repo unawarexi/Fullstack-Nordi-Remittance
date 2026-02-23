@@ -101,8 +101,8 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ category, index }) => {
             key={i}
             href="#"
             className={cn(
-              "block text-sm text-neutral-400",
-              "hover:text-amber-500 transition-colors duration-200",
+              "block text-sm text-neutral-300 dark:text-neutral-400",
+              "hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200",
               "hover:translate-x-1 transform"
             )}
           >
@@ -145,7 +145,7 @@ const RemitFooter: React.FC = () => {
       )}
   
       {/* Main Footer */}
-      <section className="bg-slate-800/95 backdrop-blur-sm relative z-10">
+      <section className="bg-slate-800/95 dark:bg-neutral-900/95 backdrop-blur-sm relative z-10 transition-colors duration-300">
         <Container>
           <div className="py-12 sm:py-16 md:py-20 lg:py-24">
             {/* Footer Grid */}
@@ -161,7 +161,7 @@ const RemitFooter: React.FC = () => {
         </Container>
 
         {/* Newsletter Section */}
-        <div className="border-t border-neutral-700">
+        <div className="border-t border-neutral-700 dark:border-neutral-800">
           <Container>
             <div className="py-8 sm:py-10">
               <div className={cn(
@@ -170,7 +170,7 @@ const RemitFooter: React.FC = () => {
               )}>
                 {/* Newsletter Form */}
                 <div className="flex-1 max-w-md">
-                  <label className="block text-sm font-medium text-neutral-400 mb-2">
+                  <label className="block text-sm font-medium text-neutral-300 dark:text-neutral-400 mb-2">
                     Subscribe to Newsletter
                   </label>
                   <div className="flex gap-2">
@@ -179,21 +179,21 @@ const RemitFooter: React.FC = () => {
                       placeholder="Enter your email"
                       className={cn(
                         "flex-1 px-4 py-2.5 rounded-lg",
-                        "bg-neutral-700/50 border border-neutral-600",
-                        "text-white placeholder-neutral-500 text-sm",
-                        "focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500",
+                        "bg-neutral-700/50 dark:bg-neutral-800/50 border border-neutral-600 dark:border-neutral-700",
+                        "text-white placeholder-neutral-400 dark:placeholder-neutral-500 text-sm",
+                        "focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500",
                         "transition-all duration-200"
                       )}
                     />
                     <Button 
                       size={isMobile ? "sm" : "md"}
-                      className="bg-amber-500 hover:bg-amber-600"
+                      className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700"
                     >
                       <Send size={16} className={isMobile ? "" : "mr-2"} />
                       {!isMobile && "Subscribe"}
                     </Button>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-2">
+                  <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-2">
                     Get updates on Nordea's banking services and promotions.
                   </p>
                 </div>
@@ -208,9 +208,9 @@ const RemitFooter: React.FC = () => {
                       whileTap={{ scale: 0.95 }}
                       className={cn(
                         "w-10 h-10 rounded-full",
-                        "bg-neutral-700 hover:bg-amber-500",
+                        "bg-neutral-700 dark:bg-neutral-800 hover:bg-primary-500 dark:hover:bg-primary-600",
                         "flex items-center justify-center",
-                        "text-neutral-400 hover:text-white",
+                        "text-neutral-300 dark:text-neutral-400 hover:text-white",
                         "transition-all duration-200"
                       )}
                       aria-label={social.label}
@@ -225,25 +225,25 @@ const RemitFooter: React.FC = () => {
         </div>
   
         {/* Bottom Bar */}
-        <div className="bg-slate-900">
+        <div className="bg-slate-900 dark:bg-neutral-950 transition-colors duration-300">
           <Container>
             <div className={cn(
               "py-4 sm:py-5",
               "flex flex-col sm:flex-row items-center justify-between gap-3"
             )}>
-              <p className="text-xs sm:text-sm text-neutral-500 text-center sm:text-left">
+              <p className="text-xs sm:text-sm text-neutral-400 dark:text-neutral-500 text-center sm:text-left">
                 © {new Date().getFullYear()} Nordea Bank — All rights reserved.{" "}
                 <a
                   href="#"
-                  className="text-amber-500 hover:text-amber-400 transition-colors"
+                  className="text-primary-500 hover:text-primary-400 transition-colors"
                 >
                   @Nordea
                 </a>
               </p>
-              <div className="flex items-center gap-4 text-xs sm:text-sm text-neutral-500">
-                <a href="#" className="hover:text-amber-500 transition-colors">Privacy Policy</a>
+              <div className="flex items-center gap-4 text-xs sm:text-sm text-neutral-400 dark:text-neutral-500">
+                <a href="#" className="hover:text-primary-500 transition-colors">Privacy Policy</a>
                 <span>•</span>
-                <a href="#" className="hover:text-amber-500 transition-colors">Terms of Service</a>
+                <a href="#" className="hover:text-primary-500 transition-colors">Terms of Service</a>
               </div>
             </div>
           </Container>

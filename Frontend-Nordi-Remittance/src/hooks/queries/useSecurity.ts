@@ -2,11 +2,6 @@
 // SECURITY HOOKS - TanStack Query hooks for security settings
 // ============================================================================
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { securityApi } from '../../core/api';
-import { queryKeys } from '../../core/api/queryClient';
-import { useToastStore } from '../../store/toast.store';
-import type { UUID } from '../../types/api.types';
 
 // ============================================================================
 // QUERIES
@@ -67,9 +62,12 @@ export const useTrustedDevices = () => {
 /**
  * Get security activity log
  */
-export const useSecurityActivityLog = (params?: { page?: number; limit?: number }) => {
+export const useSecurityActivityLog = (params?: {
+  page?: number;
+  limit?: number;
+}) => {
   return useQuery({
-    queryKey: [...queryKeys.security.all, 'activity-log', params],
+    queryKey: [...queryKeys.security.all, "activity-log", params],
     queryFn: async () => {
       const response = await securityApi.getActivityLog(params);
       return response;
@@ -82,7 +80,7 @@ export const useSecurityActivityLog = (params?: { page?: number; limit?: number 
  */
 export const useLoginHistory = (params?: { page?: number; limit?: number }) => {
   return useQuery({
-    queryKey: [...queryKeys.security.all, 'login-history', params],
+    queryKey: [...queryKeys.security.all, "login-history", params],
     queryFn: async () => {
       const response = await securityApi.getLoginHistory(params);
       return response;
@@ -95,7 +93,7 @@ export const useLoginHistory = (params?: { page?: number; limit?: number }) => {
  */
 export const useTransactionPinStatus = () => {
   return useQuery({
-    queryKey: [...queryKeys.security.all, 'transaction-pin-status'],
+    queryKey: [...queryKeys.security.all, "transaction-pin-status"],
     queryFn: async () => {
       const response = await securityApi.getTransactionPinStatus();
       return response.data;
@@ -115,16 +113,18 @@ export const useEnable2FA = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (method: 'authenticator' | 'sms' | 'email') => {
+    mutationFn: async (method: "authenticator" | "sms" | "email") => {
       const response = await securityApi.enable2FA(method);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.twoFactorStatus() });
-      showToast('2FA setup initiated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.twoFactorStatus(),
+      });
+      showToast("2FA setup initiated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to setup 2FA', 'error');
+      showToast(error.message || "Failed to setup 2FA", "error");
     },
   });
 };
@@ -142,12 +142,16 @@ export const useConfirm2FA = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.twoFactorStatus() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.settings() });
-      showToast('2FA enabled successfully', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.twoFactorStatus(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.settings(),
+      });
+      showToast("2FA enabled successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Invalid code', 'error');
+      showToast(error.message || "Invalid code", "error");
     },
   });
 };
@@ -165,12 +169,16 @@ export const useDisable2FA = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.twoFactorStatus() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.settings() });
-      showToast('2FA disabled', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.twoFactorStatus(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.settings(),
+      });
+      showToast("2FA disabled", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to disable 2FA', 'error');
+      showToast(error.message || "Failed to disable 2FA", "error");
     },
   });
 };
@@ -187,7 +195,7 @@ export const useGenerateBackupCodes = () => {
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to generate backup codes', 'error');
+      showToast(error.message || "Failed to generate backup codes", "error");
     },
   });
 };
@@ -209,11 +217,13 @@ export const useRevokeSession = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.sessions() });
-      showToast('Session revoked', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.sessions(),
+      });
+      showToast("Session revoked", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to revoke session', 'error');
+      showToast(error.message || "Failed to revoke session", "error");
     },
   });
 };
@@ -231,11 +241,13 @@ export const useRevokeAllOtherSessions = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.sessions() });
-      showToast('All other sessions revoked', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.sessions(),
+      });
+      showToast("All other sessions revoked", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to revoke sessions', 'error');
+      showToast(error.message || "Failed to revoke sessions", "error");
     },
   });
 };
@@ -257,11 +269,13 @@ export const useAddTrustedDevice = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.trustedDevices() });
-      showToast('Device added to trusted devices', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.trustedDevices(),
+      });
+      showToast("Device added to trusted devices", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to add device', 'error');
+      showToast(error.message || "Failed to add device", "error");
     },
   });
 };
@@ -279,11 +293,13 @@ export const useRemoveTrustedDevice = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.trustedDevices() });
-      showToast('Device removed', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.trustedDevices(),
+      });
+      showToast("Device removed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to remove device', 'error');
+      showToast(error.message || "Failed to remove device", "error");
     },
   });
 };
@@ -301,11 +317,13 @@ export const useRemoveAllTrustedDevices = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.trustedDevices() });
-      showToast('All trusted devices removed', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.trustedDevices(),
+      });
+      showToast("All trusted devices removed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to remove devices', 'error');
+      showToast(error.message || "Failed to remove devices", "error");
     },
   });
 };
@@ -322,16 +340,20 @@ export const useSetTransactionPin = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { pin: string; confirmPin: string; password: string }) => {
+    mutationFn: async (data: {
+      pin: string;
+      confirmPin: string;
+      password: string;
+    }) => {
       const response = await securityApi.setTransactionPin(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.security.all });
-      showToast('Transaction PIN set successfully', 'success');
+      showToast("Transaction PIN set successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to set PIN', 'error');
+      showToast(error.message || "Failed to set PIN", "error");
     },
   });
 };
@@ -343,15 +365,19 @@ export const useChangeTransactionPin = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { currentPin: string; newPin: string; confirmPin: string }) => {
+    mutationFn: async (data: {
+      currentPin: string;
+      newPin: string;
+      confirmPin: string;
+    }) => {
       const response = await securityApi.changeTransactionPin(data);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Transaction PIN changed', 'success');
+      showToast("Transaction PIN changed", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to change PIN', 'error');
+      showToast(error.message || "Failed to change PIN", "error");
     },
   });
 };
@@ -368,10 +394,10 @@ export const useResetTransactionPin = () => {
       return response.data;
     },
     onSuccess: () => {
-      showToast('PIN reset code sent to your email', 'success');
+      showToast("PIN reset code sent to your email", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reset PIN', 'error');
+      showToast(error.message || "Failed to reset PIN", "error");
     },
   });
 };
@@ -384,16 +410,20 @@ export const useConfirmTransactionPinReset = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { otp: string; newPin: string; confirmPin: string }) => {
+    mutationFn: async (data: {
+      otp: string;
+      newPin: string;
+      confirmPin: string;
+    }) => {
       const response = await securityApi.confirmTransactionPinReset(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.security.all });
-      showToast('Transaction PIN reset successfully', 'success');
+      showToast("Transaction PIN reset successfully", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to reset PIN', 'error');
+      showToast(error.message || "Failed to reset PIN", "error");
     },
   });
 };
@@ -423,11 +453,13 @@ export const useUpdateSecuritySettings = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.security.settings() });
-      showToast('Security settings updated', 'success');
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.security.settings(),
+      });
+      showToast("Security settings updated", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to update settings', 'error');
+      showToast(error.message || "Failed to update settings", "error");
     },
   });
 };
@@ -439,12 +471,16 @@ export const useVerifyIdentity = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { password?: string; code?: string; pin?: string }) => {
+    mutationFn: async (data: {
+      password?: string;
+      code?: string;
+      pin?: string;
+    }) => {
       const response = await securityApi.verifyIdentity(data);
       return response.data;
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Verification failed', 'error');
+      showToast(error.message || "Verification failed", "error");
     },
   });
 };
@@ -456,15 +492,18 @@ export const useRequestSecurityReview = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: { reason: string; contactMethod: 'email' | 'phone' }) => {
+    mutationFn: async (data: {
+      reason: string;
+      contactMethod: "email" | "phone";
+    }) => {
       const response = await securityApi.requestSecurityReview(data);
       return response.data;
     },
     onSuccess: () => {
-      showToast('Security review requested', 'success');
+      showToast("Security review requested", "success");
     },
     onError: (error: Error) => {
-      showToast(error.message || 'Failed to request review', 'error');
+      showToast(error.message || "Failed to request review", "error");
     },
   });
 };

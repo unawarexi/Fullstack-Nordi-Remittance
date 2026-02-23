@@ -3,12 +3,6 @@
 // ============================================================================
 
 import apiClient, { ApiResponse, PaginatedResponse } from '../client';
-import type {
-  FraudAlert,
-  FraudAlertSeverity,
-  FraudAlertStatus,
-  UUID,
-} from '../../../types/api.types';
 
 const FRAUD_BASE = '/fraud';
 

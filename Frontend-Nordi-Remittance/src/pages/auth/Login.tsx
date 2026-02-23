@@ -5,11 +5,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, MessageSquare } from 'lucide-react';
 
 // Components
 import { Button, Input, Spinner } from '@components/ui';
-import GetLocation from '@utils/GetLocation';
+import AuthLayout from '@components/auth_components/AuthLayout';
 
 // Auth hooks and store
 import { useLogin } from '@hooks/queries/useAuth';
@@ -17,9 +17,6 @@ import { useAuthStore } from '@store/auth.store';
 
 // Validation
 import { loginSchema, type LoginFormData } from '@utils/validators/auth.validators';
-
-// Assets
-import Images from '@utils/constants/Image_strings';
 
 // ============================================================================
 // COMPONENT
@@ -87,133 +84,111 @@ const Login = () => {
   };
 
   return (
-    <section className="relative flex min-h-screen w-full">
-      {/* LEFT SECTION - Login Form */}
-      <div className="flex w-full flex-col justify-center bg-slate-50/30 p-6 backdrop-blur-lg md:w-1/2 md:p-10 lg:p-16">
-        {/* Header */}
-        <div className="mb-8 flex w-full items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <img src={Images.headerLogo} alt="Nordea" className="h-10 w-auto" />
-          </Link>
-          <GetLocation />
-        </div>
-
-        {/* Welcome Text */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-gray-900 md:text-4xl">
-            Welcome to Nordea Internet Banking
-          </h1>
-          <p className="mt-4 text-gray-600">
-            Sign in with your Internet Banking details or Nordea More login details.
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            Not registered?{' '}
-            <Link to="/auth/signup" className="text-primary-600 hover:underline">
-              Open savings account
-            </Link>
-          </p>
-        </div>
-
-        {/* Login Form */}
-        <form 
-          onSubmit={handleSubmit(onSubmit)} 
-          className="mx-auto w-full max-w-md space-y-5"
-        >
-          {/* Email Input */}
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="Enter your email"
-            leftIcon={<Mail className="h-5 w-5" />}
-            error={errors.email?.message}
-            isRequired
-            {...register('email')}
-          />
-
-          {/* Password Input */}
-          <Input
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            leftIcon={<Lock className="h-5 w-5" />}
-            showPasswordToggle
-            error={errors.password?.message}
-            isRequired
-            {...register('password')}
-          />
-
-          {/* API Error Display */}
-          {loginMutation.error && (
-            <div className="rounded-lg bg-error-50 p-3 text-sm text-error-600">
-              {loginMutation.error.message || 'Login failed. Please check your credentials.'}
-            </div>
-          )}
-
-          {/* Forgot Password Link */}
-          <div className="text-right">
-            <Link 
-              to="/auth/forgot-password" 
-              className="text-sm text-primary-600 hover:underline"
-            >
-              Forgot Username or Password?
-            </Link>
-          </div>
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            disabled={isSubmitting || loginMutation.isPending}
-          >
-            {isSubmitting || loginMutation.isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <Spinner size="sm" variant="white" />
-                Signing in...
-              </span>
-            ) : (
-              'Sign In'
-            )}
-          </Button>
-
-          {/* Register Button */}
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            fullWidth
-            onClick={() => navigate('/auth/signup')}
-          >
-            Register on Nordea Banking
-          </Button>
-        </form>
-
-        {/* Help Section */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            Have any problem?{' '}
-            <Link to="/contact" className="text-primary-600 hover:underline">
-              Chat with us
-            </Link>
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-auto pt-8 text-center text-xs text-gray-500">
-          <p>© 2024 Nordea Bank PLC. (Licensed by the International Monetary Fund)</p>
-        </div>
-      </div>
-
-      {/* RIGHT SECTION - Image */}
-      <div className="hidden md:block md:w-1/2">
-        <img
-          src={Images.authCard1}
-          alt="Nordea Banking"
-          className="h-full w-full object-cover"
+    <AuthLayout
+      title="Welcome to Nordea Internet Banking"
+      subtitle="Sign in with your Internet Banking details or Nordea More login details."
+      variant="login"
+      alternateAction={{
+        text: "Not registered?",
+        linkText: "Open savings account",
+        href: "/auth/signup"
+      }}
+    >
+      {/* Login Form */}
+      <form 
+        onSubmit={handleSubmit(onSubmit)} 
+        className="space-y-5"
+      >
+        {/* Email Input */}
+        <Input
+          label="Email Address"
+          type="email"
+          placeholder="Enter your email"
+          leftIcon={<Mail className="h-5 w-5" />}
+          error={errors.email?.message}
+          isRequired
+          {...register('email')}
         />
+
+        {/* Password Input */}
+        <Input
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          leftIcon={<Lock className="h-5 w-5" />}
+          showPasswordToggle
+          error={errors.password?.message}
+          isRequired
+          {...register('password')}
+        />
+
+        {/* API Error Display */}
+        {loginMutation.error && (
+          <div className="rounded-lg bg-error-50 border border-error-200 p-3 text-sm text-error-600">
+            {loginMutation.error.message || 'Login failed. Please check your credentials.'}
+          </div>
+        )}
+
+        {/* Forgot Password Link */}
+        <div className="text-right">
+          <Link 
+            to="/auth/forgot-password" 
+            className="text-sm text-primary-600 hover:underline font-medium"
+          >
+            Forgot Username or Password?
+          </Link>
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          disabled={isSubmitting || loginMutation.isPending}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {isSubmitting || loginMutation.isPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <Spinner size="sm" variant="white" />
+              Signing in...
+            </span>
+          ) : (
+            'Sign In'
+          )}
+        </Button>
+
+        {/* Register Button */}
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          fullWidth
+          onClick={() => navigate('/auth/signup')}
+          className="border-primary-600 text-primary-600 hover:bg-primary-50"
+        >
+          Register on Nordea Banking
+        </Button>
+      </form>
+
+      {/* Help Section */}
+      <div className="mt-8 p-4 rounded-xl bg-neutral-100 border border-neutral-200">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-lg bg-primary-100">
+            <MessageSquare className="w-5 h-5 text-primary-600" />
+          </div>
+          <div>
+            <p className="font-medium text-neutral-900">Need help?</p>
+            <p className="text-sm text-neutral-600 mt-1">
+              Have any problem?{' '}
+              <Link to="/contact" className="text-primary-600 hover:underline font-medium">
+                Chat with us
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
-    </section>
+    </AuthLayout>
   );
 };
 

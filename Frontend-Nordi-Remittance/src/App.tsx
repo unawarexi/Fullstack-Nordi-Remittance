@@ -6,6 +6,7 @@ import MainLayout from "@layout/MainLayout";
 import ToastContainer from "@components/ui/ToastContainer";
 import { ErrorBoundary } from "@components/shared/ErrorBoundary";
 import { PageLoader } from "@components/ui/Spinner";
+import ThemeProvider from "@contexts/ThemeProvider";
 import "./App.css";
 
 // Landing page components (direct import for critical path)
@@ -137,11 +138,12 @@ function LandingPage() {
 function App() {
   return (
     <ErrorBoundary>
-      <Router basename="/">
-        {/* Global Toast Notifications */}
-        <ToastContainer />
-        
-        <Suspense fallback={<PageLoader />}>
+      <ThemeProvider>
+        <Router basename="/">
+          {/* Global Toast Notifications */}
+          <ToastContainer />
+          
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* Public/MainLayout routes */}
             <Route
@@ -172,6 +174,7 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
