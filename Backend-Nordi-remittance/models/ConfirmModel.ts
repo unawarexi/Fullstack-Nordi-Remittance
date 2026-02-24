@@ -2,16 +2,25 @@
 // CONFIRMATION & SECURITY MODELS
 // ============================================================================
 
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 // ============================================================================
 // CONFIRMATION TOKEN MODEL
 // ============================================================================
 
 interface IConfirmationToken extends Document {
-  userId: Types.ObjectId;
+  userId: string;
   token: string;
-  type: 'email_verification' | 'password_reset' | 'two_factor' | 'two_factor_setup' | 'phone_verification' | 'email_change' | 'phone_change' | 'account_deletion' | 'refresh_token';
+  type:
+    | "email_verification"
+    | "password_reset"
+    | "two_factor"
+    | "two_factor_setup"
+    | "phone_verification"
+    | "email_change"
+    | "phone_change"
+    | "account_deletion"
+    | "refresh_token";
   expiresAt: Date;
   used: boolean;
   usedAt?: Date;
@@ -19,23 +28,36 @@ interface IConfirmationToken extends Document {
   createdAt: Date;
 }
 
-const ConfirmationTokenSchema = new Schema<IConfirmationToken>({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  token: { type: String, required: true, index: true },
-  type: {
-    type: String,
-    enum: ['email_verification', 'password_reset', 'two_factor', 'two_factor_setup', 'phone_verification', 'email_change', 'phone_change', 'account_deletion', 'refresh_token'],
-    required: true,
-    index: true,
+const ConfirmationTokenSchema = new Schema<IConfirmationToken>(
+  {
+    userId: { type: String, ref: "Users", required: true, index: true },
+    token: { type: String, required: true, index: true },
+    type: {
+      type: String,
+      enum: [
+        "email_verification",
+        "password_reset",
+        "two_factor",
+        "two_factor_setup",
+        "phone_verification",
+        "email_change",
+        "phone_change",
+        "account_deletion",
+        "refresh_token",
+      ],
+      required: true,
+      index: true,
+    },
+    expiresAt: { type: Date, required: true, index: true },
+    used: { type: Boolean, default: false },
+    usedAt: { type: Date },
+    metadata: { type: Schema.Types.Mixed },
+    createdAt: { type: Date, default: Date.now },
   },
-  expiresAt: { type: Date, required: true, index: true },
-  used: { type: Boolean, default: false },
-  usedAt: { type: Date },
-  metadata: { type: Schema.Types.Mixed },
-  createdAt: { type: Date, default: Date.now },
-}, {
-  timestamps: false,
-});
+  {
+    timestamps: false,
+  },
+);
 
 // Compound index for efficient lookups
 ConfirmationTokenSchema.index({ token: 1, type: 1, used: 1 });
@@ -49,7 +71,7 @@ ConfirmationTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 // ============================================================================
 
 interface ILoginAttempt extends Document {
-  userId?: Types.ObjectId;
+  userId?: string;
   email: string;
   ipAddress: string;
   userAgent?: string;
@@ -63,22 +85,25 @@ interface ILoginAttempt extends Document {
   createdAt: Date;
 }
 
-const LoginAttemptSchema = new Schema<ILoginAttempt>({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
-  email: { type: String, required: true, lowercase: true, index: true },
-  ipAddress: { type: String, required: true, index: true },
-  userAgent: { type: String },
-  success: { type: Boolean, required: true, index: true },
-  reason: { type: String },
-  location: {
-    country: { type: String },
-    city: { type: String },
-    region: { type: String },
+const LoginAttemptSchema = new Schema<ILoginAttempt>(
+  {
+    userId: { type: String, ref: "Users", index: true },
+    email: { type: String, required: true, lowercase: true, index: true },
+    ipAddress: { type: String, required: true, index: true },
+    userAgent: { type: String },
+    success: { type: Boolean, required: true, index: true },
+    reason: { type: String },
+    location: {
+      country: { type: String },
+      city: { type: String },
+      region: { type: String },
+    },
+    createdAt: { type: Date, default: Date.now, index: true },
   },
-  createdAt: { type: Date, default: Date.now, index: true },
-}, {
-  timestamps: false,
-});
+  {
+    timestamps: false,
+  },
+);
 
 // Index for analytics and security monitoring
 LoginAttemptSchema.index({ email: 1, createdAt: -1 });
@@ -86,16 +111,19 @@ LoginAttemptSchema.index({ ipAddress: 1, createdAt: -1 });
 LoginAttemptSchema.index({ success: 1, createdAt: -1 });
 
 // Auto-delete old attempts (keep for 90 days)
-LoginAttemptSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
+LoginAttemptSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 90 * 24 * 60 * 60 },
+);
 
 // ============================================================================
 // SECURITY EVENT MODEL
 // ============================================================================
 
 interface ISecurityEvent extends Document {
-  userId?: Types.ObjectId;
+  userId?: string;
   type: string;
-  severity?: 'low' | 'medium' | 'high' | 'critical';
+  severity?: "low" | "medium" | "high" | "critical";
   description?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -107,51 +135,70 @@ interface ISecurityEvent extends Document {
   metadata?: Record<string, any>;
   resolved?: boolean;
   resolvedAt?: Date;
-  resolvedBy?: Types.ObjectId;
+  resolvedBy?: string;
   createdAt: Date;
 }
 
-const SecurityEventSchema = new Schema<ISecurityEvent>({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', index: true },
-  type: { 
-    type: String, 
-    required: true, 
-    index: true,
-    enum: [
-      'login', 'logout', 'login_failed', 'login_locked',
-      'password_changed', 'password_reset_requested', 'password_reset_completed',
-      'email_changed', 'phone_changed',
-      'two_factor_enabled', 'two_factor_disabled', 'two_factor_failed',
-      'status_changed', 'kyc_status_changed',
-      'suspicious_activity', 'account_locked', 'account_unlocked',
-      'account_deleted', 'api_key_created', 'api_key_revoked',
-      'device_added', 'device_removed',
-      'transaction_flagged', 'transaction_blocked',
-      'ip_blocked', 'ip_unblocked',
-    ],
+const SecurityEventSchema = new Schema<ISecurityEvent>(
+  {
+    userId: { type: String, ref: "Users", index: true },
+    type: {
+      type: String,
+      required: true,
+      index: true,
+      enum: [
+        "login",
+        "logout",
+        "login_failed",
+        "login_locked",
+        "password_changed",
+        "password_reset_requested",
+        "password_reset_completed",
+        "email_changed",
+        "phone_changed",
+        "two_factor_enabled",
+        "two_factor_disabled",
+        "two_factor_failed",
+        "status_changed",
+        "kyc_status_changed",
+        "suspicious_activity",
+        "account_locked",
+        "account_unlocked",
+        "account_deleted",
+        "api_key_created",
+        "api_key_revoked",
+        "device_added",
+        "device_removed",
+        "transaction_flagged",
+        "transaction_blocked",
+        "ip_blocked",
+        "ip_unblocked",
+      ],
+    },
+    severity: {
+      type: String,
+      enum: ["low", "medium", "high", "critical"],
+      default: "low",
+      index: true,
+    },
+    description: { type: String },
+    ipAddress: { type: String },
+    userAgent: { type: String },
+    location: {
+      country: { type: String },
+      city: { type: String },
+      region: { type: String },
+    },
+    metadata: { type: Schema.Types.Mixed },
+    resolved: { type: Boolean, default: false },
+    resolvedAt: { type: Date },
+    resolvedBy: { type: String, ref: "Users" },
+    createdAt: { type: Date, default: Date.now, index: true },
   },
-  severity: { 
-    type: String, 
-    enum: ['low', 'medium', 'high', 'critical'],
-    default: 'low',
-    index: true,
+  {
+    timestamps: false,
   },
-  description: { type: String },
-  ipAddress: { type: String },
-  userAgent: { type: String },
-  location: {
-    country: { type: String },
-    city: { type: String },
-    region: { type: String },
-  },
-  metadata: { type: Schema.Types.Mixed },
-  resolved: { type: Boolean, default: false },
-  resolvedAt: { type: Date },
-  resolvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  createdAt: { type: Date, default: Date.now, index: true },
-}, {
-  timestamps: false,
-});
+);
 
 // Indexes for security monitoring
 SecurityEventSchema.index({ userId: 1, type: 1, createdAt: -1 });
@@ -166,22 +213,25 @@ SecurityEventSchema.index({ resolved: 1, severity: 1 });
 interface IBlockedIP extends Document {
   ipAddress: string;
   reason: string;
-  blockedBy?: Types.ObjectId;
+  blockedBy?: string;
   expiresAt?: Date;
   permanent: boolean;
   createdAt: Date;
 }
 
-const BlockedIPSchema = new Schema<IBlockedIP>({
-  ipAddress: { type: String, required: true, unique: true, index: true },
-  reason: { type: String, required: true },
-  blockedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  expiresAt: { type: Date, index: true },
-  permanent: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-}, {
-  timestamps: false,
-});
+const BlockedIPSchema = new Schema<IBlockedIP>(
+  {
+    ipAddress: { type: String, required: true, unique: true, index: true },
+    reason: { type: String, required: true },
+    blockedBy: { type: String, ref: "Users" },
+    expiresAt: { type: Date, index: true },
+    permanent: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+  },
+  {
+    timestamps: false,
+  },
+);
 
 // Auto-delete expired blocks
 BlockedIPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
@@ -191,10 +241,10 @@ BlockedIPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 // ============================================================================
 
 interface IUserDevice extends Document {
-  userId: Types.ObjectId;
+  userId: string;
   deviceId: string;
   deviceName?: string;
-  deviceType?: 'mobile' | 'tablet' | 'desktop' | 'other';
+  deviceType?: "mobile" | "tablet" | "desktop" | "other";
   browser?: string;
   os?: string;
   ipAddress?: string;
@@ -207,24 +257,30 @@ interface IUserDevice extends Document {
   createdAt: Date;
 }
 
-const UserDeviceSchema = new Schema<IUserDevice>({
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  deviceId: { type: String, required: true, index: true },
-  deviceName: { type: String },
-  deviceType: { type: String, enum: ['mobile', 'tablet', 'desktop', 'other'] },
-  browser: { type: String },
-  os: { type: String },
-  ipAddress: { type: String },
-  location: {
-    country: { type: String },
-    city: { type: String },
+const UserDeviceSchema = new Schema<IUserDevice>(
+  {
+    userId: { type: String, ref: "Users", required: true, index: true },
+    deviceId: { type: String, required: true, index: true },
+    deviceName: { type: String },
+    deviceType: {
+      type: String,
+      enum: ["mobile", "tablet", "desktop", "other"],
+    },
+    browser: { type: String },
+    os: { type: String },
+    ipAddress: { type: String },
+    location: {
+      country: { type: String },
+      city: { type: String },
+    },
+    trusted: { type: Boolean, default: false },
+    lastActive: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now },
   },
-  trusted: { type: Boolean, default: false },
-  lastActive: { type: Date, default: Date.now },
-  createdAt: { type: Date, default: Date.now },
-}, {
-  timestamps: false,
-});
+  {
+    timestamps: false,
+  },
+);
 
 UserDeviceSchema.index({ userId: 1, deviceId: 1 }, { unique: true });
 
@@ -241,20 +297,34 @@ interface IConfirm extends Document {
 const ConfirmSchema = new Schema<IConfirm>({
   accountPassword: { type: String, required: true },
   confirmPassword: { type: String, required: true },
-  nationalId: { type: String, required: true }
+  nationalId: { type: String, required: true },
 });
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
-export const ConfirmationToken = mongoose.model<IConfirmationToken>('ConfirmationToken', ConfirmationTokenSchema);
-export const LoginAttempt = mongoose.model<ILoginAttempt>('LoginAttempt', LoginAttemptSchema);
-export const SecurityEvent = mongoose.model<ISecurityEvent>('SecurityEvent', SecurityEventSchema);
-export const BlockedIP = mongoose.model<IBlockedIP>('BlockedIP', BlockedIPSchema);
-export const UserDevice = mongoose.model<IUserDevice>('UserDevice', UserDeviceSchema);
-export const Confirm = mongoose.model<IConfirm>('Confirm', ConfirmSchema);
+export const ConfirmationToken = mongoose.model<IConfirmationToken>(
+  "ConfirmationToken",
+  ConfirmationTokenSchema,
+);
+export const LoginAttempt = mongoose.model<ILoginAttempt>(
+  "LoginAttempt",
+  LoginAttemptSchema,
+);
+export const SecurityEvent = mongoose.model<ISecurityEvent>(
+  "SecurityEvent",
+  SecurityEventSchema,
+);
+export const BlockedIP = mongoose.model<IBlockedIP>(
+  "BlockedIP",
+  BlockedIPSchema,
+);
+export const UserDevice = mongoose.model<IUserDevice>(
+  "UserDevice",
+  UserDeviceSchema,
+);
+export const Confirm = mongoose.model<IConfirm>("Confirm", ConfirmSchema);
 
 // Default export for backward compatibility
 export default Confirm;
-

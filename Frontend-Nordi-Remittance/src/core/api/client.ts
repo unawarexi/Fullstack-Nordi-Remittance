@@ -191,9 +191,12 @@ export interface PaginatedResponse<T> {
 
 export interface ApiError {
   success: false;
-  message: string;
-  errors?: Record<string, string[]>;
-  code?: string;
+  error?: {
+    code?: string;
+    message: string;
+    details?: any;
+  };
+  message?: string; // Fallback
 }
 
 // ============================================================================
@@ -203,15 +206,50 @@ export interface ApiError {
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<ApiError>;
+    const responseData = axiosError.response?.data;
+
+    // Check if the backend sent structured validation error details
+    const backendError = responseData?.error;
+
+    if (backendError) {
+      // If there are specific validation details from mongoose or Zod
+      if (backendError.details) {
+        // Handle array format (e.g. from validators)
+        if (Array.isArray(backendError.details)) {
+          const detailMessages = backendError.details
+            .map((err: any) => err.message)
+            .filter(Boolean);
+
+          if (detailMessages.length > 0) {
+            return detailMessages.join(", ");
+          }
+        }
+        // Handle object format (e.g. Mongoose validation errors)
+        else if (typeof backendError.details === "object") {
+          const detailMessages = Object.values(backendError.details)
+            .map((err: any) => err?.message || String(err))
+            .filter(Boolean);
+
+          if (detailMessages.length > 0) {
+            return detailMessages.join(", ");
+          }
+        }
+      }
+
+      return backendError.message || "An unexpected error occurred";
+    }
+
     return (
-      axiosError.response?.data?.message ||
+      responseData?.message ||
       axiosError.message ||
       "An unexpected error occurred"
     );
   }
+
   if (error instanceof Error) {
     return error.message;
   }
+
   return "An unexpected error occurred";
 };
 

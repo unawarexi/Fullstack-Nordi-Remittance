@@ -1,11 +1,17 @@
-import { v2 as cloudinary } from "cloudinary";
+import {
+  v2 as cloudinary,
+  UploadApiResponse,
+  UploadApiOptions,
+} from "cloudinary";
 import * as dotenv from "dotenv";
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
+import { Request, Response, NextFunction } from "express";
 import {
   extensionToMimeType,
   allowedExtensions,
 } from "@core/utils/extentions.js";
 import path from "path";
+import { CloudinaryUploadResult } from "../types/index.js";
 
 // Load environment variables
 dotenv.config();
@@ -22,7 +28,11 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 
 // Enhanced file filter for all media types
-const fileFilter = (req, file, cb) => {
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+) => {
   const fileExtension = path.extname(file.originalname).toLowerCase();
   const allAllowedExtensions = Object.values(allowedExtensions).flat();
   const allowedMimeTypes = Object.values(extensionToMimeType);
@@ -69,7 +79,12 @@ export const upload = multer({
 });
 
 // Multer error handler middleware
-export function multerErrorHandler(err, req, res, next) {
+export function multerErrorHandler(
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.status(400).json({
@@ -90,25 +105,26 @@ export function multerErrorHandler(err, req, res, next) {
   next();
 }
 
-const getResourceType = (filename) => {
+const getResourceType = (
+  filename: string,
+): "image" | "video" | "raw" | "auto" => {
   const ext = filename.toLowerCase().split(".").pop();
 
   if (allowedExtensions.images.includes(ext)) return "image";
   if (allowedExtensions.videos.includes(ext)) return "video";
-  if (allowedExtensions.audio.includes(ext)) return "audio"; // Cloudinary treats audio as video resource type
+  if (allowedExtensions.audio.includes(ext)) return "video"; // Cloudinary treats audio as video resource type
   return "raw"; // For documents and other files
 };
 
 //Upload file buffer directly to Cloudinary
-
 export const uploadToCloudinary = async (
-  fileBuffer,
-  originalName,
-  folder = "/projects/brainbox",
-) => {
+  fileBuffer: Buffer,
+  originalName: string,
+  folder: string = "projects/banking",
+): Promise<CloudinaryUploadResult> => {
   try {
     const resourceType = getResourceType(originalName);
-    const fileExtension = originalName.split(".").pop();
+    const fileExtension = originalName.split(".").pop() || "";
     const fileName = originalName.split(".").slice(0, -1).join(".");
 
     console.log("Upload parameters:", {
@@ -119,7 +135,7 @@ export const uploadToCloudinary = async (
       fileName,
     });
 
-    const uploadOptions = {
+    const uploadOptions: UploadApiOptions = {
       folder: folder, // This should be "projects/workspace"
       resource_type: resourceType,
       public_id: `${fileName}_${Date.now()}`,
@@ -144,7 +160,7 @@ export const uploadToCloudinary = async (
     console.log("Cloudinary upload options:", uploadOptions);
 
     // Upload buffer directly to Cloudinary
-    const result = await new Promise((resolve, reject) => {
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(uploadOptions, (error, result) => {
           if (error) {
@@ -189,8 +205,8 @@ export const uploadToCloudinary = async (
 };
 
 export const deleteFromCloudinary = async (
-  publicId,
-  resourceType = "image",
+  publicId: string,
+  resourceType: "image" | "video" | "raw" | "auto" = "image",
 ) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId, {
@@ -204,10 +220,10 @@ export const deleteFromCloudinary = async (
 };
 
 export const getOptimizedFileUrl = (
-  publicId,
-  resourceType = "image",
-  transformations = [],
-) => {
+  publicId: string,
+  resourceType: "image" | "video" | "raw" | "auto" = "image",
+  transformations: any[] = [],
+): string => {
   return cloudinary.url(publicId, {
     resource_type: resourceType,
     ...transformations,
@@ -217,7 +233,10 @@ export const getOptimizedFileUrl = (
   });
 };
 
-export const getFileMetadata = async (publicId, resourceType = "image") => {
+export const getFileMetadata = async (
+  publicId: string,
+  resourceType: "image" | "video" | "raw" | "auto" = "image",
+) => {
   try {
     const result = await cloudinary.api.resource(publicId, {
       resource_type: resourceType,

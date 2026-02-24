@@ -2,21 +2,24 @@
 // LOGIN PAGE - Authentication login with react-hook-form and Zod
 // ============================================================================
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, MessageSquare } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, MessageSquare } from "lucide-react";
 
 // Components
-import { Button, Input, Spinner } from '@components/ui';
-import AuthLayout from '@components/auth_components/AuthLayout';
+import { Button, Input, Spinner } from "@components/ui";
+import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useLogin } from '@hooks/queries/useAuth';
-import { useAuthStore } from '@store/auth.store';
+import { useLogin } from "@hooks/queries/useAuth";
+import { useAuthStore } from "@store/auth.store";
 
 // Validation
-import { loginSchema, type LoginFormData } from '@utils/validators/auth.validators';
+import {
+  loginSchema,
+  type LoginFormData,
+} from "@utils/validators/auth.validators";
 
 // ============================================================================
 // COMPONENT
@@ -24,7 +27,7 @@ import { loginSchema, type LoginFormData } from '@utils/validators/auth.validato
 
 const Login = () => {
   const navigate = useNavigate();
-  
+
   // Auth store and mutation
   const { setAuthenticated } = useAuthStore();
   const loginMutation = useLogin();
@@ -37,8 +40,8 @@ const Login = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -46,16 +49,16 @@ const Login = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginMutation.mutateAsync(data);
-      
+
       // If 2FA is required, handle it
       if (response.requiresTwoFactor) {
         // Store temp data and redirect to 2FA page
-        navigate('/auth/verify-2fa', { 
-          state: { 
+        navigate("/auth/verify-2fa", {
+          state: {
             email: data.email,
             tempToken: response.tempToken,
-            method: response.twoFactorMethod 
-          } 
+            method: response.twoFactorMethod,
+          },
         });
         return;
       }
@@ -69,17 +72,22 @@ const Login = () => {
           lastName: response.user.lastName,
           avatar: response.user.avatar,
           role: response.user.role,
-          kycStatus: response.user.kycStatus || 'pending',
+          kycStatus: response.user.kycStatus || "pending",
           isEmailVerified: response.user.emailVerified || false,
           isPhoneVerified: response.user.phoneVerified || false,
         });
       }
 
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Redirect to dashboard based on role
+      if (response.user.role === "admin") {
+        // Notification is handled in the mutation
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/customer/dashboard");
+      }
     } catch (error) {
       // Error is handled by the mutation's onError callback
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
     }
   };
 
@@ -91,14 +99,11 @@ const Login = () => {
       alternateAction={{
         text: "Not registered?",
         linkText: "Open savings account",
-        href: "/auth/signup"
+        href: "/auth/signup",
       }}
     >
       {/* Login Form */}
-      <form 
-        onSubmit={handleSubmit(onSubmit)} 
-        className="space-y-5"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Email Input */}
         <Input
           label="Email Address"
@@ -107,7 +112,7 @@ const Login = () => {
           leftIcon={<Mail className="h-5 w-5" />}
           error={errors.email?.message}
           isRequired
-          {...register('email')}
+          {...register("email")}
         />
 
         {/* Password Input */}
@@ -119,21 +124,22 @@ const Login = () => {
           showPasswordToggle
           error={errors.password?.message}
           isRequired
-          {...register('password')}
+          {...register("password")}
         />
 
         {/* API Error Display */}
         {loginMutation.error && (
-          <div className="rounded-lg bg-error-50 border border-error-200 p-3 text-sm text-error-600">
-            {loginMutation.error.message || 'Login failed. Please check your credentials.'}
+          <div className="rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-600">
+            {loginMutation.error.message ||
+              "Login failed. Please check your credentials."}
           </div>
         )}
 
         {/* Forgot Password Link */}
         <div className="text-right">
-          <Link 
-            to="/auth/forgot-password" 
-            className="text-sm text-primary-600 hover:underline font-medium"
+          <Link
+            to="/auth/forgot-password"
+            className="text-sm font-medium text-primary-600 hover:underline"
           >
             Forgot Username or Password?
           </Link>
@@ -154,7 +160,7 @@ const Login = () => {
               Signing in...
             </span>
           ) : (
-            'Sign In'
+            "Sign In"
           )}
         </Button>
 
@@ -164,7 +170,7 @@ const Login = () => {
           variant="outline"
           size="lg"
           fullWidth
-          onClick={() => navigate('/auth/signup')}
+          onClick={() => navigate("/auth/signup")}
           className="border-primary-600 text-primary-600 hover:bg-primary-50"
         >
           Register on Nordea Banking
@@ -172,16 +178,19 @@ const Login = () => {
       </form>
 
       {/* Help Section */}
-      <div className="mt-8 p-4 rounded-xl bg-neutral-100 border border-neutral-200">
+      <div className="mt-8 rounded-xl border border-neutral-200 bg-neutral-100 p-4">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-primary-100">
-            <MessageSquare className="w-5 h-5 text-primary-600" />
+          <div className="rounded-lg bg-primary-100 p-2">
+            <MessageSquare className="h-5 w-5 text-primary-600" />
           </div>
           <div>
             <p className="font-medium text-neutral-900">Need help?</p>
-            <p className="text-sm text-neutral-600 mt-1">
-              Have any problem?{' '}
-              <Link to="/contact" className="text-primary-600 hover:underline font-medium">
+            <p className="mt-1 text-sm text-neutral-600">
+              Have any problem?{" "}
+              <Link
+                to="/contact"
+                className="font-medium text-primary-600 hover:underline"
+              >
                 Chat with us
               </Link>
             </p>

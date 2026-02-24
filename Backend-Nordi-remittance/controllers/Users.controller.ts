@@ -1,20 +1,46 @@
-
-import { Request, Response, NextFunction } from 'express';
-import type { AuthenticatedRequest, UserRole, AccountStatus, KycStatus } from '../types/index.js';
-import Users from '../models/UserModel.js';
-import { Wallets, AccountBalances, AccountLimits } from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { SecurityEvent, ConfirmationToken } from '../models/ConfirmModel.js';
-import { Notifications } from '../models/NotificationModel.js';
-import Permissions from '../models/PermissionsModel.js';
-import { hashPassword, comparePassword, generateOTP } from '../core/helpers/crypto.helper.js';
-import { sendSuccess, sendCreated, sendPaginated, sendNotFound } from '../core/helpers/response.helper.js';
-import { sanitizeString, isValidEmail, isValidPhone } from '../core/helpers/validation.helper.js';
-import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
-import { sendTemplatedMail } from '../services/Mailer.service.js';
-import EmailContentGenerator from '../core/mail/Mail-content.js';
-import { env } from '../config/env.config.js';
-import { emitToUser, broadcast } from '../services/Websocket.service.js';
+import { Request, Response, NextFunction } from "express";
+import type {
+  AuthenticatedRequest,
+  UserRole,
+  AccountStatus,
+  KycStatus,
+} from "../types/index.js";
+import Users from "../models/UserModel.js";
+import {
+  Wallets,
+  AccountBalances,
+  AccountLimits,
+} from "../models/AccountsModel.js";
+import Transactions from "../models/TransactionModel.js";
+import { SecurityEvent, ConfirmationToken } from "../models/ConfirmModel.js";
+import { Notifications } from "../models/NotificationModel.js";
+import Permissions from "../models/PermissionsModel.js";
+import {
+  hashPassword,
+  comparePassword,
+  generateOTP,
+} from "../core/helpers/crypto.helper.js";
+import {
+  sendSuccess,
+  sendCreated,
+  sendPaginated,
+  sendNotFound,
+} from "../core/helpers/response.helper.js";
+import {
+  sanitizeString,
+  isValidEmail,
+  isValidPhone,
+} from "../core/helpers/validation.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+  ForbiddenError,
+} from "../core/errors/AppError.js";
+import { sendTemplatedMail } from "../services/Mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { env } from "../config/env.config.js";
+import { emitToUser, broadcast } from "../services/Websocket.service.js";
 import {
   cacheUserProfile,
   getCachedUserProfile,
@@ -34,7 +60,7 @@ import {
   CACHE_TTL,
   cacheSet,
   cacheGet,
-} from '../services/Redis.service.js';
+} from "../services/Redis.service.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -43,16 +69,16 @@ const emailGenerator = new EmailContentGenerator();
 // WEBSOCKET EVENT TYPES
 // ============================================================================
 const WS_EVENTS = {
-  PROFILE_UPDATED: 'profile:updated',
-  EMAIL_CHANGED: 'profile:email_changed',
-  PHONE_CHANGED: 'profile:phone_changed',
-  TWO_FACTOR_ENABLED: 'security:2fa_enabled',
-  TWO_FACTOR_DISABLED: 'security:2fa_disabled',
-  ACCOUNT_DELETED: 'account:deleted',
-  NOTIFICATION_NEW: 'notification:new',
-  NOTIFICATION_READ: 'notification:read',
-  KYC_STATUS_CHANGED: 'kyc:status_changed',
-  USER_STATUS_CHANGED: 'user:status_changed',
+  PROFILE_UPDATED: "profile:updated",
+  EMAIL_CHANGED: "profile:email_changed",
+  PHONE_CHANGED: "profile:phone_changed",
+  TWO_FACTOR_ENABLED: "security:2fa_enabled",
+  TWO_FACTOR_DISABLED: "security:2fa_disabled",
+  ACCOUNT_DELETED: "account:deleted",
+  NOTIFICATION_NEW: "notification:new",
+  NOTIFICATION_READ: "notification:read",
+  KYC_STATUS_CHANGED: "kyc:status_changed",
+  USER_STATUS_CHANGED: "user:status_changed",
 };
 
 // ============================================================================
@@ -63,10 +89,14 @@ const WS_EVENTS = {
  * Get current user's profile
  * GET /users/profile
  */
-export async function getProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getProfile(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const userId = req.user.userId;
@@ -83,16 +113,18 @@ export async function getProfile(req: AuthenticatedRequest, res: Response, next:
       });
     }
 
-    const user = await Users.findById(userId)
-      .select('-password -twoFactorSecret -backupCodes');
+    const user = await Users.findById(userId).select(
+      "-password -twoFactorSecret -backupCodes",
+    );
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Get wallets
-    const wallets = await Wallets.find({ user: user._id })
-      .select('walletNumber balances status isPrimary walletType');
+    const wallets = await Wallets.find({ user: user._id }).select(
+      "walletNumber balances status isPrimary walletType",
+    );
 
     // Get permissions
     const permissions = await Permissions.findOne({ userId: user._id });
@@ -116,12 +148,15 @@ export async function getProfile(req: AuthenticatedRequest, res: Response, next:
       homeAddress: user.homeAddress,
       createdAt: user.createdAt,
       lastLogin: user.lastLogin,
-      permissions: permissions ? {
-        enableDomesticTransfers: permissions.enableDomesticTransfers,
-        enableInternationalTransfers: permissions.enableInternationalTransfers,
-        enableCardPayments: permissions.enableCardPayments,
-        enableCryptoTransfers: permissions.enableCryptoTransfers,
-      } : null,
+      permissions: permissions
+        ? {
+            enableDomesticTransfers: permissions.enableDomesticTransfers,
+            enableInternationalTransfers:
+              permissions.enableInternationalTransfers,
+            enableCardPayments: permissions.enableCardPayments,
+            enableCryptoTransfers: permissions.enableCryptoTransfers,
+          }
+        : null,
     };
 
     // Cache profile and wallets in Redis
@@ -148,22 +183,33 @@ export async function getProfile(req: AuthenticatedRequest, res: Response, next:
  * Update current user's profile
  * PATCH /users/profile
  */
-export async function updateProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateProfile(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const allowedFields = [
-      'firstName', 'lastName', 'middleName', 'dateOfBirth', 'gender',
-      'timezone', 'language', 'address', 'profilePicture'
+      "firstName",
+      "lastName",
+      "middleName",
+      "dateOfBirth",
+      "gender",
+      "timezone",
+      "language",
+      "address",
+      "profilePicture",
     ];
 
     const updates: Record<string, any> = {};
 
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
-        if (typeof req.body[field] === 'string') {
+        if (typeof req.body[field] === "string") {
           updates[field] = sanitizeString(req.body[field]);
         } else {
           updates[field] = req.body[field];
@@ -172,26 +218,26 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
     }
 
     if (Object.keys(updates).length === 0) {
-      throw new ValidationError('No valid fields to update');
+      throw new ValidationError("No valid fields to update");
     }
 
     // Validate specific fields
     if (updates.firstName && updates.firstName.length < 2) {
-      throw new ValidationError('First name must be at least 2 characters');
+      throw new ValidationError("First name must be at least 2 characters");
     }
 
     if (updates.lastName && updates.lastName.length < 2) {
-      throw new ValidationError('Last name must be at least 2 characters');
+      throw new ValidationError("Last name must be at least 2 characters");
     }
 
     const user = await Users.findByIdAndUpdate(
       req.user.userId,
       { $set: updates, updatedAt: new Date() },
-      { new: true }
-    ).select('-password -twoFactorSecret -backupCodes');
+      { new: true },
+    ).select("-password -twoFactorSecret -backupCodes");
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Invalidate Redis cache
@@ -199,12 +245,12 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
 
     // Emit WebSocket event for real-time update
     emitToUser(req.user.userId, WS_EVENTS.PROFILE_UPDATED, {
-      type: 'profile_update',
+      type: "profile_update",
       data: { updatedFields: Object.keys(updates) },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { user }, 'Profile updated successfully');
+    sendSuccess(res, { user }, "Profile updated successfully");
   } catch (error) {
     next(error);
   }
@@ -218,41 +264,48 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
  * Update email (requires verification)
  * POST /users/update-email
  */
-export async function updateEmail(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateEmail(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { newEmail, password } = req.body;
 
     if (!newEmail || !isValidEmail(newEmail)) {
-      throw new ValidationError('Valid email is required');
+      throw new ValidationError("Valid email is required");
     }
 
     if (!password) {
-      throw new ValidationError('Password is required to change email');
+      throw new ValidationError("Password is required to change email");
     }
 
     // Check if email is already in use
-    const existingUser = await Users.findOne({ 
+    const existingUser = await Users.findOne({
       email: newEmail.toLowerCase(),
-      _id: { $ne: req.user.userId }
+      _id: { $ne: req.user.userId as string },
     });
 
     if (existingUser) {
-      throw new ValidationError('Email is already in use');
+      throw new ValidationError("Email is already in use");
     }
 
     // Verify password
-    const user = await Users.findById(req.user.userId).select('+password');
+    const user = await Users.findById(req.user.userId).select("+password");
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
-    const isPasswordValid = await comparePassword(password, user.password as string);
+    const isPasswordValid = await comparePassword(
+      password,
+      user.password as string,
+    );
     if (!isPasswordValid) {
-      throw new UnauthorizedError('Invalid password');
+      throw new UnauthorizedError("Invalid password");
     }
 
     // Generate verification OTP
@@ -262,7 +315,7 @@ export async function updateEmail(req: AuthenticatedRequest, res: Response, next
     await ConfirmationToken.create({
       userId: user._id,
       token: otp,
-      type: 'email_change',
+      type: "email_change",
       expiresAt: otpExpiry,
       used: false,
       metadata: { newEmail: newEmail.toLowerCase() },
@@ -273,14 +326,14 @@ export async function updateEmail(req: AuthenticatedRequest, res: Response, next
       firstName: user.firstName as string,
       email: newEmail.toLowerCase(),
       otpCode: otp,
-      purpose: 'verify your new email address',
-      expiresIn: '15 minutes',
+      purpose: "verify your new email address",
+      expiresIn: "15 minutes",
       userId: user._id.toString(),
     });
 
     await sendTemplatedMail(newEmail, emailContent);
 
-    sendSuccess(res, null, 'Verification code sent to new email');
+    sendSuccess(res, null, "Verification code sent to new email");
   } catch (error) {
     next(error);
   }
@@ -290,28 +343,32 @@ export async function updateEmail(req: AuthenticatedRequest, res: Response, next
  * Confirm email change with OTP
  * POST /users/confirm-email-change
  */
-export async function confirmEmailChange(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function confirmEmailChange(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { otp } = req.body;
 
     if (!otp) {
-      throw new ValidationError('Verification code is required');
+      throw new ValidationError("Verification code is required");
     }
 
     const tokenDoc = await ConfirmationToken.findOne({
       userId: req.user.userId,
       token: otp,
-      type: 'email_change',
+      type: "email_change",
       used: false,
       expiresAt: { $gt: new Date() },
     });
 
     if (!tokenDoc || !tokenDoc.metadata?.newEmail) {
-      throw new ValidationError('Invalid or expired verification code');
+      throw new ValidationError("Invalid or expired verification code");
     }
 
     const newEmail = tokenDoc.metadata.newEmail;
@@ -319,13 +376,13 @@ export async function confirmEmailChange(req: AuthenticatedRequest, res: Respons
     // Update user email
     const user = await Users.findByIdAndUpdate(
       req.user.userId,
-      { 
+      {
         email: newEmail,
         emailVerified: true,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      { new: true }
-    ).select('-password -twoFactorSecret -backupCodes');
+      { new: true },
+    ).select("-password -twoFactorSecret -backupCodes");
 
     // Mark token as used
     await ConfirmationToken.updateOne({ _id: tokenDoc._id }, { used: true });
@@ -333,9 +390,9 @@ export async function confirmEmailChange(req: AuthenticatedRequest, res: Respons
     // Log security event
     await SecurityEvent.create({
       userId: req.user.userId,
-      type: 'email_changed',
+      type: "email_changed",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       metadata: { newEmail },
       createdAt: new Date(),
     });
@@ -345,12 +402,12 @@ export async function confirmEmailChange(req: AuthenticatedRequest, res: Respons
 
     // Emit WebSocket event
     emitToUser(req.user.userId, WS_EVENTS.EMAIL_CHANGED, {
-      type: 'email_changed',
+      type: "email_changed",
       data: { newEmail },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { user }, 'Email updated successfully');
+    sendSuccess(res, { user }, "Email updated successfully");
   } catch (error) {
     next(error);
   }
@@ -364,41 +421,48 @@ export async function confirmEmailChange(req: AuthenticatedRequest, res: Respons
  * Update phone (requires verification)
  * POST /users/update-phone
  */
-export async function updatePhone(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updatePhone(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { newPhone, password } = req.body;
 
     if (!newPhone || !isValidPhone(newPhone)) {
-      throw new ValidationError('Valid phone number is required');
+      throw new ValidationError("Valid phone number is required");
     }
 
     if (!password) {
-      throw new ValidationError('Password is required to change phone');
+      throw new ValidationError("Password is required to change phone");
     }
 
     // Check if phone is already in use
-    const existingUser = await Users.findOne({ 
+    const existingUser = await Users.findOne({
       phone: newPhone,
-      _id: { $ne: req.user.userId }
+      _id: { $ne: req.user.userId },
     });
 
     if (existingUser) {
-      throw new ValidationError('Phone number is already in use');
+      throw new ValidationError("Phone number is already in use");
     }
 
     // Verify password
-    const user = await Users.findById(req.user.userId).select('+password');
+    const user = await Users.findById(req.user.userId).select("+password");
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
-    const isPasswordValid = await comparePassword(password, user.password as string);
+    const isPasswordValid = await comparePassword(
+      password,
+      user.password as string,
+    );
     if (!isPasswordValid) {
-      throw new UnauthorizedError('Invalid password');
+      throw new UnauthorizedError("Invalid password");
     }
 
     // Generate OTP
@@ -408,7 +472,7 @@ export async function updatePhone(req: AuthenticatedRequest, res: Response, next
     await ConfirmationToken.create({
       userId: user._id,
       token: otp,
-      type: 'phone_change',
+      type: "phone_change",
       expiresAt: otpExpiry,
       used: false,
       metadata: { newPhone },
@@ -416,9 +480,9 @@ export async function updatePhone(req: AuthenticatedRequest, res: Response, next
 
     // TODO: Send OTP via SMS
     // For now, return it in response (development only)
-    sendSuccess(res, { 
-      message: 'Verification code sent to new phone',
-      ...(env.NODE_ENV === 'development' && { otp })
+    sendSuccess(res, {
+      message: "Verification code sent to new phone",
+      ...(env.NODE_ENV === "development" && { otp }),
     });
   } catch (error) {
     next(error);
@@ -429,28 +493,32 @@ export async function updatePhone(req: AuthenticatedRequest, res: Response, next
  * Confirm phone change with OTP
  * POST /users/confirm-phone-change
  */
-export async function confirmPhoneChange(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function confirmPhoneChange(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { otp } = req.body;
 
     if (!otp) {
-      throw new ValidationError('Verification code is required');
+      throw new ValidationError("Verification code is required");
     }
 
     const tokenDoc = await ConfirmationToken.findOne({
       userId: req.user.userId,
       token: otp,
-      type: 'phone_change',
+      type: "phone_change",
       used: false,
       expiresAt: { $gt: new Date() },
     });
 
     if (!tokenDoc || !tokenDoc.metadata?.newPhone) {
-      throw new ValidationError('Invalid or expired verification code');
+      throw new ValidationError("Invalid or expired verification code");
     }
 
     const newPhone = tokenDoc.metadata.newPhone;
@@ -458,13 +526,13 @@ export async function confirmPhoneChange(req: AuthenticatedRequest, res: Respons
     // Update user phone
     const user = await Users.findByIdAndUpdate(
       req.user.userId,
-      { 
+      {
         phone: newPhone,
         phoneVerified: true,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      { new: true }
-    ).select('-password -twoFactorSecret -backupCodes');
+      { new: true },
+    ).select("-password -twoFactorSecret -backupCodes");
 
     // Mark token as used
     await ConfirmationToken.updateOne({ _id: tokenDoc._id }, { used: true });
@@ -472,9 +540,9 @@ export async function confirmPhoneChange(req: AuthenticatedRequest, res: Respons
     // Log security event
     await SecurityEvent.create({
       userId: req.user.userId,
-      type: 'phone_changed',
+      type: "phone_changed",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       metadata: { newPhone },
       createdAt: new Date(),
     });
@@ -484,12 +552,12 @@ export async function confirmPhoneChange(req: AuthenticatedRequest, res: Respons
 
     // Emit WebSocket event
     emitToUser(req.user.userId, WS_EVENTS.PHONE_CHANGED, {
-      type: 'phone_changed',
-      data: { newPhone: newPhone.slice(0, 4) + '****' + newPhone.slice(-2) },
+      type: "phone_changed",
+      data: { newPhone: newPhone.slice(0, 4) + "****" + newPhone.slice(-2) },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { user }, 'Phone updated successfully');
+    sendSuccess(res, { user }, "Phone updated successfully");
   } catch (error) {
     next(error);
   }
@@ -503,24 +571,28 @@ export async function confirmPhoneChange(req: AuthenticatedRequest, res: Respons
  * Enable 2FA
  * POST /users/enable-2fa
  */
-export async function enable2FA(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function enable2FA(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const user = await Users.findById(req.user.userId);
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     if (user.twoFactorEnabled) {
-      throw new ValidationError('Two-factor authentication is already enabled');
+      throw new ValidationError("Two-factor authentication is already enabled");
     }
 
     // Generate secret (in production, use speakeasy or similar)
     const secret = `SECRET_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    
+
     // Generate backup codes
     const backupCodes: string[] = [];
     for (let i = 0; i < 10; i++) {
@@ -529,9 +601,9 @@ export async function enable2FA(req: AuthenticatedRequest, res: Response, next: 
 
     // Store secret temporarily (user needs to verify before enabling)
     await ConfirmationToken.create({
-      userId: user._id,
+      userId: user._id as string,
       token: secret,
-      type: 'two_factor_setup',
+      type: "two_factor_setup",
       expiresAt: new Date(Date.now() + 15 * 60 * 1000),
       used: false,
       metadata: { backupCodes },
@@ -540,11 +612,15 @@ export async function enable2FA(req: AuthenticatedRequest, res: Response, next: 
     // In production, generate a proper TOTP URI and QR code
     const otpAuthUrl = `otpauth://totp/Remit:${user.email}?secret=${secret}&issuer=Remit`;
 
-    sendSuccess(res, {
-      secret,
-      otpAuthUrl,
-      backupCodes,
-    }, 'Please verify your 2FA setup by entering a code from your authenticator app');
+    sendSuccess(
+      res,
+      {
+        secret,
+        otpAuthUrl,
+        backupCodes,
+      },
+      "Please verify your 2FA setup by entering a code from your authenticator app",
+    );
   } catch (error) {
     next(error);
   }
@@ -554,33 +630,39 @@ export async function enable2FA(req: AuthenticatedRequest, res: Response, next: 
  * Verify and confirm 2FA setup
  * POST /users/verify-2fa-setup
  */
-export async function verify2FASetup(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function verify2FASetup(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { code } = req.body;
 
     if (!code) {
-      throw new ValidationError('Verification code is required');
+      throw new ValidationError("Verification code is required");
     }
 
     const tokenDoc = await ConfirmationToken.findOne({
       userId: req.user.userId,
-      type: 'two_factor_setup',
+      type: "two_factor_setup",
       used: false,
       expiresAt: { $gt: new Date() },
     });
 
     if (!tokenDoc) {
-      throw new ValidationError('2FA setup session expired. Please start again.');
+      throw new ValidationError(
+        "2FA setup session expired. Please start again.",
+      );
     }
 
     // In production, verify the TOTP code against the secret
     // For now, accept any 6-digit code for testing
     if (code.length !== 6) {
-      throw new ValidationError('Invalid verification code');
+      throw new ValidationError("Invalid verification code");
     }
 
     // Enable 2FA
@@ -589,10 +671,10 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
       {
         twoFactorEnabled: true,
         twoFactorSecret: tokenDoc.token,
-        twoFactorMethod: 'authenticator',
+        twoFactorMethod: "authenticator",
         backupCodes: tokenDoc.metadata?.backupCodes || [],
         updatedAt: new Date(),
-      }
+      },
     );
 
     // Mark token as used
@@ -601,9 +683,9 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
     // Log security event
     await SecurityEvent.create({
       userId: req.user.userId,
-      type: 'two_factor_enabled',
+      type: "two_factor_enabled",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       createdAt: new Date(),
     });
 
@@ -612,12 +694,12 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
 
     // Emit WebSocket event for security notification
     emitToUser(req.user.userId, WS_EVENTS.TWO_FACTOR_ENABLED, {
-      type: 'security_update',
+      type: "security_update",
       data: { twoFactorEnabled: true },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Two-factor authentication enabled successfully');
+    sendSuccess(res, null, "Two-factor authentication enabled successfully");
   } catch (error) {
     next(error);
   }
@@ -627,38 +709,47 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
  * Disable 2FA
  * POST /users/disable-2fa
  */
-export async function disable2FA(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function disable2FA(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { password, code } = req.body;
 
     if (!password) {
-      throw new ValidationError('Password is required');
+      throw new ValidationError("Password is required");
     }
 
-    const user = await Users.findById(req.user.userId).select('+password +twoFactorSecret');
+    const user = await Users.findById(req.user.userId).select(
+      "+password +twoFactorSecret",
+    );
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     if (!user.twoFactorEnabled) {
-      throw new ValidationError('Two-factor authentication is not enabled');
+      throw new ValidationError("Two-factor authentication is not enabled");
     }
 
     // Verify password
-    const isPasswordValid = await comparePassword(password, user.password as string);
+    const isPasswordValid = await comparePassword(
+      password,
+      user.password as string,
+    );
     if (!isPasswordValid) {
-      throw new UnauthorizedError('Invalid password');
+      throw new UnauthorizedError("Invalid password");
     }
 
     // Verify 2FA code or backup code
     const backupCodes = user.backupCodes as string[] | undefined;
-    const isValidCode = backupCodes?.includes(code) || code === '123456'; // TODO: TOTP verification
+    const isValidCode = backupCodes?.includes(code) || code === "123456"; // TODO: TOTP verification
     if (!isValidCode) {
-      throw new ValidationError('Invalid verification code');
+      throw new ValidationError("Invalid verification code");
     }
 
     // Disable 2FA
@@ -670,15 +761,15 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
         twoFactorMethod: null,
         backupCodes: [],
         updatedAt: new Date(),
-      }
+      },
     );
 
     // Log security event
     await SecurityEvent.create({
       userId: req.user.userId,
-      type: 'two_factor_disabled',
+      type: "two_factor_disabled",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       createdAt: new Date(),
     });
 
@@ -687,7 +778,7 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
       firstName: user.firstName as string,
       email: user.email as string,
       disabledAt: new Date().toISOString(),
-      ipAddress: req.clientIp || req.ip || 'Unknown',
+      ipAddress: req.clientIp || req.ip || "Unknown",
       userId: user._id.toString(),
     });
 
@@ -698,12 +789,12 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
 
     // Emit WebSocket event for security notification
     emitToUser(req.user.userId, WS_EVENTS.TWO_FACTOR_DISABLED, {
-      type: 'security_update',
+      type: "security_update",
       data: { twoFactorEnabled: false },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Two-factor authentication disabled');
+    sendSuccess(res, null, "Two-factor authentication disabled");
   } catch (error) {
     next(error);
   }
@@ -717,10 +808,14 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
  * Get user's recent activity
  * GET /users/activity
  */
-export async function getActivity(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getActivity(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const page = parseInt(req.query.page as string) || 1;
@@ -736,7 +831,12 @@ export async function getActivity(req: AuthenticatedRequest, res: Response, next
       SecurityEvent.countDocuments({ userId: req.user.userId }),
     ]);
 
-    sendPaginated(res, activities, { page, limit, total }, 'Activity retrieved successfully');
+    sendPaginated(
+      res,
+      activities,
+      { page, limit, total },
+      "Activity retrieved successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -750,29 +850,40 @@ export async function getActivity(req: AuthenticatedRequest, res: Response, next
  * Get user's notifications
  * GET /users/notifications
  */
-export async function getNotifications(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getNotifications(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const skip = (page - 1) * limit;
-    const unreadOnly = req.query.unread === 'true';
+    const unreadOnly = req.query.unread === "true";
 
     // Try Redis cache for first page of notifications
     if (page === 1 && !unreadOnly) {
-      const cachedNotifications = await getCachedUserNotifications(req.user.userId);
+      const cachedNotifications = await getCachedUserNotifications(
+        req.user.userId,
+      );
       const cachedUnreadCount = await getUnreadCount(req.user.userId);
-      
+
       if (cachedNotifications) {
-        return sendPaginated(res, cachedNotifications, { 
-          page, 
-          limit, 
-          total: cachedNotifications.length,
-          unreadCount: cachedUnreadCount,
-        }, 'Notifications retrieved');
+        return sendPaginated(
+          res,
+          cachedNotifications,
+          {
+            page,
+            limit,
+            total: cachedNotifications.length,
+            unreadCount: cachedUnreadCount,
+          },
+          "Notifications retrieved",
+        );
       }
     }
 
@@ -796,7 +907,12 @@ export async function getNotifications(req: AuthenticatedRequest, res: Response,
       await cacheUserNotifications(req.user.userId, notifications);
     }
 
-    sendPaginated(res, notifications, { page, limit, total, unreadCount }, 'Notifications retrieved');
+    sendPaginated(
+      res,
+      notifications,
+      { page, limit, total, unreadCount },
+      "Notifications retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -806,10 +922,14 @@ export async function getNotifications(req: AuthenticatedRequest, res: Response,
  * Mark notification as read
  * PATCH /users/notifications/:id/read
  */
-export async function markNotificationRead(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function markNotificationRead(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
@@ -817,11 +937,11 @@ export async function markNotificationRead(req: AuthenticatedRequest, res: Respo
     const notification = await Notifications.findOneAndUpdate(
       { _id: id, user: req.user.userId },
       { isRead: true, readAt: new Date() },
-      { new: true }
+      { new: true },
     );
 
     if (!notification) {
-      throw new NotFoundError('Notification not found');
+      throw new NotFoundError("Notification not found");
     }
 
     // Invalidate notification cache
@@ -829,12 +949,12 @@ export async function markNotificationRead(req: AuthenticatedRequest, res: Respo
 
     // Emit WebSocket event
     emitToUser(req.user.userId, WS_EVENTS.NOTIFICATION_READ, {
-      type: 'notification_read',
+      type: "notification_read",
       data: { notificationId: id },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { notification }, 'Notification marked as read');
+    sendSuccess(res, { notification }, "Notification marked as read");
   } catch (error) {
     next(error);
   }
@@ -844,15 +964,19 @@ export async function markNotificationRead(req: AuthenticatedRequest, res: Respo
  * Mark all notifications as read
  * POST /users/notifications/read-all
  */
-export async function markAllNotificationsRead(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function markAllNotificationsRead(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     await Notifications.updateMany(
       { user: req.user.userId, isRead: false },
-      { isRead: true, readAt: new Date() }
+      { isRead: true, readAt: new Date() },
     );
 
     // Reset unread count and invalidate cache
@@ -863,11 +987,11 @@ export async function markAllNotificationsRead(req: AuthenticatedRequest, res: R
 
     // Emit WebSocket event
     emitToUser(req.user.userId, WS_EVENTS.NOTIFICATION_READ, {
-      type: 'all_notifications_read',
+      type: "all_notifications_read",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'All notifications marked as read');
+    sendSuccess(res, null, "All notifications marked as read");
   } catch (error) {
     next(error);
   }
@@ -881,27 +1005,34 @@ export async function markAllNotificationsRead(req: AuthenticatedRequest, res: R
  * Request account deletion
  * POST /users/delete-account
  */
-export async function requestAccountDeletion(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function requestAccountDeletion(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { password, reason } = req.body;
 
     if (!password) {
-      throw new ValidationError('Password is required');
+      throw new ValidationError("Password is required");
     }
 
-    const user = await Users.findById(req.user.userId).select('+password');
+    const user = await Users.findById(req.user.userId).select("+password");
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Verify password
-    const isPasswordValid = await comparePassword(password, user.password as string);
+    const isPasswordValid = await comparePassword(
+      password,
+      user.password as string,
+    );
     if (!isPasswordValid) {
-      throw new UnauthorizedError('Invalid password');
+      throw new UnauthorizedError("Invalid password");
     }
 
     // Check for pending transactions or balances
@@ -913,17 +1044,21 @@ export async function requestAccountDeletion(req: AuthenticatedRequest, res: Res
         if (balance > 0) hasBalance = true;
       });
       if (hasBalance) {
-        throw new ValidationError('Please withdraw your remaining balance before deleting your account');
+        throw new ValidationError(
+          "Please withdraw your remaining balance before deleting your account",
+        );
       }
     }
 
     const pendingTransactions = await Transactions.countDocuments({
       $or: [{ sender: user._id }, { recipient: user._id }],
-      status: { $in: ['pending', 'processing'] },
+      status: { $in: ["pending", "processing"] },
     });
 
     if (pendingTransactions > 0) {
-      throw new ValidationError('Please wait for pending transactions to complete before deleting your account');
+      throw new ValidationError(
+        "Please wait for pending transactions to complete before deleting your account",
+      );
     }
 
     // Generate deletion confirmation token
@@ -931,9 +1066,9 @@ export async function requestAccountDeletion(req: AuthenticatedRequest, res: Res
     const deletionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await ConfirmationToken.create({
-      userId: user._id,
+      userId: user._id as string,
       token: deletionToken,
-      type: 'account_deletion',
+      type: "account_deletion",
       expiresAt: deletionExpiry,
       used: false,
       metadata: { reason },
@@ -944,13 +1079,13 @@ export async function requestAccountDeletion(req: AuthenticatedRequest, res: Res
       firstName: user.firstName as string,
       email: user.email as string,
       verificationCode: deletionToken,
-      expiresIn: '24 hours',
+      expiresIn: "24 hours",
       userId: user._id.toString(),
     });
 
     await sendTemplatedMail(user.email as string, emailContent);
 
-    sendSuccess(res, null, 'Account deletion confirmation sent to your email');
+    sendSuccess(res, null, "Account deletion confirmation sent to your email");
   } catch (error) {
     next(error);
   }
@@ -960,47 +1095,48 @@ export async function requestAccountDeletion(req: AuthenticatedRequest, res: Res
  * Confirm account deletion
  * POST /users/confirm-deletion
  */
-export async function confirmAccountDeletion(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function confirmAccountDeletion(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { code } = req.body;
 
     if (!code) {
-      throw new ValidationError('Confirmation code is required');
+      throw new ValidationError("Confirmation code is required");
     }
 
     const tokenDoc = await ConfirmationToken.findOne({
       userId: req.user.userId,
       token: code,
-      type: 'account_deletion',
+      type: "account_deletion",
       used: false,
       expiresAt: { $gt: new Date() },
     });
 
     if (!tokenDoc) {
-      throw new ValidationError('Invalid or expired confirmation code');
+      throw new ValidationError("Invalid or expired confirmation code");
     }
 
     // Soft delete user
     await Users.updateOne(
       { _id: req.user.userId },
       {
-        status: 'deactivated',
+        status: "deactivated",
         deletedAt: new Date(),
         email: `deleted_${req.user.userId}_${Date.now()}@deleted.local`,
         phone: null,
         updatedAt: new Date(),
-      }
+      },
     );
 
     // Deactivate wallets
-    await Wallets.updateMany(
-      { user: req.user.userId },
-      { status: 'closed' }
-    );
+    await Wallets.updateMany({ user: req.user.userId }, { status: "closed" });
 
     // Mark token as used
     await ConfirmationToken.updateOne({ _id: tokenDoc._id }, { used: true });
@@ -1008,9 +1144,9 @@ export async function confirmAccountDeletion(req: AuthenticatedRequest, res: Res
     // Log security event
     await SecurityEvent.create({
       userId: req.user.userId,
-      type: 'account_deleted',
+      type: "account_deleted",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
       metadata: { reason: tokenDoc.metadata?.reason },
       createdAt: new Date(),
     });
@@ -1020,11 +1156,11 @@ export async function confirmAccountDeletion(req: AuthenticatedRequest, res: Res
 
     // Emit WebSocket event (user will be disconnected after this)
     emitToUser(req.user.userId, WS_EVENTS.ACCOUNT_DELETED, {
-      type: 'account_deleted',
+      type: "account_deleted",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Account deleted successfully');
+    sendSuccess(res, null, "Account deleted successfully");
   } catch (error) {
     next(error);
   }
@@ -1038,10 +1174,14 @@ export async function confirmAccountDeletion(req: AuthenticatedRequest, res: Res
  * Get all users (admin only)
  * GET /users
  */
-export async function getAllUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAllUsers(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const page = parseInt(req.query.page as string) || 1;
@@ -1050,7 +1190,7 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response, next
 
     // Build filter
     const filter: Record<string, any> = {};
-    
+
     if (req.query.status) {
       filter.status = req.query.status;
     }
@@ -1061,7 +1201,7 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response, next
       filter.kycStatus = req.query.kycStatus;
     }
     if (req.query.search) {
-      const searchRegex = new RegExp(req.query.search as string, 'i');
+      const searchRegex = new RegExp(req.query.search as string, "i");
       filter.$or = [
         { email: searchRegex },
         { firstName: searchRegex },
@@ -1072,12 +1212,12 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response, next
     }
 
     // Build sort
-    const sortField = (req.query.sortBy as string) || 'createdAt';
-    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+    const sortField = (req.query.sortBy as string) || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
 
     const [users, total] = await Promise.all([
       Users.find(filter)
-        .select('-password -twoFactorSecret -backupCodes')
+        .select("-password -twoFactorSecret -backupCodes")
         .sort({ [sortField]: sortOrder })
         .skip(skip)
         .limit(limit)
@@ -1085,7 +1225,12 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response, next
       Users.countDocuments(filter),
     ]);
 
-    sendPaginated(res, users, { page, limit, total }, 'Users retrieved successfully');
+    sendPaginated(
+      res,
+      users,
+      { page, limit, total },
+      "Users retrieved successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -1095,27 +1240,32 @@ export async function getAllUsers(req: AuthenticatedRequest, res: Response, next
  * Get user by ID (admin only)
  * GET /users/:id
  */
-export async function getUserById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getUserById(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
 
-    const user = await Users.findById(id)
-      .select('-password -twoFactorSecret -backupCodes');
+    const user = await Users.findById(id).select(
+      "-password -twoFactorSecret -backupCodes",
+    );
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Get wallets
-    const wallets = await Wallets.find({ user: user._id });
+    const wallets = await Wallets.find({ user: user._id as string });
 
     // Get recent transactions
     const recentTransactions = await Transactions.find({
-      $or: [{ sender: user._id }, { recipient: user._id }],
+      $or: [{ sender: user._id as string }, { recipient: user._id as string }],
     })
       .sort({ createdAt: -1 })
       .limit(10)
@@ -1139,42 +1289,49 @@ export async function getUserById(req: AuthenticatedRequest, res: Response, next
  * Update user status (admin only)
  * PATCH /users/:id/status
  */
-export async function updateUserStatus(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateUserStatus(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
     const { status, reason } = req.body;
 
-    const validStatuses = ['active', 'suspended', 'locked', 'deactivated'];
+    const validStatuses = ["active", "suspended", "locked", "deactivated"];
     if (!status || !validStatuses.includes(status)) {
-      throw new ValidationError('Invalid status');
+      throw new ValidationError("Invalid status");
     }
 
     const user = await Users.findByIdAndUpdate(
       id,
-      { 
+      {
         status,
         updatedAt: new Date(),
-        ...(status === 'suspended' && { suspendedAt: new Date(), suspendReason: reason }),
+        ...(status === "suspended" && {
+          suspendedAt: new Date(),
+          suspendReason: reason,
+        }),
       },
-      { new: true }
-    ).select('-password -twoFactorSecret -backupCodes');
+      { new: true },
+    ).select("-password -twoFactorSecret -backupCodes");
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Log admin action
     await SecurityEvent.create({
-      userId: id,
-      type: 'status_changed',
+      userId: id as string,
+      type: "status_changed",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
-      metadata: { 
-        newStatus: status, 
+      userAgent: req.headers["user-agent"],
+      metadata: {
+        newStatus: status,
         changedBy: req.user.userId,
         reason,
       },
@@ -1182,11 +1339,11 @@ export async function updateUserStatus(req: AuthenticatedRequest, res: Response,
     });
 
     // Invalidate user cache
-    await invalidateUserCache(id);
+    await invalidateUserCache(id as string);
 
     // Emit WebSocket event to affected user
-    emitToUser(id, WS_EVENTS.USER_STATUS_CHANGED, {
-      type: 'status_changed',
+    emitToUser(id as string, WS_EVENTS.USER_STATUS_CHANGED, {
+      type: "status_changed",
       data: { newStatus: status, reason },
       timestamp: new Date().toISOString(),
     });
@@ -1201,43 +1358,50 @@ export async function updateUserStatus(req: AuthenticatedRequest, res: Response,
  * Update user KYC status (admin only)
  * PATCH /users/:id/kyc
  */
-export async function updateUserKyc(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateUserKyc(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     if (!req.user) {
-      throw new UnauthorizedError('Authentication required');
+      throw new UnauthorizedError("Authentication required");
     }
 
     const { id } = req.params;
     const { kycStatus, reason } = req.body;
 
-    const validStatuses = ['pending', 'approved', 'rejected', 'expired'];
+    const validStatuses = ["pending", "approved", "rejected", "expired"];
     if (!kycStatus || !validStatuses.includes(kycStatus)) {
-      throw new ValidationError('Invalid KYC status');
+      throw new ValidationError("Invalid KYC status");
     }
 
     const user = await Users.findByIdAndUpdate(
       id,
-      { 
+      {
         kycStatus,
         updatedAt: new Date(),
-        ...(kycStatus === 'approved' && { kycApprovedAt: new Date() }),
-        ...(kycStatus === 'rejected' && { kycRejectedAt: new Date(), kycRejectionReason: reason }),
+        ...(kycStatus === "approved" && { kycApprovedAt: new Date() }),
+        ...(kycStatus === "rejected" && {
+          kycRejectedAt: new Date(),
+          kycRejectionReason: reason,
+        }),
       },
-      { new: true }
-    ).select('-password -twoFactorSecret -backupCodes');
+      { new: true },
+    ).select("-password -twoFactorSecret -backupCodes");
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     // Log admin action
     await SecurityEvent.create({
-      userId: id,
-      type: 'kyc_status_changed',
+      userId: id as string,
+      type: "kyc_status_changed",
       ipAddress: req.clientIp || req.ip,
-      userAgent: req.headers['user-agent'],
-      metadata: { 
-        newKycStatus: kycStatus, 
+      userAgent: req.headers["user-agent"],
+      metadata: {
+        newKycStatus: kycStatus,
         changedBy: req.user.userId,
         reason,
       },
@@ -1245,11 +1409,14 @@ export async function updateUserKyc(req: AuthenticatedRequest, res: Response, ne
     });
 
     // Send notification email using template
-    const kycEmailStatus = kycStatus === 'expired' ? 'pending' : kycStatus as 'pending' | 'approved' | 'rejected';
+    const kycEmailStatus =
+      kycStatus === "expired"
+        ? "pending"
+        : (kycStatus as "pending" | "approved" | "rejected");
     const emailContent = emailGenerator.kycStatusEmail({
       firstName: user.firstName as string,
       status: kycEmailStatus,
-      notes: kycStatus === 'rejected' ? reason : undefined,
+      notes: kycStatus === "rejected" ? reason : undefined,
       userId: id as string,
     });
 
@@ -1257,13 +1424,13 @@ export async function updateUserKyc(req: AuthenticatedRequest, res: Response, ne
 
     // Invalidate user and KYC cache
     await Promise.all([
-      invalidateUserCache(id),
-      invalidateKycCache(id),
+      invalidateUserCache(id as string),
+      invalidateKycCache(id as string),
     ]);
 
     // Emit WebSocket event for KYC status change
-    emitToUser(id, WS_EVENTS.KYC_STATUS_CHANGED, {
-      type: 'kyc_status_changed',
+    emitToUser(id as string, WS_EVENTS.KYC_STATUS_CHANGED, {
+      type: "kyc_status_changed",
       data: { newStatus: kycStatus, reason },
       timestamp: new Date().toISOString(),
     });

@@ -194,7 +194,7 @@ export async function register(
     await session.commitTransaction();
 
     // Send verification email (non-blocking)
-    const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/verify-email?token=${verificationToken}`;
     sendTemplatedMail(
       user.email as string,
       emailGenerator.emailVerificationEmail({
@@ -387,7 +387,7 @@ export async function registerFullKyc(
         const res = await uploadToCloudinary(
           file.buffer,
           file.originalname,
-          "/projects/nordi-remittance/kyc",
+          "projects/nordi-remittance/kyc",
         );
         return res.url;
       }
@@ -473,7 +473,7 @@ export async function registerFullKyc(
 
     // Create default wallet with initial deposit
     const wallet = new Wallets({
-      userId: user._id,
+      user: user._id,
       walletNumber: generateWalletNumber(),
       currency: currency || "USD",
       balance: Number(initialDeposit) || 0,
@@ -896,12 +896,15 @@ export async function verify2FA(
     }
 
     // Mark token as used
-    await ConfirmationToken.updateOne({ _id: tokenDoc._id }, { used: true });
+    await ConfirmationToken.updateOne(
+      { _id: tokenDoc._id as string },
+      { used: true },
+    );
 
     // If backup code was used, remove it
     if (backupCodes?.includes(code)) {
       await Users.updateOne(
-        { _id: user._id },
+        { _id: user._id as string },
         { $pull: { backupCodes: code } },
       );
     }
@@ -1297,7 +1300,7 @@ export async function forgotPassword(
     });
 
     // Send email
-    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/reset-password?token=${resetToken}`;
     await sendTemplatedMail(
       user.email as string,
       emailGenerator.passwordResetEmail({

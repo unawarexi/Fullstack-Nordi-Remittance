@@ -456,6 +456,21 @@ export interface TransferRequest {
 // CARD TYPES
 // ============================================================================
 
+export interface CloudinaryUploadResult {
+  url: string;
+  public_id: string;
+  resource_type: string;
+  format: string;
+  bytes: number;
+  width?: number;
+  height?: number;
+  duration?: number;
+  original_filename: string;
+  created_at: string;
+  type: string;
+  filename: string;
+}
+
 export interface CardInfo {
   id: string;
   cardNumber: string; // masked

@@ -37,11 +37,16 @@ export const authApi = {
    * Register a new user with full KYC information
    */
   registerFullKyc: async (
-    data: FullKycRegisterRequest,
+    data: FullKycRegisterRequest | FormData,
   ): Promise<ApiResponse<{ user: User; message: string }>> => {
     const response = await apiClient.post<
       ApiResponse<{ user: User; message: string }>
-    >(`${AUTH_BASE}/register/full`, data);
+    >(`${AUTH_BASE}/register/full`, data, {
+      headers: {
+        "Content-Type":
+          data instanceof FormData ? undefined : "application/json",
+      },
+    });
     return response.data;
   },
 

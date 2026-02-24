@@ -101,7 +101,7 @@ export const useRegister = () => {
       );
     },
     onError: (error: Error) => {
-      showToast(error.message || "Registration failed", "error");
+      showToast(error.message || "Registration failed", "error", 8000);
     },
   });
 };
@@ -113,7 +113,7 @@ export const useRegisterFullKyc = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: FullKycRegisterRequest) => {
+    mutationFn: async (data: FullKycRegisterRequest | FormData) => {
       const response = await authApi.registerFullKyc(data);
       return response.data;
     },
@@ -124,7 +124,7 @@ export const useRegisterFullKyc = () => {
       );
     },
     onError: (error: Error) => {
-      showToast(error.message || "Registration failed", "error");
+      showToast(error.message || "Registration failed", "error", 8000);
     },
   });
 };

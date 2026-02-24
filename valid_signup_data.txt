@@ -1,0 +1,76 @@
+====================================================
+VALID SIGNUP DUMMY DATA FOR NORDI REMITTANCE
+====================================================
+
+You can use the following details to fill out the 5-step signup form 
+quickly and ensure you pass all validation checks.
+
+----------------------------------------------------
+STEP 1: PERSONAL DETAILS
+----------------------------------------------------
+First Name:          John
+Middle Name:         Edward
+Last Name:           Doe
+Date of Birth:       [Any date before 2005 to be >= 18 years old]
+Gender:              Male (or female, other)
+Nationality:         US
+Country of Res.:     US
+Marital Status:      Single
+
+----------------------------------------------------
+STEP 2: IDENTITY VERIFICATION
+----------------------------------------------------
+Profile Picture:     [Upload an image: .jpg, .png]
+Government ID:       [Upload an image or .pdf]
+ID Type:             passport
+ID Number:           A123456789
+ID Expiry Date:      [Any date in the future, e.g., 2030]
+Proof of Address:    [Upload an image or .pdf]
+Address Doc Type:    utility_bill
+Social Sec. No:      123-45-6789 (Optional)
+Tax ID Name (TIN):   987-65-4321
+
+----------------------------------------------------
+STEP 3: CONTACT INFORMATION
+----------------------------------------------------
+Email:               john.doe.test@example.com
+Mobile Number:       +14155552671
+Alternative Phone:   +14155552672 (Optional)
+Home Address:        123 Main Street, Apt 4B
+City:                San Francisco
+State/Province:      CA
+ZIP/Postal Code:     94105
+Country:             US
+
+----------------------------------------------------
+STEP 4: BANKING PREFERENCES
+----------------------------------------------------
+Account Type:        checking 
+Currency:            USD
+Source of Income:    salary
+Monthly Income:      5000-10000
+Initial Deposit:     500 (Must be >= 100)
+Employment Status:   employed
+Employer Name:       Tech Corp Inc (Required if employed)
+Occupation:          Software Engineer
+
+----------------------------------------------------
+STEP 5: BANK ACCOUNT DETAILS
+----------------------------------------------------
+Account Name:        John E Doe
+Account Number:      000123456789
+Bank Name:           Chase Bank
+Bank Address:        456 Market St, San Francisco, CA
+IBAN Number:         US44CHAS00012345678901
+Routing Number:      121000248
+SWIFT/BIC Code:      CHASUS33
+
+----------------------------------------------------
+STEP 6: SECURITY & CONSENT
+----------------------------------------------------
+Password:            StrongPass123!
+Confirm Password:    StrongPass123!
+Security Question:   mother_maiden_name
+Security Answer:     Smith
+Terms agreement:     [Checked]
+====================================================
