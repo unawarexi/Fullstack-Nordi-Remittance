@@ -7,6 +7,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { sessionManager } from "../auth/session.manager";
 
 // API Base URL - configured via environment variable
 const API_BASE_URL =
@@ -132,8 +133,7 @@ apiClient.interceptors.response.use(
       const refreshToken = TokenManager.getRefreshToken();
 
       if (!refreshToken) {
-        TokenManager.clearTokens();
-        window.location.href = "/auth/login";
+        sessionManager.forceLogout("token_expired");
         return Promise.reject(error);
       }
 
@@ -155,8 +155,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError as Error, null);
-        TokenManager.clearTokens();
-        window.location.href = "/auth/login";
+        sessionManager.forceLogout("token_expired");
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

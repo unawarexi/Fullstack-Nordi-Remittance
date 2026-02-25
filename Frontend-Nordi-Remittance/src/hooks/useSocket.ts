@@ -8,7 +8,7 @@ import { getSocket } from "../core/socket/socket.client";
 import { useSocketStore } from "../store/socket.store";
 import { useToastStore } from "../store/toast.store";
 import { useAuthStore } from "../store/auth.store";
-import { WS, type WSEventName } from "../core/constants/ws-events";
+import { WS, type WSEventName } from "../core/events/ws-events";
 
 // ============================================================================
 // GENERIC: useSocketEvent — subscribe to any WS event with auto-cleanup
@@ -216,14 +216,10 @@ export function useRealtimeNotifications() {
 
 export function useRealtimeSecurity() {
   const queryClient = useQueryClient();
-  const showToast = useToastStore((s) => s.showToast);
-  const logout = useAuthStore((s) => s.logout);
 
-  // All sessions revoked → force logout on this device
-  useSocketEvent(WS.SECURITY.ALL_SESSIONS_REVOKED, () => {
-    showToast("All sessions have been revoked. You have been logged out.", "warning");
-    logout();
-  });
+  // NOTE: ALL_SESSIONS_REVOKED and ACCOUNT_LOCKED are handled by useSessionManager
+  // via sessionManager.forceLogout() which shows the SessionExpiredModal + proper cleanup.
+  // We only handle cache invalidation here to avoid double-logout race conditions.
 
   // Single session revoked → could be this device
   useSocketEvent<{ sessionId?: string }>(WS.SECURITY.SESSION_REVOKED, () => {

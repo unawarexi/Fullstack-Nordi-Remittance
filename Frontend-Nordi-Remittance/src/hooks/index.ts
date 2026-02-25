@@ -27,6 +27,10 @@ export {
 // IntersectionObserver Hook
 export { useInView } from './useInView';
 
+// Session Management Hook
+export { useSessionManager } from './useSessionManager';
+export type { SessionModalState } from './useSessionManager';
+
 // Media Query Hook
 export { 
   useMediaQuery,

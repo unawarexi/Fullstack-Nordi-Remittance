@@ -3,6 +3,22 @@
 // ============================================================================
 
 import { QueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+
+// ============================================================================
+// RETRY FILTER — Never retry 401/403 (auth errors handled by interceptor)
+// ============================================================================
+
+const shouldRetry = (failureCount: number, error: unknown): boolean => {
+  // Don't retry auth errors — the interceptor handles token refresh / logout
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+    if (status === 401 || status === 403) return false;
+    // Don't retry client errors (4xx) except rate-limit (429)
+    if (status && status >= 400 && status < 500 && status !== 429) return false;
+  }
+  return failureCount < 3;
+};
 
 // ============================================================================
 // DEFAULT OPTIONS
@@ -17,8 +33,8 @@ export const queryClient = new QueryClient({
       // Cache data for 30 minutes
       gcTime: 30 * 60 * 1000,
       
-      // Retry failed requests up to 3 times
-      retry: 3,
+      // Smart retry: skip auth errors, retry server errors up to 3x
+      retry: shouldRetry,
       
       // Retry delay with exponential backoff
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -30,8 +46,8 @@ export const queryClient = new QueryClient({
       refetchOnReconnect: true,
     },
     mutations: {
-      // Retry mutations once
-      retry: 1,
+      // Smart retry for mutations too
+      retry: (failureCount, error) => shouldRetry(failureCount, error),
       
       // Retry delay
       retryDelay: 1000,
