@@ -979,7 +979,7 @@ const Communication: React.FC = () => {
                         <Shield size={18} className="text-red-500" />
                         <span className="text-sm font-medium">Security Alerts</span>
                       </div>
-                      <div className="text-xs font-medium text-gray-500 bg-red-50 text-red-700 px-2 py-1 rounded">
+                      <div className="text-xs font-medium bg-red-50 text-red-700 px-2 py-1 rounded">
                         Always On
                       </div>
                     </div>
