@@ -1,24 +1,19 @@
 // ============================================================================
-// INVESTMENTS — Main investments dashboard
+// INVESTMENTS — Main investments dashboard (Dark mode + Shared Primitives)
 // ============================================================================
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  LineChart,
   TrendingUp,
   TrendingDown,
   Plus,
   ChevronRight,
   PieChart,
   BarChart3,
-  DollarSign,
-  Percent,
   Eye,
   EyeOff,
-  ArrowUpRight,
-  ArrowDownLeft,
   Briefcase,
   Shield,
   Lightbulb,
@@ -28,7 +23,6 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
   StatsGridSkeleton,
-  ChartSkeleton,
   TableSkeleton,
 } from "@components/skeletons";
 import {
@@ -37,16 +31,18 @@ import {
   useInvestmentProducts,
 } from "@hooks/queries/useInvestments";
 import { useUIStore } from "@store/ui.store";
+import {
+  PageContainer,
+  StatCard,
+  StatsGrid,
+  DashCard,
+  SectionHeader,
+  ActionButton,
+  ListActionRow,
+} from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants, listItemRevealVariants } from "@core/animation/Animation";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const Investments: React.FC = () => {
   const navigate = useNavigate();
@@ -71,14 +67,9 @@ const Investments: React.FC = () => {
   const returnPercentage = portfolio?.returnPercentage || 0;
 
   return (
-    <motion.div
-      className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <PageContainer>
       {/* Header */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={dashboardItemVariants}>
         <PageHeader
           title="Investments"
           subtitle="Track and grow your investment portfolio"
@@ -87,24 +78,9 @@ const Investments: React.FC = () => {
             { label: "Investments" },
           ]}
           actions={
-            <div className="flex gap-3">
-              <motion.button
-                onClick={() => toggleShowBalances()}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-sm font-medium text-gray-700"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {showBalances ? <EyeOff size={16} /> : <Eye size={16} />}
-              </motion.button>
-              <motion.button
-                onClick={() => navigate("/customer/investments/overview")}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Plus size={16} />
-                New Investment
-              </motion.button>
+            <div className="flex gap-2 sm:gap-3">
+              <ActionButton label="" icon={showBalances ? <EyeOff size={16} /> : <Eye size={16} />} variant="secondary" onClick={() => toggleShowBalances()} />
+              <ActionButton label="New Investment" icon={<Plus size={16} />} onClick={() => navigate("/customer/investments/overview")} />
             </div>
           }
         />
@@ -114,85 +90,39 @@ const Investments: React.FC = () => {
       {isLoading ? (
         <StatsGridSkeleton count={4} />
       ) : (
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" variants={itemVariants}>
-          {[
-            {
-              label: "Portfolio Value",
-              value: showBalances ? formatCurrency(totalValue) : "••••••",
-              icon: <Briefcase size={20} />,
-              color: "from-indigo-500 to-purple-500",
-              change: returnPercentage > 0 ? `+${returnPercentage.toFixed(1)}%` : `${returnPercentage.toFixed(1)}%`,
-              positive: returnPercentage >= 0,
-            },
-            {
-              label: "Total Returns",
-              value: showBalances ? formatCurrency(totalReturns) : "••••••",
-              icon: returnPercentage >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />,
-              color: returnPercentage >= 0 ? "from-emerald-500 to-teal-500" : "from-rose-500 to-pink-500",
-              change: "",
-              positive: returnPercentage >= 0,
-            },
-            {
-              label: "Active Investments",
-              value: String(investments.length),
-              icon: <PieChart size={20} />,
-              color: "from-amber-500 to-orange-500",
-              change: "",
-              positive: true,
-            },
-            {
-              label: "Products Available",
-              value: String(products.length || "12"),
-              icon: <Target size={20} />,
-              color: "from-violet-500 to-purple-500",
-              change: "",
-              positive: true,
-            },
-          ].map((stat) => (
-            <motion.div key={stat.label} className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow" whileHover={{ y: -2 }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} text-white`}>{stat.icon}</div>
-                {stat.change && (
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${stat.positive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
-                    {stat.change}
-                  </span>
-                )}
-              </div>
-              <p className="text-2xl font-bold text-indigo-900">{stat.value}</p>
-              <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
+        <StatsGrid cols={4}>
+          <StatCard label="Portfolio Value" value={showBalances ? formatCurrency(totalValue) : "••••••"} icon={<Briefcase size={20} />} iconColor="from-indigo-500 to-purple-500" change={returnPercentage > 0 ? `+${returnPercentage.toFixed(1)}%` : `${returnPercentage.toFixed(1)}%`} positive={returnPercentage >= 0} index={0} />
+          <StatCard label="Total Returns" value={showBalances ? formatCurrency(totalReturns) : "••••••"} icon={returnPercentage >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />} iconColor={returnPercentage >= 0 ? "from-emerald-500 to-teal-500" : "from-rose-500 to-pink-500"} index={1} />
+          <StatCard label="Active Investments" value={investments.length} icon={<PieChart size={20} />} iconColor="from-amber-500 to-orange-500" index={2} />
+          <StatCard label="Products Available" value={products.length || "12"} icon={<Target size={20} />} iconColor="from-violet-500 to-purple-500" index={3} />
+        </StatsGrid>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Investment Holdings */}
-        <motion.div className="lg:col-span-2" variants={itemVariants}>
+        <motion.div className="lg:col-span-2" variants={dashboardItemVariants}>
           {isLoading ? (
             <TableSkeleton rows={5} cols={4} />
           ) : investments.length === 0 ? (
             <EmptyState
               title="No Investments Yet"
               description="Start building your portfolio with our curated investment products."
-              action={{
-                label: "Explore Products",
-                onClick: () => navigate("/customer/investments/mutual-funds"),
-              }}
+              action={{ label: "Explore Products", onClick: () => navigate("/customer/investments/mutual-funds") }}
             />
           ) : (
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-semibold text-indigo-900">Holdings</h3>
+            <DashCard padding="none">
+              <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Holdings</h3>
                 <motion.button
                   onClick={() => navigate("/customer/investments/overview")}
-                  className="text-sm text-indigo-600 font-medium flex items-center gap-1"
+                  className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1 hover:text-indigo-700 dark:hover:text-indigo-300"
                   whileHover={{ x: 2 }}
                 >
                   View All <ChevronRight size={14} />
                 </motion.button>
               </div>
 
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-gray-800/50">
                 {investments.slice(0, 6).map((inv: any, i: number) => {
                   const returnPct = inv.returnPercentage || inv.returns || 0;
                   const isPositive = returnPct >= 0;
@@ -200,26 +130,29 @@ const Investments: React.FC = () => {
                   return (
                     <motion.div
                       key={inv._id || inv.id || i}
-                      className="flex items-center gap-4 p-4 hover:bg-indigo-50/30 cursor-pointer transition-colors"
-                      whileHover={{ x: 3 }}
+                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                      custom={i}
+                      variants={listItemRevealVariants}
+                      initial="hidden"
+                      animate="visible"
                       onClick={() => navigate("/customer/investments/overview")}
                     >
-                      <div className={`p-2.5 rounded-xl ${isPositive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
+                      <div className={`p-2 sm:p-2.5 rounded-xl ${isPositive ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" : "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400"}`}>
                         {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
+                        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                           {inv.name || inv.productName || "Investment"}
                         </h4>
-                        <p className="text-xs text-gray-500 capitalize">
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 capitalize">
                           {inv.type || inv.category || "Mutual Fund"}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-indigo-900">
+                        <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
                           {showBalances ? formatCurrency(inv.currentValue || inv.amount || 0) : "••••••"}
                         </p>
-                        <p className={`text-xs font-medium ${isPositive ? "text-emerald-600" : "text-rose-600"}`}>
+                        <p className={`text-[10px] sm:text-xs font-medium ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                           {isPositive ? "+" : ""}{returnPct.toFixed(2)}%
                         </p>
                       </div>
@@ -227,48 +160,48 @@ const Investments: React.FC = () => {
                   );
                 })}
               </div>
-            </div>
+            </DashCard>
           )}
         </motion.div>
 
         {/* Sidebar */}
-        <motion.div className="space-y-4" variants={itemVariants}>
+        <motion.div className="space-y-3 sm:space-y-4" variants={dashboardItemVariants}>
           {/* Investment Categories */}
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <h3 className="font-semibold text-indigo-900 mb-4">Explore</h3>
-            <div className="space-y-2">
+          <DashCard>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Explore</h3>
+            <div className="space-y-1.5 sm:space-y-2">
               {[
-                { label: "Mutual Funds", desc: "Diversified portfolios", icon: <PieChart size={16} />, route: "/customer/investments/mutual-funds", color: "bg-indigo-50 text-indigo-600" },
-                { label: "Stocks & ETFs", desc: "Trade equities", icon: <BarChart3 size={16} />, route: "/customer/investments/stocks", color: "bg-emerald-50 text-emerald-600" },
-                { label: "Fixed Income", desc: "Bonds & treasuries", icon: <Shield size={16} />, route: "/customer/investments/fixed-income", color: "bg-amber-50 text-amber-600" },
-                { label: "Market Insights", desc: "Analysis & research", icon: <Lightbulb size={16} />, route: "/customer/investments/insights", color: "bg-purple-50 text-purple-600" },
+                { label: "Mutual Funds", desc: "Diversified portfolios", icon: <PieChart size={16} />, route: "/customer/investments/mutual-funds", color: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400" },
+                { label: "Stocks & ETFs", desc: "Trade equities", icon: <BarChart3 size={16} />, route: "/customer/investments/stocks", color: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" },
+                { label: "Fixed Income", desc: "Bonds & treasuries", icon: <Shield size={16} />, route: "/customer/investments/fixed-income", color: "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400" },
+                { label: "Market Insights", desc: "Analysis & research", icon: <Lightbulb size={16} />, route: "/customer/investments/insights", color: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400" },
               ].map((item) => (
                 <motion.button
                   key={item.label}
                   onClick={() => navigate(item.route)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-indigo-50/50 transition-colors text-left"
+                  className="w-full flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
                   whileHover={{ x: 3 }}
                 >
-                  <div className={`p-2 rounded-lg ${item.color}`}>{item.icon}</div>
+                  <div className={`p-1.5 sm:p-2 rounded-lg ${item.color}`}>{item.icon}</div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                    <p className="text-xs text-gray-500">{item.desc}</p>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
                   </div>
-                  <ChevronRight size={14} className="text-gray-400" />
+                  <ChevronRight size={14} className="text-gray-400 dark:text-gray-500" />
                 </motion.button>
               ))}
             </div>
-          </div>
+          </DashCard>
 
-          {/* Quick Links */}
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-5 text-white">
-            <h3 className="font-semibold mb-2">Start Investing</h3>
-            <p className="text-sm text-indigo-200 mb-4">
+          {/* CTA */}
+          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl border border-indigo-500/20 p-4 sm:p-5 text-white">
+            <h3 className="text-sm sm:text-base font-semibold mb-1.5 sm:mb-2">Start Investing</h3>
+            <p className="text-[10px] sm:text-sm text-indigo-200 mb-3 sm:mb-4">
               Grow your wealth with as little as $10. Diversified portfolios managed by experts.
             </p>
             <motion.button
               onClick={() => navigate("/customer/investments/overview")}
-              className="w-full py-2.5 bg-white text-indigo-700 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors"
+              className="w-full py-2 sm:py-2.5 bg-white text-indigo-700 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-50 transition-colors"
               whileTap={{ scale: 0.98 }}
             >
               Get Started
@@ -276,7 +209,7 @@ const Investments: React.FC = () => {
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </PageContainer>
   );
 };
 

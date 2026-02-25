@@ -126,21 +126,21 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="text-neutral-300 mb-4"
+        className="text-neutral-300 dark:text-gray-600 mb-4"
       >
         {displayIcon}
       </motion.div>
 
       {/* Title */}
       {displayTitle && (
-        <h3 className={cn('font-semibold text-neutral-700 mb-2', styles.title)}>
+        <h3 className={cn('font-semibold text-neutral-700 dark:text-gray-200 mb-2', styles.title)}>
           {displayTitle}
         </h3>
       )}
 
       {/* Description */}
       {displayDescription && (
-        <p className={cn('text-neutral-500 max-w-sm mb-6', styles.description)}>
+        <p className={cn('text-neutral-500 dark:text-gray-400 max-w-sm mb-6', styles.description)}>
           {displayDescription}
         </p>
       )}
@@ -204,12 +204,12 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         <RefreshCw className={styles.iconSize} />
       </motion.div>
 
-      <h3 className={cn('font-medium text-neutral-700 mb-1', styles.title)}>
+      <h3 className={cn('font-medium text-neutral-700 dark:text-gray-200 mb-1', styles.title)}>
         {title}
       </h3>
 
       {description && (
-        <p className={cn('text-neutral-500', styles.description)}>
+        <p className={cn('text-neutral-500 dark:text-gray-400', styles.description)}>
           {description}
         </p>
       )}

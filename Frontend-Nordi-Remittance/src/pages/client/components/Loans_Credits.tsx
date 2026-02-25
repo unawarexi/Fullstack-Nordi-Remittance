@@ -1,8 +1,8 @@
 // ============================================================================
-// LOANS & CREDITS — Main loans dashboard
+// LOANS & CREDITS — Main loans dashboard (Dark mode + Shared Primitives)
 // ============================================================================
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,12 +12,7 @@ import {
   FileText,
   TrendingUp,
   ChevronRight,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
   DollarSign,
-  Percent,
-  Calendar,
   BarChart3,
   ArrowRight,
   Shield,
@@ -27,32 +22,24 @@ import { EmptyState } from "@components/shared/EmptyState";
 import {
   StatsGridSkeleton,
   TableSkeleton,
-  ChartSkeleton,
 } from "@components/skeletons";
 import {
   useLoans,
   useLoanProducts,
 } from "@hooks/queries/useLoans";
 import { useUIStore } from "@store/ui.store";
+import {
+  PageContainer,
+  StatCard,
+  StatsGrid,
+  DashCard,
+  StatusBadge,
+  ProgressBar,
+  ActionButton,
+} from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants, listItemRevealVariants } from "@core/animation/Animation";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
-
-const statusColors: Record<string, { text: string; bg: string }> = {
-  active: { text: "text-emerald-700", bg: "bg-emerald-50" },
-  approved: { text: "text-blue-700", bg: "bg-blue-50" },
-  pending: { text: "text-amber-700", bg: "bg-amber-50" },
-  rejected: { text: "text-rose-700", bg: "bg-rose-50" },
-  closed: { text: "text-gray-700", bg: "bg-gray-50" },
-  disbursed: { text: "text-indigo-700", bg: "bg-indigo-50" },
-};
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const Loans_Credits: React.FC = () => {
   const navigate = useNavigate();
@@ -67,26 +54,16 @@ const Loans_Credits: React.FC = () => {
   const isLoading = loansLoading || productsLoading;
 
   const formatCurrency = (amount: number, currency = "USD") =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-    }).format(amount);
+    new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);
 
-  // Computed stats
   const totalBorrowed = loans.reduce((a: number, l: any) => a + (l.amount || l.principal || 0), 0);
   const totalOutstanding = loans.reduce((a: number, l: any) => a + (l.outstandingBalance || l.remainingAmount || 0), 0);
   const activeLoans = loans.filter((l: any) => l.status === "active" || l.status === "disbursed");
 
   return (
-    <motion.div
-      className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <PageContainer>
       {/* Header */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={dashboardItemVariants}>
         <PageHeader
           title="Loans & Credit"
           subtitle="Manage your loans, credit lines, and applications"
@@ -95,25 +72,9 @@ const Loans_Credits: React.FC = () => {
             { label: "Loans & Credit" },
           ]}
           actions={
-            <div className="flex gap-3">
-              <motion.button
-                onClick={() => navigate("/customer/loans/calculator")}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Calculator size={16} />
-                Calculator
-              </motion.button>
-              <motion.button
-                onClick={() => navigate("/customer/loans/apply")}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Plus size={16} />
-                Apply for Loan
-              </motion.button>
+            <div className="flex gap-2 sm:gap-3">
+              <ActionButton label="Calculator" icon={<Calculator size={16} />} variant="secondary" onClick={() => navigate("/customer/loans/calculator")} />
+              <ActionButton label="Apply for Loan" icon={<Plus size={16} />} onClick={() => navigate("/customer/loans/apply")} />
             </div>
           }
         />
@@ -123,55 +84,41 @@ const Loans_Credits: React.FC = () => {
       {isLoading ? (
         <StatsGridSkeleton count={4} />
       ) : (
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" variants={itemVariants}>
-          {[
-            { label: "Active Loans", value: String(activeLoans.length), icon: <Briefcase size={20} />, color: "from-indigo-500 to-purple-500" },
-            { label: "Total Borrowed", value: showBalances ? formatCurrency(totalBorrowed) : "••••••", icon: <DollarSign size={20} />, color: "from-emerald-500 to-teal-500" },
-            { label: "Outstanding", value: showBalances ? formatCurrency(totalOutstanding) : "••••••", icon: <BarChart3 size={20} />, color: "from-amber-500 to-orange-500" },
-            { label: "Credit Score", value: "750", icon: <Shield size={20} />, color: "from-violet-500 to-purple-500" },
-          ].map((stat) => (
-            <motion.div key={stat.label} className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow" whileHover={{ y: -2 }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} text-white`}>{stat.icon}</div>
-              </div>
-              <p className="text-2xl font-bold text-indigo-900">{stat.value}</p>
-              <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
+        <StatsGrid cols={4}>
+          <StatCard label="Active Loans" value={activeLoans.length} icon={<Briefcase size={20} />} iconColor="from-indigo-500 to-purple-500" index={0} />
+          <StatCard label="Total Borrowed" value={showBalances ? formatCurrency(totalBorrowed) : "••••••"} icon={<DollarSign size={20} />} iconColor="from-emerald-500 to-teal-500" index={1} />
+          <StatCard label="Outstanding" value={showBalances ? formatCurrency(totalOutstanding) : "••••••"} icon={<BarChart3 size={20} />} iconColor="from-amber-500 to-orange-500" index={2} />
+          <StatCard label="Credit Score" value="750" icon={<Shield size={20} />} iconColor="from-violet-500 to-purple-500" index={3} />
+        </StatsGrid>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Active Loans */}
-        <motion.div className="lg:col-span-2" variants={itemVariants}>
+        <motion.div className="lg:col-span-2" variants={dashboardItemVariants}>
           {isLoading ? (
             <TableSkeleton rows={4} cols={5} />
           ) : loans.length === 0 ? (
             <EmptyState
               title="No Loans Yet"
               description="Explore our loan products and apply for financing that suits your needs."
-              action={{
-                label: "Browse Products",
-                onClick: () => navigate("/customer/loans/apply"),
-              }}
+              action={{ label: "Browse Products", onClick: () => navigate("/customer/loans/apply") }}
             />
           ) : (
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-semibold text-indigo-900">My Loans</h3>
+            <DashCard padding="none">
+              <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">My Loans</h3>
                 <motion.button
                   onClick={() => navigate("/customer/loans/overview")}
-                  className="text-sm text-indigo-600 font-medium flex items-center gap-1"
+                  className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1 hover:text-indigo-700 dark:hover:text-indigo-300"
                   whileHover={{ x: 2 }}
                 >
                   View All <ChevronRight size={14} />
                 </motion.button>
               </div>
 
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-gray-800/50">
                 {loans.slice(0, 5).map((loan: any, i: number) => {
                   const status = loan.status?.toLowerCase() || "active";
-                  const sConfig = statusColors[status] || statusColors.active;
                   const progress = loan.amount
                     ? ((loan.amount - (loan.outstandingBalance || loan.remainingAmount || 0)) / loan.amount) * 100
                     : 0;
@@ -179,56 +126,51 @@ const Loans_Credits: React.FC = () => {
                   return (
                     <motion.div
                       key={loan._id || loan.id || i}
-                      className="p-4 hover:bg-indigo-50/30 cursor-pointer transition-colors"
-                      whileHover={{ x: 3 }}
+                      className="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                      custom={i}
+                      variants={listItemRevealVariants}
+                      initial="hidden"
+                      animate="visible"
                       onClick={() => navigate("/customer/loans/overview")}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <h4 className="text-sm font-medium text-gray-900">
+                          <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
                             {loan.name || loan.loanType || loan.productName || "Personal Loan"}
                           </h4>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                             {loan.reference || loan.loanId || `Loan #${i + 1}`}
                           </p>
                         </div>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${sConfig.text} ${sConfig.bg}`}>
-                          {status}
-                        </span>
+                        <StatusBadge status={status} />
                       </div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-lg font-bold text-indigo-900">
+                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                           {showBalances ? formatCurrency(loan.amount || loan.principal || 0) : "••••••"}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                           {loan.interestRate || loan.rate || "0"}% APR
                         </span>
                       </div>
-                      {/* Progress Bar */}
-                      <div className="w-full bg-gray-100 rounded-full h-1.5">
-                        <div
-                          className="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full transition-all"
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <ProgressBar value={Math.min(progress, 100)} color="from-indigo-500 to-purple-500" />
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {progress.toFixed(0)}% repaid
                       </p>
                     </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </DashCard>
           )}
         </motion.div>
 
         {/* Loan Products */}
-        <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <h3 className="font-semibold text-indigo-900 mb-4">
+        <motion.div variants={dashboardItemVariants} className="space-y-3 sm:space-y-4">
+          <DashCard>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Available Products
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {(products.length > 0
                 ? products.slice(0, 4)
                 : [
@@ -240,51 +182,52 @@ const Loans_Credits: React.FC = () => {
               ).map((p: any, i: number) => (
                 <motion.div
                   key={i}
-                  className="p-3 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 cursor-pointer transition-all"
+                  className="p-2.5 sm:p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-all"
                   whileHover={{ x: 3 }}
                   onClick={() => navigate("/customer/loans/apply")}
                 >
                   <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-medium text-gray-900">
+                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
                       {p.name || p.productName}
                     </h4>
-                    <ArrowRight size={14} className="text-indigo-400" />
+                    <ArrowRight size={14} className="text-indigo-400 dark:text-indigo-500" />
                   </div>
-                  <div className="flex gap-4 mt-1">
-                    <span className="text-xs text-gray-500">
+                  <div className="flex gap-3 sm:gap-4 mt-1">
+                    <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                       From {p.rate || p.interestRate || "—"}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                       Up to {formatCurrency(p.maxAmount || p.maximumAmount || 0)}
                     </span>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </div>
+          </DashCard>
 
           {/* Quick Links */}
-          <div className="mt-4 space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             {[
               { label: "Loan Calculator", icon: <Calculator size={16} />, route: "/customer/loans/calculator" },
               { label: "Credit Score", icon: <TrendingUp size={16} />, route: "/customer/loans/credit-score" },
               { label: "Application Status", icon: <FileText size={16} />, route: "/customer/loans/overview" },
             ].map((link) => (
-              <motion.button
-                key={link.label}
-                onClick={() => navigate(link.route)}
-                className="w-full flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm hover:shadow-md text-left text-sm"
-                whileHover={{ x: 3 }}
-              >
-                <span className="text-indigo-500">{link.icon}</span>
-                <span className="font-medium text-gray-700">{link.label}</span>
-                <ChevronRight size={14} className="text-gray-400 ml-auto" />
-              </motion.button>
+              <DashCard key={link.label} padding="sm" className="cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-all" hover>
+                <motion.div
+                  className="flex items-center gap-2.5 sm:gap-3"
+                  onClick={() => navigate(link.route)}
+                  whileHover={{ x: 3 }}
+                >
+                  <span className="text-indigo-500 dark:text-indigo-400">{link.icon}</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">{link.label}</span>
+                  <ChevronRight size={14} className="text-gray-400 dark:text-gray-500 ml-auto" />
+                </motion.div>
+              </DashCard>
             ))}
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </PageContainer>
   );
 };
 

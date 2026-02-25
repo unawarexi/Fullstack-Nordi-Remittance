@@ -365,3 +365,63 @@ export const getStaggeredItemProps = (index, baseDelay = 0.1) => ({
   viewport: { once: true },
   transition: { delay: index * baseDelay }
 });
+
+// ========== DASHBOARD SPECIFIC ANIMATIONS ==========
+
+// Dashboard Container (faster stagger for dense layouts)
+export const dashboardContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
+};
+
+// Dashboard Item (snappy entry)
+export const dashboardItemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: "easeOut" },
+  },
+};
+
+// Card reveal with index-based stagger delay
+export const cardRevealVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.35, ease: "easeOut" },
+  }),
+};
+
+// List item reveal with horizontal slide
+export const listItemRevealVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.03, duration: 0.25 },
+  }),
+};
+
+// Sidebar item (compact & fast)
+export const sidebarItemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+};
+
+// Sidebar container
+export const sidebarContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};

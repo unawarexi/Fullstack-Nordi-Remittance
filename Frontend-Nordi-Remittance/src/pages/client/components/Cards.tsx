@@ -1,5 +1,5 @@
 // ============================================================================
-// CARDS — Main cards management dashboard
+// CARDS — Main cards management dashboard (Dark mode + Shared Primitives)
 // ============================================================================
 
 import React, { useState } from "react";
@@ -16,8 +16,6 @@ import {
   ChevronRight,
   Wifi,
   Smartphone,
-  Lock,
-  MoreVertical,
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
@@ -27,18 +25,18 @@ import {
 } from "@components/skeletons";
 import { useCards } from "@hooks/queries/useCards";
 import { useUIStore } from "@store/ui.store";
+import {
+  PageContainer,
+  StatCard,
+  StatsGrid,
+  DashCard,
+  ActionButton,
+  ListActionRow,
+} from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants } from "@core/animation/Animation";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
-
-// Card gradient themes
 const cardThemes: Record<string, { bg: string; accent: string }> = {
   visa: { bg: "from-indigo-600 via-indigo-700 to-purple-800", accent: "text-indigo-200" },
   mastercard: { bg: "from-gray-800 via-gray-900 to-black", accent: "text-gray-300" },
@@ -58,11 +56,7 @@ const Cards: React.FC = () => {
   const cards = cardsData?.data || [];
 
   const formatCurrency = (amount: number, currency = "USD") =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-    }).format(amount);
+    new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);
 
   const maskCardNumber = (num: string) => {
     if (!num) return "•••• •••• •••• ••••";
@@ -71,14 +65,9 @@ const Cards: React.FC = () => {
   };
 
   return (
-    <motion.div
-      className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <PageContainer>
       {/* Header */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={dashboardItemVariants}>
         <PageHeader
           title="My Cards"
           subtitle="Manage your debit, credit, and virtual cards"
@@ -87,24 +76,18 @@ const Cards: React.FC = () => {
             { label: "Cards" },
           ]}
           actions={
-            <div className="flex gap-3">
-              <motion.button
+            <div className="flex gap-2 sm:gap-3">
+              <ActionButton
+                label=""
+                icon={showBalances ? <EyeOff size={16} /> : <Eye size={16} />}
+                variant="secondary"
                 onClick={() => toggleShowBalances()}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {showBalances ? <EyeOff size={16} /> : <Eye size={16} />}
-              </motion.button>
-              <motion.button
+              />
+              <ActionButton
+                label="New Card"
+                icon={<Plus size={16} />}
                 onClick={() => navigate("/customer/cards/apply")}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Plus size={16} />
-                New Card
-              </motion.button>
+              />
             </div>
           }
         />
@@ -114,64 +97,37 @@ const Cards: React.FC = () => {
       {isLoading ? (
         <StatsGridSkeleton count={3} />
       ) : (
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
-          variants={itemVariants}
-        >
-          {[
-            { label: "Active Cards", value: cards.filter((c: any) => c.status === "active").length || cards.length, icon: <CreditCard size={20} />, color: "from-indigo-500 to-purple-500" },
-            { label: "Total Limit", value: showBalances ? formatCurrency(cards.reduce((a: number, c: any) => a + (c.limit || c.creditLimit || 0), 0)) : "••••••", icon: <Shield size={20} />, color: "from-emerald-500 to-teal-500" },
-            { label: "Virtual Cards", value: cards.filter((c: any) => c.isVirtual || c.type === "virtual").length, icon: <Smartphone size={20} />, color: "from-violet-500 to-purple-500" },
-          ].map((stat) => (
-            <motion.div
-              key={stat.label}
-              className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow"
-              whileHover={{ y: -2 }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} text-white`}>
-                  {stat.icon}
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-indigo-900">{stat.value}</p>
-              <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
+        <StatsGrid cols={3}>
+          <StatCard label="Active Cards" value={cards.filter((c: any) => c.status === "active").length || cards.length} icon={<CreditCard size={20} />} iconColor="from-indigo-500 to-purple-500" index={0} />
+          <StatCard label="Total Limit" value={showBalances ? formatCurrency(cards.reduce((a: number, c: any) => a + (c.limit || c.creditLimit || 0), 0)) : "••••••"} icon={<Shield size={20} />} iconColor="from-emerald-500 to-teal-500" index={1} />
+          <StatCard label="Virtual Cards" value={cards.filter((c: any) => c.isVirtual || c.type === "virtual").length} icon={<Smartphone size={20} />} iconColor="from-violet-500 to-purple-500" index={2} />
+        </StatsGrid>
       )}
 
       {/* Cards Display */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {[1, 2].map((i) => (
-            <CreditCardSkeleton key={i} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 sm:mb-8">
+          {[1, 2].map((i) => <CreditCardSkeleton key={i} />)}
         </div>
       ) : cards.length === 0 ? (
         <EmptyState
           title="No Cards Yet"
           description="Apply for your first card to start making payments and managing your finances."
-          action={{
-            label: "Apply for Card",
-            onClick: () => navigate("/customer/cards/apply"),
-          }}
+          action={{ label: "Apply for Card", onClick: () => navigate("/customer/cards/apply") }}
         />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Card Visual */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={dashboardItemVariants}>
             <AnimatePresence mode="wait">
               {cards.map((card: any, index: number) => {
                 if (index !== selectedCard) return null;
-                const theme =
-                  cardThemes[card.network?.toLowerCase()] ||
-                  cardThemes[card.type?.toLowerCase()] ||
-                  cardThemes.default;
+                const theme = cardThemes[card.network?.toLowerCase()] || cardThemes[card.type?.toLowerCase()] || cardThemes.default;
 
                 return (
                   <motion.div
                     key={card._id || card.id || index}
-                    className={`bg-gradient-to-br ${theme.bg} rounded-2xl p-6 text-white shadow-xl aspect-[1.6/1] max-w-md mx-auto flex flex-col justify-between`}
+                    className={`bg-gradient-to-br ${theme.bg} rounded-2xl p-5 sm:p-6 text-white shadow-xl aspect-[1.6/1] max-w-md mx-auto flex flex-col justify-between`}
                     initial={{ opacity: 0, rotateY: -90 }}
                     animate={{ opacity: 1, rotateY: 0 }}
                     exit={{ opacity: 0, rotateY: 90 }}
@@ -179,37 +135,35 @@ const Cards: React.FC = () => {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className={`text-xs ${theme.accent} mb-1`}>
+                        <p className={`text-[10px] sm:text-xs ${theme.accent} mb-1`}>
                           {card.type?.toUpperCase() || "DEBIT"} CARD
                         </p>
-                        <p className="text-sm font-medium">
+                        <p className="text-xs sm:text-sm font-medium">
                           {card.name || "Primary Card"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Wifi size={20} className="rotate-90 opacity-70" />
-                        <span className="text-lg font-bold opacity-80">
+                        <Wifi size={18} className="rotate-90 opacity-70" />
+                        <span className="text-sm sm:text-lg font-bold opacity-80">
                           {card.network?.toUpperCase() || "VISA"}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <p className="text-lg font-mono tracking-wider mb-4">
-                        {showBalances
-                          ? maskCardNumber(card.cardNumber || card.number || "")
-                          : "•••• •••• •••• ••••"}
+                      <p className="text-base sm:text-lg font-mono tracking-wider mb-3 sm:mb-4">
+                        {showBalances ? maskCardNumber(card.cardNumber || card.number || "") : "•••• •••• •••• ••••"}
                       </p>
                       <div className="flex justify-between items-end">
                         <div>
-                          <p className={`text-xs ${theme.accent}`}>CARD HOLDER</p>
-                          <p className="text-sm font-medium">
+                          <p className={`text-[10px] sm:text-xs ${theme.accent}`}>CARD HOLDER</p>
+                          <p className="text-xs sm:text-sm font-medium">
                             {card.holderName || card.cardholderName || "ACCOUNT HOLDER"}
                           </p>
                         </div>
                         <div>
-                          <p className={`text-xs ${theme.accent}`}>EXPIRES</p>
-                          <p className="text-sm font-medium">
+                          <p className={`text-[10px] sm:text-xs ${theme.accent}`}>EXPIRES</p>
+                          <p className="text-xs sm:text-sm font-medium">
                             {card.expiryDate || card.expiry || "••/••"}
                           </p>
                         </div>
@@ -222,15 +176,15 @@ const Cards: React.FC = () => {
 
             {/* Card Selector Dots */}
             {cards.length > 1 && (
-              <div className="flex justify-center gap-2 mt-4">
+              <div className="flex justify-center gap-2 mt-3 sm:mt-4">
                 {cards.map((_: any, i: number) => (
                   <button
                     key={i}
                     onClick={() => setSelectedCard(i)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all ${
+                    className={`h-2 sm:h-2.5 rounded-full transition-all ${
                       i === selectedCard
-                        ? "bg-indigo-600 w-6"
-                        : "bg-gray-300 hover:bg-gray-400"
+                        ? "bg-indigo-600 dark:bg-indigo-400 w-5 sm:w-6"
+                        : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 w-2 sm:w-2.5"
                     }`}
                   />
                 ))}
@@ -239,40 +193,45 @@ const Cards: React.FC = () => {
           </motion.div>
 
           {/* Card Actions */}
-          <motion.div variants={itemVariants} className="space-y-3">
-            <h3 className="text-lg font-semibold text-indigo-900 mb-4">
+          <motion.div variants={dashboardItemVariants} className="space-y-2 sm:space-y-3">
+            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Quick Actions
             </h3>
             {[
-              { label: "Card Transactions", desc: "View spending history", icon: <CreditCard size={18} />, route: "/customer/cards/transactions", color: "bg-indigo-50 text-indigo-600" },
-              { label: "Freeze Card", desc: "Temporarily disable card", icon: <Snowflake size={18} />, route: "/customer/cards/security", color: "bg-blue-50 text-blue-600" },
-              { label: "Card Settings", desc: "Limits, PIN, notifications", icon: <Settings size={18} />, route: "/customer/cards/security", color: "bg-purple-50 text-purple-600" },
-              { label: "Card Security", desc: "Manage security options", icon: <Shield size={18} />, route: "/customer/cards/security", color: "bg-emerald-50 text-emerald-600" },
-              { label: "Virtual Cards", desc: "Create & manage virtual cards", icon: <Smartphone size={18} />, route: "/customer/cards/virtual", color: "bg-violet-50 text-violet-600" },
+              { label: "Card Transactions", desc: "View spending history", icon: <CreditCard size={18} />, route: "/customer/cards/transactions", color: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400" },
+              { label: "Freeze Card", desc: "Temporarily disable card", icon: <Snowflake size={18} />, route: "/customer/cards/security", color: "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400" },
+              { label: "Card Settings", desc: "Limits, PIN, notifications", icon: <Settings size={18} />, route: "/customer/cards/security", color: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400" },
+              { label: "Card Security", desc: "Manage security options", icon: <Shield size={18} />, route: "/customer/cards/security", color: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" },
+              { label: "Virtual Cards", desc: "Create & manage virtual cards", icon: <Smartphone size={18} />, route: "/customer/cards/virtual", color: "bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400" },
             ].map((action) => (
-              <motion.button
+              <DashCard
                 key={action.label}
-                onClick={() => navigate(action.route)}
-                className="w-full flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow text-left"
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
+                className="hover:border-indigo-300 dark:hover:border-indigo-700 cursor-pointer transition-all"
+                padding="sm"
+                hover
               >
-                <div className={`p-2.5 rounded-xl ${action.color}`}>
-                  {action.icon}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {action.label}
-                  </p>
-                  <p className="text-xs text-gray-500">{action.desc}</p>
-                </div>
-                <ChevronRight size={16} className="text-gray-400" />
-              </motion.button>
+                <motion.div
+                  className="flex items-center gap-3 sm:gap-4"
+                  onClick={() => navigate(action.route)}
+                  whileHover={{ x: 4 }}
+                >
+                  <div className={`p-2 sm:p-2.5 rounded-xl ${action.color}`}>
+                    {action.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                      {action.label}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{action.desc}</p>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-400 dark:text-gray-500" />
+                </motion.div>
+              </DashCard>
             ))}
           </motion.div>
         </div>
       )}
-    </motion.div>
+    </PageContainer>
   );
 };
 

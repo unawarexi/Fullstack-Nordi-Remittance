@@ -9,8 +9,10 @@ export {
   AlertTriangle,
   Info,
   CheckCircle,
+  CheckCircle2,
   XCircle,
   AlertCircle,
+  Sparkles,
   
   // Navigation & Actions
   ChevronDown,
@@ -21,6 +23,9 @@ export {
   ArrowRight,
   ArrowUp,
   ArrowDown,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ArrowDownCircle,
   Menu,
   MoreHorizontal,
   MoreVertical,
@@ -43,6 +48,14 @@ export {
   Banknote,
   Receipt,
   Calculator,
+  Percent,
+  BarChart3,
+  LineChart,
+  PieChart,
+  Target,
+  Briefcase,
+  Building2,
+  Repeat,
   
   // Security
   Shield,
@@ -54,6 +67,7 @@ export {
   Fingerprint,
   Eye,
   EyeOff,
+  Snowflake,
   
   // Communication
   Mail,
@@ -76,12 +90,16 @@ export {
   Settings,
   Cog,
   Edit,
+  Edit3,
   Trash2,
   Plus,
   Minus,
   Search,
   Filter,
   RefreshCw,
+  Zap,
+  Lightbulb,
+  Gift,
   
   // Time & Calendar
   Calendar,
@@ -93,6 +111,9 @@ export {
   Loader,
   Check,
   Ban,
+  Star,
+  StarOff,
+  Tag,
   
   // Misc
   Home,
@@ -108,6 +129,7 @@ export {
   LogOut,
   LogIn,
   HelpCircle,
+  Wifi,
   
   // Social
   Twitter,

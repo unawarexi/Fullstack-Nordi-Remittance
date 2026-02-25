@@ -90,7 +90,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       transition={{ duration: 0.3 }}
       className={cn(
         styles.padding,
-        sticky && 'sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-neutral-200',
+        sticky && 'sticky top-0 z-40 bg-white/90 dark:bg-gray-950/90 backdrop-blur-lg border-b border-neutral-200 dark:border-gray-800',
         className
       )}
     >
@@ -100,7 +100,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={index}>
               {index > 0 && (
-                <ChevronRight size={14} className="text-neutral-400" />
+                <ChevronRight size={14} className="text-neutral-400 dark:text-gray-500" />
               )}
               {crumb.href || crumb.onClick ? (
                 <a
@@ -111,12 +111,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                       crumb.onClick();
                     }
                   }}
-                  className="text-neutral-500 hover:text-primary-600 transition-colors"
+                  className="text-neutral-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   {crumb.label}
                 </a>
               ) : (
-                <span className="text-neutral-700 font-medium">
+                <span className="text-neutral-700 dark:text-gray-200 font-medium">
                   {crumb.label}
                 </span>
               )}
@@ -142,7 +142,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
           {/* Icon */}
           {icon && (
-            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
+            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary-100 dark:bg-indigo-950/50 text-primary-600 dark:text-indigo-400 flex items-center justify-center">
               {icon}
             </div>
           )}
@@ -151,21 +151,21 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {subtitle && (
-                <span className={cn('text-neutral-500', styles.subtitle)}>
+                <span className={cn('text-neutral-500 dark:text-gray-400', styles.subtitle)}>
                   {subtitle}
                 </span>
               )}
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className={cn('text-neutral-900 truncate', styles.title)}>
+              <h1 className={cn('text-neutral-900 dark:text-white truncate', styles.title)}>
                 {title}
               </h1>
               {badge}
             </div>
 
             {description && (
-              <p className={cn('text-neutral-500 mt-1', styles.description)}>
+              <p className={cn('text-neutral-500 dark:text-gray-400 mt-1', styles.description)}>
                 {description}
               </p>
             )}
@@ -202,11 +202,11 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
   return (
     <div className={cn('flex items-center justify-between mb-4', className)}>
       <div>
-        <h2 className="text-lg sm:text-xl font-semibold text-neutral-900">
+        <h2 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white">
           {title}
         </h2>
         {subtitle && (
-          <p className="text-sm text-neutral-500 mt-0.5">{subtitle}</p>
+          <p className="text-sm text-neutral-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
         )}
       </div>
       {action}
