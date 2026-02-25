@@ -24,6 +24,9 @@ export {
   useRealtimeUpdates,
 } from './useSocket';
 
+// IntersectionObserver Hook
+export { useInView } from './useInView';
+
 // Media Query Hook
 export { 
   useMediaQuery,
