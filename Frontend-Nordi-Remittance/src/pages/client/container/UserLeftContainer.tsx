@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useLogout } from "@hooks/queries/useAuth";
+import { useAuth } from "@store/auth.store";
 import {
   LayoutDashboard,
   Wallet,
@@ -248,10 +250,21 @@ const dropdownVariants = {
 const UserLeftContainer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout: clearAuthState } = useAuth();
+  const logoutMutation = useLogout();
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
   const [alertCount, setAlertCount] = useState(2);
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSettled: () => {
+        clearAuthState();
+        navigate("/login", { replace: true });
+      },
+    });
+  };
   
   // Automatically open dropdown for active route on mount
   useEffect(() => {
@@ -441,6 +454,10 @@ const UserLeftContainer: React.FC = () => {
                 >
                   <motion.div
                     onClick={() => {
+                      if (item.title === "Logout") {
+                        handleLogout();
+                        return;
+                      }
                       if (hasChildren) {
                         if (!collapsed) handleDropdown(item.route);
                         else handleNavigation(item.route);
@@ -450,14 +467,19 @@ const UserLeftContainer: React.FC = () => {
                     }}
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
-                      ${active ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-indigo-800 dark:text-indigo-200 font-semibold' : 'text-gray-700 dark:text-gray-300 font-medium'}
-                      ${!active ? 'hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300' : ''}
+                      ${item.title === "Logout"
+                        ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium'
+                        : active
+                          ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-indigo-800 dark:text-indigo-200 font-semibold'
+                          : 'text-gray-700 dark:text-gray-300 font-medium hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300'}
                     `}
                     whileHover={{ x: collapsed ? 0 : 3 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <motion.div
-                      className={active ? "text-indigo-600 dark:text-indigo-400" : "text-purple-500 dark:text-purple-400"}
+                      className={item.title === "Logout"
+                        ? "text-rose-500 dark:text-rose-400"
+                        : active ? "text-indigo-600 dark:text-indigo-400" : "text-purple-500 dark:text-purple-400"}
                       animate={{ 
                         scale: active ? 1.1 : 1 
                       }}
