@@ -44,8 +44,9 @@ export async function getFraudSignals(req: AuthenticatedRequest, res: Response, 
 
     const [signals, total] = await Promise.all([
       FraudSignals.find(filter)
+        .select('signalType severity status riskScore user transaction description createdAt')
         .populate('user', 'firstName lastName email')
-        .populate('transaction')
+        .populate('transaction', 'referenceNumber amount status transactionType')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -82,6 +83,7 @@ export async function getFraudSignalById(req: AuthenticatedRequest, res: Respons
       _id: { $ne: signal._id },
       createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
     })
+      .select('signalType severity status riskScore description createdAt')
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
@@ -147,6 +149,7 @@ export async function getFraudCases(req: AuthenticatedRequest, res: Response, ne
 
     const [cases, total] = await Promise.all([
       FraudCases.find(filter)
+        .select('caseNumber title status severity user assignedTo totalAmount signalCount createdAt updatedAt')
         .populate('user', 'firstName lastName email')
         .populate('assignedTo', 'firstName lastName')
         .sort({ severity: -1, createdAt: -1 })
@@ -206,13 +209,13 @@ export async function createFraudCase(req: AuthenticatedRequest, res: Response, 
 
       // Freeze all wallets
       await Wallets.updateMany(
-        { userId: user._id },
+        { userId: String(user._id) },
         { status: 'frozen' }
       );
 
       // Block all cards
       await Cards.updateMany(
-        { user: user._id },
+        { user: String(user._id) },
         { status: 'blocked', blockedReason: 'Fraud investigation' }
       );
     }
@@ -286,7 +289,7 @@ export async function updateFraudCase(req: AuthenticatedRequest, res: Response, 
 
             // Unfreeze wallets
             await Wallets.updateMany(
-              { user: user._id },
+              { user: String(user._id) },
               { status: 'active' },
               { session }
             );
@@ -511,6 +514,7 @@ export async function getSecurityEvents(req: AuthenticatedRequest, res: Response
 
     const [events, total] = await Promise.all([
       SecurityEvents.find(filter)
+        .select('eventType severity status user ipAddress location description createdAt')
         .populate('user', 'firstName lastName email')
         .sort({ createdAt: -1 })
         .skip(skip)

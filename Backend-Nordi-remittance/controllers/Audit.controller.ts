@@ -209,8 +209,9 @@ async function generateTransactionMonitoringReport(start: Date, end: Date, filte
     amount: { $gte: 10000 },
     status: 'completed',
   })
-    .populate('sender', 'firstName lastName email')
-    .populate('recipient', 'firstName lastName email')
+    .select('type amount currency status referenceNumber initiatedBy createdAt completedAt isInternational')
+    .populate('initiatedBy', 'firstName lastName email')
+    .limit(500)
     .lean();
 
   const findings = [];
@@ -573,6 +574,7 @@ export async function exportAuditData(req: AuthenticatedRequest, res: Response, 
     }
 
     const logs = await AuditLogs.find(filter)
+      .select('logId eventType action actor actorType resource resourceId severity status ipAddress createdAt')
       .sort({ createdAt: -1 })
       .limit(10000) // Cap at 10k records
       .lean();

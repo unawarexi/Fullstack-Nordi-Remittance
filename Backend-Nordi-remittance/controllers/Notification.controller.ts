@@ -23,13 +23,14 @@ export async function getUserNotifications(req: AuthenticatedRequest, res: Respo
     if (read !== undefined) filter.read = read === 'true';
     const [notifications, total] = await Promise.all([
       Notifications.find(filter)
+        .select('type title message read priority actionUrl createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
       Notifications.countDocuments(filter),
     ]);
-    sendPaginated(res, notifications, page, limit, total);
+    sendPaginated(res, notifications, { page, limit, total });
   } catch (error) {
     next(error);
   }

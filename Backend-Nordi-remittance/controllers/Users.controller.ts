@@ -61,6 +61,7 @@ import {
   cacheSet,
   cacheGet,
 } from "../services/Redis.service.js";
+import { onUserWrite } from "../services/QueryCacheService.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -106,14 +107,15 @@ export async function getProfile(
     const cachedWallets = await getCachedUserWallets(userId);
 
     if (cachedProfile && cachedWallets) {
-      return sendSuccess(res, {
+      sendSuccess(res, {
         user: cachedProfile,
         wallets: cachedWallets,
         permissions: cachedProfile.permissions || null,
       });
+      return;
     }
 
-    const user = await Users.findById(userId).select(
+    const user: any = await Users.findById(userId).select(
       "-password -twoFactorSecret -backupCodes",
     );
 
@@ -122,12 +124,12 @@ export async function getProfile(
     }
 
     // Get wallets
-    const wallets = await Wallets.find({ user: user._id }).select(
+    const wallets = await Wallets.find({ user: String(user._id) }).select(
       "walletNumber balances status isPrimary walletType",
     );
 
     // Get permissions
-    const permissions = await Permissions.findOne({ userId: user._id });
+    const permissions = await Permissions.findOne({ userId: String(user._id) });
 
     const profileData = {
       id: user._id,
@@ -313,7 +315,7 @@ export async function updateEmail(
     const otpExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     await ConfirmationToken.create({
-      userId: user._id,
+      userId: String(user._id),
       token: otp,
       type: "email_change",
       expiresAt: otpExpiry,
@@ -328,7 +330,7 @@ export async function updateEmail(
       otpCode: otp,
       purpose: "verify your new email address",
       expiresIn: "15 minutes",
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     await sendTemplatedMail(newEmail, emailContent);
@@ -452,7 +454,7 @@ export async function updatePhone(
     }
 
     // Verify password
-    const user = await Users.findById(req.user.userId).select("+password");
+    const user: any = await Users.findById(req.user.userId).select("+password");
     if (!user) {
       throw new NotFoundError("User not found");
     }
@@ -470,7 +472,7 @@ export async function updatePhone(
     const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
     await ConfirmationToken.create({
-      userId: user._id,
+      userId: String(user._id),
       token: otp,
       type: "phone_change",
       expiresAt: otpExpiry,
@@ -725,7 +727,7 @@ export async function disable2FA(
       throw new ValidationError("Password is required");
     }
 
-    const user = await Users.findById(req.user.userId).select(
+    const user: any = await Users.findById(req.user.userId).select(
       "+password +twoFactorSecret",
     );
     if (!user) {
@@ -779,7 +781,7 @@ export async function disable2FA(
       email: user.email as string,
       disabledAt: new Date().toISOString(),
       ipAddress: req.clientIp || req.ip || "Unknown",
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     await sendTemplatedMail(user.email as string, emailContent);
@@ -873,17 +875,17 @@ export async function getNotifications(
       const cachedUnreadCount = await getUnreadCount(req.user.userId);
 
       if (cachedNotifications) {
-        return sendPaginated(
+        sendPaginated(
           res,
           cachedNotifications,
           {
             page,
             limit,
             total: cachedNotifications.length,
-            unreadCount: cachedUnreadCount,
           },
           "Notifications retrieved",
         );
+        return;
       }
     }
 
@@ -910,7 +912,7 @@ export async function getNotifications(
     sendPaginated(
       res,
       notifications,
-      { page, limit, total, unreadCount },
+      { page, limit, total },
       "Notifications retrieved",
     );
   } catch (error) {
@@ -1021,7 +1023,7 @@ export async function requestAccountDeletion(
       throw new ValidationError("Password is required");
     }
 
-    const user = await Users.findById(req.user.userId).select("+password");
+    const user: any = await Users.findById(req.user.userId).select("+password");
     if (!user) {
       throw new NotFoundError("User not found");
     }
@@ -1036,7 +1038,7 @@ export async function requestAccountDeletion(
     }
 
     // Check for pending transactions or balances
-    const wallet = await Wallets.findOne({ user: user._id });
+    const wallet: any = await Wallets.findOne({ user: String(user._id) });
     if (wallet && wallet.balances && wallet.balances.size > 0) {
       // Check if any balance is greater than 0
       let hasBalance = false;
@@ -1066,7 +1068,7 @@ export async function requestAccountDeletion(
     const deletionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await ConfirmationToken.create({
-      userId: user._id as string,
+      userId: String(user._id),
       token: deletionToken,
       type: "account_deletion",
       expiresAt: deletionExpiry,
@@ -1080,7 +1082,7 @@ export async function requestAccountDeletion(
       email: user.email as string,
       verificationCode: deletionToken,
       expiresIn: "24 hours",
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     await sendTemplatedMail(user.email as string, emailContent);
@@ -1201,14 +1203,19 @@ export async function getAllUsers(
       filter.kycStatus = req.query.kycStatus;
     }
     if (req.query.search) {
-      const searchRegex = new RegExp(req.query.search as string, "i");
-      filter.$or = [
-        { email: searchRegex },
-        { firstName: searchRegex },
-        { lastName: searchRegex },
-        { accountNumber: searchRegex },
-        { phone: searchRegex },
-      ];
+      const search = (req.query.search as string).trim();
+      if (search.length >= 3) {
+        // Use $text index for performant full-text search
+        filter.$text = { $search: search };
+      } else {
+        // For short queries, use prefix-anchored regex (safe + indexed)
+        const sanitized = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        filter.$or = [
+          { email: new RegExp(`^${sanitized}`, 'i') },
+          { firstName: new RegExp(`^${sanitized}`, 'i') },
+          { lastName: new RegExp(`^${sanitized}`, 'i') },
+        ];
+      }
     }
 
     // Build sort
@@ -1252,7 +1259,7 @@ export async function getUserById(
 
     const { id } = req.params;
 
-    const user = await Users.findById(id).select(
+    const user: any = await Users.findById(id).select(
       "-password -twoFactorSecret -backupCodes",
     );
 
@@ -1261,18 +1268,19 @@ export async function getUserById(
     }
 
     // Get wallets
-    const wallets = await Wallets.find({ user: user._id as string });
+    const wallets = await Wallets.find({ user: String(user._id) });
 
-    // Get recent transactions
+    // Get recent transactions — with projection
     const recentTransactions = await Transactions.find({
-      $or: [{ sender: user._id as string }, { recipient: user._id as string }],
+      $or: [{ sender: String(user._id) }, { recipient: String(user._id) }],
     })
+      .select('type amount currency status referenceNumber createdAt completedAt')
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
 
     // Get permissions
-    const permissions = await Permissions.findOne({ userId: user._id });
+    const permissions = await Permissions.findOne({ userId: String(user._id) });
 
     sendSuccess(res, {
       user,
@@ -1349,6 +1357,9 @@ export async function updateUserStatus(
     });
 
     sendSuccess(res, { user }, `User status updated to ${status}`);
+
+    // Invalidate dashboard/stats caches
+    onUserWrite(id as string).catch(() => {});
   } catch (error) {
     next(error);
   }
@@ -1436,6 +1447,9 @@ export async function updateUserKyc(
     });
 
     sendSuccess(res, { user }, `User KYC status updated to ${kycStatus}`);
+
+    // Invalidate dashboard/stats caches
+    onUserWrite(id as string).catch(() => {});
   } catch (error) {
     next(error);
   }

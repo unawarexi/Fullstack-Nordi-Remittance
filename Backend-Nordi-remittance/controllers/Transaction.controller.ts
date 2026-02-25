@@ -38,6 +38,7 @@ import {
   CACHE_KEYS,
   CACHE_TTL,
 } from '../services/Redis.service.js';
+import { onTransactionWrite } from '../services/QueryCacheService.js';
 
 // ============================================================================
 // WEBSOCKET EVENT TYPES
@@ -101,14 +102,14 @@ export async function internalTransfer(req: AuthenticatedRequest, res: Response,
     }
 
     // Get sender
-    const sender = await Users.findById(req.user.userId).session(session);
+    const sender: any = await Users.findById(req.user.userId).session(session);
     if (!sender) {
       throw new NotFoundError('Sender not found');
     }
 
     // Get sender's wallet
-    const senderWallet = await Wallets.findOne({
-      user: sender._id,
+    const senderWallet: any = await Wallets.findOne({
+      user: String(sender._id),
       status: 'active',
     }).session(session);
 
@@ -133,7 +134,7 @@ export async function internalTransfer(req: AuthenticatedRequest, res: Response,
       throw new ValidationError('Recipient account number or email is required');
     }
 
-    const recipient = await Users.findOne(recipientQuery).session(session);
+    const recipient: any = await Users.findOne(recipientQuery).session(session);
     if (!recipient) {
       throw new NotFoundError('Recipient not found');
     }
@@ -144,15 +145,15 @@ export async function internalTransfer(req: AuthenticatedRequest, res: Response,
     }
 
     // Get recipient's wallet
-    let recipientWallet = await Wallets.findOne({
-      user: recipient._id,
+    let recipientWallet: any = await Wallets.findOne({
+      user: String(recipient._id),
       status: 'active',
     }).session(session);
 
     // Create wallet if not exists
     if (!recipientWallet) {
       recipientWallet = new Wallets({
-        user: recipient._id,
+        user: String(recipient._id),
         walletNumber: `W${Date.now()}${Math.random().toString(36).substring(7)}`,
         balances: new Map([[transferCurrency, 0]]),
         status: 'active',
@@ -379,6 +380,9 @@ export async function internalTransfer(req: AuthenticatedRequest, res: Response,
       },
       newBalance: senderBalanceAfter,
     }, 'Transfer successful');
+
+    // Invalidate dashboard/stats caches after successful transfer
+    onTransactionWrite(req.user.userId.toString()).catch(() => {});
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -410,21 +414,21 @@ export async function deposit(req: AuthenticatedRequest, res: Response, next: Ne
       throw new ValidationError('Invalid deposit amount');
     }
 
-    const user = await Users.findById(req.user.userId).session(session);
+    const user: any = await Users.findById(req.user.userId).session(session);
     if (!user) {
       throw new NotFoundError('User not found');
     }
 
     // Get or create wallet
     const depositCurrency = currency || 'USD';
-    let wallet = await Wallets.findOne({
-      user: user._id,
+    let wallet: any = await Wallets.findOne({
+      user: String(user._id),
       status: 'active',
     }).session(session);
 
     if (!wallet) {
       wallet = new Wallets({
-        user: user._id,
+        user: String(user._id),
         walletNumber: `W${Date.now()}${Math.random().toString(36).substring(7)}`,
         balances: new Map([[depositCurrency, 0]]),
         status: 'active',
@@ -552,6 +556,9 @@ export async function deposit(req: AuthenticatedRequest, res: Response, next: Ne
       },
       newBalance: balanceAfter,
     }, 'Deposit successful');
+
+    // Invalidate dashboard/stats caches after successful deposit
+    onTransactionWrite(req.user.userId.toString()).catch(() => {});
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -591,7 +598,7 @@ export async function withdraw(req: AuthenticatedRequest, res: Response, next: N
       throw new ValidationError('Invalid withdrawal amount');
     }
 
-    const user = await Users.findById(req.user.userId).session(session);
+    const user: any = await Users.findById(req.user.userId).session(session);
     if (!user) {
       throw new NotFoundError('User not found');
     }
@@ -602,8 +609,8 @@ export async function withdraw(req: AuthenticatedRequest, res: Response, next: N
     }
 
     const withdrawCurrency = currency || 'USD';
-    const wallet = await Wallets.findOne({
-      user: user._id,
+    const wallet: any = await Wallets.findOne({
+      user: String(user._id),
       status: 'active',
     }).session(session);
 
@@ -743,6 +750,9 @@ export async function withdraw(req: AuthenticatedRequest, res: Response, next: N
       newBalance: balanceAfter,
       message: 'Withdrawal request submitted. Processing typically takes 1-3 business days.',
     });
+
+    // Invalidate dashboard/stats caches after successful withdrawal
+    onTransactionWrite(req.user.userId.toString()).catch(() => {});
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -778,7 +788,8 @@ export async function getTransactions(req: AuthenticatedRequest, res: Response, 
       if (cachedTransactions && cachedTransactions.length > 0) {
         const total = cachedTransactions.length;
         const paginatedTx = cachedTransactions.slice(0, limit);
-        return sendPaginated(res, paginatedTx, { page, limit, total }, 'Transactions retrieved successfully (cached)');
+        sendPaginated(res, paginatedTx, { page, limit, total }, 'Transactions retrieved successfully (cached)');
+        return;
       }
     }
 
@@ -819,13 +830,15 @@ export async function getTransactions(req: AuthenticatedRequest, res: Response, 
       }
     }
 
-    // Search by reference
+    // Search by reference — use exact match or prefix-anchored regex for index usage
     if (req.query.reference) {
-      filter.referenceNumber = new RegExp(req.query.reference as string, 'i');
+      const sanitized = (req.query.reference as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.referenceNumber = new RegExp(`^${sanitized}`, 'i');
     }
 
     const [transactions, total] = await Promise.all([
       Transactions.find(filter)
+        .select('type category amount currency status referenceNumber initiatedBy recipientName createdAt completedAt fee isInternational channel description')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -866,12 +879,13 @@ export async function getTransactionById(req: AuthenticatedRequest, res: Respons
     // Try Redis cache first
     const cachedTx = await getCachedTransaction(idStr);
     if (cachedTx) {
-      return sendSuccess(res, {
+      sendSuccess(res, {
         transaction: {
           ...cachedTx,
           direction: cachedTx.type === 'deposit' ? 'in' : 'out',
         },
       });
+      return;
     }
 
     const transaction = await Transactions.findOne({
@@ -924,7 +938,9 @@ export async function getTransactionByReference(req: AuthenticatedRequest, res: 
     const transaction = await Transactions.findOne({
       referenceNumber: reference,
       initiatedBy: req.user.userId,
-    }).lean();
+    })
+      .select('type category amount currency status referenceNumber initiatedBy recipientWallet recipientName recipientAccountNumber recipientBankName exchangeRate fee feeCurrency createdAt completedAt failedReason reversalReason isInternational channel description meta')
+      .lean();
 
     if (!transaction) {
       throw new NotFoundError('Transaction not found');
@@ -1184,6 +1200,9 @@ export async function cancelTransaction(req: AuthenticatedRequest, res: Response
       refundedAmount: refundAmount,
       newBalance,
     }, 'Transaction cancelled successfully');
+
+    // Invalidate dashboard/stats caches after cancellation
+    onTransactionWrite(req.user.userId.toString()).catch(() => {});
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -1226,7 +1245,8 @@ export async function getAllTransactions(req: AuthenticatedRequest, res: Respons
 
     const [transactions, total] = await Promise.all([
       Transactions.find(filter)
-        .populate('initiatedBy', 'firstName lastName email accountNumber')
+        .select('type category amount currency status referenceNumber initiatedBy wallet recipientName createdAt completedAt fee isInternational channel description')
+        .populate('initiatedBy', 'firstName lastName email')
         .populate('wallet', 'walletNumber')
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -1336,6 +1356,9 @@ export async function updateTransactionStatus(req: AuthenticatedRequest, res: Re
     }
 
     sendSuccess(res, { transaction }, `Transaction status updated to ${status}`);
+
+    // Invalidate dashboard/stats caches after admin status update
+    if (userId) onTransactionWrite(userId).catch(() => {});
   } catch (error) {
     await session.abortTransaction();
     next(error);

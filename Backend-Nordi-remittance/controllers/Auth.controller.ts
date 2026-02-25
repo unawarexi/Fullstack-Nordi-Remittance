@@ -137,7 +137,7 @@ export async function register(
     const accountNumber = generateAccountNumber();
 
     // Create user
-    const user = new Users({
+    const user: any = new Users({
       firstName: sanitizeString(firstName),
       lastName: sanitizeString(lastName),
       email: email.toLowerCase().trim(),
@@ -401,7 +401,7 @@ export async function registerFullKyc(
     signatureUrl = await uploadFile(files["signature"]);
 
     // Create user with all KYC data
-    const user = new Users({
+    const user: any = new Users({
       // Personal Details
       firstName: sanitizeString(firstName),
       middleName: middleName ? sanitizeString(middleName) : undefined,
@@ -506,7 +506,7 @@ export async function registerFullKyc(
     await session.commitTransaction();
 
     // Send verification email (non-blocking)
-    const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/verify-email?token=${verificationToken}`;
     sendTemplatedMail(
       user.email as string,
       emailGenerator.accountCreatedEmail({
@@ -585,7 +585,7 @@ export async function login(
     }
 
     // Find user
-    const user = await Users.findOne({ email: email.toLowerCase() }).select(
+    const user: any = await Users.findOne({ email: email.toLowerCase() }).select(
       "+password +loginAttempts +lockUntil +twoFactorSecret",
     );
 
@@ -878,7 +878,7 @@ export async function verify2FA(
       throw new UnauthorizedError("Invalid or expired two-factor session");
     }
 
-    const user = await Users.findById(tokenDoc.userId).select(
+    const user: any = await Users.findById(tokenDoc.userId).select(
       "+twoFactorSecret",
     );
 
@@ -897,7 +897,7 @@ export async function verify2FA(
 
     // Mark token as used
     await ConfirmationToken.updateOne(
-      { _id: tokenDoc._id as string },
+      { _id: String(tokenDoc._id) },
       { used: true },
     );
 
@@ -1061,7 +1061,7 @@ export async function refreshToken(
     const payload = verifyRefreshToken(refreshTokenValue);
 
     // Check if user still exists and is active
-    const user = await Users.findById(payload.userId).select(
+    const user: any = await Users.findById(payload.userId).select(
       "email role status",
     );
 
@@ -1146,7 +1146,7 @@ export async function verifyEmail(
     }
 
     // Update user
-    const user = await Users.findByIdAndUpdate(
+    const user: any = await Users.findByIdAndUpdate(
       tokenDoc.userId,
       { emailVerified: true },
       { new: true },
@@ -1196,7 +1196,7 @@ export async function resendVerificationEmail(
       throw new ValidationError("Valid email is required");
     }
 
-    const user = await Users.findOne({ email: email.toLowerCase() });
+    const user: any = await Users.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       // Don't reveal if user exists
@@ -1269,7 +1269,7 @@ export async function forgotPassword(
       throw new ValidationError("Valid email is required");
     }
 
-    const user = await Users.findOne({ email: email.toLowerCase() });
+    const user: any = await Users.findOne({ email: email.toLowerCase() });
 
     // Always return success to prevent email enumeration
     if (!user) {
@@ -1369,7 +1369,7 @@ export async function resetPassword(
     const hashedPassword = await hashPassword(password);
 
     // Update user
-    const user = await Users.findByIdAndUpdate(
+    const user: any = await Users.findByIdAndUpdate(
       tokenDoc.userId,
       {
         password: hashedPassword,
@@ -1474,7 +1474,7 @@ export async function changePassword(
       );
     }
 
-    const user = await Users.findById(req.user.userId).select("+password");
+    const user: any = await Users.findById(req.user.userId).select("+password");
 
     if (!user) {
       throw new NotFoundError("User not found");
@@ -1561,7 +1561,7 @@ export async function getCurrentUser(
       throw new UnauthorizedError("Authentication required");
     }
 
-    const user = await Users.findById(req.user.userId).select(
+    const user: any = await Users.findById(req.user.userId).select(
       "-password -twoFactorSecret -backupCodes",
     );
 

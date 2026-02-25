@@ -21,6 +21,7 @@ import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
 import envConfig from '../config/env.config.js';
 import type { AdminAccountData } from '../types/Mail.types.js';
+import { getCachedDashboard, invalidateDashboardCache, getCachedSystemSettings, invalidateSystemSettingsCache } from '../services/QueryCacheService.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -57,7 +58,7 @@ export async function adminLogin(req: AuthenticatedRequest, res: Response, next:
   try {
     const { email, password, twoFactorCode } = req.body;
 
-    const admin = await AdminUsers.findOne({ email: email.toLowerCase() })
+    const admin: any = await AdminUsers.findOne({ email: email.toLowerCase() })
       .populate('permissions');
 
     if (!admin) throw new UnauthorizedError('Invalid credentials');
@@ -201,7 +202,7 @@ export async function createAdminUser(req: AuthenticatedRequest, res: Response, 
       admin: req.user.userId,
       action: 'CREATE_ADMIN',
       resource: 'admin',
-      resourceId: admin._id.toString(),
+      resourceId: String(admin._id!),
       changes: { email, role: role || 'support_agent' },
       ipAddress: req.ip || '',
       userAgent: req.headers['user-agent'] || '',
@@ -242,7 +243,7 @@ export async function updateAdminUser(req: AuthenticatedRequest, res: Response, 
     const { id } = req.params;
     const { firstName, lastName, role, status, permissions } = req.body;
 
-    const admin = await AdminUsers.findById(id);
+    const admin: any = await AdminUsers.findById(id);
     if (!admin) throw new NotFoundError('Admin not found');
 
     if (firstName) admin.firstName = firstName;
@@ -276,7 +277,7 @@ export async function deactivateAdminUser(req: AuthenticatedRequest, res: Respon
 
     const { id } = req.params;
 
-    const admin = await AdminUsers.findById(id);
+    const admin: any = await AdminUsers.findById(id);
     if (!admin) throw new NotFoundError('Admin not found');
 
     if (admin._id.toString() === req.user.userId) {
@@ -310,38 +311,39 @@ export async function getDashboard(req: AuthenticatedRequest, res: Response, nex
   try {
     if (!req.user) throw new UnauthorizedError('Authentication required');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Cache dashboard data for 30 seconds — high-frequency endpoint
+    const dashboard = await getCachedDashboard(async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    const [
-      totalUsers,
-      activeUsers,
-      pendingKyc,
-      totalTransactions,
-      todayTransactions,
-      transactionVolume,
-      activeLoans,
-      pendingLoanApps,
-      activeCards,
-      openFraudCases,
-    ] = await Promise.all([
-      Users.countDocuments(),
-      Users.countDocuments({ accountStatus: 'active' }),
-      Users.countDocuments({ kycStatus: 'pending' }),
-      Transactions.countDocuments(),
-      Transactions.countDocuments({ createdAt: { $gte: today } }),
-      Transactions.aggregate([
-        { $match: { status: 'completed' } },
-        { $group: { _id: null, total: { $sum: '$amount' } } },
-      ]),
-      Loans.countDocuments({ status: { $in: ['active', 'disbursed'] } }),
-      Loans.countDocuments({ status: 'pending' }),
-      Cards.countDocuments({ status: 'active' }),
-      FraudCases.countDocuments({ status: 'open' }),
-    ]);
+      const [
+        totalUsers,
+        activeUsers,
+        pendingKyc,
+        totalTransactions,
+        todayTransactions,
+        transactionVolume,
+        activeLoans,
+        pendingLoanApps,
+        activeCards,
+        openFraudCases,
+      ] = await Promise.all([
+        Users.estimatedDocumentCount(),
+        Users.countDocuments({ accountStatus: 'active' }),
+        Users.countDocuments({ kycStatus: 'pending' }),
+        Transactions.estimatedDocumentCount(),
+        Transactions.countDocuments({ createdAt: { $gte: today } }),
+        Transactions.aggregate([
+          { $match: { status: 'completed' } },
+          { $group: { _id: null, total: { $sum: '$amount' } } },
+        ]),
+        Loans.countDocuments({ status: { $in: ['active', 'disbursed'] } }),
+        Loans.countDocuments({ status: 'pending' }),
+        Cards.countDocuments({ status: 'active' }),
+        FraudCases.countDocuments({ status: 'open' }),
+      ]);
 
-    sendSuccess(res, {
-      dashboard: {
+      return {
         users: {
           total: totalUsers,
           active: activeUsers,
@@ -362,8 +364,10 @@ export async function getDashboard(req: AuthenticatedRequest, res: Response, nex
         fraud: {
           openCases: openFraudCases,
         },
-      },
+      };
     });
+
+    sendSuccess(res, { dashboard });
   } catch (error) {
     next(error);
   }
@@ -521,12 +525,19 @@ export async function searchUsers(req: AuthenticatedRequest, res: Response, next
     const filter: any = {};
     
     if (query) {
-      filter.$or = [
-        { email: new RegExp(query as string, 'i') },
-        { firstName: new RegExp(query as string, 'i') },
-        { lastName: new RegExp(query as string, 'i') },
-        { phone: new RegExp(query as string, 'i') },
-      ];
+      const searchTerm = (query as string).trim();
+      if (searchTerm.length >= 3) {
+        // Use $text index for performant full-text search
+        filter.$text = { $search: searchTerm };
+      } else {
+        // For short queries, use prefix-anchored regex (safe + indexed)
+        const sanitized = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        filter.$or = [
+          { email: new RegExp(`^${sanitized}`, 'i') },
+          { firstName: new RegExp(`^${sanitized}`, 'i') },
+          { lastName: new RegExp(`^${sanitized}`, 'i') },
+        ];
+      }
     }
     if (status) filter.accountStatus = status;
     if (kycStatus) filter.kycStatus = kycStatus;
@@ -556,14 +567,22 @@ export async function getUserDetails(req: AuthenticatedRequest, res: Response, n
     const user = await Users.findById(id).select('-password -twoFactorSecret').lean();
     if (!user) throw new NotFoundError('User not found');
 
-    // Get related data
+    // Get related data — use .select() projections to avoid returning full documents
     const [wallets, recentTransactions, loans, cards] = await Promise.all([
-      Wallets.find({ user: id }).lean(),
-      Transactions.find({ 
-        initiatedBy: id
-      }).sort({ createdAt: -1 }).limit(10).lean(),
-      Loans.find({ user: id }).lean(),
-      Cards.find({ user: id }).lean(),
+      Wallets.find({ user: id })
+        .select('walletNumber status balances isPrimary walletType createdAt')
+        .lean(),
+      Transactions.find({ initiatedBy: id })
+        .select('type amount currency status referenceNumber createdAt completedAt')
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean(),
+      Loans.find({ user: id })
+        .select('loanType status principalAmount interestRate createdAt')
+        .lean(),
+      Cards.find({ user: id })
+        .select('cardType brand status last4 expiryDate createdAt')
+        .lean(),
     ]);
 
     sendSuccess(res, {

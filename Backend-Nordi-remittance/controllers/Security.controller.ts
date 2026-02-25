@@ -34,6 +34,7 @@ export async function getLoginHistory(req: AuthenticatedRequest, res: Response, 
         user: req.user.userId,
         eventType: { $in: ['login', 'login_failed', 'logout'] },
       })
+        .select('eventType severity ipAddress location userAgent timestamp createdAt')
         .sort({ timestamp: -1 })
         .skip(skip)
         .limit(limit)
@@ -199,7 +200,7 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
 
     const { code } = req.body;
 
-    const user = await Users.findById(req.user.userId);
+    const user: any = await Users.findById(req.user.userId);
     if (!user) throw new NotFoundError('User not found');
 
     if (!user.twoFactorSecret || !(user as any).twoFactorPending) {
@@ -244,7 +245,7 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
       enabledAt: new Date().toISOString(),
       method: 'authenticator',
       backupCodes,
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
@@ -265,7 +266,7 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
 
     const { code, password } = req.body;
 
-    const user = await Users.findById(req.user.userId).select('+password');
+    const user: any = await Users.findById(req.user.userId).select('+password');
     if (!user) throw new NotFoundError('User not found');
 
     if (!user.twoFactorEnabled) {
@@ -311,7 +312,7 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
       email: String(user.email),
       disabledAt: new Date().toISOString(),
       ipAddress: req.ip || 'Unknown',
-      userId: user._id.toString(),
+      userId: String(user._id),
     });
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
@@ -381,6 +382,7 @@ export async function getSecurityAlerts(req: AuthenticatedRequest, res: Response
       user: req.user.userId,
       severity: { $in: ['warning', 'critical'] },
     })
+      .select('eventType severity status description ipAddress location timestamp createdAt')
       .sort({ timestamp: -1 })
       .limit(50)
       .lean();

@@ -130,7 +130,7 @@ export async function checkEligibility(req: AuthenticatedRequest, res: Response,
     const activeLoans = await Loans.find({
       user: req.user.userId,
       status: { $in: ['active', 'pending'] },
-    });
+    }).select('outstandingBalance status').lean();
 
     const totalOutstanding = activeLoans.reduce((sum, loan) => sum + (loan.outstandingBalance || 0), 0);
 
@@ -146,7 +146,7 @@ export async function checkEligibility(req: AuthenticatedRequest, res: Response,
       wallet: { $exists: true },
       status: 'completed',
       createdAt: { $gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) },
-    });
+    }).select('amount').lean();
 
     const monthlyIncome = transactions.length > 0 
       ? transactions.reduce((sum, t) => sum + t.amount, 0) / 3 

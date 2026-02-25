@@ -15,6 +15,7 @@ import { sendSuccess, sendPaginated } from '../core/helpers/response.helper.js';
 import { UnauthorizedError, NotFoundError } from '../core/errors/AppError.js';
 import { cacheSet, cacheGet, CACHE_KEYS, CACHE_TTL } from '../services/Redis.service.js';
 import { broadcast } from '../services/Websocket.service.js';
+import { getCachedPlatformStats } from '../services/QueryCacheService.js';
 
 // ============================================================================
 // USER STATISTICS
@@ -419,80 +420,84 @@ export async function getPlatformStatistics(req: AuthenticatedRequest, res: Resp
   try {
     if (!req.user) throw new UnauthorizedError('Authentication required');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Cache platform stats for 30 seconds — high-frequency admin endpoint
+    const stats = await getCachedPlatformStats(async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    const thisMonth = new Date();
-    thisMonth.setDate(1);
-    thisMonth.setHours(0, 0, 0, 0);
+      const thisMonth = new Date();
+      thisMonth.setDate(1);
+      thisMonth.setHours(0, 0, 0, 0);
 
-    const [
-      totalUsers,
-      newUsersToday,
-      newUsersThisMonth,
-      activeUsers,
-      totalTransactions,
-      transactionsToday,
-      transactionVolume,
-      volumeToday,
-      activeWallets,
-      totalWalletBalance,
-      activeLoans,
-      loanVolume,
-      activeCards,
-    ] = await Promise.all([
-      Users.countDocuments(),
-      Users.countDocuments({ createdAt: { $gte: today } }),
-      Users.countDocuments({ createdAt: { $gte: thisMonth } }),
-      Users.countDocuments({ lastActive: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }),
-      Transactions.countDocuments({ status: 'completed' }),
-      Transactions.countDocuments({ createdAt: { $gte: today }, status: 'completed' }),
-      Transactions.aggregate([
-        { $match: { status: 'completed' } },
-        { $group: { _id: null, total: { $sum: '$amount' } } },
-      ]),
-      Transactions.aggregate([
-        { $match: { createdAt: { $gte: today }, status: 'completed' } },
-        { $group: { _id: null, total: { $sum: '$amount' } } },
-      ]),
-      Wallets.countDocuments({ status: 'active' }),
-      Wallets.aggregate([
-        { $match: { status: 'active' } },
-        { $group: { _id: null, total: { $sum: '$balance' } } },
-      ]),
-      Loans.countDocuments({ status: { $in: ['active', 'disbursed'] } }),
-      Loans.aggregate([
-        { $match: { status: { $in: ['active', 'disbursed'] } } },
-        { $group: { _id: null, total: { $sum: '$principalAmount' } } },
-      ]),
-      Cards.countDocuments({ status: 'active' }),
-    ]);
+      const [
+        totalUsers,
+        newUsersToday,
+        newUsersThisMonth,
+        activeUsers,
+        totalTransactions,
+        transactionsToday,
+        transactionVolume,
+        volumeToday,
+        activeWallets,
+        totalWalletBalance,
+        activeLoans,
+        loanVolume,
+        activeCards,
+      ] = await Promise.all([
+        Users.estimatedDocumentCount(),
+        Users.countDocuments({ createdAt: { $gte: today } }),
+        Users.countDocuments({ createdAt: { $gte: thisMonth } }),
+        Users.countDocuments({ lastActive: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }),
+        Transactions.countDocuments({ status: 'completed' }),
+        Transactions.countDocuments({ createdAt: { $gte: today }, status: 'completed' }),
+        Transactions.aggregate([
+          { $match: { status: 'completed' } },
+          { $group: { _id: null, total: { $sum: '$amount' } } },
+        ]),
+        Transactions.aggregate([
+          { $match: { createdAt: { $gte: today }, status: 'completed' } },
+          { $group: { _id: null, total: { $sum: '$amount' } } },
+        ]),
+        Wallets.countDocuments({ status: 'active' }),
+        Wallets.aggregate([
+          { $match: { status: 'active' } },
+          { $group: { _id: null, total: { $sum: '$balance' } } },
+        ]),
+        Loans.countDocuments({ status: { $in: ['active', 'disbursed'] } }),
+        Loans.aggregate([
+          { $match: { status: { $in: ['active', 'disbursed'] } } },
+          { $group: { _id: null, total: { $sum: '$principalAmount' } } },
+        ]),
+        Cards.countDocuments({ status: 'active' }),
+      ]);
 
-    const stats = {
-      users: {
-        total: totalUsers,
-        newToday: newUsersToday,
-        newThisMonth: newUsersThisMonth,
-        weeklyActive: activeUsers,
-      },
-      transactions: {
-        total: totalTransactions,
-        today: transactionsToday,
-        totalVolume: transactionVolume[0]?.total || 0,
-        todayVolume: volumeToday[0]?.total || 0,
-      },
-      wallets: {
-        active: activeWallets,
-        totalBalance: totalWalletBalance[0]?.total || 0,
-      },
-      loans: {
-        active: activeLoans,
-        volume: loanVolume[0]?.total || 0,
-      },
-      cards: {
-        active: activeCards,
-      },
-    };
+      return {
+        users: {
+          total: totalUsers,
+          newToday: newUsersToday,
+          newThisMonth: newUsersThisMonth,
+          weeklyActive: activeUsers,
+        },
+        transactions: {
+          total: totalTransactions,
+          today: transactionsToday,
+          totalVolume: transactionVolume[0]?.total || 0,
+          todayVolume: volumeToday[0]?.total || 0,
+        },
+        wallets: {
+          active: activeWallets,
+          totalBalance: totalWalletBalance[0]?.total || 0,
+        },
+        loans: {
+          active: activeLoans,
+          volume: loanVolume[0]?.total || 0,
+        },
+        cards: {
+          active: activeCards,
+        },
+      };
+    });
+
     // Broadcast to all clients
     broadcast('platform:stats_updated', stats);
     sendSuccess(res, { statistics: stats });

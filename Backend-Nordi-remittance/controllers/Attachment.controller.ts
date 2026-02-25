@@ -156,6 +156,7 @@ export async function getAttachments(
 
     const [attachments, total] = await Promise.all([
       Attachments.find(filter)
+        .select('fileName fileType fileSize category status relatedEntityType relatedEntityId createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -253,7 +254,7 @@ export async function updateAttachment(
     const { id } = req.params;
     const { description, category, isPublic } = req.body;
 
-    const attachment = await Attachments.findById(id);
+    const attachment: any = await Attachments.findById(id);
     if (!attachment) throw new NotFoundError("Attachment not found");
 
     if (attachment.user.toString() !== req.user.userId) {
@@ -449,6 +450,7 @@ export async function getAllAttachments(
 
     const [attachments, total] = await Promise.all([
       Attachments.find(filter)
+        .select('fileName fileType fileSize category status user relatedEntityType relatedEntityId createdAt')
         .populate("user", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -481,6 +483,7 @@ export async function getUserKycDocuments(
       user: userId,
       category: "kyc",
     })
+      .select('fileName fileType fileSize category status metadata createdAt')
       .sort({ createdAt: -1 })
       .lean();
 

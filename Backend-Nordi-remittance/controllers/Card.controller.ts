@@ -102,6 +102,7 @@ export async function getCardById(req: AuthenticatedRequest, res: Response, next
 
     // Get recent transactions
     const recentTransactions = await CardTransactions.find({ card: card._id })
+      .select('transactionType amount currency merchantName status createdAt')
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
@@ -725,6 +726,7 @@ export async function getCardTransactions(req: AuthenticatedRequest, res: Respon
 
     const [transactions, total] = await Promise.all([
       CardTransactions.find(filter)
+        .select('transactionType amount currency merchantName merchantCategory status authorizationCode createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

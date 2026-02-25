@@ -250,6 +250,7 @@ export async function getIntegrationLogs(req: AuthenticatedRequest, res: Respons
 
     const [logs, total] = await Promise.all([
       AdminActionLogs.find(filter)
+        .select('action resource resourceId status admin description createdAt')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
