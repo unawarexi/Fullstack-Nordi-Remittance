@@ -129,33 +129,6 @@ const Toast = ({ visible, message, type = "success", duration = 3000, onHide }) 
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style jsx>{`
-        @media (min-width: 640px) {
-          .toast-container {
-            max-width: 400px !important;
-          }
-        }
-
-        @media (min-width: 768px) {
-          .toast-container {
-            max-width: 450px !important;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .toast-container {
-            max-width: 500px !important;
-          }
-        }
-
-        @media (max-width: 639px) {
-          .toast-container {
-            max-width: 85% !important;
-            font-size: 12px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };
