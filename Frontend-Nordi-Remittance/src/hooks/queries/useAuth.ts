@@ -71,8 +71,12 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      if (!data.requiresTwoFactor) {
-        TokenManager.setTokens(data.accessToken, data.refreshToken);
+      // Backend sends requires2FA (not requiresTwoFactor) for 2FA flow
+      if (!data.requiresTwoFactor && !data.requires2FA) {
+        // Backend nests tokens under data.tokens { accessToken, refreshToken, expiresIn }
+        const accessToken = data.tokens?.accessToken || data.accessToken;
+        const refreshToken = data.tokens?.refreshToken || data.refreshToken;
+        TokenManager.setTokens(accessToken, refreshToken);
         queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
         showToast("Login successful", "success");
       }

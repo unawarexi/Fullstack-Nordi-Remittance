@@ -92,6 +92,7 @@ export const useAuthStore = create<AuthStore>()(
           requires2FA: false,
           twoFactorPending: null,
           lastActivityAt: Date.now(),
+          isInitialized: true,
         });
       },
 
@@ -174,6 +175,15 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         sessionExpiresAt: state.sessionExpiresAt,
       }),
+      onRehydrateStorage: () => {
+        return (state) => {
+          // Mark as initialized once zustand finishes loading from localStorage
+          // Without this, ProtectedRoute shows <PageLoader /> forever
+          if (state) {
+            state.setInitialized(true);
+          }
+        };
+      },
     }
   )
 );

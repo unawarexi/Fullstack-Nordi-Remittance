@@ -51,13 +51,14 @@ const Login = () => {
       const response = await loginMutation.mutateAsync(data);
 
       // If 2FA is required, handle it
-      if (response.requiresTwoFactor) {
+      // Backend sends requires2FA (or requiresTwoFactor), twoFactorToken (or tempToken)
+      if (response.requiresTwoFactor || response.requires2FA) {
         // Store temp data and redirect to 2FA page
         navigate("/auth/verify-2fa", {
           state: {
             email: data.email,
-            tempToken: response.tempToken,
-            method: response.twoFactorMethod,
+            tempToken: response.tempToken || response.twoFactorToken,
+            method: response.twoFactorMethod || response.method,
           },
         });
         return;
@@ -66,7 +67,7 @@ const Login = () => {
       // Set authenticated state
       if (response.user) {
         setAuthenticated({
-          id: response.user.id,
+          id: response.user.id || (response.user as any)._id,
           email: response.user.email,
           firstName: response.user.firstName,
           lastName: response.user.lastName,
@@ -76,14 +77,13 @@ const Login = () => {
           isEmailVerified: response.user.emailVerified || false,
           isPhoneVerified: response.user.phoneVerified || false,
         });
-      }
 
-      // Redirect to dashboard based on role
-      if (response.user.role === "admin") {
-        // Notification is handled in the mutation
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/customer/dashboard");
+        // Redirect to dashboard based on role
+        if (response.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/customer/dashboard");
+        }
       }
     } catch (error) {
       // Error is handled by the mutation's onError callback
