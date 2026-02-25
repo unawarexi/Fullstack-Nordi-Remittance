@@ -172,6 +172,25 @@ UserSchema.pre("save", function () {
   }
 });
 
+// ==========================================================================
+// INDEXES — Critical for search performance
+// ==========================================================================
+// Exact match indexes (high selectivity)
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ mobileNumber: 1 }, { unique: true, sparse: true });
+UserSchema.index({ idNumber: 1 }, { sparse: true });
+
+// Filter/sort compound indexes
+UserSchema.index({ accountStatus: 1, kycStatus: 1 });
+UserSchema.index({ kycStatus: 1 });
+UserSchema.index({ isActive: 1 });
+
+// Text index for admin user search (replaces unanchored regex scans)
+UserSchema.index(
+  { email: "text", firstName: "text", lastName: "text", mobileNumber: "text" },
+  { name: "idx_users_text_search", weights: { email: 10, firstName: 5, lastName: 5, mobileNumber: 3 } },
+);
+
 // Create and export model
 const Users = mongoose.model("Users", UserSchema);
 export default Users;

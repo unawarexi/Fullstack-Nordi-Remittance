@@ -74,5 +74,9 @@ const PermissionsSchema = new Schema({
   feedbackSubmission: { type: Boolean, default: false }
 }, { timestamps: true });
 
+// Indexes
+PermissionsSchema.index({ userId: 1 }, { unique: true });
+PermissionsSchema.index({ userRole: 1 });
+
 const Permissions = mongoose.model('Permissions', PermissionsSchema);
 export default Permissions;

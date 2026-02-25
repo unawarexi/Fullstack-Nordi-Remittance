@@ -26,7 +26,9 @@
     "docker:prod": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "db:seed": "tsx ./scripts/seed.ts",
-    "db:migrate": "tsx ./scripts/migrate.ts"
+    "db:migrate": "tsx ./scripts/migrate.ts",
+    "db:create-indexes": "tsx ./scripts/create-indexes.ts",
+    "db:verify-performance": "tsx ./scripts/verify-query-performance.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

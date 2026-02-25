@@ -92,12 +92,18 @@ const AccountStatusHistorySchema = new Schema({
   createdAt: { type: Date, default: Date.now, immutable: true },
 });
 
-// Indexes
+// ==========================================================================
+// INDEXES — Optimized for actual query patterns
+// ==========================================================================
 WalletSchema.index({ status: 1 });
+WalletSchema.index({ user: 1, status: 1 });
+WalletSchema.index({ user: 1, isPrimary: 1 });
 AccountBalanceSchema.index({ wallet: 1, currency: 1 }, { unique: true });
 LedgerEntrySchema.index({ wallet: 1, createdAt: -1 });
 LedgerEntrySchema.index({ transaction: 1 });
+LedgerEntrySchema.index({ wallet: 1, entryType: 1, createdAt: -1 });
 AccountLimitSchema.index({ wallet: 1, limitType: 1, category: 1 });
+AccountLimitSchema.index({ wallet: 1, isActive: 1 });
 AccountStatusHistorySchema.index({ wallet: 1, createdAt: -1 });
 
 export const Wallets = mongoose.model("Wallets", WalletSchema);
