@@ -165,6 +165,7 @@ export const queryKeys = {
   security: {
     all: ['security'] as const,
     settings: () => [...queryKeys.security.all, 'settings'] as const,
+    twoFactorStatus: () => [...queryKeys.security.all, 'twoFactorStatus'] as const,
     sessions: () => [...queryKeys.security.all, 'sessions'] as const,
     currentSession: () => [...queryKeys.security.all, 'currentSession'] as const,
     trustedDevices: () => [...queryKeys.security.all, 'trustedDevices'] as const,
@@ -211,8 +212,12 @@ export const queryKeys = {
       [...queryKeys.statistics.all, 'transactions', filters] as const,
     volumeChart: (filters?: Record<string, unknown>) => 
       [...queryKeys.statistics.all, 'volumeChart', filters] as const,
+    spending: (filters?: Record<string, unknown>) => 
+      [...queryKeys.statistics.all, 'spending', filters] as const,
     spendingByCategory: (filters?: Record<string, unknown>) => 
       [...queryKeys.statistics.all, 'spendingByCategory', filters] as const,
+    income: (filters?: Record<string, unknown>) => 
+      [...queryKeys.statistics.all, 'income', filters] as const,
     balanceHistory: (filters?: Record<string, unknown>) => 
       [...queryKeys.statistics.all, 'balanceHistory', filters] as const,
     balanceDistribution: () => [...queryKeys.statistics.all, 'balanceDistribution'] as const,
