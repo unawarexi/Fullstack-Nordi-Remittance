@@ -4,7 +4,7 @@
 
 import { io, Socket } from "socket.io-client";
 import { TokenManager } from "../api/client";
-import type { WSEventName } from "../constants/ws-events";
+import type { WSEventName } from "../events/ws-events";
 
 // ============================================================================
 // CONFIGURATION
