@@ -46,7 +46,12 @@ const AccountSummaryPanel: React.FC = () => {
   const { data: overview, isLoading: overviewLoading } = useDashboardOverview();
   const { data: walletsRes, isLoading: walletsLoading } = useWallets();
 
-  const wallets: any[] = (walletsRes as any) || [];
+  // Ensure wallets is always an array — API may return wrapped object or undefined on error
+  const wallets: any[] = Array.isArray(walletsRes)
+    ? walletsRes
+    : Array.isArray((walletsRes as any)?.data)
+      ? (walletsRes as any).data
+      : [];
   const stats: any = (overview as any) || {};
 
   const totalBalance =

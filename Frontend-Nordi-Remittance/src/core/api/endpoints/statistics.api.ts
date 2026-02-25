@@ -43,7 +43,7 @@ export const statisticsApi = {
       activeCards: number;
       activeLoans: number;
       activeInvestments: number;
-    }>>(`${STATISTICS_BASE}/dashboard`);
+    }>>(`${STATISTICS_BASE}/user`);
     return response.data;
   },
 
@@ -129,7 +129,7 @@ export const statisticsApi = {
         trend: number;
       }>;
       totalSpending: number;
-    }>>(`${STATISTICS_BASE}/spending/categories`, { params });
+    }>>(`${STATISTICS_BASE}/spending`, { params });
     return response.data;
   },
 
@@ -359,6 +359,142 @@ export const statisticsApi = {
       }>;
       totalPotentialSavings: number;
     }>>(`${STATISTICS_BASE}/recommendations`);
+    return response.data;
+  },
+
+  // ==========================================================================
+  // EXTENDED STATISTICS (map to available backend endpoints)
+  // ==========================================================================
+
+  /** Net worth history — proxies to /statistics/user */
+  getNetWorthHistory: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/user`, { params });
+    return response.data;
+  },
+
+  /** Transactions grouped by type — proxies to /statistics/transactions */
+  getTransactionsByType: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { ...params, groupBy: 'type' } });
+    return response.data;
+  },
+
+  /** Transactions grouped by status — proxies to /statistics/transactions */
+  getTransactionsByStatus: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { ...params, groupBy: 'status' } });
+    return response.data;
+  },
+
+  /** Spending trends — proxies to /statistics/spending */
+  getSpendingTrends: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { ...params, view: 'trends' } });
+    return response.data;
+  },
+
+  /** Top spending categories — proxies to /statistics/spending */
+  getTopSpendingCategories: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { ...params, view: 'top' } });
+    return response.data;
+  },
+
+  /** Spending vs income comparison — proxies to /statistics/spending */
+  getSpendingVsIncome: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { ...params, view: 'vs-income' } });
+    return response.data;
+  },
+
+  /** Budget progress — proxies to /statistics/spending */
+  getBudgetProgress: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { view: 'budget' } });
+    return response.data;
+  },
+
+  /** Income by source — proxies to /statistics/transactions */
+  getIncomeBySource: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { ...params, filter: 'income' } });
+    return response.data;
+  },
+
+  /** Income trends — proxies to /statistics/transactions */
+  getIncomeTrends: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { ...params, filter: 'income', view: 'trends' } });
+    return response.data;
+  },
+
+  /** Remittance by country — proxies to /statistics/remittance */
+  getRemittanceByCountry: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/remittance`, { params: { ...params, groupBy: 'country' } });
+    return response.data;
+  },
+
+  /** Remittance by recipient — proxies to /statistics/remittance */
+  getRemittanceByRecipient: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/remittance`, { params: { ...params, groupBy: 'recipient' } });
+    return response.data;
+  },
+
+  /** Card spending stats — proxies to /statistics/spending */
+  getCardSpendingStats: async (cardId: string, params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { ...params, cardId } });
+    return response.data;
+  },
+
+  /** Card spending by merchant — proxies to /statistics/spending */
+  getCardSpendingByMerchant: async (cardId: string, params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { ...params, cardId, groupBy: 'merchant' } });
+    return response.data;
+  },
+
+  /** Portfolio allocation — proxies to /statistics/investments */
+  getPortfolioAllocation: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/investments`, { params: { view: 'allocation' } });
+    return response.data;
+  },
+
+  /** Savings progress — proxies to /statistics/user */
+  getSavingsProgress: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/user`, { params: { view: 'savings' } });
+    return response.data;
+  },
+
+  /** Savings rate trend — proxies to /statistics/user */
+  getSavingsRateTrend: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/user`, { params: { ...params, view: 'savings-trend' } });
+    return response.data;
+  },
+
+  /** Financial insights — alias for getInsights */
+  getFinancialInsights: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/insights`);
+    return response.data;
+  },
+
+  /** Spending alerts — proxies to /statistics/spending */
+  getSpendingAlerts: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/spending`, { params: { view: 'alerts' } });
+    return response.data;
+  },
+
+  /** Activity summary — proxies to /statistics/user */
+  getActivitySummary: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/user`, { params: { ...params, view: 'activity' } });
+    return response.data;
+  },
+
+  /** Period comparison — proxies to /statistics/transactions */
+  getPeriodComparison: async (params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { ...params, view: 'comparison' } });
+    return response.data;
+  },
+
+  /** Year over year comparison — proxies to /statistics/transactions */
+  getYearOverYearComparison: async (year?: number): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/transactions`, { params: { year, view: 'yoy' } });
+    return response.data;
+  },
+
+  /** Available export formats */
+  getAvailableExports: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${STATISTICS_BASE}/user`, { params: { view: 'exports' } });
     return response.data;
   },
 };

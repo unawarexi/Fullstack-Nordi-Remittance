@@ -12,15 +12,28 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 // ============================================================================
 
 /**
- * Get KYC status
+ * Get KYC status — returns fallback if backend KYC routes are unavailable
  */
 export const useKycStatus = () => {
   return useQuery({
     queryKey: queryKeys.kyc.status(),
     queryFn: async () => {
-      const response = await kycApi.getStatus();
-      return response.data;
+      try {
+        const response = await kycApi.getStatus();
+        return response.data;
+      } catch {
+        // KYC routes may not be available yet — return sensible default
+        return {
+          status: 'pending' as const,
+          level: 'none' as const,
+          completedSteps: [],
+          pendingSteps: ['personal_info', 'address', 'identity_document'],
+          rejectedSteps: [],
+          limits: { dailyTransaction: 0, monthlyTransaction: 0, maxBalance: 0 },
+        };
+      }
     },
+    retry: false, // Don't retry if endpoint doesn't exist
   });
 };
 

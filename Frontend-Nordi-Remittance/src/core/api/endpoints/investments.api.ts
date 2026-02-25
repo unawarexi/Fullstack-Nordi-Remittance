@@ -331,7 +331,7 @@ export const investmentsApi = {
       autoSaveEnabled: boolean;
       autoSaveAmount?: number;
       autoSaveFrequency?: 'daily' | 'weekly' | 'monthly';
-    }>>>(`${INVESTMENTS_BASE}/savings-goals`);
+    }>>>(`${INVESTMENTS_BASE}/savings`);
     return response.data;
   },
 
@@ -362,7 +362,7 @@ export const investmentsApi = {
       currentAmount: number;
       targetDate: string;
       progress: number;
-    }>>(`${INVESTMENTS_BASE}/savings-goals`, data);
+    }>>(`${INVESTMENTS_BASE}/savings`, data);
     return response.data;
   },
 
@@ -378,7 +378,7 @@ export const investmentsApi = {
     autoSaveFrequency?: 'daily' | 'weekly' | 'monthly';
   }): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.patch<ApiResponse<{ message: string }>>(
-      `${INVESTMENTS_BASE}/savings-goals/${goalId}`,
+      `${INVESTMENTS_BASE}/savings/${goalId}`,
       data
     );
     return response.data;
@@ -389,7 +389,7 @@ export const investmentsApi = {
    */
   deleteSavingsGoal: async (goalId: UUID): Promise<ApiResponse<{ message: string }>> => {
     const response = await apiClient.delete<ApiResponse<{ message: string }>>(
-      `${INVESTMENTS_BASE}/savings-goals/${goalId}`
+      `${INVESTMENTS_BASE}/savings/${goalId}`
     );
     return response.data;
   },
@@ -402,9 +402,67 @@ export const investmentsApi = {
     sourceAccountId: UUID;
   }): Promise<ApiResponse<{ message: string; newBalance: number }>> => {
     const response = await apiClient.post<ApiResponse<{ message: string; newBalance: number }>>(
-      `${INVESTMENTS_BASE}/savings-goals/${goalId}/add`,
+      `${INVESTMENTS_BASE}/savings/${goalId}/deposit`,
       data
     );
+    return response.data;
+  },
+
+  // ==========================================================================
+  // EXTENDED METHODS (map to available backend endpoints)
+  // ==========================================================================
+
+  /** Get investment portfolio */
+  getPortfolio: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${INVESTMENTS_BASE}/portfolio`);
+    return response.data;
+  },
+
+  /** Get product by ID — alias for getProductDetails */
+  getProductById: async (productId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${INVESTMENTS_BASE}/products/${productId}`);
+    return response.data;
+  },
+
+  /** Get investment performance */
+  getPerformance: async (investmentId: UUID, params?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${INVESTMENTS_BASE}/${investmentId}/performance`, { params });
+    return response.data;
+  },
+
+  /** Close an investment */
+  close: async (investmentId: UUID, data?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(`${INVESTMENTS_BASE}/${investmentId}/close`, data);
+    return response.data;
+  },
+
+  /** Set up recurring investment */
+  setupRecurring: async (investmentId: UUID, data?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(`${INVESTMENTS_BASE}/${investmentId}/recurring`, data);
+    return response.data;
+  },
+
+  /** Cancel recurring investment */
+  cancelRecurring: async (investmentId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.delete<ApiResponse<any>>(`${INVESTMENTS_BASE}/${investmentId}/recurring`);
+    return response.data;
+  },
+
+  /** Get savings goal by ID */
+  getSavingsGoalById: async (goalId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${INVESTMENTS_BASE}/savings/${goalId}`);
+    return response.data;
+  },
+
+  /** Get savings goal progress */
+  getSavingsGoalProgress: async (goalId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(`${INVESTMENTS_BASE}/savings/${goalId}`);
+    return response.data;
+  },
+
+  /** Withdraw from savings goal */
+  withdrawFromSavingsGoal: async (goalId: UUID, data?: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(`${INVESTMENTS_BASE}/savings/${goalId}/withdraw`, data);
     return response.data;
   },
 };

@@ -25,14 +25,18 @@ export const useSecuritySettings = () => {
 };
 
 /**
- * Get 2FA status
+ * Get 2FA status (derived from security settings)
  */
 export const useTwoFactorStatus = () => {
   return useQuery({
     queryKey: queryKeys.security.twoFactorStatus(),
     queryFn: async () => {
-      const response = await securityApi.get2FAStatus();
-      return response.data;
+      const response = await securityApi.getSettings();
+      const settings = response.data as any;
+      return {
+        enabled: settings?.twoFactorEnabled ?? false,
+        method: settings?.twoFactorMethod ?? null,
+      };
     },
   });
 };

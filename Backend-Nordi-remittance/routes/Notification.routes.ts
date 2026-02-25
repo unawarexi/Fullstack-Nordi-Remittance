@@ -19,31 +19,31 @@ router.get('/', NotificationController.getUserNotifications);
 // Get unread notification count
 router.get('/unread-count', NotificationController.getUnreadNotificationCount);
 
-// Get specific notification
-router.get('/:notificationId', NotificationController.getNotificationById);
-
-// Mark notification as read
-router.put('/:notificationId/read', NotificationController.markNotificationAsRead);
-
-// Mark all notifications as read
-router.put('/read-all', NotificationController.markAllNotificationsAsRead);
-
-// Delete notification
-router.delete('/:notificationId', NotificationController.deleteNotification);
-
-// Delete all notifications (or filtered)
-router.delete('/', NotificationController.deleteNotifications);
-
-// Get notification settings
+// Get notification settings (MUST be before /:notificationId to avoid matching "settings" as a param)
 router.get('/settings', NotificationController.getNotificationSettings);
 
 // Update notification settings
 router.put('/settings', NotificationController.updateNotificationSettings);
+
+// Mark all notifications as read (MUST be before /:notificationId)
+router.put('/read-all', NotificationController.markAllNotificationsAsRead);
 
 // Register push notification token
 router.post('/push-token', NotificationController.registerPushToken);
 
 // Remove push notification token
 router.delete('/push-token/:deviceId', NotificationController.removePushToken);
+
+// Delete all notifications (or filtered)
+router.delete('/', NotificationController.deleteNotifications);
+
+// Get specific notification
+router.get('/:notificationId', NotificationController.getNotificationById);
+
+// Mark notification as read
+router.put('/:notificationId/read', NotificationController.markNotificationAsRead);
+
+// Delete notification
+router.delete('/:notificationId', NotificationController.deleteNotification);
 
 export default router;

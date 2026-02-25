@@ -104,7 +104,11 @@ const filterOptions = ["Week", "Month", "Quarter", "Year"];
 const RecentTransactionsSection: React.FC = () => {
   const navigate = useNavigate();
   const { data: txRes, isLoading } = useRecentTransactions(5);
-  const transactions: any[] = (txRes as any) || [];
+  const transactions: any[] = Array.isArray(txRes)
+    ? txRes
+    : Array.isArray((txRes as any)?.data)
+      ? (txRes as any).data
+      : [];
 
   if (isLoading) return <TransactionListSkeleton count={4} />;
 
@@ -186,7 +190,11 @@ const SpendingAnalyticsSection: React.FC = () => {
 
   const catData: any = (catRes as any) || {};
   const categories: any[] = catData?.categories || [];
-  const trends: any[] = trendRes?.data || trendRes || [];
+  const trends: any[] = Array.isArray(trendRes)
+    ? trendRes
+    : Array.isArray((trendRes as any)?.data)
+      ? (trendRes as any).data
+      : [];
 
   const spendingData = categories.map((c: any, i: number) => ({
     category: c.category || c.name || `Category ${i + 1}`,
@@ -413,7 +421,11 @@ const SpendingAnalyticsSection: React.FC = () => {
 const BudgetProgressSection: React.FC = () => {
   const navigate = useNavigate();
   const { data: budgetRes, isLoading } = useBudgetProgress();
-  const budgets: any[] = budgetRes?.data || budgetRes || [];
+  const budgets: any[] = Array.isArray(budgetRes)
+    ? budgetRes
+    : Array.isArray((budgetRes as any)?.data)
+      ? (budgetRes as any).data
+      : [];
 
   if (isLoading) {
     return (
@@ -578,7 +590,11 @@ const InvestmentsSnapshotSection: React.FC = () => {
 const LoansOverviewSection: React.FC = () => {
   const navigate = useNavigate();
   const { data: loansRes, isLoading } = useLoans();
-  const loans: any[] = (loansRes as any)?.data || (loansRes as any) || [];
+  const loans: any[] = Array.isArray(loansRes)
+    ? (loansRes as any[])
+    : Array.isArray((loansRes as any)?.data)
+      ? (loansRes as any).data
+      : [];
 
   if (isLoading) {
     return (

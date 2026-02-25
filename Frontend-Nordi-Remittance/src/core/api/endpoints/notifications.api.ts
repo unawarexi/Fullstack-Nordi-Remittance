@@ -54,18 +54,18 @@ export const notificationsApi = {
    */
   getUnreadCount: async (): Promise<ApiResponse<{ count: number }>> => {
     const response = await apiClient.get<ApiResponse<{ count: number }>>(
-      `${NOTIFICATIONS_BASE}/unread/count`
+      `${NOTIFICATIONS_BASE}/unread-count`
     );
     return response.data;
   },
 
   /**
-   * Get unread notifications
+   * Get unread notifications (uses main endpoint with isRead=false filter)
    */
   getUnread: async (limit?: number): Promise<ApiResponse<AppNotification[]>> => {
     const response = await apiClient.get<ApiResponse<AppNotification[]>>(
-      `${NOTIFICATIONS_BASE}/unread`,
-      { params: { limit } }
+      NOTIFICATIONS_BASE,
+      { params: { isRead: false, limit } }
     );
     return response.data;
   },
@@ -74,7 +74,7 @@ export const notificationsApi = {
    * Mark notification as read
    */
   markAsRead: async (notificationId: UUID): Promise<ApiResponse<AppNotification>> => {
-    const response = await apiClient.patch<ApiResponse<AppNotification>>(
+    const response = await apiClient.put<ApiResponse<AppNotification>>(
       `${NOTIFICATIONS_BASE}/${notificationId}/read`
     );
     return response.data;
@@ -84,7 +84,7 @@ export const notificationsApi = {
    * Mark all notifications as read
    */
   markAllAsRead: async (): Promise<ApiResponse<{ message: string; count: number }>> => {
-    const response = await apiClient.patch<ApiResponse<{ message: string; count: number }>>(
+    const response = await apiClient.put<ApiResponse<{ message: string; count: number }>>(
       `${NOTIFICATIONS_BASE}/read-all`
     );
     return response.data;

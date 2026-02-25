@@ -70,8 +70,8 @@ export const transactionsApi = {
    */
   getRecent: async (limit?: number): Promise<ApiResponse<Transaction[]>> => {
     const response = await apiClient.get<ApiResponse<Transaction[]>>(
-      `${TRANSACTIONS_BASE}/recent`,
-      { params: { limit } }
+      TRANSACTIONS_BASE,
+      { params: { sort: '-createdAt', limit } }
     );
     return response.data;
   },

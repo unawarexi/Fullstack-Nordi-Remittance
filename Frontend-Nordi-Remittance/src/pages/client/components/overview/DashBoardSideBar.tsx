@@ -49,7 +49,12 @@ const itemVariants = {
 const CardsPreviewSection: React.FC = () => {
   const navigate = useNavigate();
   const { data: cardsRes, isLoading } = useCards();
-  const cards: any[] = (cardsRes as any)?.data || (cardsRes as any) || [];
+  // Ensure cards is always an array — API may return wrapped object or error
+  const cards: any[] = Array.isArray(cardsRes)
+    ? cardsRes
+    : Array.isArray((cardsRes as any)?.data)
+      ? (cardsRes as any).data
+      : [];
 
   if (isLoading) {
     return (
@@ -175,7 +180,11 @@ const CardsPreviewSection: React.FC = () => {
 const SavingsGoalsSection: React.FC = () => {
   const navigate = useNavigate();
   const { data: goalsRes, isLoading } = useSavingsGoals();
-  const goals: any[] = (goalsRes as any) || [];
+  const goals: any[] = Array.isArray(goalsRes)
+    ? goalsRes
+    : Array.isArray((goalsRes as any)?.data)
+      ? (goalsRes as any).data
+      : [];
 
   if (isLoading) {
     return (
@@ -265,7 +274,7 @@ const VerificationStatusSection: React.FC = () => {
   const { data: tfaRes, isLoading: tfaLoading } = useTwoFactorStatus();
 
   const kyc: any = (kycRes as any) || {};
-  const tfa: any = tfaRes?.data || tfaRes || {};
+  const tfa: any = (tfaRes as any) || {};
 
   if (kycLoading && tfaLoading) {
     return (
@@ -372,7 +381,11 @@ const NotificationsSection: React.FC = () => {
   const { data: notifsRes, isLoading } = useUnreadNotifications(5);
 
   const count = (countRes as any)?.count || 0;
-  const notifs: any[] = (notifsRes as any) || [];
+  const notifs: any[] = Array.isArray(notifsRes)
+    ? notifsRes
+    : Array.isArray((notifsRes as any)?.data)
+      ? (notifsRes as any).data
+      : [];
 
   if (isLoading) {
     return (
