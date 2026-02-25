@@ -19,6 +19,8 @@ import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } fro
 import { generateAuthTokens } from '../core/helpers/token.helper.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser, broadcast } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 import envConfig from '../config/env.config.js';
 import type { AdminAccountData } from '../types/Mail.types.js';
 import { getCachedDashboard, invalidateDashboardCache, getCachedSystemSettings, invalidateSystemSettingsCache } from '../services/QueryCacheService.js';
@@ -505,6 +507,13 @@ export async function updateSystemSetting(req: AuthenticatedRequest, res: Respon
       status: 'success',
     });
 
+    broadcast(WS.ADMIN.SETTING_UPDATED, {
+      key,
+      value,
+      updatedBy: req.user!.userId,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { setting }, 'Setting updated successfully');
   } catch (error) {
     next(error);
@@ -640,6 +649,13 @@ export async function updateUserStatus(req: AuthenticatedRequest, res: Response,
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
 
+    emitToUser((user._id as any).toString(), WS.ADMIN.USER_STATUS_CHANGED, {
+      userId: (user._id as any).toString(),
+      status: user.accountStatus,
+      reason: reason || undefined,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { user: { id: user._id, status: user.accountStatus } }, 'User status updated');
   } catch (error) {
     next(error);
@@ -679,6 +695,11 @@ export async function resetUserPassword(req: AuthenticatedRequest, res: Response
     });
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+
+    emitToUser((user._id as any).toString(), WS.ADMIN.USER_PASSWORD_RESET, {
+      userId: (user._id as any).toString(),
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, 'Password reset successfully. User notified via email.');
   } catch (error) {

@@ -194,12 +194,9 @@ CardApplicationSchema.index({ status: 1, createdAt: -1 });
 CardSchema.index({ wallet: 1 });
 CardSchema.index({ user: 1 });
 CardSchema.index({ status: 1 });
-CardSchema.index({ cardNumber: 1 }, { unique: true });
 CardTokenSchema.index({ card: 1 });
-CardTokenSchema.index({ token: 1 }, { unique: true });
 CardTransactionSchema.index({ card: 1, createdAt: -1 });
 CardTransactionSchema.index({ merchant: 1 });
-MerchantSchema.index({ merchantId: 1 }, { unique: true });
 MerchantSchema.index({ mcc: 1 });
 
 export const CardApplications = mongoose.model('CardApplications', CardApplicationSchema);

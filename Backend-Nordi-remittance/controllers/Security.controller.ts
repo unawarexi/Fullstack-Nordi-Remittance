@@ -10,6 +10,8 @@ import { sendSuccess, sendPaginated } from '../core/helpers/response.helper.js';
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 import { encrypt, decrypt } from '../core/helpers/crypto.helper.js';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
@@ -113,6 +115,11 @@ export async function revokeSession(req: AuthenticatedRequest, res: Response, ne
       metadata: { revokedSessionId: sessionId },
     });
 
+    emitToUser(req.user!.userId, WS.SECURITY.SESSION_REVOKED, {
+      sessionId,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, null, 'Session revoked successfully');
   } catch (error) {
     next(error);
@@ -149,6 +156,11 @@ export async function revokeAllSessions(req: AuthenticatedRequest, res: Response
       userAgent: req.headers['user-agent'] || '',
     });
 
+    emitToUser(req.user!.userId, WS.SECURITY.ALL_SESSIONS_REVOKED, {
+      exceptCurrent: !!exceptCurrent,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, null, 'All sessions revoked');
   } catch (error) {
     next(error);
@@ -183,6 +195,11 @@ export async function setup2FA(req: AuthenticatedRequest, res: Response, next: N
 
     // Generate QR code
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url!);
+
+    emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_ENABLED, {
+      step: 'setup_initiated',
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       secret: secret.base32,
@@ -250,6 +267,12 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
 
+    emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_ENABLED, {
+      step: 'confirmed',
+      enabled: true,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       enabled: true,
       backupCodes,
@@ -316,6 +339,10 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
     });
 
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+
+    emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_DISABLED, {
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, '2FA disabled successfully');
   } catch (error) {
@@ -440,6 +467,12 @@ export async function addTrustedDevice(req: AuthenticatedRequest, res: Response,
     user.trustedDevices = trustedDevices as any;
     await user.save();
 
+    emitToUser(req.user!.userId, WS.SECURITY.TRUSTED_DEVICE_ADDED, {
+      deviceId,
+      deviceName: deviceName || 'Unknown Device',
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { deviceId }, 'Device added to trusted devices');
   } catch (error) {
     next(error);
@@ -471,6 +504,11 @@ export async function removeTrustedDevice(req: AuthenticatedRequest, res: Respon
     trustedDevices.splice(deviceIndex, 1);
     user.trustedDevices = trustedDevices as any;
     await user.save();
+
+    emitToUser(req.user!.userId, WS.SECURITY.TRUSTED_DEVICE_REMOVED, {
+      deviceId,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, 'Device removed from trusted devices');
   } catch (error) {

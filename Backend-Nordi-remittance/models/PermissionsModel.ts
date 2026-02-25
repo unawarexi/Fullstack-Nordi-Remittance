@@ -75,7 +75,6 @@ const PermissionsSchema = new Schema({
 }, { timestamps: true });
 
 // Indexes
-PermissionsSchema.index({ userId: 1 }, { unique: true });
 PermissionsSchema.index({ userRole: 1 });
 
 const Permissions = mongoose.model('Permissions', PermissionsSchema);

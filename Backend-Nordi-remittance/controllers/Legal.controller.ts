@@ -19,6 +19,8 @@ import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/respons
 import { UnauthorizedError, ValidationError, NotFoundError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator  from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -354,6 +356,12 @@ export async function createDisputeClaim(req: AuthenticatedRequest, res: Respons
       sendTemplatedMail(String(user.email), emailContent).catch(console.error);
     }
 
+    emitToUser(req.user!.userId, WS.DISPUTE.CREATED, {
+      claimId: claim.claimId || claim._id,
+      status: claim.status,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       claim: {
         id: claim._id,
@@ -510,6 +518,13 @@ export async function updateDisputeClaim(req: AuthenticatedRequest, res: Respons
 
       sendTemplatedMail(String(user.email), emailContent).catch(console.error);
     }
+
+    emitToUser(String(claim.user), WS.DISPUTE.STATUS_UPDATED, {
+      claimId: claim.claimId || claim._id,
+      status: claim.status,
+      resolution: claim.resolution,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, { claim }, 'Dispute claim updated');
   } catch (error) {

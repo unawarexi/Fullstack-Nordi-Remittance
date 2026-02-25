@@ -7,6 +7,8 @@ import { sendSuccess, sendPaginated, sendCreated } from '../core/helpers/respons
 import { NotFoundError, UnauthorizedError, ValidationError } from '../core/errors/AppError.js';
 import type { AuthenticatedRequest } from '../types/index.js';
 import { Response, NextFunction } from 'express';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // ============================================================================
 // GET USER NOTIFICATIONS
@@ -88,6 +90,11 @@ export async function markAllNotificationsAsRead(req: AuthenticatedRequest, res:
       { user: req.user.userId, read: false },
       { read: true, readAt: new Date() }
     );
+
+    emitToUser(req.user!.userId, WS.NOTIFICATION.ALL_READ, {
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, null, 'All notifications marked as read');
   } catch (error) {
     next(error);

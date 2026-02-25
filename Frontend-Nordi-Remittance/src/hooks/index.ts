@@ -6,7 +6,23 @@
 export * from './queries';
 
 // Re-export store hooks for convenience
-export { useToast, useAuth, useTheme, useSidebar, useModal, usePreferences } from '../store';
+export { useToast, useAuth, useTheme, useSidebar, useModal, usePreferences, useSocketConnection } from '../store';
+
+// WebSocket hooks
+export {
+  useSocketEvent,
+  useSocketEvents,
+  useRealtimeBalances,
+  useRealtimeTransactions,
+  useRealtimeCards,
+  useRealtimeLoans,
+  useRealtimeInvestments,
+  useRealtimeNotifications,
+  useRealtimeSecurity,
+  useAdminRealtimeEvents,
+  useUserRealtimeEvents,
+  useRealtimeUpdates,
+} from './useSocket';
 
 // Media Query Hook
 export { 

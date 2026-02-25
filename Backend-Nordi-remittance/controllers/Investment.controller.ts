@@ -21,6 +21,8 @@ import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/respons
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -137,6 +139,13 @@ export async function createSavingsGoal(req: AuthenticatedRequest, res: Response
     await goal.save({ session });
     await session.commitTransaction();
 
+    emitToUser(req.user!.userId, WS.INVESTMENT.SAVINGS_GOAL_CREATED, {
+      goalId: goal.goalId || goal._id,
+      name: goal.name,
+      targetAmount: goal.targetAmount,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       goal: {
         id: goal._id,
@@ -231,6 +240,15 @@ export async function depositToGoal(req: AuthenticatedRequest, res: Response, ne
 
     await session.commitTransaction();
 
+    emitToUser(req.user!.userId, WS.INVESTMENT.SAVINGS_GOAL_DEPOSIT, {
+      goalId: goal.goalId || goal._id,
+      amount,
+      currentAmount: goal.currentAmount,
+      progress: Math.round((goal.currentAmount / goal.targetAmount) * 100),
+      reference,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       goal: {
         id: goal._id,
@@ -323,6 +341,14 @@ export async function withdrawFromGoal(req: AuthenticatedRequest, res: Response,
 
     await session.commitTransaction();
 
+    emitToUser(req.user!.userId, WS.INVESTMENT.SAVINGS_GOAL_WITHDRAWAL, {
+      goalId: goal.goalId || goal._id,
+      amount,
+      currentAmount: goal.currentAmount,
+      reference,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       goal: {
         id: goal._id,
@@ -401,6 +427,11 @@ export async function deleteSavingsGoal(req: AuthenticatedRequest, res: Response
     await goal.save({ session });
 
     await session.commitTransaction();
+
+    emitToUser(req.user!.userId, WS.INVESTMENT.SAVINGS_GOAL_DELETED, {
+      goalId: goal.goalId || goal._id,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, 'Savings goal deleted successfully');
   } catch (error) {
@@ -487,6 +518,13 @@ export async function createInvestmentAccount(req: AuthenticatedRequest, res: Re
 
     await account.save({ session });
     await session.commitTransaction();
+
+    emitToUser(req.user!.userId, WS.INVESTMENT.ACCOUNT_CREATED, {
+      accountId: account.accountId || account._id,
+      riskProfile: account.riskProfile,
+      status: account.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendCreated(res, {
       account: {
@@ -758,6 +796,15 @@ export async function buyAsset(req: AuthenticatedRequest, res: Response, next: N
 
     await session.commitTransaction();
 
+    emitToUser(req.user!.userId, WS.INVESTMENT.PURCHASED, {
+      asset: asset.symbol,
+      quantity,
+      pricePerUnit: asset.currentPrice,
+      totalAmount: amount,
+      reference,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       transaction: {
         id: portfolioTx._id,
@@ -893,6 +940,16 @@ export async function sellAsset(req: AuthenticatedRequest, res: Response, next: 
     }], { session });
 
     await session.commitTransaction();
+
+    emitToUser(req.user!.userId, WS.INVESTMENT.SOLD, {
+      asset: asset.symbol,
+      quantity,
+      pricePerUnit: asset.currentPrice,
+      proceeds,
+      realizedGain,
+      reference,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       transaction: {

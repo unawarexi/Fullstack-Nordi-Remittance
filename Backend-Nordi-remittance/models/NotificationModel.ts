@@ -169,7 +169,7 @@ SMSMessageSchema.index({ user: 1, createdAt: -1 });
 SMSMessageSchema.index({ status: 1, lastAttemptAt: 1 });
 PushNotificationSchema.index({ user: 1, createdAt: -1 });
 PushNotificationSchema.index({ status: 1 });
-NotificationPreferenceSchema.index({ user: 1 }, { unique: true });
+
 
 export const Notifications = mongoose.model('Notifications', NotificationSchema);
 export const EmailMessages = mongoose.model('EmailMessages', EmailMessageSchema);

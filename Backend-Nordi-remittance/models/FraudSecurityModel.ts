@@ -117,7 +117,7 @@ const BehaviorProfileSchema = new Schema({
 });
 
 const SecurityEventSchema = new Schema({
-  eventId: { type: String, required: true, unique: true, default: uuidv4 },
+  eventId: { type: String, required: true, unique: true, sparse: true, default: uuidv4 },
   user: { type: String, ref: 'Users', required: true },
   eventType: { 
     type: String, 
@@ -155,7 +155,6 @@ FraudCaseSchema.index({ user: 1, status: 1 });
 FraudCaseSchema.index({ assignedTo: 1, status: 1 });
 FraudCaseSchema.index({ priority: 1, status: 1 });
 VelocityRuleSchema.index({ isActive: 1 });
-BehaviorProfileSchema.index({ user: 1 }, { unique: true });
 SecurityEventSchema.index({ user: 1, createdAt: -1 });
 SecurityEventSchema.index({ eventType: 1, createdAt: -1 });
 
@@ -163,6 +162,6 @@ export const FraudSignals = mongoose.model('FraudSignals', FraudSignalSchema);
 export const FraudCases = mongoose.model('FraudCases', FraudCaseSchema);
 export const VelocityRules = mongoose.model('VelocityRules', VelocityRuleSchema);
 export const BehaviorProfiles = mongoose.model('BehaviorProfiles', BehaviorProfileSchema);
-export const SecurityEvents = mongoose.model('SecurityEvents', SecurityEventSchema);
+export const SecurityEvents = mongoose.model('SecurityEvents', SecurityEventSchema, 'fraud_security_events');
 
 export default FraudSignals;

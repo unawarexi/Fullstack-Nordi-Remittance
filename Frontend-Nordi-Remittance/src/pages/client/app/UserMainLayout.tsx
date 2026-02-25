@@ -2,8 +2,12 @@ import React from 'react'
 import UserLeftContainer from '../container/UserLeftContainer'
 import UserRightContainer from '../container/UserRightContainer'
 import UserRoutes from '../UserRoutes'
+import { useRealtimeUpdates } from '@hooks/useSocket'
 
 const UserMainLayout = () => {
+  // Activate all real-time WebSocket subscriptions for user role
+  useRealtimeUpdates('user');
+
   return (
     <div className="flex w-full h-screen">
       {/* Left Container - fixed, full height */}

@@ -30,3 +30,12 @@ export {
   selectIsModalOpen,
   selectModalType,
 } from './ui.store';
+
+// Socket store - WebSocket connection state
+export {
+  useSocketStore,
+  useSocketConnection,
+  selectIsSocketConnected,
+  selectSocketError,
+  selectReconnectAttempts,
+} from './socket.store';

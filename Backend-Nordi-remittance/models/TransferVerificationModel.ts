@@ -217,7 +217,6 @@ const TransactionTaxSchema = new Schema({
 
 TransferVerificationSchema.index({ user: 1, status: 1 });
 TransferVerificationSchema.index({ transaction: 1 });
-TransferVerificationSchema.index({ verificationId: 1 });
 TransferVerificationSchema.index({ status: 1, expiresAt: 1 });
 TransferVerificationSchema.index({ createdAt: -1 });
 

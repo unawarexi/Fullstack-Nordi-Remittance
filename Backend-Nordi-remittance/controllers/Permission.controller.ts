@@ -8,6 +8,8 @@ import Permissions from '../models/PermissionsModel.js';
 import { AdminUsers, AdminActionLogs } from '../models/AdminModel.js';
 import { sendSuccess } from '../core/helpers/response.helper.js';
 import { UnauthorizedError, NotFoundError } from '../core/errors/AppError.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // ============================================================================
 // USER PERMISSIONS CRUD
@@ -83,6 +85,12 @@ export async function setUserPermissions(req: AuthenticatedRequest, res: Respons
       status: 'success',
     });
 
+    emitToUser(userId, WS.PERMISSION.UPDATED, {
+      userId,
+      changes: permissionUpdates,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { permissions }, 'User permissions updated successfully');
   } catch (error) {
     next(error);
@@ -117,6 +125,13 @@ export async function updatePermissionField(req: AuthenticatedRequest, res: Resp
       status: 'success',
     });
 
+    emitToUser(userId, WS.PERMISSION.FIELD_UPDATED, {
+      userId,
+      field: fieldName,
+      value,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { permissions, field: fieldName, value }, 'Permission updated');
   } catch (error) {
     next(error);
@@ -145,6 +160,11 @@ export async function deleteUserPermissions(req: AuthenticatedRequest, res: Resp
       ipAddress: req.ip || 'unknown',
       userAgent: req.headers['user-agent'] || 'unknown',
       status: 'success',
+    });
+
+    emitToUser(userId, WS.PERMISSION.REVOKED, {
+      userId,
+      timestamp: new Date().toISOString(),
     });
 
     sendSuccess(res, null, 'User permissions deleted (reset to defaults)');
@@ -281,6 +301,14 @@ export async function bulkUpdatePermissions(req: AuthenticatedRequest, res: Resp
 
     const successful = results.filter(r => r.success).length;
     const failed = results.filter(r => !r.success).length;
+
+    // Notify each affected user
+    results.filter(r => r.success).forEach(r => {
+      emitToUser(r.userId, WS.PERMISSION.BULK_UPDATED, {
+        changes: permissions,
+        timestamp: new Date().toISOString(),
+      });
+    });
 
     sendSuccess(res, { 
       results,

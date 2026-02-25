@@ -975,6 +975,13 @@ export async function updateWalletStatus(
       throw new NotFoundError("Wallet not found");
     }
 
+    emitToUser(String(wallet.userId), WS_EVENTS.WALLET_STATUS_CHANGED, {
+      walletId: wallet._id,
+      status,
+      reason: reason || undefined,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { wallet }, `Wallet status updated to ${status}`);
   } catch (error) {
     next(error);

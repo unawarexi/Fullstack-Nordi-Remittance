@@ -21,6 +21,8 @@ import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/respons
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -124,6 +126,12 @@ export async function updateFraudSignal(req: AuthenticatedRequest, res: Response
       status: 'success',
     });
 
+    emitToUser(String(signal.user), WS.FRAUD.SIGNAL_UPDATED, {
+      signalId: (signal._id as any).toString(),
+      status: signal.status,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { signal }, 'Fraud signal updated');
   } catch (error) {
     next(error);
@@ -219,6 +227,13 @@ export async function createFraudCase(req: AuthenticatedRequest, res: Response, 
         { status: 'blocked', blockedReason: 'Fraud investigation' }
       );
     }
+
+    emitToUser(userId, WS.FRAUD.CASE_CREATED, {
+      caseId: (fraudCase._id as any).toString(),
+      severity: fraudCase.severity,
+      status: fraudCase.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendCreated(res, { fraudCase }, 'Fraud case created successfully');
   } catch (error) {
@@ -322,6 +337,14 @@ export async function updateFraudCase(req: AuthenticatedRequest, res: Response, 
 
     await session.commitTransaction();
 
+    emitToUser(String(fraudCase.user), WS.FRAUD.CASE_UPDATED, {
+      caseId: (fraudCase._id as any).toString(),
+      status: fraudCase.status,
+      severity: fraudCase.severity,
+      resolution: fraudCase.resolution,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { fraudCase }, 'Fraud case updated successfully');
   } catch (error) {
     await session.abortTransaction();
@@ -349,6 +372,11 @@ export async function addCaseComment(req: AuthenticatedRequest, res: Response, n
     });
 
     await fraudCase.save();
+
+    emitToUser(String(fraudCase.user), WS.FRAUD.COMMENT_ADDED, {
+      caseId: (fraudCase._id as any).toString(),
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, { timeline: fraudCase.timeline }, 'Comment added');
   } catch (error) {

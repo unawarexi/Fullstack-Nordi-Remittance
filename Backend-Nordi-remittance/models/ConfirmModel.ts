@@ -30,8 +30,8 @@ interface IConfirmationToken extends Document {
 
 const ConfirmationTokenSchema = new Schema<IConfirmationToken>(
   {
-    userId: { type: String, ref: "Users", required: true, index: true },
-    token: { type: String, required: true, index: true },
+    userId: { type: String, ref: "Users", required: true },
+    token: { type: String, required: true },
     type: {
       type: String,
       enum: [
@@ -46,9 +46,8 @@ const ConfirmationTokenSchema = new Schema<IConfirmationToken>(
         "refresh_token",
       ],
       required: true,
-      index: true,
     },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
     used: { type: Boolean, default: false },
     usedAt: { type: Date },
     metadata: { type: Schema.Types.Mixed },
@@ -87,18 +86,18 @@ interface ILoginAttempt extends Document {
 
 const LoginAttemptSchema = new Schema<ILoginAttempt>(
   {
-    userId: { type: String, ref: "Users", index: true },
-    email: { type: String, required: true, lowercase: true, index: true },
-    ipAddress: { type: String, required: true, index: true },
+    userId: { type: String, ref: "Users" },
+    email: { type: String, required: true, lowercase: true },
+    ipAddress: { type: String, required: true },
     userAgent: { type: String },
-    success: { type: Boolean, required: true, index: true },
+    success: { type: Boolean, required: true },
     reason: { type: String },
     location: {
       country: { type: String },
       city: { type: String },
       region: { type: String },
     },
-    createdAt: { type: Date, default: Date.now, index: true },
+    createdAt: { type: Date, default: Date.now },
   },
   {
     timestamps: false,
@@ -141,11 +140,10 @@ interface ISecurityEvent extends Document {
 
 const SecurityEventSchema = new Schema<ISecurityEvent>(
   {
-    userId: { type: String, ref: "Users", index: true },
+    userId: { type: String, ref: "Users" },
     type: {
       type: String,
       required: true,
-      index: true,
       enum: [
         "login",
         "logout",
@@ -179,7 +177,6 @@ const SecurityEventSchema = new Schema<ISecurityEvent>(
       type: String,
       enum: ["low", "medium", "high", "critical"],
       default: "low",
-      index: true,
     },
     description: { type: String },
     ipAddress: { type: String },
@@ -193,7 +190,7 @@ const SecurityEventSchema = new Schema<ISecurityEvent>(
     resolved: { type: Boolean, default: false },
     resolvedAt: { type: Date },
     resolvedBy: { type: String, ref: "Users" },
-    createdAt: { type: Date, default: Date.now, index: true },
+    createdAt: { type: Date, default: Date.now },
   },
   {
     timestamps: false,
@@ -221,7 +218,7 @@ interface IBlockedIP extends Document {
 
 const BlockedIPSchema = new Schema<IBlockedIP>(
   {
-    ipAddress: { type: String, required: true, unique: true, index: true },
+    ipAddress: { type: String, required: true, unique: true },
     reason: { type: String, required: true },
     blockedBy: { type: String, ref: "Users" },
     expiresAt: { type: Date, index: true },

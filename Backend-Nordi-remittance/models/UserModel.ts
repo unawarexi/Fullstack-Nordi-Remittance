@@ -87,6 +87,11 @@ const UserSchema: Schema = new Schema({
   inviteCode: { type: String },
 
   // Additional fields from controller
+  role: { type: String, enum: ["user", "admin", "support"], default: "user" },
+  accountNumber: { type: String, unique: true, sparse: true },
+  emailVerified: { type: Boolean, default: false },
+  phoneVerified: { type: Boolean, default: false },
+  status: { type: String, enum: ["active", "inactive", "suspended", "banned"], default: "active" },
   activationToken: { type: String },
   isActive: { type: Boolean, default: false },
   kycStatus: { type: String, default: "pending" },
@@ -176,7 +181,6 @@ UserSchema.pre("save", function () {
 // INDEXES — Critical for search performance
 // ==========================================================================
 // Exact match indexes (high selectivity)
-UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ mobileNumber: 1 }, { unique: true, sparse: true });
 UserSchema.index({ idNumber: 1 }, { sparse: true });
 

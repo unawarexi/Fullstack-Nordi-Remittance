@@ -84,9 +84,6 @@ TransactionSchema.index({ wallet: 1, category: 1 });
 TransactionSchema.index({ status: 1, createdAt: -1 });
 TransactionSchema.index({ type: 1, status: 1, createdAt: -1 });
 
-// Unique reference lookup
-TransactionSchema.index({ referenceNumber: 1 }, { unique: true });
-
 // Text index for reference search (replaces unanchored regex)
 TransactionSchema.index({ referenceNumber: "text" }, { name: "idx_tx_reference_text" });
 

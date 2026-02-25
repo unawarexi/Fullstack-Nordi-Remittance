@@ -796,10 +796,11 @@ export async function login(
       firstName: user.firstName,
       lastName: user.lastName,
       accountNumber: user.accountNumber,
-      role: user.role,
-      status: user.status,
+      role: user.role || "user",
+      status: user.status || user.accountStatus || "active",
       kycStatus: user.kycStatus,
-      emailVerified: user.emailVerified,
+      emailVerified: user.emailVerified ?? false,
+      phoneVerified: user.phoneVerified ?? false,
       twoFactorEnabled: user.twoFactorEnabled,
     };
 
@@ -946,6 +947,12 @@ export async function verify2FA(
       user: user._id,
       isPrimary: true,
     }).select("walletNumber balances");
+
+    emitToUser(String(user._id), WS_EVENTS.LOGIN_SUCCESS, {
+      sessionId,
+      timestamp: new Date().toISOString(),
+      twoFactorVerified: true,
+    });
 
     sendSuccess(
       res,
@@ -1584,9 +1591,14 @@ export async function getCurrentUser(
         mobileNumber: user.mobileNumber,
         country: user.country,
         currency: user.currency,
+        role: user.role || "user",
+        status: user.status || user.accountStatus || "active",
         kycStatus: user.kycStatus,
+        emailVerified: user.emailVerified ?? false,
+        phoneVerified: user.phoneVerified ?? false,
         isActive: user.isActive,
         enableTwoFactor: user.enableTwoFactor,
+        twoFactorEnabled: user.twoFactorEnabled,
         createdAt: user.createdAt,
         lastLogin: user.lastLogin,
       },

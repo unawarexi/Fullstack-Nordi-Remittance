@@ -15,6 +15,8 @@ import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/respons
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -235,6 +237,16 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
 
     sendTemplatedMail((user as any).email, emailContent).catch(console.error);
 
+    emitToUser(req.user!.userId, WS.CARD.CREATED, {
+      cardId: card.cardId || card._id,
+      last4: cardNumber.slice(-4),
+      cardType: card.cardType,
+      cardBrand: card.cardBrand,
+      status: card.status,
+      isPhysical: false,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       card: {
         id: card._id,
@@ -396,6 +408,15 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
 
     await session.commitTransaction();
 
+    emitToUser(req.user!.userId, WS.CARD.REQUESTED, {
+      cardId: card.cardId || card._id,
+      last4: cardNumber.slice(-4),
+      isPhysical: true,
+      status: card.status,
+      fee: issuanceFee,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       card: {
         id: card._id,
@@ -452,6 +473,13 @@ export async function activateCard(req: AuthenticatedRequest, res: Response, nex
     card.activationDate = new Date();
     await card.save();
 
+    emitToUser(req.user!.userId, WS.CARD.ACTIVATED, {
+      cardId: card.cardId || card._id,
+      status: card.status,
+      activationDate: card.activationDate,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       card: {
         id: card._id,
@@ -504,6 +532,14 @@ export async function blockCard(req: AuthenticatedRequest, res: Response, next: 
       sendTemplatedMail((user as any).email, emailContent).catch(console.error);
     }
 
+    emitToUser(req.user!.userId, WS.CARD.BLOCKED, {
+      cardId: card.cardId || card._id,
+      status: card.status,
+      reason: reason || 'User requested',
+      blockedAt: card.blockedAt,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       card: {
         id: card._id,
@@ -535,6 +571,12 @@ export async function unblockCard(req: AuthenticatedRequest, res: Response, next
     card.blockedReason = undefined;
     card.blockedAt = undefined;
     await card.save();
+
+    emitToUser(req.user!.userId, WS.CARD.UNBLOCKED, {
+      cardId: card.cardId || card._id,
+      status: card.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       card: {
@@ -584,6 +626,13 @@ export async function reportLostStolen(req: AuthenticatedRequest, res: Response,
 
       sendTemplatedMail((user as any).email, emailContent).catch(console.error);
     }
+
+    emitToUser(req.user!.userId, WS.CARD.REPORTED, {
+      cardId: card.cardId || card._id,
+      reportType: type,
+      status: card.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       message: `Card reported as ${type} and has been permanently blocked`,
@@ -636,6 +685,12 @@ export async function updateCardLimits(req: AuthenticatedRequest, res: Response,
 
     await limits.save();
 
+    emitToUser(req.user!.userId, WS.CARD.LIMITS_UPDATED, {
+      cardId: card.cardId || card._id,
+      limits: { dailyLimit: limits.dailyLimit, monthlyLimit: limits.monthlyLimit, perTransactionLimit: limits.perTransactionLimit },
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { limits }, 'Card limits updated successfully');
   } catch (error) {
     next(error);
@@ -684,6 +739,17 @@ export async function updateCardControls(req: AuthenticatedRequest, res: Respons
         await controls.save();
       }
     }
+
+    emitToUser(req.user!.userId, WS.CARD.CONTROLS_UPDATED, {
+      cardId: card.cardId || card._id,
+      controls: {
+        isInternationalEnabled: card.isInternationalEnabled,
+        isOnlineEnabled: card.isOnlineEnabled,
+        isContactlessEnabled: card.isContactlessEnabled,
+        isAtmEnabled: card.isAtmEnabled,
+      },
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       card: {
@@ -770,6 +836,11 @@ export async function changePin(req: AuthenticatedRequest, res: Response, next: 
 
     card.pin = encrypt(newPin);
     await card.save();
+
+    emitToUser(req.user!.userId, WS.CARD.PIN_CHANGED, {
+      cardId: card.cardId || card._id,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, 'PIN changed successfully');
   } catch (error) {

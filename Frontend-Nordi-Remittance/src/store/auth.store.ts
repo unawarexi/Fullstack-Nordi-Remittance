@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { TokenManager } from '../core/api/client';
+import { connectSocket, disconnectSocket } from '../core/socket/socket.client';
 
 // ============================================================================
 // TYPES
@@ -94,9 +95,20 @@ export const useAuthStore = create<AuthStore>()(
           lastActivityAt: Date.now(),
           isInitialized: true,
         });
+
+        // Establish WebSocket connection after successful auth
+        try {
+          connectSocket();
+        } catch {
+          // Non-blocking — socket failure shouldn't break login
+          console.warn('[Auth] WebSocket connection failed on login');
+        }
       },
 
       logout: () => {
+        // Disconnect WebSocket before clearing tokens
+        disconnectSocket();
+
         // Clear tokens
         TokenManager.clearTokens();
         
@@ -112,6 +124,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       clearAuth: () => {
+        disconnectSocket();
         TokenManager.clearTokens();
         set({
           isAuthenticated: false,
@@ -181,6 +194,15 @@ export const useAuthStore = create<AuthStore>()(
           // Without this, ProtectedRoute shows <PageLoader /> forever
           if (state) {
             state.setInitialized(true);
+
+            // Reconnect WebSocket if user was previously authenticated
+            if (state.isAuthenticated) {
+              try {
+                connectSocket();
+              } catch {
+                // Silent — socket will retry via its own reconnect logic
+              }
+            }
           }
         };
       },

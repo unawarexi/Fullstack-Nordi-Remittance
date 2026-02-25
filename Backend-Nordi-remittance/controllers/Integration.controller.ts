@@ -17,6 +17,8 @@ import { generateSecureToken, sha256Hash } from '../core/helpers/crypto.helper.j
 import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/response.helper.js';
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import crypto from 'crypto';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Helper function to generate API key
 function generateApiKey(): { key: string; prefix: string } {
@@ -547,6 +549,13 @@ export async function linkExternalAccount(req: AuthenticatedRequest, res: Respon
 
     await account.save();
 
+    emitToUser(req.user!.userId, WS.INTEGRATION.EXTERNAL_ACCOUNT_LINKED, {
+      accountId: account.accountId || account._id,
+      provider: account.provider,
+      institutionName: account.institutionName,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       account: {
         id: account._id,
@@ -576,6 +585,11 @@ export async function unlinkExternalAccount(req: AuthenticatedRequest, res: Resp
     // Set status to inactive instead of deleting
     account.status = 'inactive';
     await account.save();
+
+    emitToUser(req.user!.userId, WS.INTEGRATION.EXTERNAL_ACCOUNT_UNLINKED, {
+      accountId: account.accountId || account._id,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, null, 'Account unlinked');
   } catch (error) {

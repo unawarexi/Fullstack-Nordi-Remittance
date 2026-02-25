@@ -30,6 +30,7 @@ import {
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
 import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 const emailGenerator = new EmailContentGenerator();
 
@@ -368,6 +369,14 @@ export async function initiateSecureTransfer(
         reference: referenceNumber 
       },
       read: false,
+    });
+
+    emitToUser(req.user!.userId, WS.TRANSFER.INITIATED, {
+      verificationId: verification.verificationId || verification._id,
+      amount: netAmount,
+      currency,
+      referenceNumber,
+      timestamp: new Date().toISOString(),
     });
 
     sendCreated(res, {
@@ -980,6 +989,11 @@ export async function cancelVerification(
     );
 
     await session.commitTransaction();
+
+    emitToUser(req.user!.userId, WS.TRANSFER.CANCELLED, {
+      verificationId: verification.verificationId || verification._id,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       message: 'Verification cancelled successfully',

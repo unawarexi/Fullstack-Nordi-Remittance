@@ -2,8 +2,12 @@ import React from 'react'
 import AdminLeftContainer from '../container/AdminLeftContainer'
 import AdminRightContainer from '../container/AdminRightContainer'
 import AdminRoutes from '../AdminRoutes'
+import { useRealtimeUpdates } from '@hooks/useSocket'
 
 const AdminMainLayout = () => {
+  // Activate all real-time WebSocket subscriptions for admin role
+  useRealtimeUpdates('admin');
+
   return (
     <div className="flex w-full h-screen">
       {/* Left Container - fixed, full height */}

@@ -14,6 +14,8 @@ import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/respons
 import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
+import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -317,6 +319,14 @@ export async function applyForLoan(req: AuthenticatedRequest, res: Response, nex
 
     sendTemplatedMail((user as any).email, emailContent).catch(console.error);
 
+    emitToUser(req.user!.userId, WS.LOAN.APPLICATION_SUBMITTED, {
+      applicationId: application.applicationId || application._id,
+      amount,
+      termMonths,
+      status: application.status,
+      timestamp: new Date().toISOString(),
+    });
+
     sendCreated(res, {
       application: {
         id: application._id,
@@ -504,6 +514,15 @@ export async function makePayment(req: AuthenticatedRequest, res: Response, next
     }
 
     await session.commitTransaction();
+
+    emitToUser(req.user!.userId, WS.LOAN.PAYMENT_MADE, {
+      loanId: loan.loanId || loan._id,
+      paymentAmount,
+      reference,
+      outstandingBalance: loan.outstandingBalance,
+      loanStatus: loan.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       payment: {
@@ -724,6 +743,12 @@ export async function reviewApplication(req: AuthenticatedRequest, res: Response
     await application.save({ session });
     await session.commitTransaction();
 
+    emitToUser(String(application.user), WS.LOAN.APPLICATION_REVIEWED, {
+      applicationId: application.applicationId || application._id,
+      decision,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, { application }, `Application ${decision}ed successfully`);
   } catch (error) {
     await session.abortTransaction();
@@ -817,6 +842,14 @@ export async function disburseLoan(req: AuthenticatedRequest, res: Response, nex
 
       sendTemplatedMail((user as any).email, disbursementEmailContent).catch(console.error);
     }
+
+    emitToUser(String(loan.user), WS.LOAN.DISBURSED, {
+      loanId: loan.loanId || loan._id,
+      amount: loan.principalAmount,
+      disbursementReference: reference,
+      status: loan.status,
+      timestamp: new Date().toISOString(),
+    });
 
     sendSuccess(res, {
       loan: {

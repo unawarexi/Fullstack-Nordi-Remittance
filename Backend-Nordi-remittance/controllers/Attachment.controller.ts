@@ -22,6 +22,8 @@ import {
   extensionToMimeType,
 } from "../core/utils/extentions.js";
 import * as path from "path";
+import { emitToUser } from "../services/Websocket.service.js";
+import { WS } from "../core/constants/ws-events.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -112,6 +114,13 @@ export async function uploadAttachment(
     });
 
     await attachment.save();
+
+    emitToUser(req.user!.userId, WS.KYC.DOCUMENT_UPLOADED, {
+      attachmentId: attachment.attachmentId || attachment._id,
+      filename: attachment.filename,
+      fileType: attachment.fileType,
+      timestamp: new Date().toISOString(),
+    });
 
     sendCreated(
       res,
@@ -383,6 +392,14 @@ export async function uploadKycDocument(
 
       await user.save();
     }
+
+    emitToUser(req.user!.userId, WS.KYC.DOCUMENT_UPLOADED, {
+      attachmentId: attachment.attachmentId || attachment._id,
+      documentType,
+      filename: attachment.filename,
+      kycStatus: (user as any)?.kycStatus,
+      timestamp: new Date().toISOString(),
+    });
 
     sendCreated(
       res,

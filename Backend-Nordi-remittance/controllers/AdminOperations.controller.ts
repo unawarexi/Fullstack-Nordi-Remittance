@@ -32,6 +32,7 @@ import {
 import { sendTemplatedMail } from '../services/Mailer.service.js';
 import EmailContentGenerator from '../core/mail/Mail-content.js';
 import { emitToUser } from '../services/Websocket.service.js';
+import { WS } from '../core/constants/ws-events.js';
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -1765,6 +1766,14 @@ export async function approveTransaction(
 
     await session.commitTransaction();
 
+    emitToUser(String(transaction.initiatedBy), WS.TRANSACTION.APPROVED, {
+      transactionId: transaction._id,
+      referenceNumber: transaction.referenceNumber,
+      amount: transaction.amount,
+      status: transaction.status,
+      timestamp: new Date().toISOString(),
+    });
+
     sendSuccess(res, {
       transaction: {
         id: transaction._id,
@@ -2115,6 +2124,17 @@ export async function bulkCredit(
       req,
       errors.length === operations.length ? 'failed' : 'success'
     );
+
+    // Notify each credited user via WebSocket
+    results.forEach((r: any) => {
+      if (r.userId) {
+        emitToUser(String(r.userId), WS.ADMIN.WALLET_FUND, {
+          amount: r.amount,
+          reference: r.reference,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    });
 
     sendSuccess(res, {
       summary: {
