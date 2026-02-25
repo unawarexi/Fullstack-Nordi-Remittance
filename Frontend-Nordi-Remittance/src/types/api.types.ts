@@ -112,11 +112,22 @@ declare global {
 
   interface LoginResponse {
     user: User;
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
+    // Tokens may be nested under tokens object (backend) or at top level
+    tokens?: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
+    accessToken?: string;
+    refreshToken?: string;
+    expiresIn?: number;
+    wallet?: any;
+    // 2FA fields - backend sends requires2FA/twoFactorToken/method
     requiresTwoFactor?: boolean;
+    requires2FA?: boolean;
     tempToken?: string;
+    twoFactorToken?: string;
+    method?: string;
     twoFactorMethod?: "sms" | "email" | "authenticator";
   }
 
@@ -201,7 +212,7 @@ declare global {
 
   interface ConfirmResetPasswordRequest {
     token: string;
-    newPassword: string;
+    password: string;
     confirmPassword: string;
   }
 
@@ -551,7 +562,7 @@ declare global {
     };
   }
 
-  interface Notification extends Timestamps {
+  interface AppNotification extends Timestamps {
     id: UUID;
     userId: UUID;
     type: NotificationType;
@@ -843,7 +854,7 @@ declare global {
     documents: UUID[];
   }
 
-  interface Report extends Timestamps {
+  interface AppReport extends Timestamps {
     id: UUID;
     userId: UUID;
     type:

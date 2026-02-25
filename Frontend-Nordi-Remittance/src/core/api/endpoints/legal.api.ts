@@ -170,8 +170,8 @@ export const legalApi = {
   /**
    * Get all reports
    */
-  getReports: async (params?: ReportFilters): Promise<PaginatedResponse<Report>> => {
-    const response = await apiClient.get<PaginatedResponse<Report>>(
+  getReports: async (params?: ReportFilters): Promise<PaginatedResponse<AppReport>> => {
+    const response = await apiClient.get<PaginatedResponse<AppReport>>(
       `${LEGAL_BASE}/reports`,
       { params }
     );
@@ -181,8 +181,8 @@ export const legalApi = {
   /**
    * Get report by ID
    */
-  getReportById: async (reportId: UUID): Promise<ApiResponse<Report>> => {
-    const response = await apiClient.get<ApiResponse<Report>>(
+  getReportById: async (reportId: UUID): Promise<ApiResponse<AppReport>> => {
+    const response = await apiClient.get<ApiResponse<AppReport>>(
       `${LEGAL_BASE}/reports/${reportId}`
     );
     return response.data;
@@ -196,8 +196,8 @@ export const legalApi = {
     startDate: string;
     endDate: string;
     format: 'pdf' | 'csv';
-  }): Promise<ApiResponse<Report>> => {
-    const response = await apiClient.post<ApiResponse<Report>>(
+  }): Promise<ApiResponse<AppReport>> => {
+    const response = await apiClient.post<ApiResponse<AppReport>>(
       `${LEGAL_BASE}/reports/account-statement`,
       data
     );
@@ -213,8 +213,8 @@ export const legalApi = {
     format: 'pdf' | 'csv';
     accountId?: UUID;
     type?: string;
-  }): Promise<ApiResponse<Report>> => {
-    const response = await apiClient.post<ApiResponse<Report>>(
+  }): Promise<ApiResponse<AppReport>> => {
+    const response = await apiClient.post<ApiResponse<AppReport>>(
       `${LEGAL_BASE}/reports/transaction-history`,
       data
     );
@@ -227,8 +227,8 @@ export const legalApi = {
   requestTaxReport: async (data: {
     year: number;
     format: 'pdf' | 'csv';
-  }): Promise<ApiResponse<Report>> => {
-    const response = await apiClient.post<ApiResponse<Report>>(
+  }): Promise<ApiResponse<AppReport>> => {
+    const response = await apiClient.post<ApiResponse<AppReport>>(
       `${LEGAL_BASE}/reports/tax`,
       data
     );

@@ -31,8 +31,8 @@ export const notificationsApi = {
   /**
    * Get all notifications
    */
-  getAll: async (params?: NotificationFilters): Promise<PaginatedResponse<Notification>> => {
-    const response = await apiClient.get<PaginatedResponse<Notification>>(
+  getAll: async (params?: NotificationFilters): Promise<PaginatedResponse<AppNotification>> => {
+    const response = await apiClient.get<PaginatedResponse<AppNotification>>(
       NOTIFICATIONS_BASE,
       { params }
     );
@@ -42,8 +42,8 @@ export const notificationsApi = {
   /**
    * Get notification by ID
    */
-  getById: async (notificationId: UUID): Promise<ApiResponse<Notification>> => {
-    const response = await apiClient.get<ApiResponse<Notification>>(
+  getById: async (notificationId: UUID): Promise<ApiResponse<AppNotification>> => {
+    const response = await apiClient.get<ApiResponse<AppNotification>>(
       `${NOTIFICATIONS_BASE}/${notificationId}`
     );
     return response.data;
@@ -62,8 +62,8 @@ export const notificationsApi = {
   /**
    * Get unread notifications
    */
-  getUnread: async (limit?: number): Promise<ApiResponse<Notification[]>> => {
-    const response = await apiClient.get<ApiResponse<Notification[]>>(
+  getUnread: async (limit?: number): Promise<ApiResponse<AppNotification[]>> => {
+    const response = await apiClient.get<ApiResponse<AppNotification[]>>(
       `${NOTIFICATIONS_BASE}/unread`,
       { params: { limit } }
     );
@@ -73,8 +73,8 @@ export const notificationsApi = {
   /**
    * Mark notification as read
    */
-  markAsRead: async (notificationId: UUID): Promise<ApiResponse<Notification>> => {
-    const response = await apiClient.patch<ApiResponse<Notification>>(
+  markAsRead: async (notificationId: UUID): Promise<ApiResponse<AppNotification>> => {
+    const response = await apiClient.patch<ApiResponse<AppNotification>>(
       `${NOTIFICATIONS_BASE}/${notificationId}/read`
     );
     return response.data;
