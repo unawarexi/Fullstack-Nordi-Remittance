@@ -228,7 +228,7 @@ const QuickTransfer: React.FC = () => {
 
   return (
     <motion.div
-      className="p-6 max-w-4xl mx-auto bg-white rounded-2xl shadow-sm"
+      className="p-6 max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800"
       initial="initial"
       animate="in"
       exit="out"
@@ -238,7 +238,7 @@ const QuickTransfer: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-indigo-900">Quick Transfer</h1>
+          <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">Quick Transfer</h1>
           <p className="text-sm text-purple-500">Send money to contacts or mobile numbers</p>
         </div>
         <div className="flex items-center">
@@ -407,7 +407,7 @@ const QuickTransfer: React.FC = () => {
                                 {contact.avatar}
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-indigo-900">{contact.name}</div>
+                                <div className="font-medium text-indigo-900 dark:text-white">{contact.name}</div>
                                 <div className="text-xs text-gray-500 flex items-center">
                                   {contact.type === "phone" ? (
                                     <Phone size={12} className="mr-1" />
@@ -455,7 +455,7 @@ const QuickTransfer: React.FC = () => {
                     {/* Recipient details for phone */}
                     {recipientType === "phone" && (
                       <div className="space-y-1">
-                        <label htmlFor="recipientPhone" className="block text-sm font-medium text-indigo-900">
+                        <label htmlFor="recipientPhone" className="block text-sm font-medium text-indigo-900 dark:text-white">
                           Phone Number
                         </label>
                         <div className="relative">
@@ -481,7 +481,7 @@ const QuickTransfer: React.FC = () => {
                     {/* Recipient details for email */}
                     {recipientType === "email" && (
                       <div className="space-y-1">
-                        <label htmlFor="recipientEmail" className="block text-sm font-medium text-indigo-900">
+                        <label htmlFor="recipientEmail" className="block text-sm font-medium text-indigo-900 dark:text-white">
                           Email Address
                         </label>
                         <div className="relative">
@@ -512,7 +512,7 @@ const QuickTransfer: React.FC = () => {
                             {selectedContact.avatar}
                           </div>
                           <div>
-                            <div className="font-medium text-indigo-900">{selectedContact.name}</div>
+                            <div className="font-medium text-indigo-900 dark:text-white">{selectedContact.name}</div>
                             <div className="text-xs text-gray-600 flex items-center">
                               {selectedContact.type === "phone" ? (
                                 <Phone size={12} className="mr-1" />
@@ -545,15 +545,15 @@ const QuickTransfer: React.FC = () => {
                       <div className="grid grid-cols-3 gap-4">
                         <div>
                           <div className="text-xs text-indigo-500 mb-1">Per Transaction</div>
-                          <div className="text-sm font-semibold text-indigo-900">${limits.quick.perTransaction.toLocaleString()}</div>
+                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.perTransaction.toLocaleString()}</div>
                         </div>
                         <div>
                           <div className="text-xs text-indigo-500 mb-1">Daily Limit</div>
-                          <div className="text-sm font-semibold text-indigo-900">${limits.quick.daily.toLocaleString()}</div>
+                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.daily.toLocaleString()}</div>
                         </div>
                         <div>
                           <div className="text-xs text-indigo-500 mb-1">Remaining Today</div>
-                          <div className="text-sm font-semibold text-indigo-900">${limits.quick.remaining.toLocaleString()}</div>
+                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.remaining.toLocaleString()}</div>
                         </div>
                       </div>
                     </div>
@@ -561,7 +561,7 @@ const QuickTransfer: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Amount */}
                       <div className="space-y-1">
-                        <label htmlFor="amount" className="block text-sm font-medium text-indigo-900">
+                        <label htmlFor="amount" className="block text-sm font-medium text-indigo-900 dark:text-white">
                           Amount
                         </label>
                         <div className="relative">
@@ -586,7 +586,7 @@ const QuickTransfer: React.FC = () => {
 
                       {/* Payment Method */}
                       <div className="space-y-1">
-                        <label className="block text-sm font-medium text-indigo-900">
+                        <label className="block text-sm font-medium text-indigo-900 dark:text-white">
                           From Account
                         </label>
                         <div className="mt-1">
@@ -609,7 +609,7 @@ const QuickTransfer: React.FC = () => {
                                     whileTap={{ scale: 0.99 }}
                                   >
                                     <div className="flex-1">
-                                      <div className="font-medium text-indigo-900">{method.name}</div>
+                                      <div className="font-medium text-indigo-900 dark:text-white">{method.name}</div>
                                       <div className="text-xs text-gray-500 flex items-center justify-between">
                                         <span>{method.number}</span>
                                         <span className="font-semibold text-indigo-700">${method.balance.toLocaleString()}</span>
@@ -631,7 +631,7 @@ const QuickTransfer: React.FC = () => {
 
                       {/* P2P Network */}
                       <div className="space-y-1">
-                        <label className="block text-sm font-medium text-indigo-900">
+                        <label className="block text-sm font-medium text-indigo-900 dark:text-white">
                           Transfer Method
                         </label>
                         <div className="mt-1">
@@ -657,7 +657,7 @@ const QuickTransfer: React.FC = () => {
                                   >
                                     <div className="mr-3">{network.icon}</div>
                                     <div className="flex-1">
-                                      <div className="font-medium text-indigo-900">{network.name}</div>
+                                      <div className="font-medium text-indigo-900 dark:text-white">{network.name}</div>
                                       <div className="text-xs flex justify-between">
                                         <span className="text-gray-500">Fee: {network.fee > 0 ? `${network.fee}%` : 'Free'}</span>
                                         <span className="text-indigo-600">{network.time}</span>
@@ -674,7 +674,7 @@ const QuickTransfer: React.FC = () => {
 
                       {/* Memo */}
                       <div className="space-y-1">
-                        <label htmlFor="memo" className="block text-sm font-medium text-indigo-900">
+                        <label htmlFor="memo" className="block text-sm font-medium text-indigo-900 dark:text-white">
                           Memo (Optional)
                         </label>
                         <div className="relative">
@@ -786,7 +786,7 @@ const QuickTransfer: React.FC = () => {
               <h2 className="text-2xl font-bold text-indigo-900 mb-2">
                 {transferSuccess ? "Transfer Successful!" : "Transfer Failed"}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 {transferSuccess
                   ? "Your money is on its way to the recipient."
                   : "There was an issue processing your transfer. Please try again."}
@@ -808,47 +808,47 @@ const QuickTransfer: React.FC = () => {
 
                   <motion.div variants={staggerItemVariants} className="space-y-4">
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Transaction ID</span>
-                      <span className="text-sm font-medium text-indigo-900">{transactionId}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Transaction ID</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">{transactionId}</span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Date & Time</span>
-                      <span className="text-sm font-medium text-indigo-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Date & Time</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
                         {new Date().toLocaleString()}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Amount</span>
-                      <span className="text-sm font-medium text-indigo-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Amount</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
                         ${parseFloat("0").toFixed(2)}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Recipient</span>
-                      <span className="text-sm font-medium text-indigo-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Recipient</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
                         {selectedContact?.name || "Recipient"}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Payment Method</span>
-                      <span className="text-sm font-medium text-indigo-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Payment Method</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
                         {selectedPaymentMethod?.name}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600">Network</span>
-                      <span className="text-sm font-medium text-indigo-900">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Network</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
                         {selectedP2PNetwork?.name}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-600">Status</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
                       <span className="text-sm font-medium bg-green-100 text-green-800 py-1 px-3 rounded-full">
                         Complete
                       </span>

@@ -1,238 +1,361 @@
 // ============================================================================
-// TRANSACTIONS SUB-PAGES — Recent, Scheduled, History, Download
+// TRANSACTIONS SUB-PAGES — Recent Activity, Scheduled, History, Download
+// Dark mode + DashboardPrimitives + grey borders + responsive typography
 // ============================================================================
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import {
-  Clock, Calendar, BarChart3, Download, Search, Filter,
-  ArrowUpRight, ArrowDownLeft, Repeat, CheckCircle2,
-  XCircle, RefreshCw, ChevronRight, FileText, Send,
+  ArrowUpRight, ArrowDownLeft, Clock, Download, Search, Filter,
+  ChevronDown, Calendar, FileText, TrendingUp, TrendingDown,
+  CheckCircle2, XCircle, Timer, AlertTriangle,
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
+import {
+  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge, SectionHeader,
+} from "@components/shared/DashboardPrimitives";
 import { TransactionListSkeleton, StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
+import { dashboardItemVariants } from "@core/animation/Animation";
 import { useTransactions, useRecentTransactions } from "@hooks/queries/useTransactions";
 import { useUIStore } from "@store/ui.store";
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+const fmt = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
 
-const fmt = (n: number, c = "USD") => new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
-const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
-
-const statusIcons: Record<string, { icon: React.ReactNode; color: string; bg: string }> = {
-  completed: { icon: <CheckCircle2 size={14} />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  success: { icon: <CheckCircle2 size={14} />, color: "text-emerald-600", bg: "bg-emerald-50" },
-  pending: { icon: <Clock size={14} />, color: "text-amber-600", bg: "bg-amber-50" },
-  processing: { icon: <RefreshCw size={14} />, color: "text-blue-600", bg: "bg-blue-50" },
-  failed: { icon: <XCircle size={14} />, color: "text-rose-600", bg: "bg-rose-50" },
-  cancelled: { icon: <XCircle size={14} />, color: "text-gray-600", bg: "bg-gray-50" },
-  scheduled: { icon: <Calendar size={14} />, color: "text-indigo-600", bg: "bg-indigo-50" },
+const txnIcon = (type: string) => {
+  const t = (type || "").toLowerCase();
+  if (t.includes("debit") || t.includes("send") || t.includes("out"))
+    return <ArrowUpRight size={16} />;
+  return <ArrowDownLeft size={16} />;
 };
 
-const TransactionRow: React.FC<{ tx: any; showBalances: boolean; onClick?: () => void }> = ({ tx, showBalances, onClick }) => {
-  const type = tx.type?.toLowerCase() || "transfer";
-  const status = tx.status?.toLowerCase() || "completed";
-  const sConfig = statusIcons[status] || statusIcons.completed;
-  const isCredit = ["credit", "deposit", "refund"].includes(type);
-
-  return (
-    <motion.div className="flex items-center gap-4 px-4 py-3.5 hover:bg-indigo-50/50 cursor-pointer transition-colors" whileHover={{ x: 3 }} onClick={onClick}>
-      <div className={`p-2 rounded-full ${isCredit ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-600"}`}>
-        {isCredit ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{tx.description || tx.recipientName || tx.narration || "Transaction"}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{tx.createdAt && fmtDate(tx.createdAt)}</p>
-      </div>
-      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${sConfig.color} ${sConfig.bg}`}>
-        {sConfig.icon}<span className="capitalize">{status}</span>
-      </div>
-      <p className={`text-sm font-semibold ${isCredit ? "text-emerald-600" : "text-gray-900"}`}>
-        {showBalances ? `${isCredit ? "+" : "-"}${fmt(tx.amount || 0, tx.currency)}` : "••••••"}
-      </p>
-    </motion.div>
-  );
+const txnColor = (type: string) => {
+  const t = (type || "").toLowerCase();
+  if (t.includes("debit") || t.includes("send") || t.includes("out"))
+    return "text-red-500 bg-red-50 dark:bg-red-950/50 dark:text-red-400";
+  return "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400";
 };
 
-// ========================
-// RECENT ACTIVITY
-// ========================
+const statusIcon = (s: string) => {
+  switch ((s || "").toLowerCase()) {
+    case "completed": case "success": return <CheckCircle2 size={14} className="text-emerald-500" />;
+    case "failed": return <XCircle size={14} className="text-red-500" />;
+    case "pending": return <Timer size={14} className="text-amber-500" />;
+    default: return <AlertTriangle size={14} className="text-gray-400" />;
+  }
+};
+
+interface TransactionRowProps {
+  tx: any;
+  show: boolean;
+}
+
+const TransactionRow: React.FC<TransactionRowProps> = ({ tx, show }) => (
+  <div className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+    <div className="flex items-center gap-3">
+      <div className={`p-2 rounded-xl ${txnColor(tx.type)}`}>{txnIcon(tx.type)}</div>
+      <div>
+        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+          {tx.description || tx.name || "Transaction"}
+        </h4>
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+            {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+          </p>
+          {tx.status && <span className="flex items-center gap-1">{statusIcon(tx.status)}</span>}
+        </div>
+      </div>
+    </div>
+    <p className={`text-xs sm:text-sm font-bold ${
+      (tx.type || "").toLowerCase().includes("credit") || (tx.type || "").toLowerCase().includes("in")
+        ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+    }`}>
+      {show ? ((tx.type || "").toLowerCase().includes("credit") ? "+" : "-") + fmt(Math.abs(tx.amount || 0)) : "••••••"}
+    </p>
+  </div>
+);
+
+/* ═══════ RECENT ACTIVITY ═══════ */
 export const RecentActivity: React.FC = () => {
-  const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data, isLoading } = useRecentTransactions(20);
-  const transactions = (data as any)?.data ? (data as any).data : data || [];
+  const { data: txData, isLoading } = useRecentTransactions();
+  const txns = (txData as any)?.data ?? txData ?? [];
+
+  const totalIn = txns.filter((t: any) => (t.type || "").toLowerCase().includes("credit")).reduce((a: number, t: any) => a + (t.amount || 0), 0);
+  const totalOut = txns.filter((t: any) => !(t.type || "").toLowerCase().includes("credit")).reduce((a: number, t: any) => a + (t.amount || 0), 0);
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Recent Activity" subtitle="Your latest financial transactions"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Transactions", href: "/customer/transactions" }, { label: "Recent" }]}
-          actions={
-            <motion.button onClick={() => navigate("/customer/send/domestic")} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Send size={16} /> New Transfer
-            </motion.button>
-          } />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Recent Activity"
+          subtitle="Your latest transactions at a glance"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Transactions", href: "/customer/transactions" },
+            { label: "Recent Activity" },
+          ]}
+        />
       </motion.div>
 
-      {isLoading ? <TransactionListSkeleton count={10} /> : transactions.length === 0 ? (
-        <EmptyState title="No Recent Activity" description="Your recent transactions will appear here."
-          action={{ label: "Make a Transfer", onClick: () => navigate("/customer/send/domestic") }} />
+      {isLoading ? (
+        <>
+          <StatsGridSkeleton count={3} />
+          <TransactionListSkeleton count={6} />
+        </>
       ) : (
-        <motion.div className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-          <div className="p-4 border-b border-gray-100"><h3 className="font-semibold text-indigo-900">Recent Transactions</h3></div>
-          <div className="divide-y divide-gray-50">
-            {transactions.map((tx: any, i: number) => <TransactionRow key={tx._id || i} tx={tx} showBalances={show} />)}
-          </div>
-        </motion.div>
+        <>
+          <StatsGrid cols={3}>
+            <StatCard label="Total In" value={show ? fmt(totalIn) : "••••••"} icon={<TrendingUp size={20} />} iconColor="from-emerald-500 to-teal-500" />
+            <StatCard label="Total Out" value={show ? fmt(totalOut) : "••••••"} icon={<TrendingDown size={20} />} iconColor="from-red-500 to-pink-500" />
+            <StatCard label="Transactions" value={String(txns.length)} icon={<Clock size={20} />} iconColor="from-indigo-500 to-purple-500" />
+          </StatsGrid>
+
+          {txns.length === 0 ? (
+            <EmptyState title="No Recent Transactions" description="Your recent transactions will appear here." />
+          ) : (
+            <DashCard padding="none" className="mt-6">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Recent Transactions</h3>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{txns.length} total</span>
+              </div>
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                {txns.slice(0, 20).map((tx: any, i: number) => (
+                  <TransactionRow key={tx._id || tx.id || i} tx={tx} show={show} />
+                ))}
+              </div>
+            </DashCard>
+          )}
+        </>
       )}
-    </motion.div>
+    </PageContainer>
   );
 };
 
-// ========================
-// SCHEDULED TRANSFERS
-// ========================
+/* ═══════ SCHEDULED TRANSFERS ═══════ */
 export const ScheduledTransfers: React.FC = () => {
-  const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data, isLoading } = useTransactions({ status: "pending" as any });
-  const transactions = data?.data || [];
+  const { data: txData, isLoading } = useTransactions();
+  const allTxns = (txData as any)?.data ?? txData ?? [];
+  const scheduled = allTxns.filter((t: any) => (t.status || "").toLowerCase() === "pending" || (t.status || "").toLowerCase() === "scheduled");
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Scheduled Transfers" subtitle="Manage your upcoming and recurring transfers"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Transactions", href: "/customer/transactions" }, { label: "Scheduled" }]}
-          actions={
-            <motion.button onClick={() => navigate("/customer/send/domestic")} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Calendar size={16} /> Schedule Transfer
-            </motion.button>
-          } />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Scheduled Transfers"
+          subtitle="Upcoming and recurring transfers"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Transactions", href: "/customer/transactions" },
+            { label: "Scheduled" },
+          ]}
+        />
       </motion.div>
 
-      {isLoading ? <TransactionListSkeleton count={5} /> : transactions.length === 0 ? (
-        <EmptyState title="No Scheduled Transfers" description="Schedule transfers to automate your payments and never miss a due date."
-          action={{ label: "Schedule Transfer", onClick: () => navigate("/customer/send/domestic") }} />
+      {isLoading ? (
+        <TransactionListSkeleton count={5} />
+      ) : scheduled.length === 0 ? (
+        <EmptyState
+          title="No Scheduled Transfers"
+          description="You don't have any upcoming or recurring transfers. Schedule one to get started."
+        />
       ) : (
-        <motion.div className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-          <div className="p-4 border-b border-gray-100"><h3 className="font-semibold text-indigo-900">Upcoming Transfers</h3></div>
-          <div className="divide-y divide-gray-50">
-            {transactions.map((tx: any, i: number) => <TransactionRow key={tx._id || i} tx={{ ...tx, status: "scheduled" }} showBalances={show} />)}
+        <DashCard padding="none">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Upcoming Transfers</h3>
           </div>
-        </motion.div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {scheduled.map((tx: any, i: number) => (
+              <div key={i} className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                    <Calendar size={16} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{tx.description || "Scheduled Transfer"}</h4>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                      {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Pending"}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">
+                    {show ? fmt(tx.amount || 0) : "••••••"}
+                  </p>
+                  <StatusBadge status="pending" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </DashCard>
       )}
-    </motion.div>
+    </PageContainer>
   );
 };
 
-// ========================
-// TRANSACTION HISTORY
-// ========================
+/* ═══════ TRANSACTION HISTORY ═══════ */
 export const TransactionHistory: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const { data, isLoading, refetch } = useTransactions({ page: 1, limit: 100 });
-  const transactions = data?.data || [];
+  const [typeFilter, setTypeFilter] = useState("all");
+  const { data: txData, isLoading } = useTransactions();
+  const allTxns = (txData as any)?.data ?? txData ?? [];
 
-  const filtered = useMemo(() => {
-    return transactions.filter((t: any) => {
-      const matchSearch = !search || t.description?.toLowerCase().includes(search.toLowerCase()) || t.reference?.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = statusFilter === "all" || t.status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [transactions, search, statusFilter]);
+  const filtered = allTxns.filter((t: any) => {
+    const matchSearch = !search || (t.description || "").toLowerCase().includes(search.toLowerCase());
+    const matchType = typeFilter === "all" || (t.type || "").toLowerCase().includes(typeFilter);
+    return matchSearch && matchType;
+  });
+
+  const inputCls =
+    "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Transaction History" subtitle="Complete history of all your transactions"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Transactions", href: "/customer/transactions" }, { label: "History" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Transaction History"
+          subtitle="Search and filter your complete transaction history"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Transactions", href: "/customer/transactions" },
+            { label: "History" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap gap-3 items-center" variants={itemVariants}>
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input type="text" placeholder="Search transactions..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="all">All Status</option>
-          <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
-          <option value="failed">Failed</option>
-        </select>
-        <motion.button onClick={() => refetch()} className="p-2 rounded-lg bg-indigo-50 text-indigo-600" whileTap={{ scale: 0.95 }}>
-          <RefreshCw size={16} />
-        </motion.button>
-      </motion.div>
-
-      {isLoading ? <TransactionListSkeleton count={10} /> : filtered.length === 0 ? (
-        <EmptyState title="No Transactions Found" description={search ? "Try adjusting your search criteria." : "Your transaction history will appear here."} variant={search ? "search" : "default"} />
-      ) : (
-        <motion.div className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-          <div className="p-4 border-b border-gray-100"><h3 className="font-semibold text-indigo-900">All Transactions ({filtered.length})</h3></div>
-          <div className="divide-y divide-gray-50">
-            {filtered.map((tx: any, i: number) => <TransactionRow key={tx._id || i} tx={tx} showBalances={show} />)}
+      <DashCard className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search transactions..."
+              className={`${inputCls} pl-10`}
+            />
           </div>
-        </motion.div>
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className={`${inputCls} sm:w-44`}>
+            <option value="all">All Types</option>
+            <option value="credit">Credits</option>
+            <option value="debit">Debits</option>
+          </select>
+        </div>
+      </DashCard>
+
+      {isLoading ? (
+        <TransactionListSkeleton count={8} />
+      ) : filtered.length === 0 ? (
+        <EmptyState title="No Transactions Found" description="Try adjusting your search or filter criteria." />
+      ) : (
+        <DashCard padding="none">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">All Transactions</h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{filtered.length} results</span>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {filtered.map((tx: any, i: number) => (
+              <TransactionRow key={tx._id || tx.id || i} tx={tx} show={show} />
+            ))}
+          </div>
+        </DashCard>
       )}
-    </motion.div>
+    </PageContainer>
   );
 };
 
-// ========================
-// DOWNLOAD STATEMENT
-// ========================
+/* ═══════ DOWNLOAD STATEMENT ═══════ */
 export const DownloadStatement: React.FC = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [format, setFormat] = useState("pdf");
 
+  const inputCls =
+    "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
+  const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Download Statement" subtitle="Export your transaction data"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Transactions", href: "/customer/transactions" }, { label: "Download" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Download Statement"
+          subtitle="Export your transaction data in multiple formats"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Transactions", href: "/customer/transactions" },
+            { label: "Download" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="max-w-2xl" variants={itemVariants}>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-indigo-900 mb-6">Export Transactions</h3>
+      <div className="max-w-2xl">
+        <DashCard>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-6">
+            Generate Transaction Statement
+          </h3>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-                <input type="date" value={dateRange.from} onChange={(e) => setDateRange(p => ({ ...p, from: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <label className={labelCls}>From Date</label>
+                <input type="date" value={dateRange.from} onChange={(e) => setDateRange((p) => ({ ...p, from: e.target.value }))} className={inputCls} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-                <input type="date" value={dateRange.to} onChange={(e) => setDateRange(p => ({ ...p, to: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <label className={labelCls}>To Date</label>
+                <input type="date" value={dateRange.to} onChange={(e) => setDateRange((p) => ({ ...p, to: e.target.value }))} className={inputCls} />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Export Format</label>
+              <label className={labelCls}>Format</label>
               <div className="flex gap-3">
                 {["pdf", "csv", "excel"].map((f) => (
-                  <button key={f} onClick={() => setFormat(f)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${format === f ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                  <button
+                    key={f}
+                    onClick={() => setFormat(f)}
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                      format === f
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                    }`}
+                  >
                     {f.toUpperCase()}
                   </button>
                 ))}
               </div>
             </div>
-            <motion.button className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium mt-4" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+            <motion.button
+              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium mt-4"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
               <Download size={16} /> Download Statement
             </motion.button>
           </div>
-        </div>
-      </motion.div>
-    </motion.div>
+        </DashCard>
+
+        <DashCard className="mt-6">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white mb-4">
+            Previous Downloads
+          </h3>
+          <div className="space-y-2">
+            {["March 2025 Statement", "February 2025 Statement", "January 2025 Statement"].map((item) => (
+              <div key={item} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
+                    <FileText size={16} />
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{item}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">PDF • 245 KB</p>
+                  </div>
+                </div>
+                <Download size={16} className="text-indigo-500 dark:text-indigo-400" />
+              </div>
+            ))}
+          </div>
+        </DashCard>
+      </div>
+    </PageContainer>
   );
 };

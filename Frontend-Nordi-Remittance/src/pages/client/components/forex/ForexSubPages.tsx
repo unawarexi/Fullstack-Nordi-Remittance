@@ -1,235 +1,349 @@
 // ============================================================================
-// FOREX SUB-PAGES — Exchange, Live Rates, Alerts, History
+// FOREX SUB-PAGES — Currency Exchange, Live Rates, Alerts, History
+// Dark mode + DashboardPrimitives + grey borders + responsive typography
 // ============================================================================
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  ArrowLeftRight, TrendingUp, Bell, Clock, RefreshCw,
-  Search, ChevronRight, ArrowUp, ArrowDown, Plus,
-  DollarSign, Globe, BarChart3, Star,
+  ArrowLeftRight, TrendingUp, TrendingDown, Bell, Clock,
+  DollarSign, Plus, AlertTriangle, RefreshCw,
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
+import {
+  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge,
+} from "@components/shared/DashboardPrimitives";
+import { StatsGridSkeleton } from "@components/skeletons";
+import { dashboardItemVariants } from "@core/animation/Animation";
 import { useUIStore } from "@store/ui.store";
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
-const fmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+const fmt = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
 
-const currencies = [
-  { code: "EUR", name: "Euro", flag: "🇪🇺", rate: 0.9234, change: 0.15 },
-  { code: "GBP", name: "British Pound", flag: "🇬🇧", rate: 0.7912, change: -0.08 },
-  { code: "JPY", name: "Japanese Yen", flag: "🇯🇵", rate: 148.52, change: 0.32 },
-  { code: "CAD", name: "Canadian Dollar", flag: "🇨🇦", rate: 1.3456, change: 0.05 },
-  { code: "AUD", name: "Australian Dollar", flag: "🇦🇺", rate: 1.5432, change: -0.12 },
-  { code: "CHF", name: "Swiss Franc", flag: "🇨🇭", rate: 0.8765, change: 0.02 },
-  { code: "CNY", name: "Chinese Yuan", flag: "🇨🇳", rate: 7.2345, change: -0.18 },
-  { code: "INR", name: "Indian Rupee", flag: "🇮🇳", rate: 83.12, change: 0.22 },
-  { code: "NOK", name: "Norwegian Krone", flag: "🇳🇴", rate: 10.52, change: -0.05 },
-  { code: "SEK", name: "Swedish Krona", flag: "🇸🇪", rate: 10.34, change: 0.10 },
-];
+const currencies = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NGN", "KES", "ZAR"];
 
-// ========================
-// CURRENCY EXCHANGE
-// ========================
+/* ═══════ CURRENCY EXCHANGE ═══════ */
 export const CurrencyExchange: React.FC = () => {
-  const [fromCurrency, setFromCurrency] = useState("USD");
-  const [toCurrency, setToCurrency] = useState("EUR");
-  const [amount, setAmount] = useState("1000");
+  const [from, setFrom] = useState("USD");
+  const [to, setTo] = useState("EUR");
+  const [amount, setAmount] = useState("");
+  const rate = 0.92; // mock
+  const converted = amount ? (parseFloat(amount) * rate).toFixed(2) : "0.00";
 
-  const rate = currencies.find((c) => c.code === toCurrency)?.rate || 1;
-  const converted = Number(amount) * rate;
+  const inputCls =
+    "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
+  const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+
+  const swap = () => { setFrom(to); setTo(from); };
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Currency Exchange" subtitle="Convert currencies at competitive rates"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Forex", href: "/customer/forex" }, { label: "Exchange" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Currency Exchange"
+          subtitle="Convert currencies at competitive rates"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Forex", href: "/customer/forex" },
+            { label: "Exchange" },
+          ]}
+        />
       </motion.div>
 
       <div className="max-w-2xl">
-        <motion.div className="bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <div className="space-y-4">
+        <DashCard>
+          <div className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">You Send</label>
+              <label className={labelCls}>You Send</label>
               <div className="flex gap-3">
-                <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)} className="px-4 py-2.5 border rounded-xl text-sm font-medium bg-gray-50 focus:ring-2 focus:ring-indigo-500">
-                  <option value="USD">🇺🇸 USD</option>
-                  {currencies.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.code}</option>)}
+                <select value={from} onChange={(e) => setFrom(e.target.value)} className={`${inputCls} w-28`}>
+                  {currencies.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="flex-1 px-4 py-2.5 border rounded-xl text-right text-xl font-bold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className={`${inputCls} flex-1`}
+                />
               </div>
             </div>
 
             <div className="flex justify-center">
-              <motion.button className="p-3 bg-indigo-50 rounded-full text-indigo-600" whileHover={{ rotate: 180 }} transition={{ duration: 0.3 }}><ArrowLeftRight size={20} /></motion.button>
+              <motion.button
+                onClick={swap}
+                className="p-3 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                whileHover={{ rotate: 180 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowLeftRight size={18} className="text-indigo-600 dark:text-indigo-400" />
+              </motion.button>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">They Receive</label>
+              <label className={labelCls}>They Receive</label>
               <div className="flex gap-3">
-                <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)} className="px-4 py-2.5 border rounded-xl text-sm font-medium bg-gray-50 focus:ring-2 focus:ring-indigo-500">
-                  {currencies.map((c) => <option key={c.code} value={c.code}>{c.flag} {c.code}</option>)}
+                <select value={to} onChange={(e) => setTo(e.target.value)} className={`${inputCls} w-28`}>
+                  {currencies.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <div className="flex-1 px-4 py-2.5 border rounded-xl text-right text-xl font-bold text-indigo-900 bg-indigo-50/50">{converted.toFixed(2)}</div>
+                <div className={`${inputCls} flex-1 flex items-center bg-gray-50 dark:bg-gray-800`}>
+                  <span className="text-gray-900 dark:text-white font-semibold">{converted}</span>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-sm text-gray-500">Exchange Rate</span>
-              <span className="text-sm font-semibold text-gray-900">1 {fromCurrency} = {rate.toFixed(4)} {toCurrency}</span>
-            </div>
+            <DashCard className="!bg-gray-50 dark:!bg-gray-800/50">
+              <div className="flex justify-between text-xs sm:text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Exchange Rate</span>
+                <span className="font-medium text-gray-900 dark:text-white">1 {from} = {rate} {to}</span>
+              </div>
+              <div className="flex justify-between text-xs sm:text-sm mt-2">
+                <span className="text-gray-500 dark:text-gray-400">Transfer Fee</span>
+                <span className="font-medium text-emerald-600 dark:text-emerald-400">$0.00</span>
+              </div>
+            </DashCard>
 
-            <motion.button className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
-              Exchange Now
+            <motion.button
+              className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              Convert Now
             </motion.button>
           </div>
-        </motion.div>
+        </DashCard>
       </div>
-    </motion.div>
+    </PageContainer>
   );
 };
 
-// ========================
-// LIVE RATES
-// ========================
+/* ═══════ LIVE RATES ═══════ */
 export const LiveRates: React.FC = () => {
-  const [search, setSearch] = useState("");
-  const [baseCurrency] = useState("USD");
-
-  const filtered = currencies.filter((c) => !search || c.code.toLowerCase().includes(search.toLowerCase()) || c.name.toLowerCase().includes(search.toLowerCase()));
+  const rates = [
+    { pair: "USD/EUR", rate: 0.9200, change: -0.12 },
+    { pair: "USD/GBP", rate: 0.7860, change: 0.08 },
+    { pair: "USD/JPY", rate: 149.50, change: 0.35 },
+    { pair: "USD/CHF", rate: 0.8820, change: -0.05 },
+    { pair: "EUR/GBP", rate: 0.8540, change: 0.15 },
+    { pair: "USD/NGN", rate: 1580.00, change: 1.20 },
+    { pair: "USD/KES", rate: 129.50, change: -0.30 },
+    { pair: "EUR/USD", rate: 1.0870, change: 0.10 },
+  ];
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Live Rates" subtitle={`Real-time exchange rates (Base: ${baseCurrency})`}
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Forex", href: "/customer/forex" }, { label: "Rates" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Live Rates"
+          subtitle="Real-time currency exchange rates"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Forex", href: "/customer/forex" },
+            { label: "Live Rates" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex items-center gap-3" variants={itemVariants}>
-        <div className="relative flex-1"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input placeholder="Search currencies..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" /></div>
-        <button className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors"><RefreshCw size={16} /></button>
-      </motion.div>
-
-      <motion.div className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-        <table className="w-full">
-          <thead><tr className="border-b border-gray-200 bg-gray-50">
-            <th className="text-left text-xs font-medium text-gray-500 p-4">Currency</th>
-            <th className="text-right text-xs font-medium text-gray-500 p-4">Rate</th>
-            <th className="text-right text-xs font-medium text-gray-500 p-4">24h Change</th>
-            <th className="text-right text-xs font-medium text-gray-500 p-4">Action</th>
-          </tr></thead>
-          <tbody className="divide-y divide-gray-50">
-            {filtered.map((c) => {
-              const up = c.change >= 0;
-              return (
-                <tr key={c.code} className="hover:bg-indigo-50/30 transition-colors">
-                  <td className="p-4"><div className="flex items-center gap-3"><span className="text-xl">{c.flag}</span><div><p className="text-sm font-semibold text-gray-900">{c.code}</p><p className="text-xs text-gray-500">{c.name}</p></div></div></td>
-                  <td className="p-4 text-right text-sm font-bold text-gray-900">{c.rate < 10 ? c.rate.toFixed(4) : c.rate.toFixed(2)}</td>
-                  <td className={`p-4 text-right text-sm font-medium ${up ? "text-emerald-600" : "text-rose-600"}`}>
-                    <span className="flex items-center justify-end gap-1">{up ? <ArrowUp size={12} /> : <ArrowDown size={12} />}{Math.abs(c.change).toFixed(2)}%</span>
+      <DashCard padding="none">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Currency Pairs</h3>
+          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            <RefreshCw size={12} /> Updated just now
+          </span>
+        </div>
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-800/50">
+                <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Pair</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Rate</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">24h Change</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {rates.map((r) => (
+                <tr key={r.pair} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{r.pair}</td>
+                  <td className="px-4 py-3 text-sm text-right font-mono text-gray-900 dark:text-white">{r.rate.toFixed(4)}</td>
+                  <td className={`px-4 py-3 text-sm text-right font-medium ${r.change >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                    <span className="flex items-center justify-end gap-1">
+                      {r.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      {r.change >= 0 ? "+" : ""}{r.change.toFixed(2)}%
+                    </span>
                   </td>
-                  <td className="p-4 text-right">
-                    <button className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium hover:bg-indigo-100 transition-colors">Exchange</button>
+                  <td className="px-4 py-3 text-right">
+                    <button className="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Trade</button>
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </motion.div>
-    </motion.div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Mobile list */}
+        <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-800">
+          {rates.map((r) => (
+            <div key={r.pair} className="flex items-center justify-between p-3">
+              <div>
+                <p className="text-xs font-medium text-gray-900 dark:text-white">{r.pair}</p>
+                <p className="text-[10px] font-mono text-gray-500 dark:text-gray-400">{r.rate.toFixed(4)}</p>
+              </div>
+              <span className={`text-xs font-medium flex items-center gap-1 ${r.change >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                {r.change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {r.change >= 0 ? "+" : ""}{r.change.toFixed(2)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </DashCard>
+    </PageContainer>
   );
 };
 
-// ========================
-// CURRENCY ALERTS
-// ========================
+/* ═══════ CURRENCY ALERTS ═══════ */
 export const CurrencyAlerts: React.FC = () => {
-  const alerts = [
-    { id: "1", pair: "USD/EUR", target: 0.90, condition: "below", current: 0.9234, active: true },
-    { id: "2", pair: "USD/GBP", target: 0.80, condition: "above", current: 0.7912, active: true },
-    { id: "3", pair: "USD/JPY", target: 150.00, condition: "above", current: 148.52, active: false },
+  const [alerts, setAlerts] = useState([
+    { id: 1, pair: "USD/EUR", target: 0.9000, current: 0.9200, enabled: true },
+    { id: 2, pair: "USD/GBP", target: 0.8000, current: 0.7860, enabled: false },
+    { id: 3, pair: "EUR/USD", target: 1.1000, current: 1.0870, enabled: true },
+  ]);
+
+  const toggle = (id: number) =>
+    setAlerts((p) => p.map((a) => (a.id === id ? { ...a, enabled: !a.enabled } : a)));
+
+  return (
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Currency Alerts"
+          subtitle="Get notified when rates hit your target"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Forex", href: "/customer/forex" },
+            { label: "Alerts" },
+          ]}
+          actions={
+            <motion.button
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Plus size={16} /> New Alert
+            </motion.button>
+          }
+        />
+      </motion.div>
+
+      {alerts.length === 0 ? (
+        <EmptyState title="No Alerts" description="Create a currency alert to get notified when rates change." />
+      ) : (
+        <div className="space-y-3">
+          {alerts.map((alert) => (
+            <motion.div key={alert.id} variants={dashboardItemVariants}>
+              <DashCard>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-xl ${alert.enabled ? "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
+                      <Bell size={16} />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{alert.pair}</h4>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                          Target: <span className="font-mono font-medium text-gray-900 dark:text-white">{alert.target.toFixed(4)}</span>
+                        </span>
+                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                          Current: <span className="font-mono font-medium text-gray-900 dark:text-white">{alert.current.toFixed(4)}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => toggle(alert.id)}
+                    className={`relative w-11 h-6 rounded-full transition-colors ${alert.enabled ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${alert.enabled ? "translate-x-5" : ""}`} />
+                  </button>
+                </div>
+              </DashCard>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </PageContainer>
+  );
+};
+
+/* ═══════ EXCHANGE HISTORY ═══════ */
+export const ExchangeHistory: React.FC = () => {
+  const history = [
+    { date: "Mar 20, 2025", from: "USD", to: "EUR", amount: 1000, rate: 0.9200, received: 920, status: "completed" },
+    { date: "Mar 15, 2025", from: "EUR", to: "GBP", amount: 500, rate: 0.8540, received: 427, status: "completed" },
+    { date: "Mar 10, 2025", from: "USD", to: "NGN", amount: 200, rate: 1580, received: 316000, status: "completed" },
+    { date: "Mar 5, 2025", from: "GBP", to: "USD", amount: 300, rate: 1.2720, received: 381.60, status: "pending" },
   ];
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Currency Alerts" subtitle="Get notified when rates hit your targets"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Forex", href: "/customer/forex" }, { label: "Alerts" }]}
-          actions={<motion.button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}><Plus size={16} /> New Alert</motion.button>} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Exchange History"
+          subtitle="Your past currency exchanges"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Forex", href: "/customer/forex" },
+            { label: "History" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="space-y-4 max-w-3xl" variants={containerVariants}>
-        {alerts.map((alert) => (
-          <motion.div key={alert.id} className="bg-white rounded-xl shadow-sm p-5 flex items-center justify-between" variants={itemVariants}>
-            <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-xl ${alert.active ? "bg-indigo-50 text-indigo-600" : "bg-gray-100 text-gray-400"}`}><Bell size={20} /></div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{alert.pair}</h3>
-                <p className="text-sm text-gray-500">Alert when rate goes {alert.condition} {alert.target.toFixed(4)}</p>
-                <p className="text-xs text-gray-400">Current: {alert.current.toFixed(4)}</p>
+      <DashCard padding="none">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Exchange History</h3>
+        </div>
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-800/50">
+                {["Date", "From", "To", "Amount", "Rate", "Received", "Status"].map((h) => (
+                  <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {history.map((h, i) => (
+                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{h.date}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{h.from}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{h.to}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{h.amount.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-300">{h.rate}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{h.received.toLocaleString()}</td>
+                  <td className="px-4 py-3"><StatusBadge status={h.status as any} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Mobile */}
+        <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-800">
+          {history.map((h, i) => (
+            <div key={i} className="p-3">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-gray-900 dark:text-white">{h.from} → {h.to}</span>
+                <StatusBadge status={h.status as any} />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-gray-500 dark:text-gray-400">{h.date}</span>
+                <span className="text-xs font-medium text-gray-900 dark:text-white">{h.amount} → {h.received.toLocaleString()}</span>
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked={alert.active} className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
-            </label>
-          </motion.div>
-        ))}
-
-        {alerts.length === 0 && (
-          <div className="p-8"><EmptyState title="No Alerts" description="Create alerts to be notified of rate changes." /></div>
-        )}
-      </motion.div>
-    </motion.div>
-  );
-};
-
-// ========================
-// EXCHANGE HISTORY
-// ========================
-export const ExchangeHistory: React.FC = () => {
-  const show = useUIStore((s) => s.preferences.showBalances);
-
-  const history = [
-    { id: "1", from: "USD", to: "EUR", fromAmount: 1000, toAmount: 923.40, rate: 0.9234, date: "2024-01-28", status: "completed" },
-    { id: "2", from: "USD", to: "GBP", fromAmount: 2500, toAmount: 1978.00, rate: 0.7912, date: "2024-01-25", status: "completed" },
-    { id: "3", from: "EUR", to: "USD", fromAmount: 500, toAmount: 541.50, rate: 1.0830, date: "2024-01-20", status: "completed" },
-    { id: "4", from: "USD", to: "JPY", fromAmount: 3000, toAmount: 445560, rate: 148.52, date: "2024-01-15", status: "completed" },
-    { id: "5", from: "USD", to: "CAD", fromAmount: 1500, toAmount: 2018.40, rate: 1.3456, date: "2024-01-10", status: "completed" },
-  ];
-
-  return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Exchange History" subtitle="Your past currency exchanges"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Forex", href: "/customer/forex" }, { label: "History" }]} />
-      </motion.div>
-
-      <motion.div className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-        <table className="w-full">
-          <thead><tr className="border-b border-gray-200 bg-gray-50">
-            <th className="text-left text-xs font-medium text-gray-500 p-4">Date</th>
-            <th className="text-left text-xs font-medium text-gray-500 p-4">From</th>
-            <th className="text-left text-xs font-medium text-gray-500 p-4">To</th>
-            <th className="text-right text-xs font-medium text-gray-500 p-4">Rate</th>
-            <th className="text-right text-xs font-medium text-gray-500 p-4">Status</th>
-          </tr></thead>
-          <tbody className="divide-y divide-gray-50">
-            {history.map((h) => (
-              <tr key={h.id} className="hover:bg-indigo-50/30 transition-colors">
-                <td className="p-4 text-sm text-gray-600">{new Date(h.date).toLocaleDateString()}</td>
-                <td className="p-4"><p className="text-sm font-semibold text-gray-900">{show ? h.fromAmount.toLocaleString() : "••••"} {h.from}</p></td>
-                <td className="p-4"><p className="text-sm font-semibold text-indigo-900">{show ? h.toAmount.toLocaleString() : "••••"} {h.to}</p></td>
-                <td className="p-4 text-sm text-gray-600 text-right">{h.rate.toFixed(4)}</td>
-                <td className="p-4 text-right"><span className="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 capitalize">{h.status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </motion.div>
-    </motion.div>
+          ))}
+        </div>
+      </DashCard>
+    </PageContainer>
   );
 };

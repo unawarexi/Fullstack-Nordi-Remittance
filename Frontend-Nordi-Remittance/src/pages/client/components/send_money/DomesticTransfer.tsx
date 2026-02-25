@@ -181,7 +181,7 @@ const DomesticTransfer: React.FC = () => {
 
   return (
     <motion.div 
-      className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 min-h-screen"
+      className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 min-h-screen"
       variants={pageVariants}
       initial="initial"
       animate="animate"
@@ -190,21 +190,21 @@ const DomesticTransfer: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-indigo-900">Domestic Transfer</h1>
+          <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">Domestic Transfer</h1>
           <p className="text-purple-600">Send money to accounts within the United States</p>
         </div>
         
         {/* Progress steps */}
         <div className="flex items-center mb-8">
-          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
             1
           </div>
           <div className={`h-1 flex-1 ${step >= 2 ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
-          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
             2
           </div>
           <div className={`h-1 flex-1 ${step >= 3 ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
-          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+          <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
             3
           </div>
         </div>
@@ -218,7 +218,7 @@ const DomesticTransfer: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="bg-white rounded-xl shadow-lg p-6"
+              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
             >
               <h2 className="text-lg font-semibold text-indigo-900 mb-4">Transfer Details</h2>
               
@@ -259,11 +259,11 @@ const DomesticTransfer: React.FC = () => {
                               <div className="flex items-center">
                                 <div className={`w-4 h-4 rounded-full ${values.fromAccount === account.id ? 'bg-indigo-600' : 'border border-gray-400'}`}></div>
                                 <div className="ml-3">
-                                  <div className="font-medium text-gray-900">{account.name}</div>
-                                  <div className="text-sm text-gray-600">{account.number}</div>
+                                  <div className="font-medium text-gray-900 dark:text-white">{account.name}</div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">{account.number}</div>
                                 </div>
                               </div>
-                              <div className="font-semibold text-indigo-900">${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                              <div className="font-semibold text-indigo-900 dark:text-white">${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                             </div>
                           </motion.div>
                         ))}
@@ -353,10 +353,10 @@ const DomesticTransfer: React.FC = () => {
                                         <div className={`w-4 h-4 rounded-full ${values.beneficiaryId === beneficiary.id ? 'bg-indigo-600' : 'border border-gray-400'}`}></div>
                                         <div className="ml-3">
                                           <div className="flex items-center">
-                                            <div className="font-medium text-gray-900">{beneficiary.name}</div>
+                                            <div className="font-medium text-gray-900 dark:text-white">{beneficiary.name}</div>
                                             {beneficiary.star && <Star size={14} className="ml-2 text-amber-500 fill-amber-500" />}
                                           </div>
-                                          <div className="text-sm text-gray-600">{beneficiary.bankName} - {beneficiary.accountNumber}</div>
+                                          <div className="text-sm text-gray-600 dark:text-gray-400">{beneficiary.bankName} - {beneficiary.accountNumber}</div>
                                         </div>
                                       </div>
                                       <Share2 size={16} className="text-indigo-600" />
@@ -490,7 +490,7 @@ const DomesticTransfer: React.FC = () => {
                                   <div className="flex items-center">
                                     <div className={`w-4 h-4 rounded-full ${values.transferType === type.id ? 'bg-indigo-600' : 'border border-gray-400'}`}></div>
                                     <div className="ml-3">
-                                      <div className="font-medium text-gray-900">{type.name}</div>
+                                      <div className="font-medium text-gray-900 dark:text-white">{type.name}</div>
                                     </div>
                                   </div>
                                   <div className="font-medium text-indigo-600">
@@ -574,18 +574,18 @@ const DomesticTransfer: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="bg-white rounded-xl shadow-lg p-6"
+              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
             >
               <h2 className="text-lg font-semibold text-indigo-900 mb-4">Confirm Your Transfer</h2>
               
               <div className="mb-6 bg-indigo-50 p-4 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm text-indigo-800 font-medium">Transfer Amount</div>
-                  <div className="text-xl font-bold text-indigo-900">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className="text-xl font-bold text-indigo-900 dark:text-white">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
-                  <div className="text-gray-600">Fee</div>
+                  <div className="text-gray-600 dark:text-gray-400">Fee</div>
                   <div className="text-gray-800 font-medium">
                     ${getSelectedTransferType()?.fee.toFixed(2)}
                   </div>
@@ -593,7 +593,7 @@ const DomesticTransfer: React.FC = () => {
                 
                 <div className="mt-4 pt-2 border-t border-indigo-200 flex items-center justify-between">
                   <div className="text-sm font-medium text-indigo-800">Total</div>
-                  <div className="text-lg font-bold text-indigo-900">
+                  <div className="text-lg font-bold text-indigo-900 dark:text-white">
                     ${(parseFloat(formData.amount) + (getSelectedTransferType()?.fee || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
@@ -608,7 +608,7 @@ const DomesticTransfer: React.FC = () => {
                     onClick={() => toggleSection("details")}
                   >
                     <div className="flex items-center justify-between p-4">
-                      <div className="font-medium text-indigo-900">Transfer Details</div>
+                      <div className="font-medium text-indigo-900 dark:text-white">Transfer Details</div>
                       {expandedSection === "details" ? (
                         <ChevronUp size={18} className="text-indigo-600" />
                       ) : (
@@ -626,18 +626,18 @@ const DomesticTransfer: React.FC = () => {
                     >
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <div className="text-sm text-gray-600">Transfer Type</div>
-                          <div className="text-sm font-medium text-gray-900">{getSelectedTransferType()?.name}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Transfer Type</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{getSelectedTransferType()?.name}</div>
                         </div>
                         <div className="flex justify-between">
-                          <div className="text-sm text-gray-600">Transfer Date</div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Transfer Date</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {new Date(formData.transferDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                           </div>
                         </div>
                         <div className="flex justify-between">
-                          <div className="text-sm text-gray-600">Reference</div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Reference</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {formData.reference || "No reference provided"}
                           </div>
                         </div>
@@ -651,7 +651,7 @@ const DomesticTransfer: React.FC = () => {
                     onClick={() => toggleSection("from")}
                   >
                     <div className="flex items-center justify-between p-4">
-                      <div className="font-medium text-indigo-900">From Account</div>
+                      <div className="font-medium text-indigo-900 dark:text-white">From Account</div>
                       {expandedSection === "from" ? (
                         <ChevronUp size={18} className="text-indigo-600" />
                       ) : (
@@ -668,9 +668,9 @@ const DomesticTransfer: React.FC = () => {
                       className="bg-indigo-50 p-4"
                     >
                       <div className="bg-white p-3 rounded-lg">
-                        <div className="font-medium text-gray-900">{selectedAccount?.name}</div>
-                        <div className="text-sm text-gray-600 mb-1">{selectedAccount?.number}</div>
-                        <div className="font-semibold text-indigo-900">${selectedAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{selectedAccount?.name}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{selectedAccount?.number}</div>
+                        <div className="font-semibold text-indigo-900 dark:text-white">${selectedAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                       </div>
                     </motion.div>
                   )}
@@ -681,7 +681,7 @@ const DomesticTransfer: React.FC = () => {
                     onClick={() => toggleSection("to")}
                   >
                     <div className="flex items-center justify-between p-4">
-                      <div className="font-medium text-indigo-900">To Account</div>
+                      <div className="font-medium text-indigo-900 dark:text-white">To Account</div>
                       {expandedSection === "to" ? (
                         <ChevronUp size={18} className="text-indigo-600" />
                       ) : (
@@ -699,16 +699,16 @@ const DomesticTransfer: React.FC = () => {
                     >
                       {formData.recipientType === "existing" ? (
                         <div className="bg-white p-3 rounded-lg">
-                          <div className="font-medium text-gray-900">{getSelectedBeneficiary()?.name}</div>
-                          <div className="text-sm text-gray-600 mb-1">{getSelectedBeneficiary()?.bankName}</div>
-                          <div className="text-sm text-gray-600">Account: {getSelectedBeneficiary()?.accountNumber}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{getSelectedBeneficiary()?.name}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{getSelectedBeneficiary()?.bankName}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Account: {getSelectedBeneficiary()?.accountNumber}</div>
                         </div>
                       ) : (
                         <div className="bg-white p-3 rounded-lg">
-                          <div className="font-medium text-gray-900">{formData.accountName}</div>
-                          <div className="text-sm text-gray-600 mb-1">{formData.bankName}</div>
-                          <div className="text-sm text-gray-600">Account: {formData.accountNumber}</div>
-                          <div className="text-sm text-gray-600">Routing: {formData.routingNumber}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{formData.accountName}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{formData.bankName}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Account: {formData.accountNumber}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Routing: {formData.routingNumber}</div>
                         </div>
                       )}
                     </motion.div>
@@ -757,7 +757,7 @@ const DomesticTransfer: React.FC = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="bg-white rounded-xl shadow-lg p-6"
+              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
             >
               <div className="flex flex-col items-center text-center mb-8">
                 <motion.div
@@ -777,7 +777,7 @@ const DomesticTransfer: React.FC = () => {
               <div className="bg-indigo-50 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center mb-3">
                   <div className="text-sm text-indigo-800 font-medium">Transfer Amount</div>
-                  <div className="text-lg font-bold text-indigo-900">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className="text-lg font-bold text-indigo-900 dark:text-white">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-indigo-800 font-medium">Reference Number</div>
@@ -800,8 +800,8 @@ const DomesticTransfer: React.FC = () => {
                   <div className="flex items-center">
                     <Clock size={18} className="text-indigo-600 mr-3" />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">Estimated Arrival</div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">Estimated Arrival</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
                         {getSelectedTransferType()?.id === "standard" 
                           ? "1-2 business days" 
                           : getSelectedTransferType()?.id === "same-day" 
@@ -817,8 +817,8 @@ const DomesticTransfer: React.FC = () => {
                   <div className="flex items-center">
                     <RefreshCw size={18} className="text-indigo-600 mr-3" />
                     <div>
-                      <div className="text-sm font-medium text-gray-900">Status Updates</div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">Status Updates</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
                         You'll receive notifications about this transfer
                       </div>
                     </div>

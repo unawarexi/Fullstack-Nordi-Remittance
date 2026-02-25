@@ -463,10 +463,10 @@ const Communication: React.FC = () => {
       >
         <motion.div 
           variants={itemVariants}
-          className="bg-white rounded-2xl p-6 shadow-lg mb-8"
+          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 mb-8"
         >
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-indigo-900">Communication Preferences</h1>
+            <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">Communication Preferences</h1>
             <motion.button
               variants={saveButtonVariants}
               initial="idle"
@@ -486,14 +486,14 @@ const Communication: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mb-6 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg flex items-center gap-3"
+              className="mb-6 bg-green-50 dark:bg-green-950/30 border border-green-200 text-green-700 p-4 rounded-lg flex items-center gap-3"
             >
               <CheckCircle size={20} className="text-green-500" />
               <span>Your communication preferences have been successfully updated.</span>
             </motion.div>
           )}
 
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 mb-6">
             <motion.button
               variants={tabVariants}
               animate={activeTab === "notifications" ? "active" : "inactive"}
@@ -540,7 +540,7 @@ const Communication: React.FC = () => {
                         className={`p-4 rounded-xl flex flex-col items-center ${
                           channel.enabled
                             ? "bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100"
-                            : "bg-gray-50 border border-gray-200"
+                            : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 dark:border-gray-700"
                         }`}
                       >
                         <div className={`p-3 rounded-full mb-3 ${
@@ -551,7 +551,7 @@ const Communication: React.FC = () => {
                           {channel.icon}
                         </div>
                         <h3 className={`font-medium text-sm mb-2 ${
-                          channel.enabled ? "text-indigo-900" : "text-gray-500"
+                          channel.enabled ? "text-indigo-900 dark:text-white" : "text-gray-500"
                         }`}>
                           {channel.name}
                         </h3>
@@ -578,7 +578,7 @@ const Communication: React.FC = () => {
                         <motion.div
                           layout
                           key={type.id}
-                          className="border border-gray-200 rounded-xl overflow-hidden"
+                          className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
                         >
                           <motion.div
                             layout
@@ -590,7 +590,7 @@ const Communication: React.FC = () => {
                                 {type.icon}
                               </div>
                               <div>
-                                <h3 className="font-medium text-indigo-900">{type.name}</h3>
+                                <h3 className="font-medium text-indigo-900 dark:text-white">{type.name}</h3>
                                 <p className="text-xs text-gray-500">{type.description}</p>
                               </div>
                             </div>
@@ -610,7 +610,7 @@ const Communication: React.FC = () => {
                                 animate="visible"
                                 exit="hidden"
                                 variants={expandVariants}
-                                className="border-t border-gray-200 bg-gray-50 divide-y divide-gray-200"
+                                className="border-t border-gray-200 dark:border-gray-700 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 divide-y divide-gray-200"
                               >
                                 {type.categories.map((category) => (
                                   <motion.div
@@ -619,13 +619,13 @@ const Communication: React.FC = () => {
                                     className="p-4"
                                   >
                                     <div className="flex items-center justify-between mb-3">
-                                      <h4 className="font-medium text-sm text-gray-800">
+                                      <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200">
                                         {category.name}
                                       </h4>
                                       <div className="flex items-center gap-2">
                                         <button
                                           onClick={() => toggleAllCategoryChannels(type.id, category.id, true)}
-                                          className="text-xs font-medium bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                                          className="text-xs font-medium bg-indigo-100 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded"
                                         >
                                           Enable All
                                         </button>
@@ -656,10 +656,10 @@ const Communication: React.FC = () => {
                                             disabled={!channelInfo?.enabled}
                                             className={`p-2 rounded-lg flex items-center justify-between ${
                                               !channelInfo?.enabled
-                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
                                                 : channel.enabled
                                                 ? "bg-indigo-100 text-indigo-700"
-                                                : "bg-white text-gray-700 border border-gray-200"
+                                                : "bg-white text-gray-700 border border-gray-200 dark:border-gray-700 dark:border-gray-700"
                                             }`}
                                           >
                                             <div className="flex items-center gap-2">
@@ -678,7 +678,7 @@ const Communication: React.FC = () => {
                                             ) : (
                                               <XCircle
                                                 size={16}
-                                                className="text-gray-400"
+                                                className="text-gray-400 dark:text-gray-500"
                                               />
                                             )}
                                           </motion.button>
@@ -706,7 +706,7 @@ const Communication: React.FC = () => {
                 exit={{ opacity: 0 }}
                 className="space-y-8"
               >
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2">
                       <Clock size={20} className="text-indigo-600" />
@@ -767,7 +767,7 @@ const Communication: React.FC = () => {
                         className={`w-full p-2 border rounded-lg ${
                           timePreferences.quietHoursEnabled
                             ? "border-indigo-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                            : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 cursor-not-allowed"
                         }`}
                       />
                     </div>
@@ -785,14 +785,14 @@ const Communication: React.FC = () => {
                         className={`w-full p-2 border rounded-lg ${
                           timePreferences.quietHoursEnabled
                             ? "border-indigo-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                            : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 cursor-not-allowed"
                         }`}
                       />
                     </div>
                   </div>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2 mb-4">
                     <Calendar size={20} className="text-indigo-600" />
                     Preferred Days
@@ -811,7 +811,7 @@ const Communication: React.FC = () => {
                           className={`px-3 py-2 rounded-lg text-sm font-medium capitalize ${
                             timePreferences.preferredDays.includes(day)
                               ? "bg-indigo-100 text-indigo-700"
-                              : "bg-gray-100 text-gray-600"
+                              : "bg-gray-100 dark:bg-gray-800 text-gray-600"
                           }`}
                         >
                           {day.slice(0, 3)}
@@ -821,7 +821,7 @@ const Communication: React.FC = () => {
                   </div>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2 mb-4">
                     <Clock size={20} className="text-indigo-600" />
                     Communication Frequency
@@ -833,13 +833,13 @@ const Communication: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                      <h3 className="font-medium text-gray-800">Market Updates & Insights</h3>
+                      <h3 className="font-medium text-gray-800 dark:text-gray-200">Market Updates & Insights</h3>
                         <p className="text-xs text-gray-500">Financial news and market trends relevant to your portfolio</p>
                       </div>
                       <select
                         value={frequency.marketUpdates}
                         onChange={(e) => updateFrequency("marketUpdates", e.target.value)}
-                        className="p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                        className="p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
                       >
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
@@ -850,13 +850,13 @@ const Communication: React.FC = () => {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-gray-800">Account Summaries</h3>
+                        <h3 className="font-medium text-gray-800 dark:text-gray-200">Account Summaries</h3>
                         <p className="text-xs text-gray-500">Overviews of your account activity and balance</p>
                       </div>
                       <select
                         value={frequency.accountSummaries}
                         onChange={(e) => updateFrequency("accountSummaries", e.target.value)}
-                        className="p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                        className="p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
                       >
                         <option value="weekly">Weekly</option>
                         <option value="biweekly">Bi-weekly</option>
@@ -867,13 +867,13 @@ const Communication: React.FC = () => {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-gray-800">Promotional Offers</h3>
+                        <h3 className="font-medium text-gray-800 dark:text-gray-200">Promotional Offers</h3>
                         <p className="text-xs text-gray-500">Special offers, discounts, and product recommendations</p>
                       </div>
                       <select
                         value={frequency.promotionalOffers}
                         onChange={(e) => updateFrequency("promotionalOffers", e.target.value)}
-                        className="p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                        className="p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
                       >
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
@@ -894,7 +894,7 @@ const Communication: React.FC = () => {
                 exit={{ opacity: 0 }}
                 className="space-y-8"
               >
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2 mb-4">
                     <Globe size={20} className="text-indigo-600" />
                     Regional Settings
@@ -908,7 +908,7 @@ const Communication: React.FC = () => {
                       <select
                         value={timePreferences.timezone}
                         onChange={(e) => updateTimePreference("timezone", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
                       >
                         <option value="Europe/Helsinki">Europe/Helsinki (GMT+3)</option>
                         <option value="Europe/London">Europe/London (GMT+1)</option>
@@ -925,7 +925,7 @@ const Communication: React.FC = () => {
                       <div className="grid grid-cols-2 gap-3">
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 border border-indigo-300 bg-indigo-50 text-indigo-700 rounded-lg flex items-center gap-2"
+                          className="p-3 border border-indigo-300 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 rounded-lg flex items-center gap-2"
                         >
                           <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
                             <CheckCircle size={14} className="text-indigo-600" />
@@ -934,27 +934,27 @@ const Communication: React.FC = () => {
                         </motion.button>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 border border-gray-200 bg-white text-gray-700 rounded-lg flex items-center gap-2"
+                          className="p-3 border border-gray-200 dark:border-gray-700 bg-white text-gray-700 rounded-lg flex items-center gap-2"
                         >
-                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                             <div className="w-3 h-3 rounded-full border-2 border-gray-400" />
                           </div>
                           <span>Finnish</span>
                         </motion.button>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 border border-gray-200 bg-white text-gray-700 rounded-lg flex items-center gap-2"
+                          className="p-3 border border-gray-200 dark:border-gray-700 bg-white text-gray-700 rounded-lg flex items-center gap-2"
                         >
-                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                             <div className="w-3 h-3 rounded-full border-2 border-gray-400" />
                           </div>
                           <span>Swedish</span>
                         </motion.button>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          className="p-3 border border-gray-200 bg-white text-gray-700 rounded-lg flex items-center gap-2"
+                          className="p-3 border border-gray-200 dark:border-gray-700 bg-white text-gray-700 rounded-lg flex items-center gap-2"
                         >
-                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                             <div className="w-3 h-3 rounded-full border-2 border-gray-400" />
                           </div>
                           <span>Norwegian</span>
@@ -964,7 +964,7 @@ const Communication: React.FC = () => {
                   </div>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2 mb-4">
                     <AlertTriangle size={20} className="text-indigo-600" />
                     Critical Alerts Override
@@ -974,17 +974,17 @@ const Communication: React.FC = () => {
                   </p>
 
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 dark:bg-gray-800">
                       <div className="flex items-center gap-2">
                         <Shield size={18} className="text-red-500" />
                         <span className="text-sm font-medium">Security Alerts</span>
                       </div>
-                      <div className="text-xs font-medium bg-red-50 text-red-700 px-2 py-1 rounded">
+                      <div className="text-xs font-medium bg-red-50 dark:bg-red-950/30 text-red-700 px-2 py-1 rounded">
                         Always On
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center gap-2">
                         <AlertTriangle size={18} className="text-amber-500" />
                         <span className="text-sm font-medium">Suspicious Transactions</span>
@@ -1008,7 +1008,7 @@ const Communication: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center gap-2">
                         <DollarSign size={18} className="text-green-500" />
                         <span className="text-sm font-medium">Large Transactions</span>
@@ -1032,7 +1032,7 @@ const Communication: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Clock size={18} className="text-blue-500" />
                         <span className="text-sm font-medium">Payment Reminders</span>
@@ -1057,7 +1057,7 @@ const Communication: React.FC = () => {
                   </div>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="bg-white p-5 rounded-xl border border-indigo-100">
+                <motion.div variants={itemVariants} className="bg-white dark:bg-gray-900 p-5 rounded-xl border border-indigo-100">
                   <h2 className="text-lg font-semibold text-indigo-900 flex items-center gap-2 mb-4">
                     <Info size={20} className="text-indigo-600" />
                     Communication History
@@ -1070,7 +1070,7 @@ const Communication: React.FC = () => {
                     <motion.button
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-200"
+                      className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-200"
                     >
                       <FileText size={16} />
                       <span>Export Communication History</span>
@@ -1079,7 +1079,7 @@ const Communication: React.FC = () => {
                     <motion.button
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg border border-red-200"
+                      className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-950/30 text-red-700 rounded-lg border border-red-200"
                     >
                       <XCircle size={16} />
                       <span>Delete Communication History</span>
@@ -1098,7 +1098,7 @@ const Communication: React.FC = () => {
         >
           <div className="flex items-center gap-2">
             <Shield size={18} className="text-indigo-600" />
-            <span className="text-indigo-900">Your communication preferences are protected and never shared with third parties.</span>
+            <span className="text-indigo-900 dark:text-white">Your communication preferences are protected and never shared with third parties.</span>
           </div>
           <motion.button
             whileHover={{ x: 3 }}

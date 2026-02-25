@@ -137,7 +137,7 @@ const PersonalInformation = () => {
   };
 
   const getStatusColor = (status: string) => {
-    if (!status) return 'bg-slate-100 text-slate-800';
+    if (!status) return 'bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-gray-200';
     switch(status.toLowerCase()) {
       case 'verified':
         return 'bg-green-100 text-green-800';
@@ -146,7 +146,7 @@ const PersonalInformation = () => {
       case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-slate-100 text-slate-800';
+        return 'bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-gray-200';
     }
   };
 
@@ -169,10 +169,10 @@ const PersonalInformation = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading user details...</p>
+          <p className="text-slate-600 dark:text-gray-400">Loading user details...</p>
         </div>
       </div>
     );
@@ -180,13 +180,13 @@ const PersonalInformation = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="text-center max-w-md p-6 bg-slate-50 rounded-lg shadow-md">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
+        <div className="text-center max-w-md p-6 bg-slate-50 dark:bg-gray-900 rounded-lg shadow-md">
           <div className="text-red-600 text-5xl mb-4">!</div>
           <h2 className="text-xl font-bold mb-2">Error</h2>
-          <p className="text-slate-600 mb-4">{error}</p>
+          <p className="text-slate-600 dark:text-gray-400 mb-4">{error}</p>
           <button 
-            className="px-4 py-2 bg-blue-600 text-slate-50 rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg hover:bg-blue-700"
             // onClick={() => navigate('/admin/users')}
           >
             Back to User List
@@ -198,12 +198,12 @@ const PersonalInformation = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="text-center max-w-md p-6 bg-slate-50 rounded-lg shadow-md">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
+        <div className="text-center max-w-md p-6 bg-slate-50 dark:bg-gray-900 rounded-lg shadow-md">
           <h2 className="text-xl font-bold mb-2">User Not Found</h2>
-          <p className="text-slate-600 mb-4">The requested user could not be found.</p>
+          <p className="text-slate-600 dark:text-gray-400 mb-4">The requested user could not be found.</p>
           <button 
-            className="px-4 py-2 bg-blue-600 text-slate-50 rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg hover:bg-blue-700"
             // onClick={() => navigate('/admin/users')}
           >
             Back to User List
@@ -227,19 +227,19 @@ const PersonalInformation = () => {
       >
         <div className="flex items-center">
           <button 
-            className="p-2 rounded-full hover:bg-slate-100 mr-4"
+            className="p-2 rounded-full hover:bg-slate-100 dark:bg-gray-800 mr-4"
             // onClick={() => navigate('/customers/users')}
           >
             <ArrowLeft size={20} />
           </button>
           <div>
             <h1 className="text-2xl font-bold">User Details</h1>
-            <p className="text-slate-500">Manage and view user information</p>
+            <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Manage and view user information</p>
           </div>
         </div>
         <div className="flex space-x-3">
           <motion.button
-            className="px-4 py-2 bg-yellow-500 text-slate-50 rounded-lg flex items-center"
+            className="px-4 py-2 bg-yellow-500 text-slate-50 dark:text-white rounded-lg flex items-center"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate(`/customers/users/${id}/edit`)}
@@ -248,7 +248,7 @@ const PersonalInformation = () => {
             Edit User
           </motion.button>
           <motion.button
-            className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 rounded-lg flex items-center`}
+            className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setConfirmAction({ type: 'activate', visible: true })}
@@ -270,7 +270,7 @@ const PersonalInformation = () => {
 
       {/* User Summary Card */}
       <motion.div 
-        className="bg-slate-50 rounded-lg shadow-sm p-6 mb-6 border border-slate-200"
+        className="bg-slate-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-slate-200"
         variants={itemVariants}
       >
         <div className="flex flex-col md:flex-row items-center md:items-start">
@@ -278,8 +278,8 @@ const PersonalInformation = () => {
             {user.profilePicture ? (
               <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                <User size={40} className="text-slate-400" />
+              <div className="w-full h-full bg-slate-200 dark:bg-gray-700 flex items-center justify-center">
+                <User size={40} className="text-slate-400 dark:text-gray-500" />
               </div>
             )}
           </div>
@@ -288,13 +288,13 @@ const PersonalInformation = () => {
             <h2 className="text-xl font-bold mb-1">
               {[user.firstName, user.middleName, user.lastName].filter(Boolean).join(' ') || 'N/A'}
             </h2>
-            <p className="text-slate-500 mb-3">{user.email || 'N/A'}</p>
+            <p className="text-slate-50 dark:text-white0 dark:text-gray-400 mb-3">{user.email || 'N/A'}</p>
             
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
               <span className={`px-3 py-1 rounded-full text-xs ${getStatusColor(user.kycStatus)}`}>
                 KYC: {user.kycStatus ? user.kycStatus.charAt(0).toUpperCase() + user.kycStatus.slice(1) : 'N/A'}
               </span>
-              <span className={`px-3 py-1 rounded-full text-xs ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'}`}>
+              <span className={`px-3 py-1 rounded-full text-xs ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-400'}`}>
                 {user.isActive ? 'Active' : 'Inactive'}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs ${user.isLocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -307,15 +307,15 @@ const PersonalInformation = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-slate-500">Account Number</p>
+                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Account Number</p>
                 <p className="font-medium">{user.accountNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-slate-500">Last Login</p>
+                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Last Login</p>
                 <p className="font-medium">{user.lastLogin ? formatDate(user.lastLogin) : 'Never'}</p>
               </div>
               <div>
-                <p className="text-slate-500">Currency</p>
+                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Currency</p>
                 <p className="font-medium">{user.currency || 'N/A'}</p>
               </div>
             </div>
@@ -323,15 +323,15 @@ const PersonalInformation = () => {
           
           <div className="mt-4 md:mt-0 md:ml-6 flex flex-col space-y-2">
             <div className="flex flex-col">
-              <span className="text-slate-500 text-xs">ID Number</span>
+              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Number</span>
               <span className="font-medium">{user.idNumber || 'N/A'}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-slate-500 text-xs">ID Type</span>
+              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Type</span>
               <span className="font-medium capitalize">{user.idType ? user.idType.replace('_', ' ') : 'N/A'}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-slate-500 text-xs">ID Expiry</span>
+              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Expiry</span>
               <span className="font-medium">{user.idExpiryDate ? formatDate(user.idExpiryDate) : 'N/A'}</span>
             </div>
           </div>
@@ -344,31 +344,31 @@ const PersonalInformation = () => {
         variants={itemVariants}
       >
         <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'personal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'personal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
           onClick={() => setActiveTab('personal')}
         >
           Personal Details
         </button>
         <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'account' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'account' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
           onClick={() => setActiveTab('account')}
         >
           Account Details
         </button>
         <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'financial' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'financial' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
           onClick={() => setActiveTab('financial')}
         >
           Financial Info
         </button>
         <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'security' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'security' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
           onClick={() => setActiveTab('security')}
         >
           Security Settings
         </button>
         <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'documents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'documents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
           onClick={() => setActiveTab('documents')}
         >
           Documents
@@ -377,7 +377,7 @@ const PersonalInformation = () => {
       
       {/* Tab Content */}
       <motion.div 
-        className="bg-slate-50 rounded-lg shadow-sm p-6 border border-slate-200 mb-6"
+        className="bg-slate-50 dark:bg-gray-900 rounded-lg p-6 border border-slate-200 mb-6"
         variants={itemVariants}
       >
         {/* Personal Details Tab */}
@@ -390,39 +390,39 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Full Name</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Full Name</p>
                 <p className="font-medium">{[user.firstName, user.middleName, user.lastName].filter(Boolean).join(' ') || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Date of Birth</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Date of Birth</p>
                 <p className="font-medium">{user.dateOfBirth ? formatDate(user.dateOfBirth) : 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Gender</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Gender</p>
                 <p className="font-medium capitalize">{user.gender || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Nationality</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Nationality</p>
                 <p className="font-medium">{user.nationality || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Country of Residence</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Country of Residence</p>
                 <p className="font-medium">{user.countryOfResidence || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Marital Status</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Marital Status</p>
                 <p className="font-medium capitalize">{user.maritalStatus || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Email</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Email</p>
                 <p className="font-medium">{user.email || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Mobile Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Mobile Number</p>
                 <p className="font-medium">{user.mobileNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Alternative Phone</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Alternative Phone</p>
                 <p className="font-medium">{user.alternativePhone || 'N/A'}</p>
               </div>
             </div>
@@ -430,23 +430,23 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4 mt-8">Address Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Home Address</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Home Address</p>
                 <p className="font-medium">{user.homeAddress || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">City</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">City</p>
                 <p className="font-medium capitalize">{user.city || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">State/Province</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">State/Province</p>
                 <p className="font-medium">{user.stateProvince || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Zip/Postal Code</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Zip/Postal Code</p>
                 <p className="font-medium">{user.zipCode || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Country</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Country</p>
                 <p className="font-medium">{user.country || 'N/A'}</p>
               </div>
             </div>
@@ -463,43 +463,43 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4">Account Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Account Type</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Type</p>
                 <p className="font-medium capitalize">{user.accountType || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Account Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Number</p>
                 <p className="font-medium">{user.accountNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Account Name</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Name</p>
                 <p className="font-medium">{user.accountName || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Currency</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Currency</p>
                 <p className="font-medium">{user.currency || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Initial Deposit</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Initial Deposit</p>
                 <p className="font-medium">
                   {user.currency} {typeof user.initialDeposit === 'number' ? user.initialDeposit.toLocaleString() : 'N/A'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Referral Code</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Referral Code</p>
                 <p className="font-medium">{user.referralCode || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Invite Code</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Invite Code</p>
                 <p className="font-medium">{user.inviteCode || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Status</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Status</p>
                 <p className={`font-medium ${user.isActive ? 'text-green-600' : 'text-red-600'}`}>
                   {user.isActive ? 'Active' : 'Inactive'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Last Login</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Last Login</p>
                 <p className="font-medium">{user.lastLogin ? formatDate(user.lastLogin) : 'Never'}</p>
               </div>
             </div>
@@ -516,31 +516,31 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4">Financial Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Source of Income</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Source of Income</p>
                 <p className="font-medium capitalize">{user.sourceOfIncome ? user.sourceOfIncome.replace('_', ' ') : 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Monthly Income Range</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Monthly Income Range</p>
                 <p className="font-medium">{user.monthlyIncomeRange || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Employment Status</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Employment Status</p>
                 <p className="font-medium capitalize">{user.employmentStatus || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Employer Name</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Employer Name</p>
                 <p className="font-medium">{user.employerName || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Occupation</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Occupation</p>
                 <p className="font-medium capitalize">{user.occupation || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Tax Identification Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Tax Identification Number</p>
                 <p className="font-medium">{user.taxIdentificationNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Social Security Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Social Security Number</p>
                 <p className="font-medium">{user.socialSecurityNumber || 'N/A'}</p>
               </div>
             </div>
@@ -548,23 +548,23 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4 mt-8">Bank Account Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Bank Name</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Bank Name</p>
                 <p className="font-medium">{user.bankName || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Bank Address</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Bank Address</p>
                 <p className="font-medium">{user.bankAddress || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">IBAN Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">IBAN Number</p>
                 <p className="font-medium">{user.ibanNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Routing Number</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Routing Number</p>
                 <p className="font-medium">{user.routingNumber || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">SWIFT/BIC</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">SWIFT/BIC</p>
                 <p className="font-medium">{user.swiftBic || 'N/A'}</p>
               </div>
             </div>
@@ -581,29 +581,29 @@ const PersonalInformation = () => {
             <h3 className="text-lg font-bold mb-4">Security Settings</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Two-Factor Authentication</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Two-Factor Authentication</p>
                 <p className={`font-medium ${user.enableTwoFactor ? 'text-green-600' : 'text-red-600'}`}>
                   {user.enableTwoFactor ? 'Enabled' : 'Disabled'}
                 </p>
               </div>
               {user.enableTwoFactor && (
                 <div>
-                  <p className="text-sm text-slate-500 mb-1">Two-Factor Method</p>
+                  <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Two-Factor Method</p>
                   <p className="font-medium capitalize">{user.twoFactorMethod || 'N/A'}</p>
                 </div>
               )}
               <div>
-                <p className="text-sm text-slate-500 mb-1">Account Lock Status</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Lock Status</p>
                 <p className={`font-medium ${user.isLocked ? 'text-red-600' : 'text-green-600'}`}>
                   {user.isLocked ? 'Locked' : 'Unlocked'}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Login Attempts</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Login Attempts</p>
                 <p className="font-medium">{user.loginAttempts ? user.loginAttempts.length : '0'}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Security Question</p>
+                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Security Question</p>
                 <p className="font-medium capitalize">{user.securityQuestion ? user.securityQuestion.replace('_', ' ') : 'N/A'}</p>
               </div>
             </div>
@@ -612,7 +612,7 @@ const PersonalInformation = () => {
               <h3 className="text-lg font-bold mb-4">Account Actions</h3>
               <div className="flex flex-wrap gap-3">
                 <motion.button
-                  className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 rounded-lg flex items-center`}
+                  className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setConfirmAction({ type: 'activate', visible: true })}
@@ -631,7 +631,7 @@ const PersonalInformation = () => {
                 </motion.button>
                 
                 <motion.button
-                  className={`px-4 py-2 ${user.isLocked ? 'bg-green-600' : 'bg-red-600'} text-slate-50 rounded-lg flex items-center`}
+                  className={`px-4 py-2 ${user.isLocked ? 'bg-green-600' : 'bg-red-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setConfirmAction({ type: 'lock', visible: true })}
@@ -650,7 +650,7 @@ const PersonalInformation = () => {
                 </motion.button>
                 
                 <motion.button
-                  className="px-4 py-2 bg-blue-600 text-slate-50 rounded-lg flex items-center"
+                  className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg flex items-center"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 //   onClick={() => navigate(`/admin/users/${id}/reset-password`)}
@@ -675,31 +675,31 @@ const PersonalInformation = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="border border-slate-200 rounded-lg p-4">
                 <h4 className="font-medium mb-3">Government ID</h4>
-                <div className="aspect-video bg-slate-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                   {user.governmentId ? (
                     <img src={user.governmentId} alt="Government ID" className="w-full h-full object-contain" />
                   ) : (
-                    <FileBadge size={48} className="text-slate-400" />
+                    <FileBadge size={48} className="text-slate-400 dark:text-gray-500" />
                   )}
                 </div>
                 <div className="text-sm space-y-2">
-                  <p><span className="text-slate-500">ID Type:</span> {user.idType || 'N/A'}</p>
-                  <p><span className="text-slate-500">ID Number:</span> {user.idNumber || 'N/A'}</p>
-                  <p><span className="text-slate-500">ID Expiry:</span> {user.idExpiryDate ? formatDate(user.idExpiryDate) : 'N/A'}</p>
+                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Type:</span> {user.idType || 'N/A'}</p>
+                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Number:</span> {user.idNumber || 'N/A'}</p>
+                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Expiry:</span> {user.idExpiryDate ? formatDate(user.idExpiryDate) : 'N/A'}</p>
                 </div>
               </div>
               
               <div className="border border-slate-200 rounded-lg p-4">
                 <h4 className="font-medium mb-3">Proof of Address</h4>
-                <div className="aspect-video bg-slate-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                   {user.proofOfAddress ? (
                     <img src={user.proofOfAddress} alt="Proof of Address" className="w-full h-full object-contain" />
                   ) : (
-                    <FileBadge size={48} className="text-slate-400" />
+                    <FileBadge size={48} className="text-slate-400 dark:text-gray-500" />
                   )}
                 </div>
                 <div className="text-sm space-y-2">
-                  <p><span className="text-slate-500">Document Type:</span> {user.addressDocType || 'N/A'}</p>
+                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">Document Type:</span> {user.addressDocType || 'N/A'}</p>
                 </div>
               </div>
             </div>
@@ -707,22 +707,22 @@ const PersonalInformation = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="border border-slate-200 rounded-lg p-4">
                 <h4 className="font-medium mb-3">Selfie with ID</h4>
-                <div className="aspect-video bg-slate-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                   {user.selfieWithId ? (
                     <img src={user.selfieWithId} alt="Selfie with ID" className="w-full h-full object-contain" />
                   ) : (
-                    <User size={48} className="text-slate-400" />
+                    <User size={48} className="text-slate-400 dark:text-gray-500" />
                   )}
                 </div>
               </div>
               
               <div className="border border-slate-200 rounded-lg p-4">
                 <h4 className="font-medium mb-3">Signature</h4>
-                <div className="aspect-video bg-slate-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                   {user.signature ? (
                     <img src={user.signature} alt="Signature" className="w-full h-full object-contain" />
                   ) : (
-                    <FileCheck size={48} className="text-slate-400" />
+                    <FileCheck size={48} className="text-slate-400 dark:text-gray-500" />
                   )}
                 </div>
               </div>
@@ -732,7 +732,7 @@ const PersonalInformation = () => {
               <h3 className="text-lg font-bold mb-4">KYC Status Management</h3>
               <div className="flex flex-wrap gap-3">
                 <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'verified' ? 'bg-slate-400' : 'bg-green-600'} text-slate-50 rounded-lg flex items-center`}
+                  className={`px-4 py-2 ${user.kycStatus === 'verified' ? 'bg-slate-400' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   disabled={user.kycStatus === 'verified'}
@@ -743,7 +743,7 @@ const PersonalInformation = () => {
                 </motion.button>
                 
                 <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'pending' ? 'bg-slate-400' : 'bg-yellow-600'} text-slate-50 rounded-lg flex items-center`}
+                  className={`px-4 py-2 ${user.kycStatus === 'pending' ? 'bg-slate-400' : 'bg-yellow-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   disabled={user.kycStatus === 'pending'}
@@ -754,7 +754,7 @@ const PersonalInformation = () => {
                 </motion.button>
                 
                 <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'rejected' ? 'bg-slate-400' : 'bg-red-600'} text-slate-50 rounded-lg flex items-center`}
+                  className={`px-4 py-2 ${user.kycStatus === 'rejected' ? 'bg-slate-400' : 'bg-red-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   disabled={user.kycStatus === 'rejected'}
@@ -773,7 +773,7 @@ const PersonalInformation = () => {
       {confirmAction && confirmAction.visible && (
         <div className="fixed inset-0 bg-slate-800 bg-opacity-50 flex items-center justify-center z-50">
           <motion.div 
-            className="bg-slate-50 rounded-lg shadow-lg p-6 max-w-md w-full"
+            className="bg-slate-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 max-w-md w-full"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.2 }}
@@ -809,13 +809,13 @@ const PersonalInformation = () => {
             
             <div className="flex justify-end space-x-3">
               <button
-                className="px-4 py-2 bg-slate-200 text-slate-800 rounded hover:bg-slate-300"
+                className="px-4 py-2 bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-300"
                 onClick={() => setConfirmAction(null)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-blue-600 text-slate-50 rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded hover:bg-blue-700"
                 onClick={() => {
                   if (confirmAction.type === 'activate') {
                     handleActivateDeactivate();

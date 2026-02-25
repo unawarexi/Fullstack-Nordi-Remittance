@@ -145,7 +145,7 @@ const InstantPayment: React.FC = () => {
 
   return (
     <motion.div
-      className="p-6 max-w-4xl mx-auto bg-white rounded-2xl shadow-sm"
+      className="p-6 max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800"
       initial="initial"
       animate="in"
       exit="out"
@@ -155,7 +155,7 @@ const InstantPayment: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-indigo-900">Instant Payment</h1>
+          <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">Instant Payment</h1>
           <p className="text-sm text-purple-500">Transfer funds instantly to any account</p>
         </div>
         <div className="flex items-center">
@@ -258,15 +258,15 @@ const InstantPayment: React.FC = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <div className="text-xs text-indigo-500 mb-1">Per Transaction</div>
-                  <div className="text-sm font-semibold text-indigo-900">${limits.instant.perTransaction.toLocaleString()}</div>
+                  <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.instant.perTransaction.toLocaleString()}</div>
                 </div>
                 <div>
                   <div className="text-xs text-indigo-500 mb-1">Daily Limit</div>
-                  <div className="text-sm font-semibold text-indigo-900">${limits.instant.daily.toLocaleString()}</div>
+                  <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.instant.daily.toLocaleString()}</div>
                 </div>
                 <div>
                   <div className="text-xs text-indigo-500 mb-1">Remaining Today</div>
-                  <div className="text-sm font-semibold text-indigo-900">${limits.instant.remaining.toLocaleString()}</div>
+                  <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.instant.remaining.toLocaleString()}</div>
                 </div>
               </div>
             </div>
@@ -289,7 +289,7 @@ const InstantPayment: React.FC = () => {
                 <Form className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1">
-                      <label htmlFor="recipientName" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="recipientName" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Recipient Name
                       </label>
                       <div className="relative">
@@ -312,7 +312,7 @@ const InstantPayment: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="accountNumber" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="accountNumber" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Account Number
                       </label>
                       <div className="relative">
@@ -335,7 +335,7 @@ const InstantPayment: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="bankName" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="bankName" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Bank Name
                       </label>
                       <div className="relative">
@@ -358,7 +358,7 @@ const InstantPayment: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="amount" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="amount" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Amount
                       </label>
                       <div className="relative">
@@ -382,7 +382,7 @@ const InstantPayment: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="description" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="description" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Description (Optional)
                       </label>
                       <div className="relative">
@@ -405,7 +405,7 @@ const InstantPayment: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="securityCode" className="block text-sm font-medium text-indigo-900">
+                      <label htmlFor="securityCode" className="block text-sm font-medium text-indigo-900 dark:text-white">
                         Security Code
                       </label>
                       <div className="relative">
@@ -434,11 +434,11 @@ const InstantPayment: React.FC = () => {
                   {/* Fees and estimated time */}
                   <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Transaction Fee</span>
-                      <span className="text-sm font-medium text-indigo-900">$0.00</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Transaction Fee</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">$0.00</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Estimated Arrival Time</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Estimated Arrival Time</span>
                       <span className="text-sm font-medium text-green-600">Instant</span>
                     </div>
                   </div>
@@ -521,23 +521,23 @@ const InstantPayment: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Transaction ID</span>
-                      <span className="text-sm font-medium text-indigo-900">{transactionId}</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">{transactionId}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Recipient</span>
-                      <span className="text-sm font-medium text-indigo-900">John Smith</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">John Smith</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Amount</span>
-                      <span className="text-sm font-medium text-indigo-900">$1,500.00</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">$1,500.00</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Fee</span>
-                      <span className="text-sm font-medium text-indigo-900">$0.00</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">$0.00</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Date & Time</span>
-                      <span className="text-sm font-medium text-indigo-900">{new Date().toLocaleString()}</span>
+                      <span className="text-sm font-medium text-indigo-900 dark:text-white">{new Date().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-500">Status</span>

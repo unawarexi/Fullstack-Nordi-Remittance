@@ -1,252 +1,347 @@
 // ============================================================================
-// SUPPORT SUB-PAGES — Contact Us, Live Chat, FAQs, Schedule Appointment
+// SUPPORT SUB-PAGES — Contact Us, Live Chat, FAQs, Appointment
+// Dark mode + DashboardPrimitives + grey borders + responsive typography
 // ============================================================================
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Phone, Mail, MessageCircle, MapPin, Clock, Calendar,
-  ChevronDown, ChevronUp, Send, Headphones, HelpCircle,
-  FileText, Video, Search, ExternalLink, CheckCircle2,
+  Phone, Mail, MapPin, MessageCircle, HelpCircle,
+  Calendar, ChevronDown, ChevronUp, Send, Clock,
+  Headphones, Globe, ExternalLink,
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
+import {
+  PageContainer, DashCard,
+} from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants } from "@core/animation/Animation";
 import { useToastStore } from "@store/toast.store";
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+const inputCls =
+  "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
+const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
-// ========================
-// CONTACT US
-// ========================
+/* ═══════ CONTACT US ═══════ */
 export const ContactUs: React.FC = () => {
-  const showToast = useToastStore((s) => s.showToast);
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
-
   const contacts = [
-    { label: "Phone Support", value: "+1 (800) 123-4567", icon: <Phone size={20} />, color: "bg-emerald-50 text-emerald-600", desc: "Mon-Fri 8am-8pm EST" },
-    { label: "Email Support", value: "support@nordi.com", icon: <Mail size={20} />, color: "bg-blue-50 text-blue-600", desc: "Response within 24 hours" },
-    { label: "Live Chat", value: "Available 24/7", icon: <MessageCircle size={20} />, color: "bg-indigo-50 text-indigo-600", desc: "Instant support" },
-    { label: "Branch Locator", value: "Find nearest branch", icon: <MapPin size={20} />, color: "bg-purple-50 text-purple-600", desc: "150+ locations" },
+    { icon: Phone, label: "Phone", value: "+1 (800) 123-4567", desc: "Mon–Fri, 8am–8pm EST", gradient: "from-indigo-500 to-purple-500" },
+    { icon: Mail, label: "Email", value: "support@nordi.com", desc: "We reply within 24 hours", gradient: "from-emerald-500 to-teal-500" },
+    { icon: MapPin, label: "Office", value: "123 Finance Street, NY", desc: "Visit us in person", gradient: "from-amber-500 to-orange-500" },
+    { icon: Globe, label: "Website", value: "www.nordi.com", desc: "Help center & resources", gradient: "from-pink-500 to-rose-500" },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    showToast("Message sent! We'll respond within 24 hours.", "success");
-    setForm({ name: "", email: "", subject: "", message: "" });
-  };
-
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Contact Us" subtitle="We're here to help"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Support", href: "/customer/support" }, { label: "Contact" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Contact Us"
+          subtitle="We're here to help — reach out anytime"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Support", href: "/customer/support" },
+            { label: "Contact" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" variants={containerVariants}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {contacts.map((c) => (
-          <motion.div key={c.label} className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer" variants={itemVariants} whileHover={{ y: -2 }}>
-            <div className={`p-3 rounded-xl ${c.color} w-fit mb-3`}>{c.icon}</div>
-            <h3 className="font-semibold text-gray-900 text-sm">{c.label}</h3>
-            <p className="text-sm text-indigo-600 font-medium mt-1">{c.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
+          <motion.div key={c.label} variants={dashboardItemVariants}>
+            <DashCard className="cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className={`w-12 h-12 bg-gradient-to-br ${c.gradient} rounded-2xl flex items-center justify-center text-white flex-shrink-0`}>
+                  <c.icon size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">{c.label}</h3>
+                  <p className="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400">{c.value}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5">{c.desc}</p>
+                </div>
+              </div>
+            </DashCard>
           </motion.div>
         ))}
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 max-w-2xl" variants={itemVariants}>
-        <h3 className="font-semibold text-indigo-900 mb-4">Send us a Message</h3>
+      <DashCard className="mt-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Send a Message</h3>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Name</label><input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required /></div>
-            <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Email</label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required /></div>
+            <div>
+              <label className={labelCls}>Name</label>
+              <input type="text" placeholder="Your name" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Email</label>
+              <input type="email" placeholder="your@email.com" className={inputCls} />
+            </div>
           </div>
-          <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Subject</label><input type="text" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required /></div>
-          <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Message</label><textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none" required /></div>
-          <motion.button type="submit" className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium flex items-center gap-2" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <div>
+            <label className={labelCls}>Subject</label>
+            <input type="text" placeholder="How can we help?" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Message</label>
+            <textarea rows={4} placeholder="Describe your issue…" className={`${inputCls} resize-none`} />
+          </div>
+          <motion.button
+            className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
             <Send size={16} /> Send Message
           </motion.button>
         </div>
-      </motion.form>
-    </motion.div>
+      </DashCard>
+    </PageContainer>
   );
 };
 
-// ========================
-// LIVE CHAT
-// ========================
+/* ═══════ LIVE CHAT ═══════ */
 export const LiveChat: React.FC = () => {
-  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
-    { id: 1, sender: "bot", text: "Hello! 👋 Welcome to Nordi Support. How can I help you today?", time: "now" },
+    { id: 1, from: "bot", text: "Hello! 👋 I'm Nordi Assistant. How can I help you today?" },
   ]);
+  const [input, setInput] = useState("");
 
-  const quickReplies = ["Check my balance", "Recent transactions", "Report fraud", "Card issues", "Transfer help", "Other"];
-
-  const handleSend = () => {
-    if (!message.trim()) return;
-    setMessages((prev) => [...prev, { id: prev.length + 1, sender: "user", text: message, time: "now" }]);
-    setMessage("");
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { id: prev.length + 1, sender: "bot", text: "Thank you for your message. Let me look into that for you. A support agent will be with you shortly.", time: "now" }]);
-    }, 1000);
+  const send = () => {
+    if (!input.trim()) return;
+    setMessages((p) => [
+      ...p,
+      { id: p.length + 1, from: "user", text: input },
+      { id: p.length + 2, from: "bot", text: "Thanks for your message! A support agent will be with you shortly." },
+    ]);
+    setInput("");
   };
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Live Chat" subtitle="Chat with our support team"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Support", href: "/customer/support" }, { label: "Chat" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Live Chat"
+          subtitle="Chat with our support team in real-time"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Support", href: "/customer/support" },
+            { label: "Live Chat" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="bg-white rounded-xl shadow-sm max-w-2xl overflow-hidden" variants={itemVariants}>
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-xl"><Headphones size={20} className="text-white" /></div>
-          <div><p className="text-white font-semibold text-sm">Nordi Support</p><p className="text-indigo-200 text-xs flex items-center gap-1"><span className="w-2 h-2 bg-emerald-400 rounded-full inline-block" /> Online</p></div>
-        </div>
-
-        <div className="h-80 overflow-y-auto p-4 space-y-3">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${msg.sender === "user" ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-br-md" : "bg-gray-100 text-gray-800 rounded-bl-md"}`}>
-                {msg.text}
-              </div>
+      <div className="max-w-2xl">
+        <DashCard padding="none">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white">
+              <Headphones size={16} />
             </div>
-          ))}
-        </div>
-
-        <div className="p-3 border-t border-gray-100">
-          <div className="flex flex-wrap gap-2 mb-3">
-            {quickReplies.map((qr) => (
-              <button key={qr} onClick={() => setMessage(qr)} className="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors">{qr}</button>
+            <div>
+              <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">Nordi Support</p>
+              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> Online
+              </p>
+            </div>
+          </div>
+          <div className="h-80 sm:h-96 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900/50">
+            {messages.map((m) => (
+              <div key={m.id} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-xs sm:text-sm ${
+                    m.from === "user"
+                      ? "bg-indigo-600 text-white rounded-br-md"
+                      : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-md"
+                  }`}
+                >
+                  {m.text}
+                </div>
+              </div>
             ))}
           </div>
-          <div className="flex gap-2">
-            <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()} placeholder="Type a message..." className="flex-1 px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-            <motion.button onClick={handleSend} className="p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><Send size={18} /></motion.button>
+          <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-800 flex gap-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && send()}
+              placeholder="Type a message…"
+              className={`${inputCls} flex-1`}
+            />
+            <motion.button
+              onClick={send}
+              className="p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Send size={16} />
+            </motion.button>
           </div>
-        </div>
-      </motion.div>
-    </motion.div>
+        </DashCard>
+      </div>
+    </PageContainer>
   );
 };
 
-// ========================
-// FAQs
-// ========================
+/* ═══════ FAQs ═══════ */
 export const FAQs: React.FC = () => {
   const [openId, setOpenId] = useState<number | null>(null);
-  const [search, setSearch] = useState("");
 
   const faqs = [
-    { id: 1, category: "Accounts", q: "How do I open a new account?", a: "You can open a new account by navigating to 'My Accounts' and clicking 'Open New Account'. Choose your preferred account type and follow the guided setup process. Account verification typically takes 1-2 business days." },
-    { id: 2, category: "Transfers", q: "What are the transfer limits?", a: "Daily transfer limits vary by account type: Standard accounts - $5,000/day, Premium - $25,000/day, Business - $100,000/day. International transfers may have additional limits. Contact support for higher limits." },
-    { id: 3, category: "Cards", q: "How do I freeze my card?", a: "Go to 'My Cards' → select the card → 'Card Security' → toggle 'Freeze Card'. Your card will be instantly frozen. You can unfreeze it anytime from the same menu." },
-    { id: 4, category: "Security", q: "What should I do if I suspect fraud?", a: "Immediately freeze your card, change your password, and contact us via Live Chat or call +1 (800) 123-4567. Our fraud team operates 24/7 and will investigate within 24 hours." },
-    { id: 5, category: "Transfers", q: "How long do international transfers take?", a: "Standard international transfers take 1-3 business days. Express transfers can be completed within 2-4 hours for a small additional fee. Transfer times may vary based on the destination country." },
-    { id: 6, category: "Accounts", q: "How do I update my personal information?", a: "Navigate to Profile → Personal Information. You can update your name, address, phone number, and email. Some changes may require identity verification for security purposes." },
-    { id: 7, category: "Loans", q: "What are the loan eligibility requirements?", a: "Eligibility depends on credit score (minimum 650), income verification, employment status, and existing debt ratio. You can check your eligibility by visiting the 'Apply for Loan' page." },
-    { id: 8, category: "Security", q: "How do I enable two-factor authentication?", a: "Go to Security Center → Two-Factor Authentication → Enable. You can choose between authenticator app, SMS, or email verification. We recommend using an authenticator app for the highest security." },
+    { q: "How do I reset my password?", a: "Go to Settings > Security > Change Password, or click 'Forgot Password' on the login page. You'll receive a verification email to reset your password." },
+    { q: "How long do transfers take?", a: "Domestic transfers are usually instant or within 1–2 business hours. International transfers may take 1–3 business days depending on the destination." },
+    { q: "What are the transfer fees?", a: "Domestic transfers are free for amounts under $5,000/month. International transfers have a competitive fee starting at 0.5% of the transfer amount." },
+    { q: "How do I enable two-factor authentication?", a: "Navigate to Settings > Security > Two-Factor Authentication and follow the setup guide. You can use SMS, email, or an authenticator app." },
+    { q: "Can I have multiple accounts?", a: "Yes! You can open multiple savings and current accounts in different currencies. Visit Accounts > Open New Account to get started." },
+    { q: "How do I dispute a transaction?", a: "Contact our support team via Live Chat or call us. You can also go to Transactions, find the transaction, and click 'Report Issue'." },
   ];
 
-  const filtered = faqs.filter((f) => !search || f.q.toLowerCase().includes(search.toLowerCase()) || f.a.toLowerCase().includes(search.toLowerCase()));
-
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="FAQs" subtitle="Frequently asked questions"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Support", href: "/customer/support" }, { label: "FAQs" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="FAQs"
+          subtitle="Find answers to common questions"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Support", href: "/customer/support" },
+            { label: "FAQs" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="bg-white rounded-xl shadow-sm p-4 mb-6 max-w-3xl" variants={itemVariants}>
-        <div className="relative"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" /><input placeholder="Search FAQs..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" /></div>
-      </motion.div>
-
-      <motion.div className="space-y-3 max-w-3xl" variants={containerVariants}>
-        {filtered.map((faq) => (
-          <motion.div key={faq.id} className="bg-white rounded-xl shadow-sm overflow-hidden" variants={itemVariants}>
-            <button onClick={() => setOpenId(openId === faq.id ? null : faq.id)} className="w-full p-5 flex items-center justify-between text-left">
-              <div className="flex items-center gap-3">
-                <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full">{faq.category}</span>
-                <h3 className="font-medium text-gray-900 text-sm">{faq.q}</h3>
+      <div className="max-w-2xl space-y-2">
+        {faqs.map((faq, i) => (
+          <motion.div key={i} variants={dashboardItemVariants}>
+            <DashCard className="cursor-pointer" onClick={() => setOpenId(openId === i ? null : i)}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                    <HelpCircle size={14} />
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{faq.q}</h4>
+                </div>
+                {openId === i ? (
+                  <ChevronUp size={16} className="text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronDown size={16} className="text-gray-400 flex-shrink-0" />
+                )}
               </div>
-              {openId === faq.id ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
-            </button>
-            {openId === faq.id && (
-              <motion.div className="px-5 pb-5 pt-0" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-                <p className="text-sm text-gray-600 leading-relaxed pl-[76px]">{faq.a}</p>
-              </motion.div>
-            )}
+              <AnimatePresence>
+                {openId === i && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                      {faq.a}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </DashCard>
           </motion.div>
         ))}
-      </motion.div>
-    </motion.div>
+      </div>
+    </PageContainer>
   );
 };
 
-// ========================
-// SCHEDULE APPOINTMENT
-// ========================
+/* ═══════ SCHEDULE APPOINTMENT ═══════ */
 export const ScheduleAppointment: React.FC = () => {
-  const showToast = useToastStore((s) => s.showToast);
-  const [form, setForm] = useState({ type: "", date: "", time: "", branch: "", notes: "" });
+  const { showToast } = useToastStore();
+  const [form, setForm] = useState({ date: "", time: "", branch: "", reason: "" });
 
-  const appointmentTypes = [
-    { value: "general", label: "General Inquiry", icon: <HelpCircle size={18} /> },
-    { value: "account", label: "Account Setup", icon: <FileText size={18} /> },
-    { value: "loan", label: "Loan Consultation", icon: <FileText size={18} /> },
-    { value: "investment", label: "Investment Advisory", icon: <FileText size={18} /> },
-    { value: "video", label: "Video Call", icon: <Video size={18} /> },
-  ];
-
-  const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm((p) => ({ ...p, [key]: e.target.value }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    showToast("Appointment scheduled! You'll receive a confirmation email.", "success");
+    if (!form.date || !form.time) {
+      showToast("Please select date and time", "error");
+      return;
+    }
+    showToast("Appointment scheduled successfully!", "success");
+    setForm({ date: "", time: "", branch: "", reason: "" });
   };
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Schedule Appointment" subtitle="Book a meeting with our advisors"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Support", href: "/customer/support" }, { label: "Appointment" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Schedule Appointment"
+          subtitle="Book a visit to your nearest branch"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Support", href: "/customer/support" },
+            { label: "Appointment" },
+          ]}
+        />
       </motion.div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <motion.div className="bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-4">Appointment Type</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {appointmentTypes.map((type) => (
-              <button key={type.value} type="button" onClick={() => setForm({ ...form, type: type.value })}
-                className={`p-3 rounded-xl border-2 text-left transition-all ${form.type === type.value ? "border-indigo-500 bg-indigo-50" : "border-transparent bg-gray-50 hover:bg-gray-100"}`}>
-                <div className="text-indigo-600 mb-2">{type.icon}</div>
-                <p className="text-sm font-medium text-gray-900">{type.label}</p>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div className="bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-4">Date & Time</h3>
-          <div className="space-y-4">
-            <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Preferred Date</label><input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required /></div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">Time Slot</label>
-              <div className="grid grid-cols-4 gap-2">
-                {timeSlots.map((slot) => (
-                  <button key={slot} type="button" onClick={() => setForm({ ...form, time: slot })}
-                    className={`py-2 px-3 rounded-lg text-xs font-medium transition-colors ${form.time === slot ? "bg-indigo-600 text-white" : "bg-gray-50 text-gray-700 hover:bg-gray-100"}`}>{slot}</button>
-                ))}
+      <div className="max-w-2xl">
+        <DashCard>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Date</label>
+                <input type="date" value={form.date} onChange={set("date")} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Time</label>
+                <select value={form.time} onChange={set("time")} className={inputCls}>
+                  <option value="">Select time</option>
+                  {["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"].map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
             </div>
-            <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Additional Notes</label><textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none" placeholder="Describe what you'd like to discuss..." /></div>
-          </div>
-        </motion.div>
+            <div>
+              <label className={labelCls}>Branch</label>
+              <select value={form.branch} onChange={set("branch")} className={inputCls}>
+                <option value="">Select branch</option>
+                <option value="ny">New York — Main Branch</option>
+                <option value="la">Los Angeles — Downtown</option>
+                <option value="ch">Chicago — Loop Office</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Reason for Visit</label>
+              <textarea
+                rows={3}
+                value={form.reason}
+                onChange={set("reason")}
+                placeholder="Briefly describe your purpose…"
+                className={`${inputCls} resize-none`}
+              />
+            </div>
+            <motion.button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              <Calendar size={16} /> Schedule Appointment
+            </motion.button>
+          </form>
+        </DashCard>
 
-        <motion.button type="submit" className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium shadow-md flex items-center gap-2" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} variants={itemVariants}>
-          <Calendar size={16} /> Schedule Appointment
-        </motion.button>
-      </form>
-    </motion.div>
+        <DashCard className="mt-6">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+              <Clock size={18} />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-900 dark:text-white">Branch Hours</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Monday – Friday: 9:00 AM – 5:00 PM<br />
+                Saturday: 9:00 AM – 1:00 PM<br />
+                Sunday & Holidays: Closed
+              </p>
+            </div>
+          </div>
+        </DashCard>
+      </div>
+    </PageContainer>
   );
 };

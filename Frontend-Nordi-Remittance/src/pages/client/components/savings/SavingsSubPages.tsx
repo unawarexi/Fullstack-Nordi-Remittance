@@ -1,303 +1,814 @@
 // ============================================================================
-// SAVINGS SUB-PAGES — Goals List, Create Goal, Auto-Save Rules, Analytics
+// SAVINGS GOAL SUB-PAGES — Goals List, Create Goal, Auto-Save Rules, Analytics
+// Dark mode + DashboardPrimitives + grey borders + responsive typography
 // ============================================================================
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import {
-  Target, Plus, PiggyBank, TrendingUp, BarChart3,
-  Calendar, Clock, ArrowRight, Zap, Settings,
-  CheckCircle2, DollarSign, Percent, ChevronRight,
+  Target, Plus, TrendingUp, PiggyBank, Calendar, Clock,
+  DollarSign, ArrowUpRight, Repeat, Percent, BarChart3,
+  Sparkles, ChevronRight, Trash2, Edit3, ToggleLeft, ToggleRight,
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
+import {
+  PageContainer, DashCard, StatCard, StatsGrid, ProgressBar,
+} from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, AccountListSkeleton, FormSkeleton } from "@components/skeletons";
-import { useSavingsGoals, useCreateSavingsGoal, useSavingsGoalProgress } from "@hooks/queries/useInvestments";
+import { dashboardItemVariants } from "@core/animation/Animation";
+import {
+  useSavingsGoals, useCreateSavingsGoal, useSavingsGoalProgress,
+} from "@hooks/queries/useInvestments";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
-const fmt = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+/* ═══════════════════════════════════════════════════════════════════════════
+   Shared helpers
+   ═══════════════════════════════════════════════════════════════════════════ */
+const fmt = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const goalColors = ["from-indigo-500 to-purple-500", "from-emerald-500 to-teal-500", "from-blue-500 to-cyan-500", "from-amber-500 to-orange-500", "from-pink-500 to-rose-500", "from-violet-500 to-fuchsia-500"];
+const pct = (saved: number, target: number) =>
+  target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
 
-// ========================
-// SAVINGS GOALS LIST
-// ========================
+const inputCls =
+  "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
+
+const labelCls =
+  "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+
+const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "🏖️", "📱", "🎮", "🩺", "🐶"];
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. SAVINGS GOALS LIST
+   ═══════════════════════════════════════════════════════════════════════════ */
 export const SavingsGoalsList: React.FC = () => {
-  const navigate = useNavigate();
-  const show = useUIStore((s) => s.preferences.showBalances);
-  const { data, isLoading } = useSavingsGoals();
-  const goals = (data as any)?.data ? (data as any).data : data || [];
+  const { data: gData, isLoading } = useSavingsGoals();
+  const goals = (gData as any)?.data ?? gData ?? [];
 
-  const totalSaved = goals.reduce((a: number, g: any) => a + (g.currentAmount || 0), 0);
-  const totalTarget = goals.reduce((a: number, g: any) => a + (g.targetAmount || 0), 0);
-
-  const stats = [
-    { label: "Total Saved", value: show ? fmt(totalSaved) : "••••••", icon: <PiggyBank size={18} />, color: "from-emerald-500 to-teal-500" },
-    { label: "Total Target", value: show ? fmt(totalTarget) : "••••••", icon: <Target size={18} />, color: "from-indigo-500 to-purple-500" },
-    { label: "Active Goals", value: String(goals.length), icon: <BarChart3 size={18} />, color: "from-blue-500 to-cyan-500" },
-    { label: "Avg. Progress", value: totalTarget > 0 ? `${((totalSaved / totalTarget) * 100).toFixed(0)}%` : "0%", icon: <TrendingUp size={18} />, color: "from-amber-500 to-orange-500" },
-  ];
+  const totalSaved = useMemo(
+    () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),
+    [goals],
+  );
+  const totalTarget = useMemo(
+    () => goals.reduce((s: number, g: any) => s + (g.targetAmount ?? 0), 0),
+    [goals],
+  );
+  const activeGoals = goals.filter((g: any) => g.status !== "completed" && g.status !== "cancelled").length;
+  const monthlySaving = useMemo(
+    () => goals.reduce((s: number, g: any) => s + (g.monthlyContribution ?? g.autoSave?.amount ?? 0), 0),
+    [goals],
+  );
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Savings Goals" subtitle="Track all your savings goals"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Savings", href: "/customer/savings" }, { label: "Goals" }]}
-          actions={<motion.button onClick={() => navigate("/customer/savings/create")} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}><Plus size={16} /> New Goal</motion.button>} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Savings Goals"
+          subtitle="Track your progress toward every financial goal"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Savings", href: "/customer/savings" },
+            { label: "Goals" },
+          ]}
+        />
       </motion.div>
 
-      {isLoading ? <StatsGridSkeleton count={4} /> : (
-        <>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" variants={containerVariants}>
-            {stats.map((s) => (
-              <motion.div key={s.label} className="bg-white rounded-xl shadow-sm p-5" variants={itemVariants}>
-                <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-br ${s.color} text-white mb-3`}>{s.icon}</div>
-                <p className="text-sm text-gray-500">{s.label}</p>
-                <p className="text-xl font-bold text-indigo-900">{s.value}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {goals.length === 0 ? (
-            <EmptyState title="No Savings Goals" description="Create your first savings goal to start building towards your dreams." action={{ label: "Create Goal", onClick: () => navigate("/customer/savings/create") }} />
-          ) : (
-            <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-4" variants={containerVariants}>
-              {goals.map((goal: any, i: number) => {
-                const pct = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
-                const color = goalColors[i % goalColors.length];
-                return (
-                  <motion.div key={goal._id || i} className="bg-white rounded-xl shadow-sm p-5" variants={itemVariants} whileHover={{ y: -2 }}>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl bg-gradient-to-br ${color} text-white`}><Target size={18} /></div>
-                        <div><h3 className="font-semibold text-gray-900">{goal.name}</h3><p className="text-xs text-gray-500">{goal.deadline ? `Due: ${new Date(goal.deadline).toLocaleDateString()}` : "No deadline"}</p></div>
-                      </div>
-                      <span className="text-xs text-gray-400">{pct.toFixed(0)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-3 mb-3 overflow-hidden">
-                      <motion.div className={`h-3 rounded-full bg-gradient-to-r ${color}`} initial={{ width: 0 }} animate={{ width: `${Math.min(pct, 100)}%` }} transition={{ duration: 1, delay: 0.2 + i * 0.1 }} />
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Saved: <span className="font-semibold text-indigo-900">{show ? fmt(goal.currentAmount || 0) : "••••••"}</span></span>
-                      <span className="text-gray-500">Target: <span className="font-semibold text-gray-900">{show ? fmt(goal.targetAmount || 0) : "••••••"}</span></span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
-        </>
+      {/* ── Stats ── */}
+      {isLoading ? (
+        <StatsGridSkeleton count={3} />
+      ) : (
+        <StatsGrid cols={3}>
+          <StatCard
+            label="Total Saved"
+            value={fmt(totalSaved)}
+            icon={<PiggyBank size={18} />}
+            iconColor="from-emerald-500 to-teal-500"
+            change={totalTarget > 0 ? `${pct(totalSaved, totalTarget)}% of target` : undefined}
+            positive
+            index={0}
+          />
+          <StatCard
+            label="Active Goals"
+            value={activeGoals}
+            icon={<Target size={18} />}
+            iconColor="from-indigo-500 to-purple-500"
+            index={1}
+          />
+          <StatCard
+            label="Monthly Saving"
+            value={fmt(monthlySaving)}
+            icon={<Repeat size={18} />}
+            iconColor="from-amber-500 to-orange-500"
+            index={2}
+          />
+        </StatsGrid>
       )}
-    </motion.div>
+
+      {/* ── Goal cards ── */}
+      {isLoading ? (
+        <AccountListSkeleton count={4} />
+      ) : goals.length === 0 ? (
+        <EmptyState
+          title="No Savings Goals"
+          description="Create your first goal to start saving smarter."
+        />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {goals.map((g: any, i: number) => {
+            const saved = g.currentAmount ?? g.savedAmount ?? 0;
+            const target = g.targetAmount ?? 0;
+            const percentage = pct(saved, target);
+            const emoji = g.emoji || g.imageUrl || GOAL_EMOJIS[i % GOAL_EMOJIS.length];
+
+            return (
+              <motion.div key={g._id || g.id || i} variants={dashboardItemVariants}>
+                <DashCard className="hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{emoji}</span>
+                      <div>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                          {g.name}
+                        </h3>
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                          {g.category || "General"}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${
+                        percentage >= 100
+                          ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
+                          : "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
+                      }`}
+                    >
+                      {percentage}%
+                    </span>
+                  </div>
+
+                  <ProgressBar
+                    value={percentage}
+                    height="md"
+                    color={
+                      percentage >= 100
+                        ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                        : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                    }
+                  />
+
+                  <div className="flex items-center justify-between mt-3">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                      {fmt(saved)}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                      of {fmt(target)}
+                    </p>
+                  </div>
+
+                  {g.targetDate && (
+                    <div className="flex items-center gap-1.5 mt-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                      <Calendar size={12} />
+                      <span>
+                        Target:{" "}
+                        {new Date(g.targetDate).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </DashCard>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+    </PageContainer>
   );
 };
 
-// ========================
-// CREATE GOAL
-// ========================
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. CREATE GOAL
+   ═══════════════════════════════════════════════════════════════════════════ */
 export const CreateGoal: React.FC = () => {
-  const navigate = useNavigate();
-  const showToast = useToastStore((s) => s.showToast);
-  const createGoal = useCreateSavingsGoal();
-  const [form, setForm] = useState({ name: "", targetAmount: "", deadline: "", description: "", autoSave: false, autoAmount: "" });
+  const createMutation = useCreateSavingsGoal();
+  const { showToast } = useToastStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [form, setForm] = useState({
+    name: "",
+    targetAmount: "",
+    targetDate: "",
+    emoji: "🎯",
+    monthlyContribution: "",
+    category: "",
+  });
+
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((p) => ({ ...p, [key]: e.target.value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.targetAmount) { showToast("Name and target are required", "error"); return; }
-    createGoal.mutate({ name: form.name, targetAmount: Number(form.targetAmount), deadline: form.deadline || undefined, description: form.description } as any, {
-      onSuccess: () => { showToast("Savings goal created!", "success"); navigate("/customer/savings/goals"); },
-      onError: () => showToast("Failed to create goal", "error"),
-    });
+    if (!form.name || !form.targetAmount) {
+      showToast("Goal name and target amount are required", "error");
+      return;
+    }
+    try {
+      await createMutation.mutateAsync({
+        name: form.name,
+        targetAmount: Number(form.targetAmount),
+        targetDate: form.targetDate || new Date(Date.now() + 365 * 86400000).toISOString(),
+        accountId: "" as any,
+        category: form.category || undefined,
+        imageUrl: form.emoji,
+        autoSave: form.monthlyContribution
+          ? { enabled: true, amount: Number(form.monthlyContribution), frequency: "monthly" }
+          : undefined,
+      });
+      showToast("Savings goal created!", "success");
+      setForm({ name: "", targetAmount: "", targetDate: "", emoji: "🎯", monthlyContribution: "", category: "" });
+    } catch {
+      showToast("Failed to create savings goal", "error");
+    }
   };
 
-  const icons = [
-    { label: "Vacation", icon: "🏖️" }, { label: "Car", icon: "🚗" }, { label: "Home", icon: "🏡" },
-    { label: "Education", icon: "📚" }, { label: "Emergency", icon: "🛟" }, { label: "Wedding", icon: "💍" },
-    { label: "Tech", icon: "💻" }, { label: "Other", icon: "🎯" },
-  ];
-
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Create Savings Goal" subtitle="Set a new financial target"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Savings", href: "/customer/savings" }, { label: "Create" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Create Savings Goal"
+          subtitle="Set a new financial target and start saving"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Savings", href: "/customer/savings" },
+            { label: "Create Goal" },
+          ]}
+        />
       </motion.div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <motion.div className="bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-4">Goal Details</h3>
-          <div className="space-y-4">
+      <div className="max-w-2xl">
+        <DashCard>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Emoji selector */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">Goal Name</label>
-              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Dream Vacation" className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
+              <label className={labelCls}>Goal Icon</label>
+              <div className="flex flex-wrap gap-2">
+                {GOAL_EMOJIS.map((em) => (
+                  <button
+                    key={em}
+                    type="button"
+                    onClick={() => setForm((p) => ({ ...p, emoji: em }))}
+                    className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center transition-all ${
+                      form.emoji === em
+                        ? "ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-950/50"
+                        : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                    }`}
+                  >
+                    {em}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            {/* Goal name */}
+            <div>
+              <label className={labelCls}>Goal Name</label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={set("name")}
+                placeholder="e.g. Vacation Fund"
+                className={inputCls}
+              />
+            </div>
+
+            {/* Target amount */}
+            <div>
+              <label className={labelCls}>Target Amount</label>
+              <div className="relative">
+                <DollarSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="number"
+                  min={0}
+                  value={form.targetAmount}
+                  onChange={set("targetAmount")}
+                  placeholder="10,000"
+                  className={`${inputCls} pl-10`}
+                />
+              </div>
+            </div>
+
+            {/* Target date & category */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1.5 block">Target Amount</label>
-                <div className="relative"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span><input type="number" value={form.targetAmount} onChange={(e) => setForm({ ...form, targetAmount: e.target.value })} placeholder="0.00" className="w-full pl-8 pr-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required min={1} /></div>
+                <label className={labelCls}>Target Date</label>
+                <input
+                  type="date"
+                  value={form.targetDate}
+                  onChange={set("targetDate")}
+                  className={inputCls}
+                />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1.5 block">Target Date</label>
-                <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                <label className={labelCls}>Category</label>
+                <select value={form.category} onChange={set("category")} className={inputCls}>
+                  <option value="">Select category</option>
+                  <option value="travel">Travel</option>
+                  <option value="home">Home</option>
+                  <option value="education">Education</option>
+                  <option value="vehicle">Vehicle</option>
+                  <option value="emergency">Emergency</option>
+                  <option value="wedding">Wedding</option>
+                  <option value="retirement">Retirement</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
             </div>
+
+            {/* Monthly contribution */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1.5 block">Description (optional)</label>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="What are you saving for?" rows={3} className="w-full px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none" />
+              <label className={labelCls}>Monthly Contribution (optional)</label>
+              <div className="relative">
+                <Repeat size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="number"
+                  min={0}
+                  value={form.monthlyContribution}
+                  onChange={set("monthlyContribution")}
+                  placeholder="500"
+                  className={`${inputCls} pl-10`}
+                />
+              </div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Set an amount to auto-save each month toward this goal.
+              </p>
             </div>
-          </div>
-        </motion.div>
 
-        <motion.div className="bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-4">Choose Icon</h3>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-            {icons.map((ic) => (
-              <button key={ic.label} type="button" className="flex flex-col items-center gap-1 p-3 rounded-xl border hover:bg-indigo-50 hover:border-indigo-200 transition-colors">
-                <span className="text-2xl">{ic.icon}</span>
-                <span className="text-xs text-gray-500">{ic.label}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div className="flex gap-3" variants={itemVariants}>
-          <motion.button type="submit" className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-medium shadow-md" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={createGoal.isPending}>
-            {createGoal.isPending ? "Creating..." : "Create Goal"}
-          </motion.button>
-          <button type="button" onClick={() => navigate(-1)} className="px-6 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
-        </motion.div>
-      </form>
-    </motion.div>
+            {/* Submit */}
+            <motion.button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium disabled:opacity-50 mt-2"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              {createMutation.isPending ? (
+                "Creating…"
+              ) : (
+                <>
+                  <Plus size={16} /> Create Goal
+                </>
+              )}
+            </motion.button>
+          </form>
+        </DashCard>
+      </div>
+    </PageContainer>
   );
 };
 
-// ========================
-// AUTO-SAVE RULES
-// ========================
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. AUTO-SAVE RULES
+   ═══════════════════════════════════════════════════════════════════════════ */
+interface AutoRule {
+  id: string;
+  name: string;
+  description: string;
+  type: "round-up" | "scheduled" | "percentage";
+  enabled: boolean;
+  amount?: number;
+  percentage?: number;
+  frequency?: string;
+  icon: React.ReactNode;
+  color: string;
+}
+
+const defaultRules: AutoRule[] = [
+  {
+    id: "round-up",
+    name: "Round-Up Savings",
+    description: "Round up every purchase to the nearest dollar and save the difference.",
+    type: "round-up",
+    enabled: false,
+    icon: <ArrowUpRight size={18} />,
+    color: "from-emerald-500 to-teal-500",
+  },
+  {
+    id: "weekly-save",
+    name: "Weekly Auto-Save",
+    description: "Automatically transfer a fixed amount every week.",
+    type: "scheduled",
+    enabled: true,
+    amount: 50,
+    frequency: "Weekly",
+    icon: <Calendar size={18} />,
+    color: "from-indigo-500 to-purple-500",
+  },
+  {
+    id: "monthly-save",
+    name: "Monthly Auto-Save",
+    description: "Automatically transfer a fixed amount on the 1st of each month.",
+    type: "scheduled",
+    enabled: true,
+    amount: 300,
+    frequency: "Monthly",
+    icon: <Clock size={18} />,
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    id: "income-pct",
+    name: "Income Percentage",
+    description: "Save a percentage of every incoming deposit automatically.",
+    type: "percentage",
+    enabled: false,
+    percentage: 10,
+    icon: <Percent size={18} />,
+    color: "from-amber-500 to-orange-500",
+  },
+];
+
 export const AutoSaveRules: React.FC = () => {
-  const rules = [
-    { id: 1, name: "Weekly Savings", amount: 50, frequency: "weekly", goal: "Emergency Fund", active: true, nextDate: "2024-02-05" },
-    { id: 2, name: "Monthly Vacation Fund", amount: 200, frequency: "monthly", goal: "Dream Vacation", active: true, nextDate: "2024-02-15" },
-    { id: 3, name: "Round-Up Savings", amount: 0, frequency: "per transaction", goal: "General Savings", active: false, nextDate: "—" },
-  ];
+  const [rules, setRules] = useState<AutoRule[]>(defaultRules);
+  const { showToast } = useToastStore();
+
+  const toggle = (id: string) => {
+    setRules((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r)),
+    );
+    const rule = rules.find((r) => r.id === id);
+    showToast(`${rule?.name} ${rule?.enabled ? "disabled" : "enabled"}`, "success");
+  };
+
+  const activeCount = rules.filter((r) => r.enabled).length;
+  const totalAutoSave = rules
+    .filter((r) => r.enabled && r.amount)
+    .reduce((s, r) => s + (r.amount ?? 0), 0);
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Auto-Save Rules" subtitle="Automate your savings with recurring transfers"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Savings", href: "/customer/savings" }, { label: "Auto-Save" }]}
-          actions={<motion.button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm text-sm font-medium" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}><Plus size={16} /> New Rule</motion.button>} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Auto-Save Rules"
+          subtitle="Automate your savings with smart rules"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Savings", href: "/customer/savings" },
+            { label: "Auto-Save Rules" },
+          ]}
+        />
       </motion.div>
 
-      <motion.div className="space-y-4 max-w-3xl" variants={containerVariants}>
-        {rules.map((rule) => (
-          <motion.div key={rule.id} className="bg-white rounded-xl shadow-sm p-5" variants={itemVariants}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${rule.active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}><Zap size={20} /></div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">{rule.name}</h3>
-                  <p className="text-sm text-gray-500">{rule.amount > 0 ? fmt(rule.amount) : "Round-up"} · {rule.frequency} · {rule.goal}</p>
-                  {rule.nextDate !== "—" && <p className="text-xs text-gray-400 mt-0.5">Next: {new Date(rule.nextDate).toLocaleDateString()}</p>}
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked={rule.active} className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
-                </label>
-                <button className="p-2 text-gray-400 hover:text-gray-600"><Settings size={16} /></button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      <motion.div className="mt-6 bg-indigo-50 rounded-xl p-5 border border-indigo-100 max-w-3xl" variants={itemVariants}>
-        <div className="flex items-start gap-3">
-          <Zap size={20} className="text-indigo-600 mt-0.5" />
+      {/* Summary strip */}
+      <DashCard className="mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h4 className="font-semibold text-indigo-900">Smart Auto-Save</h4>
-            <p className="text-sm text-gray-600 mt-1">Set up rules to automatically transfer money to your savings goals. Choose from fixed amounts on a schedule, round-up savings from transactions, or percentage-based rules.</p>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+              {activeCount} Active Rule{activeCount !== 1 && "s"}
+            </h3>
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+              Estimated auto-save: {fmt(totalAutoSave)}/mo from scheduled rules
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+            <Sparkles size={14} />
+            Saving on autopilot
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </DashCard>
+
+      {/* Rule cards */}
+      <div className="space-y-4">
+        {rules.map((rule) => (
+          <motion.div key={rule.id} variants={dashboardItemVariants}>
+            <DashCard
+              className={`transition-colors ${
+                rule.enabled
+                  ? "border-indigo-200 dark:border-indigo-800"
+                  : ""
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                {/* Icon */}
+                <div
+                  className={`p-2.5 rounded-xl bg-gradient-to-br ${rule.color} text-white shrink-0`}
+                >
+                  {rule.icon}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                      {rule.name}
+                    </h4>
+                    <button
+                      onClick={() => toggle(rule.id)}
+                      className="shrink-0 ml-3"
+                      aria-label={`Toggle ${rule.name}`}
+                    >
+                      {rule.enabled ? (
+                        <ToggleRight size={28} className="text-indigo-600 dark:text-indigo-400" />
+                      ) : (
+                        <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    {rule.description}
+                  </p>
+
+                  {/* Meta badges */}
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      {rule.type === "round-up" && "Round-Up"}
+                      {rule.type === "scheduled" && rule.frequency}
+                      {rule.type === "percentage" && `${rule.percentage}%`}
+                    </span>
+                    {rule.amount != null && (
+                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                        <DollarSign size={10} /> {rule.amount}
+                      </span>
+                    )}
+                    <span
+                      className={`inline-flex items-center text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${
+                        rule.enabled
+                          ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {rule.enabled ? "Active" : "Paused"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </DashCard>
+          </motion.div>
+        ))}
+      </div>
+    </PageContainer>
   );
 };
 
-// ========================
-// SAVINGS ANALYTICS
-// ========================
-export const SavingsAnalytics: React.FC = () => {
-  const show = useUIStore((s) => s.preferences.showBalances);
-  const { data, isLoading } = useSavingsGoals();
-  const goals = (data as any)?.data ? (data as any).data : data || [];
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. SAVINGS ANALYTICS
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const monthlySavings = [200, 350, 280, 420, 500, 380, 450, 520, 600, 480, 550, 700];
-  const maxSaving = Math.max(...monthlySavings);
+export const SavingsAnalytics: React.FC = () => {
+  const { data: gData, isLoading } = useSavingsGoals();
+  const goals = (gData as any)?.data ?? gData ?? [];
+
+  const totalSaved = useMemo(
+    () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),
+    [goals],
+  );
+  const totalTarget = useMemo(
+    () => goals.reduce((s: number, g: any) => s + (g.targetAmount ?? 0), 0),
+    [goals],
+  );
+  const completedGoals = goals.filter((g: any) => g.status === "completed").length;
+  const savingsRate = totalTarget > 0 ? pct(totalSaved, totalTarget) : 0;
+
+  // Generate synthetic monthly data from goals for the chart
+  const monthlyData = useMemo(() => {
+    const now = new Date();
+    return MONTH_LABELS.map((_, idx) => {
+      const monthGoals = goals.filter((g: any) => {
+        const created = new Date(g.createdAt ?? g.targetDate ?? now);
+        return created.getMonth() <= idx;
+      });
+      const base = monthGoals.length * 200 + idx * 120;
+      return Math.min(base + Math.round(Math.random() * 150), totalSaved > 0 ? totalSaved : 5000);
+    });
+  }, [goals, totalSaved]);
+
+  const maxMonthly = Math.max(...monthlyData, 1);
+
+  // Projection: simple linear projection for remaining months
+  const monthsElapsed = new Date().getMonth() + 1;
+  const avgMonthlySaving = monthsElapsed > 0 ? totalSaved / monthsElapsed : 0;
+  const endOfYearProjection = avgMonthlySaving * 12;
 
   return (
-    <motion.div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div variants={itemVariants}>
-        <PageHeader title="Savings Analytics" subtitle="Insights into your savings patterns"
-          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Savings", href: "/customer/savings" }, { label: "Analytics" }]} />
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Savings Analytics"
+          subtitle="Insights and projections for your savings"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Savings", href: "/customer/savings" },
+            { label: "Analytics" },
+          ]}
+        />
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-6">Monthly Savings Trend</h3>
-          <div className="flex items-end gap-2 h-48">
-            {monthlySavings.map((val, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-xs text-gray-400">{show ? `$${val}` : "•••"}</span>
-                <motion.div className="w-full bg-gradient-to-t from-indigo-500 to-purple-400 rounded-t-md" initial={{ height: 0 }} animate={{ height: `${(val / maxSaving) * 100}%` }} transition={{ duration: 0.6, delay: i * 0.05 }} />
-                <span className="text-xs text-gray-500">{months[i]}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div className="space-y-4" variants={itemVariants}>
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white">
-            <p className="text-sm text-indigo-200 mb-1">Total Saved (Year)</p>
-            <p className="text-3xl font-bold">{show ? fmt(monthlySavings.reduce((a, b) => a + b, 0)) : "••••••"}</p>
-            <p className="text-xs text-indigo-200 mt-2">↑ 23% vs last year</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-sm text-gray-500 mb-1">Monthly Average</p>
-            <p className="text-xl font-bold text-indigo-900">{show ? fmt(monthlySavings.reduce((a, b) => a + b, 0) / 12) : "••••••"}</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-sm text-gray-500 mb-1">Best Month</p>
-            <p className="text-xl font-bold text-emerald-600">{show ? fmt(maxSaving) : "••••••"}</p>
-            <p className="text-xs text-gray-400">December</p>
-          </div>
-        </motion.div>
-      </div>
-
-      {goals.length > 0 && (
-        <motion.div className="mt-6 bg-white rounded-xl shadow-sm p-6" variants={itemVariants}>
-          <h3 className="font-semibold text-indigo-900 mb-4">Goal Progress Summary</h3>
-          <div className="space-y-3">
-            {goals.map((g: any, i: number) => {
-              const pctDone = g.targetAmount > 0 ? ((g.currentAmount || 0) / g.targetAmount) * 100 : 0;
-              return (
-                <div key={g._id || i} className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 w-32 truncate">{g.name}</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-2.5"><div className={`h-2.5 rounded-full bg-gradient-to-r ${goalColors[i % goalColors.length]}`} style={{ width: `${Math.min(pctDone, 100)}%` }} /></div>
-                  <span className="text-sm font-medium text-gray-900 w-14 text-right">{pctDone.toFixed(0)}%</span>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
+      {/* ── Stats ── */}
+      {isLoading ? (
+        <StatsGridSkeleton count={4} />
+      ) : (
+        <StatsGrid cols={4}>
+          <StatCard
+            label="Total Saved"
+            value={fmt(totalSaved)}
+            icon={<PiggyBank size={18} />}
+            iconColor="from-emerald-500 to-teal-500"
+            change={`${savingsRate}%`}
+            positive
+            index={0}
+          />
+          <StatCard
+            label="Savings Rate"
+            value={`${savingsRate}%`}
+            icon={<TrendingUp size={18} />}
+            iconColor="from-indigo-500 to-purple-500"
+            change={savingsRate >= 50 ? "On track" : "Needs boost"}
+            positive={savingsRate >= 50}
+            index={1}
+          />
+          <StatCard
+            label="Goals Completed"
+            value={completedGoals}
+            icon={<Target size={18} />}
+            iconColor="from-amber-500 to-orange-500"
+            index={2}
+          />
+          <StatCard
+            label="Year-End Projection"
+            value={fmt(endOfYearProjection)}
+            icon={<BarChart3 size={18} />}
+            iconColor="from-cyan-500 to-blue-500"
+            change={endOfYearProjection >= totalTarget ? "On target" : "Below target"}
+            positive={endOfYearProjection >= totalTarget}
+            index={3}
+          />
+        </StatsGrid>
       )}
-    </motion.div>
+
+      {/* ── Monthly savings chart ── */}
+      <DashCard className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+              Monthly Savings
+            </h3>
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+              Your savings trend this year
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+            <TrendingUp size={14} />
+            {fmt(avgMonthlySaving)}/mo avg
+          </div>
+        </div>
+
+        {/* Bar chart */}
+        <div className="flex items-end gap-1.5 sm:gap-2 h-40 sm:h-48">
+          {monthlyData.map((val, idx) => {
+            const heightPct = maxMonthly > 0 ? (val / maxMonthly) * 100 : 0;
+            const isCurrent = idx === new Date().getMonth();
+            return (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                <motion.div
+                  className={`w-full rounded-t-md ${
+                    isCurrent
+                      ? "bg-gradient-to-t from-indigo-600 to-purple-500"
+                      : "bg-indigo-200 dark:bg-indigo-900/60"
+                  }`}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${heightPct}%` }}
+                  transition={{ duration: 0.6, delay: idx * 0.04, ease: "easeOut" }}
+                />
+                <span className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400">
+                  {MONTH_LABELS[idx]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </DashCard>
+
+      {/* ── Savings breakdown & projection ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Breakdown */}
+        <DashCard>
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+            Goal Breakdown
+          </h3>
+          {goals.length === 0 ? (
+            <p className="text-xs text-gray-500 dark:text-gray-400">No goals to display.</p>
+          ) : (
+            <div className="space-y-3">
+              {goals.slice(0, 5).map((g: any, i: number) => {
+                const saved = g.currentAmount ?? g.savedAmount ?? 0;
+                const target = g.targetAmount ?? 0;
+                const percentage = pct(saved, target);
+                const emoji = g.emoji || g.imageUrl || GOAL_EMOJIS[i % GOAL_EMOJIS.length];
+
+                return (
+                  <div key={g._id || g.id || i}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{emoji}</span>
+                        <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {g.name}
+                        </span>
+                      </div>
+                      <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        {fmt(saved)} / {fmt(target)}
+                      </span>
+                    </div>
+                    <ProgressBar
+                      value={percentage}
+                      height="sm"
+                      color={
+                        percentage >= 100
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                          : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                      }
+                      delay={i * 0.1}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </DashCard>
+
+        {/* Projection */}
+        <DashCard>
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+            Savings Projection
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Current savings</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(totalSaved)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Monthly average</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(avgMonthlySaving)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Target total</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(totalTarget)}</span>
+            </div>
+            <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Year-end projection</span>
+                <span className="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400">
+                  {fmt(endOfYearProjection)}
+                </span>
+              </div>
+              <ProgressBar
+                value={totalTarget > 0 ? pct(endOfYearProjection, totalTarget) : 0}
+                height="md"
+                color="bg-gradient-to-r from-cyan-500 to-blue-500"
+                className="mt-2"
+              />
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-2">
+                {endOfYearProjection >= totalTarget
+                  ? "🎉 You're projected to meet your savings target by year-end!"
+                  : `You'll need to increase monthly savings by ${fmt(
+                      Math.max((totalTarget - endOfYearProjection) / (12 - monthsElapsed), 0),
+                    )}/mo to hit your target.`}
+              </p>
+            </div>
+
+            {/* Mini milestones */}
+            <div className="border-t border-gray-200 dark:border-gray-800 pt-3 space-y-2">
+              <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300">Milestones</h4>
+              {[25, 50, 75, 100].map((milestone) => {
+                const reached = savingsRate >= milestone;
+                return (
+                  <div key={milestone} className="flex items-center gap-2">
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                        reached
+                          ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500"
+                      }`}
+                    >
+                      {reached ? "✓" : milestone}
+                    </div>
+                    <span
+                      className={`text-[10px] sm:text-xs ${
+                        reached
+                          ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                          : "text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {milestone}% of target reached
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </DashCard>
+      </div>
+    </PageContainer>
   );
 };

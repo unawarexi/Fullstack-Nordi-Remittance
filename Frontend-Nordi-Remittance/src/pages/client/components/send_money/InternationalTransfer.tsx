@@ -251,7 +251,7 @@
 
     return (
         <motion.div 
-        className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 min-h-screen"
+        className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 min-h-screen"
         variants={pageVariants}
         initial="initial"
         animate="animate"
@@ -260,21 +260,21 @@
         <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="mb-6">
-            <h1 className="text-2xl font-bold text-indigo-900">International Wire Transfer</h1>
+            <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">International Wire Transfer</h1>
             <p className="text-purple-600">Send money securely to bank accounts worldwide</p>
             </div>
             
             {/* Progress steps */}
             <div className="flex items-center mb-8">
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
                 1
             </div>
             <div className={`h-1 flex-1 ${step >= 2 ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
                 2
             </div>
             <div className={`h-1 flex-1 ${step >= 3 ? 'bg-indigo-600' : 'bg-gray-200'}`}></div>
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-600 dark:text-gray-400'}`}>
                 3
             </div>
             </div>
@@ -289,7 +289,7 @@
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="bg-white rounded-xl shadow-lg p-6"
+                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
                 >
                 <h2 className="text-lg font-semibold text-indigo-900 mb-4">International Transfer Details</h2>
                 
@@ -332,11 +332,11 @@
                                 <div className="flex items-center">
                                     <div className={`w-4 h-4 rounded-full ${values.fromAccount === account.id ? 'bg-indigo-600' : 'border border-gray-400'}`}></div>
                                     <div className="ml-3">
-                                    <div className="font-medium text-gray-900">{account.name}</div>
-                                    <div className="text-sm text-gray-600">{account.number}</div>
+                                    <div className="font-medium text-gray-900 dark:text-white">{account.name}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">{account.number}</div>
                                     </div>
                                 </div>
-                                <div className="font-semibold text-indigo-900">${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                                <div className="font-semibold text-indigo-900 dark:text-white">${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                                 </div>
                             </motion.div>
                             ))}
@@ -572,7 +572,7 @@
         {values.amount && values.currency && values.currency !== "USD" && (
             <div className="mt-2">
             <div className="flex items-center text-sm">
-                <div className="text-gray-600">
+                <div className="text-gray-600 dark:text-gray-400">
                 Exchange Rate: 1 USD = {exchangeRateInfo.rate} {values.currency}
                 </div>
                 <button
@@ -645,10 +645,10 @@
                 <div className="flex items-center">
                     <div className={`w-4 h-4 rounded-full ${values.deliveryOption === option.id ? 'bg-indigo-600' : 'border border-gray-400'}`}></div>
                     <div className="ml-3">
-                    <div className="font-medium text-gray-900">{option.name}</div>
+                    <div className="font-medium text-gray-900 dark:text-white">{option.name}</div>
                     </div>
                 </div>
-                <div className="font-semibold text-indigo-900">${option.fee.toFixed(2)}</div>
+                <div className="font-semibold text-indigo-900 dark:text-white">${option.fee.toFixed(2)}</div>
                 </div>
             </div>
             ))}
@@ -754,7 +754,7 @@
     initial="initial"
     animate="animate"
     exit="exit"
-    className="bg-white rounded-xl shadow-lg p-6"
+    className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
     >
     <h2 className="text-lg font-semibold text-indigo-900 mb-4">Confirm International Transfer</h2>
     
@@ -768,7 +768,7 @@
             <div className="flex justify-between items-center p-4 cursor-pointer bg-gray-50">
             <div className="flex items-center">
                 <FileText size={20} className="text-indigo-600 mr-2" />
-                <h3 className="font-medium text-gray-900">Transfer Details</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white">Transfer Details</h3>
             </div>
             {expandedSection === "details" ? 
                 <ChevronsUp size={20} className="text-gray-500" /> : 
@@ -819,7 +819,7 @@
             <div className="flex justify-between items-center p-4 cursor-pointer bg-gray-50">
             <div className="flex items-center">
                 <User size={20} className="text-purple-600 mr-2" />
-                <h3 className="font-medium text-gray-900">Recipient Information</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white">Recipient Information</h3>
             </div>
             {expandedSection === "recipient" ? 
                 <ChevronsUp size={20} className="text-gray-500" /> : 
@@ -874,7 +874,7 @@
             <div className="flex justify-between items-center p-4 cursor-pointer bg-gray-50">
             <div className="flex items-center">
                 <DollarSign size={20} className="text-green-600 mr-2" />
-                <h3 className="font-medium text-gray-900">Fees & Timing</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white">Fees & Timing</h3>
             </div>
             {expandedSection === "fees" ? 
                 <ChevronsUp size={20} className="text-gray-500" /> : 
@@ -887,16 +887,16 @@
                 <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
                     <dt className="text-gray-500">Transfer Amount</dt>
-                    <dd className="font-medium text-gray-900">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</dd>
+                    <dd className="font-medium text-gray-900 dark:text-white">${parseFloat(formData.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</dd>
                 </div>
                 <div className="flex justify-between">
                     <dt className="text-gray-500">Delivery Fee ({getSelectedDeliveryOption()?.name})</dt>
-                    <dd className="font-medium text-gray-900">${getSelectedDeliveryOption()?.fee.toFixed(2)}</dd>
+                    <dd className="font-medium text-gray-900 dark:text-white">${getSelectedDeliveryOption()?.fee.toFixed(2)}</dd>
                 </div>
                 {formData.currency !== "USD" && (
                     <div className="flex justify-between">
                     <dt className="text-gray-500">Exchange Fee ({exchangeRateInfo.fee}%)</dt>
-                    <dd className="font-medium text-gray-900">${((parseFloat(formData.amount) * exchangeRateInfo.fee) / 100).toFixed(2)}</dd>
+                    <dd className="font-medium text-gray-900 dark:text-white">${((parseFloat(formData.amount) * exchangeRateInfo.fee) / 100).toFixed(2)}</dd>
                     </div>
                 )}
                 <div className="pt-2 border-t border-gray-200">
@@ -969,7 +969,7 @@
     initial="initial"
     animate="animate"
     exit="exit"
-    className="bg-white rounded-xl shadow-lg p-6"
+    className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
     >
     {transferSuccess ? (
         <motion.div 
@@ -984,8 +984,8 @@
             </div>
         </motion.div>
         
-        <motion.h2 variants={fadeInUp} className="mt-4 text-xl font-semibold text-gray-900">Transfer Submitted Successfully</motion.h2>
-        <motion.p variants={fadeInUp} className="mt-2 text-gray-600">Your international wire transfer has been submitted for processing</motion.p>
+        <motion.h2 variants={fadeInUp} className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Transfer Submitted Successfully</motion.h2>
+        <motion.p variants={fadeInUp} className="mt-2 text-gray-600 dark:text-gray-400">Your international wire transfer has been submitted for processing</motion.p>
         
         <motion.div variants={fadeInUp} className="mt-6 bg-gray-50 rounded-lg p-4">
             <div className="text-sm text-gray-800">
@@ -1066,8 +1066,8 @@
         <div className="flex justify-center">
             <RefreshCw size={36} className="text-indigo-600 animate-spin" />
         </div>
-        <h2 className="mt-4 text-xl font-semibold text-gray-900">Processing Your Transfer</h2>
-        <p className="mt-2 text-gray-600">Please wait while we process your international wire transfer...</p>
+        <h2 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Processing Your Transfer</h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">Please wait while we process your international wire transfer...</p>
         </div>
     )}
     </motion.div>
@@ -1078,7 +1078,7 @@
     {/* FAQ section */}
     {step === 1 && (
     <motion.div 
-    className="mt-8 bg-white rounded-xl shadow-lg p-6"
+    className="mt-8 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6"
     variants={fadeInUp}
     initial="initial"
     animate="animate"
@@ -1096,7 +1096,7 @@
             {expandedSection === "faq1" ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {expandedSection === "faq1" && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <p>International transfers typically take 2-5 business days to complete, depending on the destination country, intermediary banks involved, and the selected delivery option. Same-day and express options are available for eligible countries at an additional fee.</p>
             </div>
         )}
@@ -1111,7 +1111,7 @@
             {expandedSection === "faq2" ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {expandedSection === "faq2" && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <p>You'll need the recipient's full name, bank account number or IBAN, their bank's name, address, and SWIFT/BIC code. For some countries, additional information like routing numbers or sort codes may be required. Providing complete and accurate information helps ensure your transfer is processed without delays.</p>
             </div>
         )}
@@ -1126,7 +1126,7 @@
             {expandedSection === "faq3" ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {expandedSection === "faq3" && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <p>Fees consist of our service fee (based on delivery speed selected), potential exchange rate margin if currency conversion is involved, and sometimes intermediary bank fees. The exact amount is shown during the transfer process before confirmation. Premium account holders may receive preferential rates and fee waivers.</p>
             </div>
         )}
@@ -1141,7 +1141,7 @@
             {expandedSection === "faq4" ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         {expandedSection === "faq4" && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <p>Once submitted, international transfers can be difficult to cancel as they are processed quickly through the banking system. Contact our customer service immediately if you need to attempt a cancellation. A recall fee may apply, and we cannot guarantee funds can be recovered if the transfer has already been processed by intermediary banks.</p>
             </div>
         )}
@@ -1171,7 +1171,7 @@
             <HelpCircle size={20} className="text-indigo-600" />
             </div>
             <div>
-            <h3 className="font-medium text-indigo-900">Need assistance?</h3>
+            <h3 className="font-medium text-indigo-900 dark:text-white">Need assistance?</h3>
             <p className="text-sm text-purple-700">Our international payments team is here to help</p>
             </div>
         </div>
