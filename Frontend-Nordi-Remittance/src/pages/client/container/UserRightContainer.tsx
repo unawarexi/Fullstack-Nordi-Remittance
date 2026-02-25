@@ -8,14 +8,14 @@ interface AdminRightContainerProps {
 
 const UserRightContainer = ({ children }: AdminRightContainerProps) => {
   return (
-    <div className="flex h-screen flex-col">
-      <div className="bg-white sticky top-0 z-20 shadow">
+    <div className="flex h-screen flex-col bg-white dark:bg-gray-950 transition-colors duration-200">
+      <div className="bg-white dark:bg-gray-900 sticky top-0 z-20 shadow dark:shadow-gray-800/50">
         <RightContainerNav />
       </div>
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">{children}</div>
 
-      <div>
+      <div className="dark:bg-gray-900">
         <RightContainerFooter />
       </div>
     </div>

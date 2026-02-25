@@ -148,6 +148,7 @@ export async function register(
       currency: currency || "USD",
       role: "user",
       status: "active",
+      isActive: true,
       kycStatus: "pending",
       emailVerified: false,
       phoneVerified: false,
@@ -465,7 +466,8 @@ export async function registerFullKyc(
       inviteCode: inviteCode?.trim(),
       // System fields
       kycStatus: "pending",
-      isActive: false,
+      isActive: true,
+      status: "active",
       createdAt: new Date(),
     });
 
@@ -1152,10 +1154,10 @@ export async function verifyEmail(
       throw new UnauthorizedError("Invalid or expired verification token");
     }
 
-    // Update user
+    // Update user — also activate account on email verification
     const user: any = await Users.findByIdAndUpdate(
       tokenDoc.userId,
-      { emailVerified: true },
+      { emailVerified: true, isActive: true },
       { new: true },
     );
 

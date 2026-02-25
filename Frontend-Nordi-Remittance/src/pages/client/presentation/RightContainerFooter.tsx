@@ -10,7 +10,7 @@ const RightContainerFooter = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-full bg-white border-t border-gray-100 py-4 px-6"
+      className="w-full bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-4 px-6 transition-colors duration-200"
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between text-sm">

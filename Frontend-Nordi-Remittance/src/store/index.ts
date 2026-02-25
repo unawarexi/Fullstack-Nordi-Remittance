@@ -39,3 +39,7 @@ export {
   selectSocketError,
   selectReconnectAttempts,
 } from './socket.store';
+
+// Theme store - Dark/light/system mode management
+export { default as useThemeStore } from './theme.store';
+export type { ThemeMode } from './theme.store';

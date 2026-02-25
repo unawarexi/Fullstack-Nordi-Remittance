@@ -292,7 +292,7 @@ const UserLeftContainer: React.FC = () => {
       variants={sidebarVariants}
       initial="expanded"
       animate={collapsed ? "collapsed" : "expanded"}
-      className="h-screen bg-gradient-to-b from-indigo-50 to-purple-50 shadow-lg flex flex-col py-6 relative"
+      className="h-screen bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-900 shadow-lg dark:shadow-gray-950/50 flex flex-col py-6 relative transition-colors duration-200"
     >
       {/* Toggle button */}
       <button 
@@ -323,8 +323,8 @@ const UserLeftContainer: React.FC = () => {
             exit={{ opacity: 0 }}
             className="ml-3"
           >
-            <div className="font-semibold text-indigo-900">User Name</div>
-            <div className="text-xs text-purple-500 font-medium">Premium Member</div>
+            <div className="font-semibold text-indigo-900 dark:text-indigo-200">User Name</div>
+            <div className="text-xs text-purple-500 dark:text-purple-400 font-medium">Premium Member</div>
           </motion.div>
         )}
       </motion.div>
@@ -337,43 +337,43 @@ const UserLeftContainer: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          <div className="bg-white rounded-xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-semibold text-indigo-900">Quick Actions</span>
-              <Zap size={14} className="text-purple-500" />
+              <span className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Quick Actions</span>
+              <Zap size={14} className="text-purple-500 dark:text-purple-400" />
             </div>
             <div className="grid grid-cols-4 gap-2">
               <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 cursor-pointer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-gray-600 cursor-pointer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Send size={16} className="text-indigo-600 mb-1" />
-                <span className="text-xs text-indigo-700">Send</span>
+                <Send size={16} className="text-indigo-600 dark:text-indigo-400 mb-1" />
+                <span className="text-xs text-indigo-700 dark:text-indigo-300">Send</span>
               </motion.div>
               <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-purple-50 hover:bg-purple-100 cursor-pointer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-purple-50 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-gray-600 cursor-pointer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <QrCode size={16} className="text-purple-600 mb-1" />
-                <span className="text-xs text-purple-700">Scan</span>
+                <QrCode size={16} className="text-purple-600 dark:text-purple-400 mb-1" />
+                <span className="text-xs text-purple-700 dark:text-purple-300">Scan</span>
               </motion.div>
               <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-pink-50 hover:bg-pink-100 cursor-pointer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-pink-50 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-gray-600 cursor-pointer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <BanknoteIcon size={16} className="text-pink-600 mb-1" />
-                <span className="text-xs text-pink-700">Pay</span>
+                <BanknoteIcon size={16} className="text-pink-600 dark:text-pink-400 mb-1" />
+                <span className="text-xs text-pink-700 dark:text-pink-300">Pay</span>
               </motion.div>
               <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 cursor-pointer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Globe size={16} className="text-blue-600 mb-1" />
-                <span className="text-xs text-blue-700">Forex</span>
+                <Globe size={16} className="text-blue-600 dark:text-blue-400 mb-1" />
+                <span className="text-xs text-blue-700 dark:text-blue-300">Forex</span>
               </motion.div>
             </div>
           </div>
@@ -389,12 +389,12 @@ const UserLeftContainer: React.FC = () => {
           animate="visible"
         >
           <motion.div 
-            className="bg-white rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
             whileHover={{ x: 3 }}
           >
             <div className="flex items-center gap-2">
-              <Bell size={16} className="text-purple-500" />
-              <span className="text-xs font-medium text-gray-800">Notifications</span>
+              <Bell size={16} className="text-purple-500 dark:text-purple-400" />
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Notifications</span>
             </div>
             {notificationCount > 0 && (
               <div className="bg-purple-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
@@ -404,12 +404,12 @@ const UserLeftContainer: React.FC = () => {
           </motion.div>
           
           <motion.div 
-            className="bg-white rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
             whileHover={{ x: 3 }}
           >
             <div className="flex items-center gap-2">
-              <AlertTriangle size={16} className="text-amber-500" />
-              <span className="text-xs font-medium text-gray-800">Security Alerts</span>
+              <AlertTriangle size={16} className="text-amber-500 dark:text-amber-400" />
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Security Alerts</span>
             </div>
             {alertCount > 0 && (
               <div className="bg-amber-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
@@ -450,14 +450,14 @@ const UserLeftContainer: React.FC = () => {
                     }}
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
-                      ${active ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 font-semibold' : 'text-gray-700 font-medium'}
-                      ${!active ? 'hover:bg-indigo-50 hover:text-indigo-700' : ''}
+                      ${active ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-indigo-800 dark:text-indigo-200 font-semibold' : 'text-gray-700 dark:text-gray-300 font-medium'}
+                      ${!active ? 'hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300' : ''}
                     `}
                     whileHover={{ x: collapsed ? 0 : 3 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <motion.div
-                      className={active ? "text-indigo-600" : "text-purple-500"}
+                      className={active ? "text-indigo-600 dark:text-indigo-400" : "text-purple-500 dark:text-purple-400"}
                       animate={{ 
                         scale: active ? 1.1 : 1 
                       }}
@@ -505,8 +505,8 @@ const UserLeftContainer: React.FC = () => {
                                   onClick={() => navigate(child.route)}
                                   className={`
                                     px-3 py-2 rounded-lg cursor-pointer text-sm transition
-                                    ${childActive ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'text-gray-700 font-normal'}
-                                    ${!childActive ? 'hover:bg-indigo-50 hover:text-indigo-600' : ''}
+                                    ${childActive ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold' : 'text-gray-700 dark:text-gray-400 font-normal'}
+                                    ${!childActive ? 'hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-300' : ''}
                                   `}
                                   whileHover={{ x: 3 }}
                                   whileTap={{ scale: 0.98 }}
@@ -536,37 +536,37 @@ const UserLeftContainer: React.FC = () => {
       {/* Upcoming events */}
       {!collapsed && (
         <motion.div 
-          className="mt-auto border-t border-indigo-100 pt-4 px-4 mb-4"
+          className="mt-auto border-t border-indigo-100 dark:border-gray-700 pt-4 px-4 mb-4"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
         >
-          <div className="bg-white rounded-xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-semibold text-indigo-900">Coming Up</span>
-              <Calendar size={14} className="text-purple-500" />
+              <span className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Coming Up</span>
+              <Calendar size={14} className="text-purple-500 dark:text-purple-400" />
             </div>
-            <motion.div className="flex items-center gap-3 mb-2 bg-indigo-50 p-2 rounded-lg"
+            <motion.div className="flex items-center gap-3 mb-2 bg-indigo-50 dark:bg-gray-700 p-2 rounded-lg"
               whileHover={{ x: 2 }}
             >
-              <div className="h-8 w-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <div className="h-8 w-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                 <Clock size={16} />
               </div>
               <div>
-                <div className="text-xs font-medium text-indigo-900">Loan Payment</div>
-                <div className="text-xs text-gray-500">Tomorrow, 9:00 AM</div>
+                <div className="text-xs font-medium text-indigo-900 dark:text-indigo-200">Loan Payment</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Tomorrow, 9:00 AM</div>
               </div>
             </motion.div>
             
-            <motion.div className="flex items-center gap-3 bg-purple-50 p-2 rounded-lg"
+            <motion.div className="flex items-center gap-3 bg-purple-50 dark:bg-gray-700 p-2 rounded-lg"
               whileHover={{ x: 2 }}
             >
-              <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+              <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
                 <FileText size={16} />
               </div>
               <div>
-                <div className="text-xs font-medium text-purple-900">Statement Available</div>
-                <div className="text-xs text-gray-500">Apr 22, 2025</div>
+                <div className="text-xs font-medium text-purple-900 dark:text-purple-200">Statement Available</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Apr 22, 2025</div>
               </div>
             </motion.div>
           </div>
@@ -582,15 +582,15 @@ const UserLeftContainer: React.FC = () => {
           animate="visible"
         >
           <motion.div 
-            className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer"
+            className="bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 rounded-xl p-3 flex items-center gap-3 cursor-pointer"
             whileHover={{ y: -2, boxShadow: "0 4px 6px rgba(79, 70, 229, 0.1)" }}
           >
             <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
               <MessageSquare size={16} />
             </div>
             <div>
-              <div className="text-xs font-medium text-indigo-900">Need assistance?</div>
-              <div className="text-xs text-indigo-700">Chat with support</div>
+              <div className="text-xs font-medium text-indigo-900 dark:text-indigo-200">Need assistance?</div>
+              <div className="text-xs text-indigo-700 dark:text-indigo-400">Chat with support</div>
             </div>
           </motion.div>
         </motion.div>
@@ -605,7 +605,7 @@ const UserLeftContainer: React.FC = () => {
         }}
       >
         {!collapsed ? (
-          <div className="text-indigo-400">
+          <div className="text-indigo-400 dark:text-indigo-500">
             &copy; {new Date().getFullYear()} Remit Digital Banking
           </div>
         ) : (

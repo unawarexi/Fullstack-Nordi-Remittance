@@ -188,7 +188,15 @@ export async function verifyAccountStatus(
       return next(new UnauthorizedError('Authentication required'));
     }
 
-    const user = await Users.findById(req.user.userId).select('isActive isLocked lockReason').lean();
+    // Check admin roles — skip user-model lookup for admins
+    const adminRoles = ['admin', 'super_admin', 'compliance_officer', 'support_agent', 'analyst'];
+    if (adminRoles.includes(req.user.role)) {
+      return next();
+    }
+
+    const user = await Users.findById(req.user.userId)
+      .select('status isActive isLocked lockReason')
+      .lean() as any;
 
     if (!user) {
       return next(new UnauthorizedError('User account not found'));
@@ -198,8 +206,18 @@ export async function verifyAccountStatus(
       return next(new AccountLockedError(user.lockReason || 'Account is locked'));
     }
 
-    if (!user.isActive) {
-      return next(new AccountSuspendedError('Account is not active'));
+    // Check account status — status field (defaults to 'active') is the source of truth.
+    // isActive may be false for newly registered users before email verification,
+    // but users with status='active' should still access their data.
+    const accountStatus = user.status || 'active';
+    if (accountStatus === 'suspended') {
+      return next(new AccountSuspendedError('Account is suspended'));
+    }
+    if (accountStatus === 'banned') {
+      return next(new ForbiddenError('Account has been banned'));
+    }
+    if (accountStatus === 'inactive') {
+      return next(new AccountSuspendedError('Account is inactive'));
     }
 
     next();

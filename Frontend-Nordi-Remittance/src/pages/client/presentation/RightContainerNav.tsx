@@ -1,232 +1,418 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Bell, 
-  MessageSquare, 
-  Settings, 
-  ChevronDown, 
-  CreditCard, 
-  Briefcase, 
-  PiggyBank, 
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  Bell,
+  Settings,
+  ChevronDown,
+  CreditCard,
+  Briefcase,
+  PiggyBank,
   Wallet,
   ChevronRight,
   Sun,
-  Moon
-} from 'lucide-react';
+  Moon,
+  Monitor,
+  LogOut,
+  User,
+} from "lucide-react";
+import { useAuth } from "@store/auth.store";
+import useThemeStore from "@store/theme.store";
+import { useWallets, useUnreadNotificationsCount } from "@hooks/queries";
 
-// Sample user accounts for the dropdown
-const userAccounts = [
-  { id: 1, type: "Checking Account", number: "****6789", balance: "$4,256.78", icon: <CreditCard size={16} /> },
-  { id: 2, type: "Savings Account", number: "****1234", balance: "$12,845.50", icon: <PiggyBank size={16} /> },
-  { id: 3, type: "Investment Portfolio", number: "****8901", balance: "$36,720.42", icon: <Briefcase size={16} /> },
-  { id: 4, type: "Business Account", number: "****4567", balance: "$85,412.19", icon: <Wallet size={16} /> }
-];
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// Placeholder user data
-const userData = {
-  name: "Alexander Thompson",
-  image: "/api/placeholder/40/40", // You can replace with actual image path
-  notifications: 3,
-  messages: 2
+// ============================================================================
+// HELPERS
+// ============================================================================
+const walletIconMap: Record<string, React.ReactNode> = {
+  savings: <PiggyBank size={16} />,
+  checking: <CreditCard size={16} />,
+  business: <Briefcase size={16} />,
+  investment: <Briefcase size={16} />,
+  primary: <Wallet size={16} />,
 };
 
-const RightContainerNav = () => {
-  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+const getWalletIcon = (type?: string) =>
+  walletIconMap[type || "primary"] || <Wallet size={16} />;
+
+const formatBalance = (amount: number, currency?: string) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency || "USD",
+    minimumFractionDigits: 2,
+  }).format(amount);
+
+const maskNumber = (num?: string) =>
+  num ? `****${num.slice(-4)}` : "****0000";
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+const RightContainerNav: React.FC = () => {
+  const navigate = useNavigate();
+
+  // ── Auth ──
+  const { user, userName, logout } = useAuth();
+
+  // ── Theme ──
+  const { mode, isDarkMode, setMode, toggleDarkMode } = useThemeStore();
+
+  // ── Wallets (real data) ──
+  const { data: walletsRes } = useWallets();
+  const wallets: any[] = Array.isArray(walletsRes)
+    ? walletsRes
+    : Array.isArray((walletsRes as any)?.data)
+      ? (walletsRes as any).data
+      : [];
+
+  // ── Notifications (real count) ──
+  const { data: countRes } = useUnreadNotificationsCount();
+  const unreadCount =
+    typeof countRes === "number"
+      ? countRes
+      : typeof (countRes as any)?.count === "number"
+        ? (countRes as any).count
+        : 0;
+
+  // ── Local UI state ──
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isThemeOpen, setIsThemeOpen] = useState(false);
   const [greeting, setGreeting] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
-  // Calculate greeting based on time of day
+
+  const accountRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
+
+  // Greeting based on time-of-day
   useEffect(() => {
-    const hours = new Date().getHours();
-    if (hours < 12) setGreeting("Good Morning");
-    else if (hours < 18) setGreeting("Good Afternoon");
-    else setGreeting("Good Evening");
+    const h = new Date().getHours();
+    setGreeting(h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening");
   }, []);
-  
-  // Toggle account dropdown
-  const toggleAccountDropdown = () => {
-    setIsAccountDropdownOpen(!isAccountDropdownOpen);
-  };
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node))
+        setIsAccountOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target as Node))
+        setIsProfileOpen(false);
+      if (themeRef.current && !themeRef.current.contains(e.target as Node))
+        setIsThemeOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Animation variants
-  const dropdownVariants = {
-    hidden: { opacity: 0, y: -5, height: 0 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      height: "auto",
-      transition: { duration: 0.2, ease: "easeOut" }
+  const dropdown = {
+    hidden: { opacity: 0, y: -5, scale: 0.97 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.15, ease: "easeOut" },
     },
-    exit: {
-      opacity: 0,
-      y: -5,
-      height: 0,
-      transition: { duration: 0.2, ease: "easeIn" }
-    }
+    exit: { opacity: 0, y: -5, scale: 0.97, transition: { duration: 0.1 } },
   };
 
-  const iconButtonVariants = {
-    hover: { scale: 1.1 },
-    tap: { scale: 0.95 }
-  };
+  const initials = user
+    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    : "U";
 
   return (
-    <nav className="w-full bg-gradient-to-b from-indigo-50 to-purple-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <div className="flex justify-between h-16">
-          {/* Left section: Logo and greeting */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 rounded-md flex items-center justify-center text-white font-bold mr-2">
-                SB
-              </div>
-              <span className="text-indigo-700 font-bold text-lg hidden md:block">SecureBank</span>
+    <nav className="w-full bg-white dark:bg-gray-900 border-b border-indigo-100 dark:border-gray-800 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
+        <div className="flex items-center justify-between h-14">
+          {/* ── Left: Logo + Greeting ── */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-8 w-8 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
+              NR
             </div>
-            
-            <div className="ml-6 hidden md:flex items-center text-indigo-900">
-              <span className="mr-1 text-sm text-purple-400">{greeting},</span>
-              <span className="font-medium text-indigo-700">{userData.name}</span>
-            </div>
-          </div>
-          
-          {/* Center: Search */}
-          <div className="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-end">
-            <div className="max-w-lg w-full lg:max-w-xs relative">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search size={18} className="text-purple-400" />
-                </div>
-                <input
-                  id="search"
-                  className="block w-full pl-10 pr-3 py-2 border border-indigo-100 rounded-full leading-5 bg-indigo-50 placeholder-purple-300 focus:outline-none focus:bg-white focus:ring-1 focus:ring-purple-400 focus:border-purple-400 transition duration-150 ease-in-out text-sm text-indigo-900"
-                  placeholder="Search transactions, accounts..."
-                  type="search"
-                />
-              </div>
+            <span className="text-indigo-700 dark:text-indigo-300 font-bold text-base hidden md:block">
+              Nordi
+            </span>
+            <div className="hidden lg:flex items-center text-sm ml-2">
+              <span className="text-purple-400 dark:text-purple-500 mr-1">
+                {greeting},
+              </span>
+              <span className="font-medium text-indigo-700 dark:text-indigo-300 truncate max-w-[180px]">
+                {userName || "User"}
+              </span>
             </div>
           </div>
-          
-          {/* Right section: Account selector and icons */}
-          <div className="flex items-center space-x-4">
-            {/* Account selector dropdown */}
+
+          {/* ── Center: Search ── */}
+          <div className="flex-1 max-w-xs mx-4 hidden sm:block">
             <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400 dark:text-purple-500"
+              />
+              <input
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-full border border-indigo-100 dark:border-gray-700 bg-indigo-50/60 dark:bg-gray-800 placeholder-purple-300 dark:placeholder-gray-500 text-indigo-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-purple-400 dark:focus:ring-purple-600 focus:bg-white dark:focus:bg-gray-800 transition"
+                placeholder="Search..."
+                type="search"
+              />
+            </div>
+          </div>
+
+          {/* ── Right: Controls ── */}
+          <div className="flex items-center gap-2">
+            {/* Account Selector */}
+            <div ref={accountRef} className="relative hidden sm:block">
               <motion.button
-                onClick={toggleAccountDropdown}
-                className="flex items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 text-indigo-700 px-3 py-1.5 rounded-lg transition-colors duration-150 text-sm border border-indigo-100"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setIsAccountOpen(!isAccountOpen);
+                  setIsProfileOpen(false);
+                  setIsThemeOpen(false);
+                }}
+                className="flex items-center gap-1.5 bg-indigo-50 dark:bg-gray-800 hover:bg-indigo-100 dark:hover:bg-gray-700 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-lg text-sm border border-indigo-100 dark:border-gray-700 transition"
+                whileTap={{ scale: 0.97 }}
               >
-                <span className="hidden sm:inline">Choose Account</span>
-                <ChevronDown size={16} className={`transform transition-transform duration-200 ${isAccountDropdownOpen ? 'rotate-180' : ''}`} />
+                <Wallet size={14} />
+                <span className="hidden md:inline">Accounts</span>
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${isAccountOpen ? "rotate-180" : ""}`}
+                />
               </motion.button>
-              
+
               <AnimatePresence>
-                {isAccountDropdownOpen && (
+                {isAccountOpen && (
                   <motion.div
-                    className="absolute right-0 mt-2 w-72 bg-gradient-to-b from-indigo-50 to-purple-50 rounded-lg shadow-lg border border-indigo-100 z-50"
-                    variants={dropdownVariants}
+                    className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-indigo-100 dark:border-gray-700 z-50 overflow-hidden"
+                    variants={dropdown}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
                   >
-                    <div className="p-3 border-b border-indigo-100">
-                      <h3 className="text-sm font-medium text-indigo-900">Your Accounts</h3>
+                    <div className="px-4 py-3 border-b border-indigo-50 dark:border-gray-800">
+                      <h3 className="text-sm font-semibold text-indigo-900 dark:text-gray-100">
+                        Your Wallets
+                      </h3>
                     </div>
-                    <div className="py-1">
-                      {userAccounts.map((account) => (
-                        <motion.a
-                          key={account.id}
-                          href="#"
-                          className="block px-4 py-3 hover:bg-indigo-50 transition-colors duration-150"
-                          whileHover={{ backgroundColor: "rgba(238,242,255,0.7)" }}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center">
-                              <div className="mr-3 text-purple-500">
-                                {account.icon}
-                              </div>
+                    <div className="max-h-60 overflow-y-auto">
+                      {wallets.length === 0 ? (
+                        <p className="text-xs text-gray-400 text-center py-6">
+                          No wallets found
+                        </p>
+                      ) : (
+                        wallets.map((w: any, i: number) => (
+                          <button
+                            key={w._id || w.id || i}
+                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-indigo-50 dark:hover:bg-gray-800 transition text-left"
+                            onClick={() => {
+                              setIsAccountOpen(false);
+                              navigate("/customer/accounts");
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-purple-500 dark:text-purple-400">
+                                {getWalletIcon(w.type)}
+                              </span>
                               <div>
-                                <div className="text-sm font-medium text-indigo-900">{account.type}</div>
-                                <div className="text-xs text-purple-400">{account.number}</div>
+                                <div className="text-sm font-medium text-indigo-900 dark:text-gray-100">
+                                  {w.type
+                                    ? `${w.type.charAt(0).toUpperCase()}${w.type.slice(1)} Wallet`
+                                    : "Wallet"}
+                                </div>
+                                <div className="text-xs text-purple-400 dark:text-purple-500">
+                                  {maskNumber(w.walletNumber || w.accountNumber)}
+                                </div>
                               </div>
                             </div>
-                            <div className="text-sm font-semibold text-purple-700">{account.balance}</div>
-                          </div>
-                        </motion.a>
-                      ))}
+                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                              {formatBalance(
+                                w.balance ?? w.availableBalance ?? 0,
+                                w.currency
+                              )}
+                            </span>
+                          </button>
+                        ))
+                      )}
                     </div>
-                    <div className="p-3 border-t border-indigo-100">
-                      <a href="/accounts" className="text-xs flex items-center justify-center text-purple-600 hover:text-indigo-700 font-medium">
-                        View All Accounts
-                        <ChevronRight size={14} className="ml-1" />
-                      </a>
+                    <div className="border-t border-indigo-50 dark:border-gray-800 px-4 py-2.5">
+                      <button
+                        onClick={() => {
+                          setIsAccountOpen(false);
+                          navigate("/customer/accounts");
+                        }}
+                        className="text-xs flex items-center justify-center w-full text-purple-600 dark:text-purple-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                      >
+                        View All Accounts{" "}
+                        <ChevronRight size={13} className="ml-1" />
+                      </button>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-            
-            {/* Icon buttons */}
-            <div className="flex items-center space-x-2">
-              {/* Toggle dark/light mode */}
+
+            {/* Theme Toggle */}
+            <div ref={themeRef} className="relative">
               <motion.button
-                className="p-2 rounded-full bg-indigo-50 text-purple-500 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                variants={iconButtonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2 rounded-full bg-indigo-50 dark:bg-gray-800 text-purple-500 dark:text-purple-400 hover:bg-indigo-100 dark:hover:bg-gray-700 transition"
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                  setIsThemeOpen(!isThemeOpen);
+                  setIsAccountOpen(false);
+                  setIsProfileOpen(false);
+                }}
+                title={`Theme: ${mode}`}
               >
                 {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
               </motion.button>
-            
-              {/* Messages */}
-              <motion.div className="relative" variants={iconButtonVariants} whileHover="hover" whileTap="tap">
-                <button className="p-2 rounded-full bg-purple-50 text-purple-500 hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                  <MessageSquare size={18} />
-                </button>
-                {userData.messages > 0 && (
-                  <span className="absolute top-0 right-0 bg-amber-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    {userData.messages}
-                  </span>
+
+              <AnimatePresence>
+                {isThemeOpen && (
+                  <motion.div
+                    className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-indigo-100 dark:border-gray-700 z-50 overflow-hidden"
+                    variants={dropdown}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    {(
+                      [
+                        { key: "light" as const, icon: <Sun size={15} />, label: "Light" },
+                        { key: "dark" as const, icon: <Moon size={15} />, label: "Dark" },
+                        { key: "system" as const, icon: <Monitor size={15} />, label: "System" },
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={() => {
+                          setMode(opt.key);
+                          setIsThemeOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition ${
+                          mode === opt.key
+                            ? "bg-indigo-50 dark:bg-gray-800 text-indigo-700 dark:text-indigo-300 font-medium"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        }`}
+                      >
+                        {opt.icon} {opt.label}
+                      </button>
+                    ))}
+                  </motion.div>
                 )}
-              </motion.div>
-              
-              {/* Notifications */}
-              <motion.div className="relative" variants={iconButtonVariants} whileHover="hover" whileTap="tap">
-                <button className="p-2 rounded-full bg-indigo-50 text-indigo-500 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                  <Bell size={18} />
-                </button>
-                {userData.notifications > 0 && (
-                  <span className="absolute top-0 right-0 bg-purple-600 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    {userData.notifications}
-                  </span>
-                )}
-              </motion.div>
-              
-              {/* Settings */}
-              <motion.button
-                className="p-2 rounded-full bg-purple-50 text-purple-500 hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                variants={iconButtonVariants}
-                whileHover="hover"
-                whileTap="tap"
-              >
-                <Settings size={18} />
-              </motion.button>
+              </AnimatePresence>
             </div>
-            
-            {/* User profile */}
-            <div className="ml-2 flex items-center">
-              <motion.div 
-                className="h-10 w-10 rounded-full bg-gradient-to-tr from-indigo-200 via-purple-200 to-pink-100 overflow-hidden border-2 border-indigo-200"
-                whileHover={{ scale: 1.05 }}
+
+            {/* Notifications */}
+            <motion.button
+              className="relative p-2 rounded-full bg-indigo-50 dark:bg-gray-800 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-gray-700 transition"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigate("/customer/notifications")}
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-purple-600 text-white text-[10px] min-w-[16px] h-4 flex items-center justify-center rounded-full px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </motion.button>
+
+            {/* Settings */}
+            <motion.button
+              className="p-2 rounded-full bg-purple-50 dark:bg-gray-800 text-purple-500 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-gray-700 transition hidden md:flex"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigate("/customer/settings")}
+            >
+              <Settings size={18} />
+            </motion.button>
+
+            {/* Profile Avatar + Dropdown */}
+            <div ref={profileRef} className="relative ml-1">
+              <motion.button
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsAccountOpen(false);
+                  setIsThemeOpen(false);
+                }}
+                className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-200 via-purple-200 to-pink-100 dark:from-indigo-700 dark:via-purple-700 dark:to-pink-800 overflow-hidden border-2 border-indigo-200 dark:border-gray-700 flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}
               >
-                <img
-                  src={userData.image}
-                  alt={userData.name}
-                  className="h-full w-full object-cover"
-                />
-              </motion.div>
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={userName || "User"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-200">
+                    {initials}
+                  </span>
+                )}
+              </motion.button>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-indigo-100 dark:border-gray-700 z-50 overflow-hidden"
+                    variants={dropdown}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    {/* User info header */}
+                    <div className="px-4 py-3 border-b border-indigo-50 dark:border-gray-800">
+                      <p className="text-sm font-semibold text-indigo-900 dark:text-gray-100 truncate">
+                        {userName || "User"}
+                      </p>
+                      <p className="text-xs text-purple-400 dark:text-purple-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+
+                    {/* Menu items */}
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigate("/customer/profile");
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <User size={15} /> My Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigate("/customer/settings");
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <Settings size={15} /> Settings
+                    </button>
+
+                    {/* Dark mode quick toggle */}
+                    <button
+                      onClick={toggleDarkMode}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-gray-800 transition"
+                    >
+                      {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+                      {isDarkMode ? "Light Mode" : "Dark Mode"}
+                    </button>
+
+                    {/* Logout */}
+                    <div className="border-t border-indigo-50 dark:border-gray-800">
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          logout();
+                          navigate("/login");
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <LogOut size={15} /> Sign Out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
