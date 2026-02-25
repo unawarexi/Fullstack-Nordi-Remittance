@@ -18,6 +18,7 @@
       "@hooks/*": ["hooks/*"],
       "@hooks/index": ["hooks/index"],
       "@store/*": ["store/*"],
+      "@constants/*": ["constants/*"],
       "@types": ["types/index"],
       "@types/*": ["types/*"]
     },

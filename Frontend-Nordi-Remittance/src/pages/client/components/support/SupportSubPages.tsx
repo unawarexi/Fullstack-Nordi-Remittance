@@ -9,7 +9,7 @@ import {
   Phone, Mail, MapPin, MessageCircle, HelpCircle,
   Calendar, ChevronDown, ChevronUp, Send, Clock,
   Headphones, Globe, ExternalLink,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import {
   PageContainer, DashCard,

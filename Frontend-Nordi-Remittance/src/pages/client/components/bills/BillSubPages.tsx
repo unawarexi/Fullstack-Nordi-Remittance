@@ -9,7 +9,7 @@ import {
   Zap, Droplets, Wifi, Flame, Shield, Phone, Search,
   Calendar, Clock, Plus, ToggleLeft, ToggleRight,
   Receipt, CreditCard, CheckCircle2, AlertTriangle,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {

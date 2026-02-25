@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import {
   ArrowLeftRight, TrendingUp, TrendingDown, Bell, Clock,
   DollarSign, Plus, AlertTriangle, RefreshCw,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {

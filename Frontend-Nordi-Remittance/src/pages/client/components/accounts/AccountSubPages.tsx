@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import {
   PiggyBank, Building2, Lock, Download, FileText,
   TrendingUp, Percent, Shield, Plus,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
@@ -20,6 +20,8 @@ import { dashboardItemVariants } from "@core/animation/Animation";
 import { useWallets } from "@hooks/queries/useAccounts";
 import { useUIStore } from "@store/ui.store";
 
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
+
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
 
@@ -28,7 +30,7 @@ export const SavingsAccount: React.FC = () => {
   const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: walletsData, isLoading } = useWallets();
-  const allWallets = (walletsData as any)?.data ?? walletsData ?? [];
+  const allWallets = safeArray(walletsData);
   const wallets = allWallets.filter(
     (w: any) => (w.type || w.accountType || "").toLowerCase() === "savings"
   );
@@ -99,7 +101,7 @@ export const CurrentAccount: React.FC = () => {
   const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: walletsData, isLoading } = useWallets();
-  const allWallets = (walletsData as any)?.data ?? walletsData ?? [];
+  const allWallets = safeArray(walletsData);
   const wallets = allWallets.filter(
     (w: any) => ["current", "checking"].includes((w.type || w.accountType || "").toLowerCase())
   );
@@ -170,7 +172,7 @@ export const FixedDeposits: React.FC = () => {
   const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: walletsData, isLoading } = useWallets();
-  const allWallets = (walletsData as any)?.data ?? walletsData ?? [];
+  const allWallets = safeArray(walletsData);
   const deposits = allWallets.filter(
     (w: any) => (w.type || w.accountType || "").toLowerCase().includes("fixed")
   );
@@ -261,7 +263,7 @@ export const AccountStatements: React.FC = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [format, setFormat] = useState("pdf");
   const { data: walletsData, isLoading } = useWallets();
-  const wallets = (walletsData as any)?.data ?? walletsData ?? [];
+  const wallets = safeArray(walletsData);
   const [selectedAccount, setSelectedAccount] = useState("");
 
   const inputCls =

@@ -28,7 +28,7 @@ import {
   Newspaper,
   Tag,
   CalendarDays,
-} from "lucide-react";
+} from "@constants/icons";
 
 import {
   PageContainer,
@@ -52,6 +52,8 @@ import {
   useInvestmentPerformance,
 } from "@hooks/queries/useInvestments";
 import { useUIStore } from "@store/ui.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -80,7 +82,7 @@ export const InvestmentOverview: React.FC = () => {
   const { data: portfolioData, isLoading: pLoading } = useInvestmentPortfolio();
   const { data: invData, isLoading: iLoading } = useInvestments();
   const portfolio = (portfolioData as any)?.data ?? portfolioData ?? {};
-  const investments: any[] = (invData as any)?.data ?? (invData as any)?.investments ?? [];
+  const investments: any[] = safeArray(invData);
   const isLoading = pLoading || iLoading;
 
   const totalValue = portfolio?.totalValue ?? 0;
@@ -308,7 +310,7 @@ export const InvestmentOverview: React.FC = () => {
 
 export const MutualFunds: React.FC = () => {
   const { data, isLoading } = useInvestmentProducts({ type: "mutual_fund" as any });
-  const allProducts: any[] = (data as any)?.data ?? (data as any)?.products ?? data ?? [];
+  const allProducts: any[] = safeArray(data);
   const products = allProducts.filter(
     (p: any) =>
       p.type === "mutual_fund" || p.category === "mutual_funds" || true
@@ -509,7 +511,7 @@ export const MutualFunds: React.FC = () => {
 export const StocksETFs: React.FC = () => {
   const [search, setSearch] = useState("");
   const { data: productsData, isLoading } = useInvestmentProducts({ type: "stock" as any });
-  const apiStocks: any[] = (productsData as any)?.data ?? (productsData as any)?.products ?? [];
+  const apiStocks: any[] = safeArray(productsData);
 
   const defaultStocks = [
     { symbol: "AAPL", name: "Apple Inc.", price: 189.25, change: 2.34, pctChange: 1.25, marketCap: 2940000000000 },
@@ -699,7 +701,7 @@ export const StocksETFs: React.FC = () => {
 
 export const FixedIncome: React.FC = () => {
   const { data: productsData, isLoading } = useInvestmentProducts({ type: "fixed_income" as any });
-  const apiProducts: any[] = (productsData as any)?.data ?? (productsData as any)?.products ?? [];
+  const apiProducts: any[] = safeArray(productsData);
 
   const defaultBonds = [
     { name: "US Treasury 10Y", type: "Government Bond", yield: 4.25, tenure: "10 years", minInvestment: 1000, rating: "AAA", risk: "low" },

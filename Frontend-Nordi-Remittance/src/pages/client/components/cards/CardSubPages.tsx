@@ -9,7 +9,7 @@ import {
   CreditCard, Eye, EyeOff, Lock, Plus, Shield, Smartphone,
   ArrowUpRight, ArrowDownLeft, Settings, CheckCircle2, AlertTriangle,
   Globe, Wifi, ShoppingBag, TrendingUp,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
@@ -21,6 +21,8 @@ import {
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useCards, useCardTransactions } from "@hooks/queries/useCards";
 import { useUIStore } from "@store/ui.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
@@ -59,7 +61,7 @@ const CardVisual: React.FC<{ card: any; show: boolean; gradient?: string }> = ({
 export const CardsOverview: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: cardsData, isLoading } = useCards();
-  const cards = (cardsData as any)?.data ?? cardsData ?? [];
+  const cards = safeArray(cardsData);
 
   const gradients = [
     "from-indigo-600 via-purple-600 to-fuchsia-600",
@@ -133,10 +135,10 @@ export const CardsOverview: React.FC = () => {
 export const CardTransactions: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: cardsData } = useCards();
-  const cards = (cardsData as any)?.data ?? cardsData ?? [];
+  const cards = safeArray(cardsData);
   const selectedCardId = cards?.[0]?.id ?? cards?.[0]?._id ?? "";
   const { data: txData, isLoading } = useCardTransactions(selectedCardId);
-  const txns = (txData as any)?.data ?? txData ?? [];
+  const txns = safeArray(txData);
 
   const txnIcon = (t: string) =>
     (t || "").toLowerCase().includes("online") ? <Globe size={16} /> : <ShoppingBag size={16} />;
@@ -249,7 +251,7 @@ export const ApplyForCard: React.FC = () => {
 /* ═══════ CARD SECURITY ═══════ */
 export const CardSecurity: React.FC = () => {
   const { data: cardsData, isLoading } = useCards();
-  const cards = (cardsData as any)?.data ?? cardsData ?? [];
+  const cards = safeArray(cardsData);
 
   const securityOpts = [
     { label: "Online Transactions", key: "online", desc: "Allow online/e-commerce purchases" },
@@ -346,7 +348,7 @@ export const CardSecurity: React.FC = () => {
 export const VirtualCards: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
   const { data: cardsData, isLoading } = useCards();
-  const allCards = (cardsData as any)?.data ?? cardsData ?? [];
+  const allCards = safeArray(cardsData);
   const virtual = allCards.filter((c: any) => (c.type || "").toLowerCase().includes("virtual"));
 
   return (

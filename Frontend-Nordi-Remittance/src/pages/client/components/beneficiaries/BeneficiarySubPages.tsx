@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import {
   Users, UserPlus, FolderOpen, Search, Trash2, Star,
   Building2, User, Globe, Phone,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
@@ -19,11 +19,13 @@ import { dashboardItemVariants } from "@core/animation/Animation";
 import { useBeneficiaries, useAddBeneficiary, useRemoveBeneficiary } from "@hooks/queries/useAccounts";
 import { useToastStore } from "@store/toast.store";
 
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
+
 /* ═══════ ALL BENEFICIARIES ═══════ */
 export const AllBeneficiaries: React.FC = () => {
   const [search, setSearch] = useState("");
   const { data: bData, isLoading } = useBeneficiaries();
-  const beneficiaries = (bData as any)?.data ?? bData ?? [];
+  const beneficiaries = safeArray(bData);
   const removeMutation = useRemoveBeneficiary();
   const { showToast } = useToastStore();
 
@@ -224,7 +226,7 @@ export const AddBeneficiary: React.FC = () => {
 /* ═══════ BENEFICIARY CATEGORIES ═══════ */
 export const BeneficiaryCategories: React.FC = () => {
   const { data: bData, isLoading } = useBeneficiaries();
-  const beneficiaries = (bData as any)?.data ?? bData ?? [];
+  const beneficiaries = safeArray(bData);
 
   const categories = [
     { name: "Family", icon: Users, color: "from-pink-500 to-rose-500", count: beneficiaries.filter((b: any) => (b.category || "").toLowerCase() === "family").length },
@@ -277,7 +279,7 @@ export const BeneficiaryCategories: React.FC = () => {
 /* ═══════ RECENT RECIPIENTS ═══════ */
 export const RecentRecipients: React.FC = () => {
   const { data: bData, isLoading } = useBeneficiaries();
-  const beneficiaries = (bData as any)?.data ?? bData ?? [];
+  const beneficiaries = safeArray(bData);
   const recent = [...beneficiaries]
     .sort((a: any, b: any) => new Date(b.lastTransferDate || 0).getTime() - new Date(a.lastTransferDate || 0).getTime())
     .slice(0, 10);

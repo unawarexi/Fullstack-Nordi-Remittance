@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import {
   Globe, FileText, Upload, Download, CheckCircle2,
   Clock, Trash2, Eye,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {

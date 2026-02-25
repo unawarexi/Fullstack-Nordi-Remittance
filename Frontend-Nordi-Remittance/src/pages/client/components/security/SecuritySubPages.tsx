@@ -9,7 +9,7 @@ import {
   Shield, Lock, Fingerprint, Eye, EyeOff, Clock,
   Smartphone, AlertTriangle, CheckCircle2, XCircle,
   Key, RefreshCw, MonitorSmartphone, Mail, Bell,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
@@ -19,6 +19,8 @@ import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useSecuritySettings, useLoginHistory, useSecurityActivityLog, useUpdateSecuritySettings, useEnable2FA } from "@hooks/queries/useSecurity";
 import { useToastStore } from "@store/toast.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 /* ═══════ SECURITY SETTINGS ═══════ */
 export const SecuritySettings: React.FC = () => {
@@ -296,10 +298,10 @@ export const BiometricAccess: React.FC = () => {
 /* ═══════ ACTIVITY LOGS ═══════ */
 export const ActivityLogs: React.FC = () => {
   const { data: logData, isLoading } = useSecurityActivityLog();
-  const logs = (logData as any)?.data ?? logData ?? [];
+  const logs = safeArray(logData);
 
   const { data: loginData } = useLoginHistory();
-  const logins = (loginData as any)?.data ?? loginData ?? [];
+  const logins = safeArray(loginData);
   const allLogs = [...logs, ...logins].sort(
     (a: any, b: any) => new Date(b.timestamp || b.date || 0).getTime() - new Date(a.timestamp || a.date || 0).getTime()
   );

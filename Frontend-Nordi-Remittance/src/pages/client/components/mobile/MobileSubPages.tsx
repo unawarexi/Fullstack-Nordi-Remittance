@@ -9,7 +9,7 @@ import {
   Smartphone, Monitor, QrCode, Bell, Shield, Download,
   Trash2, CheckCircle2, Fingerprint, Send, PieChart,
   ToggleLeft, ToggleRight, Tablet,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import {
   PageContainer, DashCard,

@@ -9,7 +9,7 @@ import {
   Target, Plus, TrendingUp, PiggyBank, Calendar, Clock,
   DollarSign, ArrowUpRight, Repeat, Percent, BarChart3,
   Sparkles, ChevronRight, Trash2, Edit3, ToggleLeft, ToggleRight,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
@@ -22,6 +22,8 @@ import {
 } from "@hooks/queries/useInvestments";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Shared helpers
@@ -45,7 +47,7 @@ const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "
    ═══════════════════════════════════════════════════════════════════════════ */
 export const SavingsGoalsList: React.FC = () => {
   const { data: gData, isLoading } = useSavingsGoals();
-  const goals = (gData as any)?.data ?? gData ?? [];
+  const goals = safeArray(gData);
 
   const totalSaved = useMemo(
     () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),
@@ -558,7 +560,7 @@ const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "S
 
 export const SavingsAnalytics: React.FC = () => {
   const { data: gData, isLoading } = useSavingsGoals();
-  const goals = (gData as any)?.data ?? gData ?? [];
+  const goals = safeArray(gData);
 
   const totalSaved = useMemo(
     () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),

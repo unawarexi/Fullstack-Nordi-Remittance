@@ -24,7 +24,7 @@ import {
   DollarSign,
   Wallet,
   Banknote,
-} from "lucide-react";
+} from "@constants/icons";
 
 import {
   PageContainer,
@@ -43,6 +43,8 @@ import {
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useLoans, useLoanProducts } from "@hooks/queries/useLoans";
 import { useUIStore } from "@store/ui.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -75,7 +77,7 @@ export const LoansOverview: React.FC = () => {
   const { data: loansData, isLoading } = useLoans();
   const sidebarCollapsed = useUIStore((s) => s.sidebar.isCollapsed);
 
-  const loans = Array.isArray(loansData) ? loansData : (loansData as any)?.data ?? [];
+  const loans = safeArray(loansData);
 
   const stats = useMemo(() => {
     if (!loans.length)
@@ -240,7 +242,7 @@ export const ApplyForLoan: React.FC = () => {
   const { data: productsData, isLoading } = useLoanProducts();
   const sidebarCollapsed = useUIStore((s) => s.sidebar.isCollapsed);
 
-  const products = Array.isArray(productsData) ? productsData : [];
+  const products = safeArray(productsData);
 
   return (
     <PageContainer>

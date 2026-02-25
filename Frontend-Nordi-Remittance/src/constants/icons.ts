@@ -25,6 +25,8 @@ export {
   ArrowDown,
   ArrowUpRight,
   ArrowDownLeft,
+  ArrowDownRight,
+  ArrowLeftRight,
   ArrowDownCircle,
   Menu,
   MoreHorizontal,
@@ -46,6 +48,7 @@ export {
   TrendingDown,
   PiggyBank,
   Banknote,
+  BadgeDollarSign,
   Receipt,
   Calculator,
   Percent,
@@ -55,6 +58,7 @@ export {
   Target,
   Briefcase,
   Building2,
+  Landmark,
   Repeat,
   
   // Security
@@ -73,15 +77,20 @@ export {
   Mail,
   Phone,
   MessageSquare,
+  MessageCircle,
   Bell,
   BellOff,
   Send,
+  Headphones,
   
   // Documents
   FileText,
   FileCheck,
   FileBadge,
   File,
+  FolderOpen,
+  BookOpen,
+  Newspaper,
   Upload,
   Download,
   Paperclip,
@@ -103,6 +112,8 @@ export {
   
   // Time & Calendar
   Calendar,
+  CalendarClock,
+  CalendarDays,
   Clock,
   Timer,
   
@@ -125,12 +136,28 @@ export {
   Link,
   QrCode,
   Smartphone,
+  Tablet,
   Monitor,
+  MonitorSmartphone,
   LogOut,
   LogIn,
   HelpCircle,
   Wifi,
   
+  // Shopping & Rewards
+  ShoppingBag,
+  Crown,
+  Trophy,
+  Coffee,
+  Plane,
+
+  // Toggles & UI
+  ToggleLeft,
+  ToggleRight,
+  Layers,
+  Flame,
+  Droplets,
+
   // Social
   Twitter,
   Facebook,

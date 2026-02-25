@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import {
   Gift, Star, Tag, Percent, Trophy, Zap,
   ShoppingBag, Coffee, Plane, CreditCard, Crown,
-} from "lucide-react";
+} from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
