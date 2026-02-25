@@ -1,68 +1,73 @@
-import React, { useState, useEffect } from 'react';
+// ============================================================================
+// GET LOCATION - IP-based geolocation (no browser permission required)
+// Uses free ip-api.com service to detect user's country from their IP address
+// ============================================================================
+
+import { useState, useEffect } from 'react';
 import Countries from '../core/data/Countries';
 
-const GetLocation = () => {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [country, setCountry] = useState<{ name: string; flag: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Loading state added
+interface GeoIpResponse {
+  status: string;
+  country: string;
+  countryCode: string;
+  regionName: string;
+  city: string;
+}
 
-  // Get user's location
+const GetLocation = () => {
+  const [country, setCountry] = useState<{ name: string; flag: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation({ latitude, longitude });
-          fetchCountryFromLocation(latitude, longitude);
-        },
-        (error) => {
-          setError('Error fetching location. Please enable location services.');
+    const controller = new AbortController();
+
+    const fetchLocation = async () => {
+      try {
+        // ip-api.com — free, no API key, returns country from user's IP
+        const response = await fetch(
+          'http://ip-api.com/json/?fields=status,country,countryCode,regionName,city',
+          { signal: controller.signal }
+        );
+        const data: GeoIpResponse = await response.json();
+
+        if (data.status === 'success' && data.countryCode) {
+          // Match against our local Countries list for the flag emoji
+          const matched = Countries.find(
+            (c) => c.code === data.countryCode
+          );
+
+          setCountry({
+            name: matched?.name || data.country,
+            flag: matched?.flag || '🌍',
+          });
         }
-      );
-    } else {
-      setError('Geolocation is not supported by your browser.');
-    }
+      } catch {
+        // Silently fail — location display is non-critical
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLocation();
+
+    return () => controller.abort();
   }, []);
 
-  // Fetch country based on latitude and longitude
-  const fetchCountryFromLocation = async (lat: number, lon: number) => {
-    try {
-      const response = await fetch(
-        `https://geocode.xyz/${lat},${lon}?geoit=json`
-      );
-      const data = await response.json();
-      const countryCode = data.prov; // Adjust based on API response, prov often returns country code
+  if (loading) {
+    return (
+      <span className="text-sm text-neutral-400 animate-pulse">
+        Detecting location...
+      </span>
+    );
+  }
 
-      const matchedCountry = Countries.find(
-        (country) => country.code === countryCode
-      );
-
-      if (matchedCountry) {
-        setCountry({ name: matchedCountry.name, flag: matchedCountry.flag });
-      } else {
-        setError('Country not found for your location.');
-      }
-    } catch (err) {
-      setError('Error fetching country information.');
-    } finally {
-        setLoading(false)
-    }
-  };
-
-  if(loading) return <> Loading...</>
+  if (!country) return null;
 
   return (
-    <div>
-    {country ? (
-      <div className='flex space-x-4'>
-        <h3>{country.name}</h3>
-        <p>{country.flag}</p>
-      </div>
-    ) : (
-      <div>No country information available</div>
-    )}
-  </div>
+    <div className="flex items-center gap-2 text-sm text-neutral-600">
+      <span className="text-lg">{country.flag}</span>
+      <span>{country.name}</span>
+    </div>
   );
 };
 

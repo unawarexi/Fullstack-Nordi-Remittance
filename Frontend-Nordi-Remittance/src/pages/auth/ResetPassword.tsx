@@ -68,7 +68,7 @@ const ResetPassword = () => {
     try {
       await resetPasswordMutation.mutateAsync({
         token,
-        newPassword: data.password,
+        password: data.password,
         confirmPassword: data.confirmPassword,
       });
       setIsSuccess(true);

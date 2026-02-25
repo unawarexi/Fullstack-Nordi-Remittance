@@ -51,7 +51,7 @@ const ToastItem = ({ toast, onDismiss }: ToastItemProps) => {
       role="alert"
       className={cn(
         'flex items-start gap-3 p-4 rounded-lg border shadow-lg',
-        'animate-in slide-in-from-right-full duration-300',
+        'animate-in slide-in-from-top duration-300',
         'max-w-md w-full',
         bgColors[toast.type]
       )}
@@ -100,7 +100,7 @@ export const ToastContainer = () => {
     <div
       aria-live="polite"
       aria-label="Notifications"
-      className="fixed bottom-4 right-4 z-50 flex flex-col-reverse gap-2"
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center"
     >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />

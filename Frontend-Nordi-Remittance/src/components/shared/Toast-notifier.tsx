@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BadgeCheck, X, AlertTriangle, Info } from "../../constants/icons";
-import { toastVariants } from "../../core/animation/animations";
+import { BadgeCheck, X, AlertTriangle, Info } from "lucide-react";
+import { toastVariants } from "../../core/animation/Animation";
 
 const Toast = ({ visible, message, type = "success", duration = 3000, onHide }) => {
   useEffect(() => {
