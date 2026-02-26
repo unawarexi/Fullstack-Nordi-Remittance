@@ -20,6 +20,7 @@ import {
 import { useAuth } from "@store/auth.store";
 import useThemeStore from "@store/theme.store";
 import { useWallets, useUnreadNotificationsCount } from "@hooks/queries";
+import { useUserProfile } from "@hooks/queries/useUsers";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -55,6 +56,11 @@ const RightContainerNav: React.FC = () => {
 
   // ── Auth ──
   const { user, userName, logout } = useAuth();
+
+  // ── Profile (for profilePicture fallback) ──
+  const { data: profileData } = useUserProfile();
+  const profile = (profileData ?? {}) as Record<string, any>;
+  const avatarUrl = profile.profilePicture || user?.avatar || null;
 
   // ── Theme ──
   const { mode, isDarkMode, setMode, toggleDarkMode } = useThemeStore();
@@ -336,9 +342,9 @@ const RightContainerNav: React.FC = () => {
                 className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-200 via-purple-200 to-pink-100 dark:from-indigo-700 dark:via-purple-700 dark:to-pink-800 overflow-hidden border-2 border-indigo-200 dark:border-gray-700 flex items-center justify-center"
                 whileTap={{ scale: 0.95 }}
               >
-                {user?.avatar ? (
+                {avatarUrl ? (
                   <img
-                    src={user.avatar}
+                    src={avatarUrl}
                     alt={userName || "User"}
                     className="h-full w-full object-cover"
                   />

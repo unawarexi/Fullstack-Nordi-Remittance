@@ -171,4 +171,10 @@ export {
   Hash,
   ChevronsUp,
   ChevronsDown,
+
+  // Media & Documents (extended)
+  Image,
+  Camera,
+  PenTool,
+  ScanFace,
 } from 'lucide-react';

@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import {
   Globe, FileText, Upload, Eye, AlertCircle, Shield,
   Loader2, FileCheck, Clock, CheckCircle2, Trash2,
+  Image, Camera, PenTool, ScanFace, User,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
@@ -17,6 +18,7 @@ import {
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useToastStore } from "@store/toast.store";
 import { useKycDocuments, useKycStatus, useUploadKycDocument, useDeleteKycDocument } from "@hooks/queries/useKyc";
+import { useUserProfile } from "@hooks/queries/useUsers";
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
@@ -197,13 +199,69 @@ export const DocumentCenter: React.FC = () => {
   /* ── Hooks ── */
   const { data: docsData, isLoading: docsLoading } = useKycDocuments();
   const { data: kycData } = useKycStatus();
+  const { data: profileData, isLoading: profileLoading } = useUserProfile();
   const uploadDoc = useUploadKycDocument();
   const deleteDoc = useDeleteKycDocument();
 
   const documents = safeArr(docsData);
   const kyc = ((kycData ?? {}) as Record<string, any>);
+  const profile = ((profileData ?? {}) as Record<string, any>);
 
   const [selectedType, setSelectedType] = useState("passport");
+
+  const capitalize = (s?: string | null) =>
+    s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ") : "";
+
+  const fmtDate = (d?: string | null) => {
+    if (!d) return null;
+    try {
+      return new Date(d).toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric",
+      });
+    } catch { return d; }
+  };
+
+  /* ── Build profile documents array from user profile fields ── */
+  const profileDocuments = [
+    {
+      key: "profilePicture",
+      label: "Profile Picture",
+      url: profile.profilePicture || profile.avatar,
+      icon: <Camera size={18} />,
+      iconBg: "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400",
+    },
+    {
+      key: "governmentId",
+      label: "Government ID",
+      url: profile.governmentId,
+      icon: <Shield size={18} />,
+      iconBg: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400",
+      detail: profile.idType ? `${capitalize(profile.idType)} • ${profile.idNumber || ""}` : undefined,
+      expiry: profile.idExpiryDate,
+    },
+    {
+      key: "proofOfAddress",
+      label: "Proof of Address",
+      url: profile.proofOfAddress,
+      icon: <FileText size={18} />,
+      iconBg: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400",
+      detail: profile.addressDocType ? capitalize(profile.addressDocType) : undefined,
+    },
+    {
+      key: "selfieWithId",
+      label: "Selfie with ID",
+      url: profile.selfieWithId,
+      icon: <ScanFace size={18} />,
+      iconBg: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400",
+    },
+    {
+      key: "signature",
+      label: "Signature",
+      url: profile.signature,
+      icon: <PenTool size={18} />,
+      iconBg: "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400",
+    },
+  ].filter((d) => !!d.url);
 
   const statusColor = (s: string) => {
     switch (s) {
@@ -276,6 +334,101 @@ export const DocumentCenter: React.FC = () => {
             )}
           </DashCard>
         </motion.div>
+
+        {/* ── Profile Documents (from user profile) ── */}
+        {profileLoading ? (
+          <motion.div variants={dashboardItemVariants}>
+            <DashCard>
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 w-40 bg-gray-200 dark:bg-gray-800 rounded" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-48 bg-gray-100 dark:bg-gray-800 rounded-xl" />
+                  ))}
+                </div>
+              </div>
+            </DashCard>
+          </motion.div>
+        ) : profileDocuments.length > 0 ? (
+          <motion.div variants={dashboardItemVariants}>
+            <DashCard>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                  <Image size={16} />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                    Your Documents
+                  </h3>
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                    {profileDocuments.length} document{profileDocuments.length !== 1 ? "s" : ""} on file
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {profileDocuments.map((doc) => (
+                  <motion.div
+                    key={doc.key}
+                    className="group relative rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
+                    whileHover={{ y: -2 }}
+                  >
+                    {/* Image Preview */}
+                    <div className="relative h-36 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                      <img
+                        src={doc.url}
+                        alt={doc.label}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                        }}
+                      />
+                      <div className="hidden flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500">
+                        <FileText size={24} />
+                        <span className="text-[10px] mt-1">Preview unavailable</span>
+                      </div>
+
+                      {/* View overlay */}
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200"
+                      >
+                        <div className="bg-white dark:bg-gray-900 rounded-full p-2 shadow-lg">
+                          <Eye size={16} className="text-gray-700 dark:text-gray-300" />
+                        </div>
+                      </a>
+                    </div>
+
+                    {/* Info */}
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className={`p-1.5 rounded-lg ${doc.iconBg}`}>
+                          {doc.icon}
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {doc.label}
+                        </h4>
+                      </div>
+                      {doc.detail && (
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-8">
+                          {doc.detail}
+                        </p>
+                      )}
+                      {doc.expiry && (
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 ml-8">
+                          Expires {fmtDate(doc.expiry)}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </DashCard>
+          </motion.div>
+        ) : null}
 
         {/* ── Upload Section ── */}
         <motion.div variants={dashboardItemVariants}>

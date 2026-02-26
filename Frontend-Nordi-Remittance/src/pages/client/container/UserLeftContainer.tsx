@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "@hooks/queries/useAuth";
 import { useAuth } from "@store/auth.store";
+import { useUserProfile } from "@hooks/queries/useUsers";
 import {
   LayoutDashboard,
   Wallet,
@@ -250,12 +251,24 @@ const dropdownVariants = {
 const UserLeftContainer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout: clearAuthState } = useAuth();
+  const { logout: clearAuthState, user, userName } = useAuth();
+  const { data: profileData } = useUserProfile();
   const logoutMutation = useLogout();
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
   const [alertCount, setAlertCount] = useState(2);
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const profile = (profileData ?? {}) as Record<string, any>;
+  const avatarUrl = profile.profilePicture || user?.avatar || null;
+  const displayName = userName || `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || "User";
+  const initials = user
+    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    : displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "U";
+  const memberTier = profile.accountType
+    ? `${(profile.accountType as string).charAt(0).toUpperCase()}${(profile.accountType as string).slice(1)} Account`
+    : user?.kycStatus === "verified" ? "Verified Member" : "Member";
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -325,8 +338,19 @@ const UserLeftContainer: React.FC = () => {
         className="font-bold text-xl mb-6 px-4 flex items-center"
         animate={{ justifyContent: collapsed ? "center" : "flex-start" }}
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 flex items-center justify-center text-white font-bold text-lg shadow-md">
-          U
+        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 flex items-center justify-center text-white font-bold text-lg shadow-md overflow-hidden">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+                (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+              }}
+            />
+          ) : null}
+          <span className={avatarUrl ? "hidden" : ""}>{initials}</span>
         </div>
         
         {!collapsed && (
@@ -336,8 +360,8 @@ const UserLeftContainer: React.FC = () => {
             exit={{ opacity: 0 }}
             className="ml-3"
           >
-            <div className="font-semibold text-indigo-900 dark:text-indigo-200">User Name</div>
-            <div className="text-xs text-purple-500 dark:text-purple-400 font-medium">Premium Member</div>
+            <div className="font-semibold text-indigo-900 dark:text-indigo-200 text-sm truncate max-w-[180px]">{displayName}</div>
+            <div className="text-xs text-purple-500 dark:text-purple-400 font-medium">{memberTier}</div>
           </motion.div>
         )}
       </motion.div>
