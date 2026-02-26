@@ -1,6 +1,6 @@
 // ============================================================================
 // PERSONAL INFORMATION — Client profile view page
-// Uses useUserProfile, useUserAddress, useUserEmployment, useKycStatus
+// Uses useUserProfile, useUserAddress, useUserEmployment
 // Dark mode + DashboardPrimitives + grey borders + responsive
 // ============================================================================
 
@@ -11,7 +11,7 @@ import {
   User, Mail, Phone, MapPin, Calendar, ShieldCheck,
   Edit3, Briefcase, Building2, Globe, CheckCircle2,
   Clock, Landmark, BadgeCheck, Banknote, Star,
-  AlertCircle, Target, CreditCard,
+  Target, CreditCard,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import {
@@ -22,7 +22,6 @@ import { useAuth } from "@store/auth.store";
 import {
   useUserProfile, useUserAddress, useUserEmployment, useUserBankAccounts,
 } from "@hooks/queries/useUsers";
-import { useKycStatus } from "@hooks/queries/useKyc";
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 const fmtDate = (d?: string | null) => {
@@ -160,7 +159,6 @@ const PersonalInformation: React.FC = () => {
   const { data: addressData, isLoading: aLoad } = useUserAddress();
   const { data: employmentData, isLoading: eLoad } = useUserEmployment();
   const { data: banksData } = useUserBankAccounts();
-  const { data: kycData } = useKycStatus();
 
   if (pLoad) return <ProfileSkeleton />;
 
@@ -169,7 +167,6 @@ const PersonalInformation: React.FC = () => {
   const addr = ((addressData as any) || {}) as Record<string, any>;
   const emp = ((employmentData as any) || {}) as Record<string, any>;
   const banks = safeArr(banksData);
-  const kyc = ((kycData as any) || {}) as Record<string, any>;
 
   const initials = [p.firstName, p.lastName]
     .filter(Boolean)
@@ -177,9 +174,18 @@ const PersonalInformation: React.FC = () => {
     .join("")
     .toUpperCase() || "?";
 
-  const kycLevel = kyc.level || "none";
+  /* Derive KYC level from kycStatus on the User model */
+  const kycStatusRaw = (p.kycStatus || "pending") as string;
+  const kycLevel =
+    kycStatusRaw === "verified" || kycStatusRaw === "approved" ? "verified"
+    : kycStatusRaw === "in_review" ? "in review"
+    : kycStatusRaw === "rejected" ? "rejected"
+    : "pending";
   const kycPercent =
-    kycLevel === "full" ? 100 : kycLevel === "enhanced" ? 75 : kycLevel === "basic" ? 50 : 0;
+    kycStatusRaw === "verified" || kycStatusRaw === "approved" ? 100
+    : kycStatusRaw === "in_review" ? 60
+    : kycStatusRaw === "rejected" ? 0
+    : 25;
 
   const avatar = p.profilePicture || p.avatar;
 
@@ -227,7 +233,7 @@ const PersonalInformation: React.FC = () => {
                 <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{p.phone}</p>
               )}
               <div className="flex flex-wrap items-center gap-2 mt-2">
-                <KycBadge status={p.kycStatus || kyc.status} />
+                <KycBadge status={p.kycStatus} />
                 {p.isEmailVerified && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
                     ✓ Email Verified
@@ -374,7 +380,7 @@ const PersonalInformation: React.FC = () => {
               </div>
               <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">KYC Verification</h3>
             </div>
-            <KycBadge status={kyc.status || p.kycStatus} />
+            <KycBadge status={kycStatusRaw} />
           </div>
           <div className="space-y-4">
             {/* Progress */}
@@ -393,51 +399,26 @@ const PersonalInformation: React.FC = () => {
               </div>
             </div>
 
-            {/* Steps */}
+            {/* Document checklist derived from profile fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(kyc.completedSteps || []).map((step: string) => (
-                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300">
-                  <CheckCircle2 size={14} />
-                  <span className="text-xs font-medium">{capitalize(step)}</span>
-                </div>
-              ))}
-              {(kyc.pendingSteps || []).map((step: string) => (
-                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300">
-                  <Clock size={14} />
-                  <span className="text-xs font-medium">{capitalize(step)}</span>
-                </div>
-              ))}
-              {(kyc.rejectedSteps || []).map((step: string) => (
-                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300">
-                  <AlertCircle size={14} />
-                  <span className="text-xs font-medium">{capitalize(step)}</span>
+              {[
+                { label: "Government ID", ok: !!p.governmentId },
+                { label: "Proof of Address", ok: !!p.proofOfAddress },
+                { label: "Selfie with ID", ok: !!p.selfieWithId },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className={`flex items-center gap-2 p-2.5 rounded-xl ${
+                    item.ok
+                      ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
+                      : "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
+                  }`}
+                >
+                  {item.ok ? <CheckCircle2 size={14} /> : <Clock size={14} />}
+                  <span className="text-xs font-medium">{item.label}</span>
                 </div>
               ))}
             </div>
-
-            {/* Limits */}
-            {kyc.limits && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Daily Limit</p>
-                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
-                    ${Number(kyc.limits.dailyTransaction || 0).toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monthly Limit</p>
-                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
-                    ${Number(kyc.limits.monthlyTransaction || 0).toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Max Balance</p>
-                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
-                    ${Number(kyc.limits.maxBalance || 0).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </DashCard>
       </motion.div>

@@ -22,12 +22,12 @@ import { useInView } from "@hooks/useInView";
 import {
   useCards,
   useSavingsGoals,
-  useKycStatus,
   useUnreadNotifications,
   useUnreadNotificationsCount,
   useFinancialInsights,
   useTwoFactorStatus,
 } from "@hooks/queries";
+import { useUserProfile } from "@hooks/queries/useUsers";
 import { CreditCardSkeleton, SkeletonBlock } from "@components/skeletons/Skeletons";
 import {
   DashCard,
@@ -185,16 +185,16 @@ const SavingsGoalsSection: React.FC = () => {
 // ========================
 const VerificationStatusSection: React.FC = () => {
   const navigate = useNavigate();
-  const { data: kycRes, isLoading: kycLoading } = useKycStatus();
+  const { data: profileRes, isLoading: profileLoading } = useUserProfile();
   const { data: tfaRes, isLoading: tfaLoading } = useTwoFactorStatus();
-  const kyc: any = (kycRes as any) || {};
+  const profile: any = (profileRes as any) || {};
   const tfa: any = (tfaRes as any) || {};
 
-  if (kycLoading && tfaLoading) {
+  if (profileLoading && tfaLoading) {
     return (<DashCard><SkeletonBlock className="h-5 w-36 mb-3" /><div className="space-y-2">{[1, 2, 3].map((i) => (<SkeletonBlock key={i} className="h-10 w-full" />))}</div></DashCard>);
   }
 
-  const kycStatus = kyc?.status || kyc?.kycStatus || "pending";
+  const kycStatus = profile?.kycStatus || "pending";
   const kycVerified = kycStatus === "verified" || kycStatus === "approved";
   const twoFaEnabled = tfa?.enabled || tfa?.isEnabled || false;
 

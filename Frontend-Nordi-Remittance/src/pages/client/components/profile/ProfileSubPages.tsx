@@ -3,21 +3,19 @@
 // Dark mode + DashboardPrimitives + grey borders + responsive + real hooks
 // ============================================================================
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  Globe, FileText, Upload, Eye, AlertCircle, Shield,
-  Loader2, FileCheck, Clock, CheckCircle2, Trash2,
+  Globe, FileText, Eye, Shield,
+  Clock, CheckCircle2,
   Image, Camera, PenTool, ScanFace, Download, ExternalLink,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
-import { EmptyState } from "@components/shared/EmptyState";
 import {
   PageContainer, DashCard,
 } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useToastStore } from "@store/toast.store";
-import { useKycDocuments, useKycStatus, useUploadKycDocument, useDeleteKycDocument } from "@hooks/queries/useKyc";
 import { useUserProfile } from "@hooks/queries/useUsers";
 
 const inputCls =
@@ -332,27 +330,15 @@ const ProfileDocCard: React.FC<{
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DOCUMENT CENTER — Real KYC hooks + User Profile documents
+   DOCUMENT CENTER — User Profile documents from real backend
    ═══════════════════════════════════════════════════════════════════════════ */
-const safeArr = (d: unknown): any[] =>
-  Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
-
 export const DocumentCenter: React.FC = () => {
-  const { showToast } = useToastStore();
-  const fileRef = useRef<HTMLInputElement>(null);
 
   /* ── Hooks ── */
-  const { data: docsData, isLoading: docsLoading } = useKycDocuments();
-  const { data: kycData } = useKycStatus();
   const { data: profileData, isLoading: profileLoading } = useUserProfile();
-  const uploadDoc = useUploadKycDocument();
-  const deleteDoc = useDeleteKycDocument();
 
-  const documents = safeArr(docsData);
-  const kyc = ((kycData ?? {}) as Record<string, any>);
   const profile = ((profileData ?? {}) as Record<string, any>);
-
-  const [selectedType, setSelectedType] = useState("passport");
+  const kycStatus = (profile.kycStatus || "pending") as string;
 
   const capitalize = (s?: string | null) =>
     s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ") : "";
@@ -422,16 +408,6 @@ export const DocumentCenter: React.FC = () => {
     }
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    uploadDoc.mutate({
-      documentType: selectedType as any,
-      frontImage: file,
-    });
-    e.target.value = "";
-  };
-
   return (
     <PageContainer>
       <motion.div variants={dashboardItemVariants}>
@@ -451,37 +427,26 @@ export const DocumentCenter: React.FC = () => {
         <motion.div variants={dashboardItemVariants}>
           <DashCard>
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
-                <Shield size={18} />
+              <div className={`p-2.5 rounded-xl ${
+                kycStatus === "verified" || kycStatus === "approved"
+                  ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
+                  : "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400"
+              }`}>
+                {kycStatus === "verified" || kycStatus === "approved" ? <CheckCircle2 size={18} /> : <Shield size={18} />}
               </div>
               <div className="flex-1">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                   Verification Status
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Level: <span className="font-medium capitalize">{kyc.level || "None"}</span>
-                  {" • "}Status: <span className="font-medium capitalize">{(kyc.status || "pending").replace(/_/g, " ")}</span>
+                  Status: <span className="font-medium capitalize">{kycStatus.replace(/_/g, " ")}</span>
+                  {" • "}{profileDocuments.length} document{profileDocuments.length !== 1 ? "s" : ""} on file
                 </p>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold capitalize ${statusColor(kyc.status || "pending")}`}>
-                {(kyc.status || "pending").replace(/_/g, " ")}
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold capitalize ${statusColor(kycStatus)}`}>
+                {kycStatus.replace(/_/g, " ")}
               </span>
             </div>
-            {/* KYC Steps */}
-            {(kyc.completedSteps?.length > 0 || kyc.pendingSteps?.length > 0) && (
-              <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-                {(kyc.completedSteps || []).map((s: string) => (
-                  <span key={s} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300">
-                    <CheckCircle2 size={10} /> {s.replace(/_/g, " ")}
-                  </span>
-                ))}
-                {(kyc.pendingSteps || []).map((s: string) => (
-                  <span key={s} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300">
-                    <Clock size={10} /> {s.replace(/_/g, " ")}
-                  </span>
-                ))}
-              </div>
-            )}
           </DashCard>
         </motion.div>
 
@@ -533,157 +498,6 @@ export const DocumentCenter: React.FC = () => {
             </DashCard>
           </motion.div>
         ) : null}
-
-        {/* ── Upload Section ── */}
-        <motion.div variants={dashboardItemVariants}>
-          <DashCard>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Upload New Document</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">
-                  Document Type
-                </label>
-                <select
-                  value={selectedType}
-                  onChange={(ev) => setSelectedType(ev.target.value)}
-                  className={inputCls}
-                >
-                  <option value="passport">Passport</option>
-                  <option value="national_id">National ID</option>
-                  <option value="drivers_license">Driver&apos;s License</option>
-                  <option value="proof_of_address">Proof of Address</option>
-                  <option value="tax_document">Tax Document</option>
-                  <option value="selfie">Selfie with ID</option>
-                </select>
-              </div>
-              <div className="flex items-end">
-                <motion.button
-                  onClick={() => fileRef.current?.click()}
-                  disabled={uploadDoc.isPending}
-                  className="flex items-center gap-2 px-4 py-2.5 w-full justify-center bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {uploadDoc.isPending ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                  Choose File & Upload
-                </motion.button>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*,.pdf"
-                  className="hidden"
-                  onChange={handleUpload}
-                />
-              </div>
-            </div>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500">
-              Accepted formats: PDF, JPG, PNG. Maximum file size: 10MB.
-            </p>
-          </DashCard>
-        </motion.div>
-
-        {/* ── Document List ── */}
-        <motion.div variants={dashboardItemVariants}>
-          <DashCard padding="none">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">
-                  Your Documents
-                </h3>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {documents.length} document{documents.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-            </div>
-
-            {docsLoading ? (
-              <div className="p-6 space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="animate-pulse flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-xl" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3.5 w-32 bg-gray-200 dark:bg-gray-800 rounded" />
-                      <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800 rounded" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : documents.length === 0 ? (
-              <div className="p-6">
-                <EmptyState
-                  title="No Documents"
-                  description="Upload your documents to get verified and unlock higher limits."
-                />
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100 dark:divide-gray-800">
-                {documents.map((doc: any) => (
-                  <div
-                    key={doc.id || doc.type}
-                    className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-xl ${
-                        doc.status === "approved" || doc.status === "verified"
-                          ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
-                          : doc.status === "rejected"
-                          ? "bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400"
-                          : "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400"
-                      }`}>
-                        {doc.status === "approved" || doc.status === "verified"
-                          ? <FileCheck size={16} />
-                          : doc.status === "rejected"
-                          ? <AlertCircle size={16} />
-                          : <FileText size={16} />}
-                      </div>
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white capitalize">
-                          {(doc.type || "Document").replace(/_/g, " ")}
-                        </h4>
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                          {doc.documentNumber ? `#${doc.documentNumber} • ` : ""}
-                          {doc.expiryDate
-                            ? `Expires ${new Date(doc.expiryDate).toLocaleDateString()}`
-                            : "No expiry set"}
-                        </p>
-                        {doc.rejectionReason && (
-                          <p className="text-[10px] text-red-500 mt-0.5 flex items-center gap-1">
-                            <AlertCircle size={10} /> {doc.rejectionReason}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium capitalize ${statusColor(doc.status)}`}>
-                        {(doc.status || "pending").replace(/_/g, " ")}
-                      </span>
-                      {doc.frontImageUrl && (
-                        <a
-                          href={doc.frontImageUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                          title="View document"
-                        >
-                          <Eye size={14} />
-                        </a>
-                      )}
-                      {doc.id && doc.status !== "approved" && doc.status !== "verified" && (
-                        <button
-                          onClick={() => deleteDoc.mutate(doc.id)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 hover:text-red-500 transition-colors"
-                          title="Delete document"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </DashCard>
-        </motion.div>
       </div>
     </PageContainer>
   );
