@@ -1,847 +1,513 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Calendar,  ShieldCheck, Edit, Lock, Unlock, FileCheck, FileBadge } from 'lucide-react';
-import { getUserById, updateUserById } from '@core/api/UserService';
+// ============================================================================
+// PERSONAL INFORMATION — Client profile view page
+// Uses useUserProfile, useUserAddress, useUserEmployment, useKycStatus
+// Dark mode + DashboardPrimitives + grey borders + responsive
+// ============================================================================
 
+import React from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import {
+  User, Mail, Phone, MapPin, Calendar, ShieldCheck,
+  Edit3, Briefcase, Building2, Globe, CheckCircle2,
+  Clock, Landmark, BadgeCheck, Banknote, Star,
+  AlertCircle, Target, CreditCard,
+} from "@constants/icons";
+import PageHeader from "@components/shared/PageHeader";
+import {
+  PageContainer, DashCard, StatsGrid, StatCard,
+} from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants } from "@core/animation/Animation";
+import { useAuth } from "@store/auth.store";
+import {
+  useUserProfile, useUserAddress, useUserEmployment, useUserBankAccounts,
+} from "@hooks/queries/useUsers";
+import { useKycStatus } from "@hooks/queries/useKyc";
 
-interface UserDetails {
-  _id: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  dateOfBirth: string;
-  gender: string;
-  nationality: string;
-  countryOfResidence: string;
-  maritalStatus: string;
-  profilePicture: string;
-  governmentId: string;
-  idType: string;
-  idNumber: string;
-  idExpiryDate: string;
-  proofOfAddress: string;
-  addressDocType: string;
-  socialSecurityNumber: string;
-  taxIdentificationNumber: string;
-  email: string;
-  mobileNumber: string;
-  alternativePhone: string;
-  homeAddress: string;
-  city: string;
-  securityQuestion: string;
-  stateProvince: string;
-  zipCode: string;
-  country: string;
-  accountType: string;
-  currency: string;
-  sourceOfIncome: string;
-  monthlyIncomeRange: string;
-  initialDeposit: number;
-  employmentStatus: string;
-  employerName: string;
-  occupation: string;
-  accountName: string;
-  accountNumber: string;
-  bankName: string;
-  bankAddress: string;
-  ibanNumber: string;
-  routingNumber: string;
-  swiftBic: string;
-  enableTwoFactor: boolean;
-  twoFactorMethod: string;
-  referralCode: string;
-  selfieWithId: string;
-  signature: string;
-  inviteCode: string;
-  isActive: boolean;
-  kycStatus: string;
-  lastLogin: string | null;
-  isLocked: boolean;
-  loginAttempts: any[];
-}
-
-const PersonalInformation = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [user, setUser] = useState<UserDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ type: string; visible: boolean } | null>(null);
-  const [activeTab, setActiveTab] = useState('personal');
-
-  useEffect(() => {
-    if (id) {
-      fetchUserDetails(id);
-    }
-  }, [id]);
-
-  const fetchUserDetails = async (userId: string) => {
-    setLoading(true);
-    try {
-      const data = await getUserById(userId);
-      setUser(data.user ? data.user : data);
-      setError(null);
-    } catch (error) {
-      console.error('Failed to fetch user details:', error);
-      setError('Failed to load user details. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleActivateDeactivate = async () => {
-    if (!user || !id) return;
-    
-    try {
-      await updateUserById(id, { isActive: !user.isActive });
-      setUser({ ...user, isActive: !user.isActive });
-      setConfirmAction(null);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-    }
-  };
-
-  const handleLockUnlock = async () => {
-    if (!user || !id) return;
-    
-    try {
-      await updateUserById(id, { isLocked: !user.isLocked });
-      setUser({ ...user, isLocked: !user.isLocked });
-      setConfirmAction(null);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-    }
-  };
-
-  const handleKycStatusChange = async (status: string) => {
-    if (!user || !id) return;
-    
-    try {
-      await updateUserById(id, { kycStatus: status });
-      setUser({ ...user, kycStatus: status });
-      setConfirmAction(null);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+/* ── Helpers ─────────────────────────────────────────────────────────── */
+const fmtDate = (d?: string | null) => {
+  if (!d) return null;
+  try {
+    return new Date(d).toLocaleDateString("en-US", {
+      year: "numeric", month: "short", day: "numeric",
     });
-  };
+  } catch { return d; }
+};
 
-  const getStatusColor = (status: string) => {
-    if (!status) return 'bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-gray-200';
-    switch(status.toLowerCase()) {
-      case 'verified':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-gray-200';
-    }
-  };
+const capitalize = (s?: string | null) =>
+  s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ") : null;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { duration: 0.3, staggerChildren: 0.1 }
-    }
-  };
+const safeArr = (d: unknown): any[] =>
+  Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.3 }
-    }
-  };
+/* ── InfoField ───────────────────────────────────────────────────────── */
+const InfoField: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value?: string | number | null;
+  verified?: boolean;
+}> = ({ icon, label, value, verified }) => (
+  <div className="flex items-start gap-3">
+    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex-shrink-0">
+      {icon}
+    </div>
+    <div className="min-w-0 flex-1">
+      <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        {label}
+      </p>
+      <div className="flex items-center gap-1.5 mt-0.5">
+        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
+          {value ?? "Not provided"}
+        </p>
+        {verified && <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" />}
+      </div>
+    </div>
+  </div>
+);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600 dark:text-gray-400">Loading user details...</p>
+/* ── SectionCard ─────────────────────────────────────────────────────── */
+const SectionCard: React.FC<{
+  icon: React.ReactNode;
+  iconBg?: string;
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}> = ({ icon, iconBg = "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400", title, action, children }) => (
+  <motion.div variants={dashboardItemVariants}>
+    <DashCard>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className={`p-2 rounded-lg ${iconBg}`}>{icon}</div>
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">{title}</h3>
+        </div>
+        {action}
+      </div>
+      {children}
+    </DashCard>
+  </motion.div>
+);
+
+/* ── KYC Badge ───────────────────────────────────────────────────────── */
+const KycBadge: React.FC<{ status?: string }> = ({ status }) => {
+  const map: Record<string, string> = {
+    approved: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
+    verified: "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
+    pending: "bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300",
+    in_review: "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300",
+    rejected: "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300",
+    none: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
+  };
+  const cls = map[status || "none"] || map.none;
+  return (
+    <span className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${cls}`}>
+      KYC: {capitalize(status) || "Not Started"}
+    </span>
+  );
+};
+
+/* ── Shimmer ─────────────────────────────────────────────────────────── */
+const Shimmer: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={`animate-pulse bg-gray-200 dark:bg-gray-800 rounded-lg ${className || ""}`} />
+);
+
+/* ── Loading Skeleton ────────────────────────────────────────────────── */
+const ProfileSkeleton: React.FC = () => (
+  <PageContainer>
+    <div className="space-y-6">
+      <Shimmer className="h-8 w-64" />
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+        <div className="flex items-center gap-4">
+          <Shimmer className="h-16 w-16 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <Shimmer className="h-5 w-48" />
+            <Shimmer className="h-4 w-32" />
+          </div>
         </div>
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
-        <div className="text-center max-w-md p-6 bg-slate-50 dark:bg-gray-900 rounded-lg shadow-md">
-          <div className="text-red-600 text-5xl mb-4">!</div>
-          <h2 className="text-xl font-bold mb-2">Error</h2>
-          <p className="text-slate-600 dark:text-gray-400 mb-4">{error}</p>
-          <button 
-            className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg hover:bg-blue-700"
-            // onClick={() => navigate('/admin/users')}
-          >
-            Back to User List
-          </button>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <Shimmer className="h-4 w-20 mb-2" />
+            <Shimmer className="h-6 w-16" />
+          </div>
+        ))}
       </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 dark:bg-gray-900">
-        <div className="text-center max-w-md p-6 bg-slate-50 dark:bg-gray-900 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-2">User Not Found</h2>
-          <p className="text-slate-600 dark:text-gray-400 mb-4">The requested user could not be found.</p>
-          <button 
-            className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg hover:bg-blue-700"
-            // onClick={() => navigate('/admin/users')}
-          >
-            Back to User List
-          </button>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+            <Shimmer className="h-5 w-40 mb-4" />
+            <div className="space-y-3">
+              <Shimmer className="h-10 w-full" />
+              <Shimmer className="h-10 w-full" />
+              <Shimmer className="h-10 w-3/4" />
+            </div>
+          </div>
+        ))}
       </div>
-    );
-  }
+    </div>
+  </PageContainer>
+);
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ══════════════════════════════════════════════════════════════════════════ */
+const PersonalInformation: React.FC = () => {
+  const navigate = useNavigate();
+  const { user: authUser } = useAuth();
+
+  /* ── Data Hooks ── */
+  const { data: profileData, isLoading: pLoad } = useUserProfile();
+  const { data: addressData, isLoading: aLoad } = useUserAddress();
+  const { data: employmentData, isLoading: eLoad } = useUserEmployment();
+  const { data: banksData } = useUserBankAccounts();
+  const { data: kycData } = useKycStatus();
+
+  if (pLoad) return <ProfileSkeleton />;
+
+  /* Merge profile + auth fallback */
+  const p = { ...(authUser || {}), ...((profileData as any) || {}) } as Record<string, any>;
+  const addr = ((addressData as any) || {}) as Record<string, any>;
+  const emp = ((employmentData as any) || {}) as Record<string, any>;
+  const banks = safeArr(banksData);
+  const kyc = ((kycData as any) || {}) as Record<string, any>;
+
+  const initials = [p.firstName, p.lastName]
+    .filter(Boolean)
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase() || "?";
+
+  const kycLevel = kyc.level || "none";
+  const kycPercent =
+    kycLevel === "full" ? 100 : kycLevel === "enhanced" ? 75 : kycLevel === "basic" ? 50 : 0;
+
+  const avatar = p.profilePicture || p.avatar;
 
   return (
-    <motion.div 
-      className="container mx-auto py-6 px-4 max-w-6xl"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header */}
-      <motion.div 
-        className="flex justify-between items-center mb-6"
-        variants={itemVariants}
-      >
-        <div className="flex items-center">
-          <button 
-            className="p-2 rounded-full hover:bg-slate-100 dark:bg-gray-800 mr-4"
-            // onClick={() => navigate('/customers/users')}
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">User Details</h1>
-            <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Manage and view user information</p>
-          </div>
-        </div>
-        <div className="flex space-x-3">
-          <motion.button
-            className="px-4 py-2 bg-yellow-500 text-slate-50 dark:text-white rounded-lg flex items-center"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate(`/customers/users/${id}/edit`)}
-          >
-            <Edit size={16} className="mr-2" />
-            Edit User
-          </motion.button>
-          <motion.button
-            className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setConfirmAction({ type: 'activate', visible: true })}
-          >
-            {user.isActive ? (
-              <>
-                <Lock size={16} className="mr-2" />
-                Deactivate
-              </>
-            ) : (
-              <>
-                <Unlock size={16} className="mr-2" />
-                Activate
-              </>
-            )}
-          </motion.button>
-        </div>
+    <PageContainer>
+      {/* ── Header ── */}
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Personal Information"
+          subtitle="View and manage your profile details"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Profile" },
+          ]}
+          actions={
+            <motion.button
+              onClick={() => navigate("/customer/profile/edit")}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Edit3 size={15} /> Edit Profile
+            </motion.button>
+          }
+        />
       </motion.div>
 
-      {/* User Summary Card */}
-      <motion.div 
-        className="bg-slate-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-slate-200"
-        variants={itemVariants}
-      >
-        <div className="flex flex-col md:flex-row items-center md:items-start">
-          <div className="w-24 h-24 rounded-full overflow-hidden mb-4 md:mb-0 md:mr-6 flex-shrink-0 border-2 border-slate-200">
-            {user.profilePicture ? (
-              <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-slate-200 dark:bg-gray-700 flex items-center justify-center">
-                <User size={40} className="text-slate-400 dark:text-gray-500" />
-              </div>
-            )}
-          </div>
-          
-          <div className="text-center md:text-left flex-grow">
-            <h2 className="text-xl font-bold mb-1">
-              {[user.firstName, user.middleName, user.lastName].filter(Boolean).join(' ') || 'N/A'}
-            </h2>
-            <p className="text-slate-50 dark:text-white0 dark:text-gray-400 mb-3">{user.email || 'N/A'}</p>
-            
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
-              <span className={`px-3 py-1 rounded-full text-xs ${getStatusColor(user.kycStatus)}`}>
-                KYC: {user.kycStatus ? user.kycStatus.charAt(0).toUpperCase() + user.kycStatus.slice(1) : 'N/A'}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-xs ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-400'}`}>
-                {user.isActive ? 'Active' : 'Inactive'}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-xs ${user.isLocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                {user.isLocked ? 'Locked' : 'Unlocked'}
-              </span>
-              <span className="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                {user.accountType ? user.accountType.charAt(0).toUpperCase() + user.accountType.slice(1) : 'N/A'}
-              </span>
+      {/* ── Profile Summary Card ── */}
+      <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
+        <DashCard>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Avatar */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-2xl font-bold flex-shrink-0 overflow-hidden">
+              {avatar ? (
+                <img src={avatar} alt="" className="w-full h-full rounded-full object-cover" />
+              ) : initials}
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Account Number</p>
-                <p className="font-medium">{user.accountNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Last Login</p>
-                <p className="font-medium">{user.lastLogin ? formatDate(user.lastLogin) : 'Never'}</p>
-              </div>
-              <div>
-                <p className="text-slate-50 dark:text-white0 dark:text-gray-400">Currency</p>
-                <p className="font-medium">{user.currency || 'N/A'}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-4 md:mt-0 md:ml-6 flex flex-col space-y-2">
-            <div className="flex flex-col">
-              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Number</span>
-              <span className="font-medium">{user.idNumber || 'N/A'}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Type</span>
-              <span className="font-medium capitalize">{user.idType ? user.idType.replace('_', ' ') : 'N/A'}</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-slate-50 dark:text-white0 dark:text-gray-400 text-xs">ID Expiry</span>
-              <span className="font-medium">{user.idExpiryDate ? formatDate(user.idExpiryDate) : 'N/A'}</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-      
-      {/* Tabs Navigation */}
-      <motion.div 
-        className="flex border-b border-slate-200 mb-6 overflow-x-auto"
-        variants={itemVariants}
-      >
-        <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'personal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('personal')}
-        >
-          Personal Details
-        </button>
-        <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'account' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('account')}
-        >
-          Account Details
-        </button>
-        <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'financial' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('financial')}
-        >
-          Financial Info
-        </button>
-        <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'security' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('security')}
-        >
-          Security Settings
-        </button>
-        <button
-          className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === 'documents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-50 dark:text-white0 dark:text-gray-400 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('documents')}
-        >
-          Documents
-        </button>
-      </motion.div>
-      
-      {/* Tab Content */}
-      <motion.div 
-        className="bg-slate-50 dark:bg-gray-900 rounded-lg p-6 border border-slate-200 mb-6"
-        variants={itemVariants}
-      >
-        {/* Personal Details Tab */}
-        {activeTab === 'personal' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-lg font-bold mb-4">Personal Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Full Name</p>
-                <p className="font-medium">{[user.firstName, user.middleName, user.lastName].filter(Boolean).join(' ') || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Date of Birth</p>
-                <p className="font-medium">{user.dateOfBirth ? formatDate(user.dateOfBirth) : 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Gender</p>
-                <p className="font-medium capitalize">{user.gender || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Nationality</p>
-                <p className="font-medium">{user.nationality || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Country of Residence</p>
-                <p className="font-medium">{user.countryOfResidence || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Marital Status</p>
-                <p className="font-medium capitalize">{user.maritalStatus || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Email</p>
-                <p className="font-medium">{user.email || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Mobile Number</p>
-                <p className="font-medium">{user.mobileNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Alternative Phone</p>
-                <p className="font-medium">{user.alternativePhone || 'N/A'}</p>
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-bold mb-4 mt-8">Address Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Home Address</p>
-                <p className="font-medium">{user.homeAddress || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">City</p>
-                <p className="font-medium capitalize">{user.city || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">State/Province</p>
-                <p className="font-medium">{user.stateProvince || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Zip/Postal Code</p>
-                <p className="font-medium">{user.zipCode || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Country</p>
-                <p className="font-medium">{user.country || 'N/A'}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        {/* Account Details Tab */}
-        {activeTab === 'account' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-lg font-bold mb-4">Account Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Type</p>
-                <p className="font-medium capitalize">{user.accountType || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Number</p>
-                <p className="font-medium">{user.accountNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Name</p>
-                <p className="font-medium">{user.accountName || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Currency</p>
-                <p className="font-medium">{user.currency || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Initial Deposit</p>
-                <p className="font-medium">
-                  {user.currency} {typeof user.initialDeposit === 'number' ? user.initialDeposit.toLocaleString() : 'N/A'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Referral Code</p>
-                <p className="font-medium">{user.referralCode || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Invite Code</p>
-                <p className="font-medium">{user.inviteCode || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Status</p>
-                <p className={`font-medium ${user.isActive ? 'text-green-600' : 'text-red-600'}`}>
-                  {user.isActive ? 'Active' : 'Inactive'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Last Login</p>
-                <p className="font-medium">{user.lastLogin ? formatDate(user.lastLogin) : 'Never'}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        {/* Financial Info Tab */}
-        {activeTab === 'financial' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-lg font-bold mb-4">Financial Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Source of Income</p>
-                <p className="font-medium capitalize">{user.sourceOfIncome ? user.sourceOfIncome.replace('_', ' ') : 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Monthly Income Range</p>
-                <p className="font-medium">{user.monthlyIncomeRange || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Employment Status</p>
-                <p className="font-medium capitalize">{user.employmentStatus || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Employer Name</p>
-                <p className="font-medium">{user.employerName || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Occupation</p>
-                <p className="font-medium capitalize">{user.occupation || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Tax Identification Number</p>
-                <p className="font-medium">{user.taxIdentificationNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Social Security Number</p>
-                <p className="font-medium">{user.socialSecurityNumber || 'N/A'}</p>
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-bold mb-4 mt-8">Bank Account Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Bank Name</p>
-                <p className="font-medium">{user.bankName || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Bank Address</p>
-                <p className="font-medium">{user.bankAddress || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">IBAN Number</p>
-                <p className="font-medium">{user.ibanNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Routing Number</p>
-                <p className="font-medium">{user.routingNumber || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">SWIFT/BIC</p>
-                <p className="font-medium">{user.swiftBic || 'N/A'}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        {/* Security Settings Tab */}
-        {activeTab === 'security' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-lg font-bold mb-4">Security Settings</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Two-Factor Authentication</p>
-                <p className={`font-medium ${user.enableTwoFactor ? 'text-green-600' : 'text-red-600'}`}>
-                  {user.enableTwoFactor ? 'Enabled' : 'Disabled'}
-                </p>
-              </div>
-              {user.enableTwoFactor && (
-                <div>
-                  <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Two-Factor Method</p>
-                  <p className="font-medium capitalize">{user.twoFactorMethod || 'N/A'}</p>
-                </div>
+            {/* Name & info */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white truncate">
+                {[p.firstName, p.middleName, p.lastName].filter(Boolean).join(" ") || "User"}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{p.email}</p>
+              {p.phone && (
+                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{p.phone}</p>
               )}
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Account Lock Status</p>
-                <p className={`font-medium ${user.isLocked ? 'text-red-600' : 'text-green-600'}`}>
-                  {user.isLocked ? 'Locked' : 'Unlocked'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Login Attempts</p>
-                <p className="font-medium">{user.loginAttempts ? user.loginAttempts.length : '0'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-slate-50 dark:text-white0 dark:text-gray-400 mb-1">Security Question</p>
-                <p className="font-medium capitalize">{user.securityQuestion ? user.securityQuestion.replace('_', ' ') : 'N/A'}</p>
-              </div>
-            </div>
-            
-            <div className="mt-8 border-t border-slate-200 pt-6">
-              <h3 className="text-lg font-bold mb-4">Account Actions</h3>
-              <div className="flex flex-wrap gap-3">
-                <motion.button
-                  className={`px-4 py-2 ${user.isActive ? 'bg-red-600' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setConfirmAction({ type: 'activate', visible: true })}
-                >
-                  {user.isActive ? (
-                    <>
-                      <Lock size={16} className="mr-2" />
-                      Deactivate Account
-                    </>
-                  ) : (
-                    <>
-                      <Unlock size={16} className="mr-2" />
-                      Activate Account
-                    </>
-                  )}
-                </motion.button>
-                
-                <motion.button
-                  className={`px-4 py-2 ${user.isLocked ? 'bg-green-600' : 'bg-red-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setConfirmAction({ type: 'lock', visible: true })}
-                >
-                  {user.isLocked ? (
-                    <>
-                      <Unlock size={16} className="mr-2" />
-                      Unlock Account
-                    </>
-                  ) : (
-                    <>
-                      <Lock size={16} className="mr-2" />
-                      Lock Account
-                    </>
-                  )}
-                </motion.button>
-                
-                <motion.button
-                  className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded-lg flex items-center"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                //   onClick={() => navigate(`/admin/users/${id}/reset-password`)}
-                >
-                  <Lock size={16} className="mr-2" />
-                  Reset Password
-                </motion.button>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <KycBadge status={p.kycStatus || kyc.status} />
+                {p.isEmailVerified && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
+                    ✓ Email Verified
+                  </span>
+                )}
+                {p.isPhoneVerified && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">
+                    ✓ Phone Verified
+                  </span>
+                )}
               </div>
             </div>
-          </motion.div>
-        )}
-        
-        {/* Documents Tab */}
-        {activeTab === 'documents' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-lg font-bold mb-4">User Documents</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h4 className="font-medium mb-3">Government ID</h4>
-                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                  {user.governmentId ? (
-                    <img src={user.governmentId} alt="Government ID" className="w-full h-full object-contain" />
-                  ) : (
-                    <FileBadge size={48} className="text-slate-400 dark:text-gray-500" />
-                  )}
-                </div>
-                <div className="text-sm space-y-2">
-                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Type:</span> {user.idType || 'N/A'}</p>
-                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Number:</span> {user.idNumber || 'N/A'}</p>
-                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">ID Expiry:</span> {user.idExpiryDate ? formatDate(user.idExpiryDate) : 'N/A'}</p>
-                </div>
-              </div>
-              
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h4 className="font-medium mb-3">Proof of Address</h4>
-                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                  {user.proofOfAddress ? (
-                    <img src={user.proofOfAddress} alt="Proof of Address" className="w-full h-full object-contain" />
-                  ) : (
-                    <FileBadge size={48} className="text-slate-400 dark:text-gray-500" />
-                  )}
-                </div>
-                <div className="text-sm space-y-2">
-                  <p><span className="text-slate-50 dark:text-white0 dark:text-gray-400">Document Type:</span> {user.addressDocType || 'N/A'}</p>
-                </div>
-              </div>
+            {/* Account ID */}
+            <div className="text-right hidden sm:block">
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Account ID</p>
+              <p className="text-xs sm:text-sm font-mono text-gray-700 dark:text-gray-300">
+                {p.accountNumber || p.id?.slice(0, 12) || "—"}
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h4 className="font-medium mb-3">Selfie with ID</h4>
-                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                  {user.selfieWithId ? (
-                    <img src={user.selfieWithId} alt="Selfie with ID" className="w-full h-full object-contain" />
-                  ) : (
-                    <User size={48} className="text-slate-400 dark:text-gray-500" />
-                  )}
-                </div>
-              </div>
-              
-              <div className="border border-slate-200 rounded-lg p-4">
-                <h4 className="font-medium mb-3">Signature</h4>
-                <div className="aspect-video bg-slate-100 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                  {user.signature ? (
-                    <img src={user.signature} alt="Signature" className="w-full h-full object-contain" />
-                  ) : (
-                    <FileCheck size={48} className="text-slate-400 dark:text-gray-500" />
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-8 border-t border-slate-200 pt-6">
-              <h3 className="text-lg font-bold mb-4">KYC Status Management</h3>
-              <div className="flex flex-wrap gap-3">
-                <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'verified' ? 'bg-slate-400' : 'bg-green-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  disabled={user.kycStatus === 'verified'}
-                  onClick={() => setConfirmAction({ type: 'kyc-verify', visible: true })}
-                >
-                  <ShieldCheck size={16} className="mr-2" />
-                  Verify KYC
-                </motion.button>
-                
-                <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'pending' ? 'bg-slate-400' : 'bg-yellow-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  disabled={user.kycStatus === 'pending'}
-                  onClick={() => setConfirmAction({ type: 'kyc-pending', visible: true })}
-                >
-                  <Calendar size={16} className="mr-2" />
-                  Mark as Pending
-                </motion.button>
-                
-                <motion.button
-                  className={`px-4 py-2 ${user.kycStatus === 'rejected' ? 'bg-slate-400' : 'bg-red-600'} text-slate-50 dark:text-white rounded-lg flex items-center`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  disabled={user.kycStatus === 'rejected'}
-                  onClick={() => setConfirmAction({ type: 'kyc-reject', visible: true })}
-                >
-                  <Lock size={16} className="mr-2" />
-                  Reject KYC
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        )}
+          </div>
+        </DashCard>
       </motion.div>
-      
-      {/* Confirmation Dialog */}
-      {confirmAction && confirmAction.visible && (
-        <div className="fixed inset-0 bg-slate-800 bg-opacity-50 flex items-center justify-center z-50">
-          <motion.div 
-            className="bg-slate-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 max-w-md w-full"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h3 className="text-xl font-bold mb-4">Confirm Action</h3>
-            {confirmAction.type === 'activate' && (
-              <p className="mb-6">
-                Are you sure you want to {user.isActive ? 'deactivate' : 'activate'} this user account?
-                {user.isActive ? ' The user will no longer be able to access their account.' : ' The user will regain access to their account.'}
-              </p>
+
+      {/* ── Quick Stats ── */}
+      <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
+        <StatsGrid cols={4}>
+          <StatCard
+            label="Account Status"
+            value={capitalize(p.accountStatus || p.status) || "Active"}
+            icon={<ShieldCheck size={20} />}
+            iconColor="text-emerald-600 dark:text-emerald-400"
+          />
+          <StatCard
+            label="KYC Level"
+            value={capitalize(kycLevel) || "None"}
+            icon={<BadgeCheck size={20} />}
+            iconColor="text-blue-600 dark:text-blue-400"
+          />
+          <StatCard
+            label="Member Since"
+            value={fmtDate(p.createdAt) || "—"}
+            icon={<Calendar size={20} />}
+            iconColor="text-purple-600 dark:text-purple-400"
+          />
+          <StatCard
+            label="Last Login"
+            value={fmtDate(p.lastLogin) || "—"}
+            icon={<Clock size={20} />}
+            iconColor="text-amber-600 dark:text-amber-400"
+          />
+        </StatsGrid>
+      </motion.div>
+
+      {/* ── Details Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        {/* Personal Details */}
+        <SectionCard
+          icon={<User size={16} />}
+          iconBg="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
+          title="Personal Details"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <InfoField icon={<User size={14} />} label="First Name" value={p.firstName} />
+            <InfoField icon={<User size={14} />} label="Last Name" value={p.lastName} />
+            <InfoField icon={<User size={14} />} label="Middle Name" value={p.middleName} />
+            <InfoField icon={<Calendar size={14} />} label="Date of Birth" value={fmtDate(p.dateOfBirth)} />
+            <InfoField icon={<User size={14} />} label="Gender" value={capitalize(p.gender)} />
+            <InfoField icon={<Globe size={14} />} label="Nationality" value={p.nationality} />
+            <InfoField icon={<Globe size={14} />} label="Country" value={p.countryOfResidence || p.country} />
+            <InfoField icon={<Star size={14} />} label="Marital Status" value={capitalize(p.maritalStatus)} />
+          </div>
+        </SectionCard>
+
+        {/* Contact Information */}
+        <SectionCard
+          icon={<Mail size={16} />}
+          iconBg="bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
+          title="Contact Information"
+        >
+          <div className="space-y-3">
+            <InfoField icon={<Mail size={14} />} label="Email Address" value={p.email} verified={p.isEmailVerified} />
+            <InfoField icon={<Phone size={14} />} label="Phone Number" value={p.phone} verified={p.isPhoneVerified} />
+            <InfoField icon={<Phone size={14} />} label="Alternative Phone" value={p.alternativePhone} />
+            <InfoField icon={<CreditCard size={14} />} label="Account Type" value={capitalize(p.accountType)} />
+            <InfoField icon={<Globe size={14} />} label="Preferred Currency" value={p.preferredCurrency || p.currency} />
+          </div>
+        </SectionCard>
+
+        {/* Address */}
+        <SectionCard
+          icon={<MapPin size={16} />}
+          iconBg="bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400"
+          title="Address"
+        >
+          {aLoad ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => <Shimmer key={i} className="h-10 w-full" />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <InfoField icon={<MapPin size={14} />} label="Street" value={addr.street || p.homeAddress} />
+              <InfoField icon={<Building2 size={14} />} label="City" value={addr.city || p.city} />
+              <InfoField icon={<MapPin size={14} />} label="State / Province" value={addr.state || p.state} />
+              <InfoField icon={<MapPin size={14} />} label="Postal Code" value={addr.postalCode || p.zipCode} />
+              <InfoField icon={<Globe size={14} />} label="Country" value={addr.country || p.country} />
+            </div>
+          )}
+        </SectionCard>
+
+        {/* Employment & Financial */}
+        <SectionCard
+          icon={<Briefcase size={16} />}
+          iconBg="bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400"
+          title="Employment & Financial"
+        >
+          {eLoad ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => <Shimmer key={i} className="h-10 w-full" />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <InfoField icon={<Briefcase size={14} />} label="Employment Status" value={capitalize(emp.status || p.employmentStatus)} />
+              <InfoField icon={<Building2 size={14} />} label="Employer" value={emp.employer || p.employerName} />
+              <InfoField icon={<Briefcase size={14} />} label="Job Title" value={emp.jobTitle || p.occupation} />
+              <InfoField icon={<Target size={14} />} label="Industry" value={emp.industry} />
+              <InfoField
+                icon={<Banknote size={14} />}
+                label="Annual Income"
+                value={emp.annualIncome ? `$${Number(emp.annualIncome).toLocaleString()}` : (p.monthlyIncomeRange || null)}
+              />
+              <InfoField icon={<Banknote size={14} />} label="Source of Funds" value={capitalize(emp.sourceOfFunds || p.sourceOfIncome)} />
+            </div>
+          )}
+        </SectionCard>
+      </div>
+
+      {/* ── KYC Verification ── */}
+      <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
+        <DashCard>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                <ShieldCheck size={16} />
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">KYC Verification</h3>
+            </div>
+            <KycBadge status={kyc.status || p.kycStatus} />
+          </div>
+          <div className="space-y-4">
+            {/* Progress */}
+            <div>
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1.5">
+                <span>Verification Progress</span>
+                <span className="font-semibold">{kycPercent}%</span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${kycPercent}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                />
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {(kyc.completedSteps || []).map((step: string) => (
+                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300">
+                  <CheckCircle2 size={14} />
+                  <span className="text-xs font-medium">{capitalize(step)}</span>
+                </div>
+              ))}
+              {(kyc.pendingSteps || []).map((step: string) => (
+                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300">
+                  <Clock size={14} />
+                  <span className="text-xs font-medium">{capitalize(step)}</span>
+                </div>
+              ))}
+              {(kyc.rejectedSteps || []).map((step: string) => (
+                <div key={step} className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300">
+                  <AlertCircle size={14} />
+                  <span className="text-xs font-medium">{capitalize(step)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Limits */}
+            {kyc.limits && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Daily Limit</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                    ${Number(kyc.limits.dailyTransaction || 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monthly Limit</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                    ${Number(kyc.limits.monthlyTransaction || 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Max Balance</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                    ${Number(kyc.limits.maxBalance || 0).toLocaleString()}
+                  </p>
+                </div>
+              </div>
             )}
-            {confirmAction.type === 'lock' && (
-              <p className="mb-6">
-                Are you sure you want to {user.isLocked ? 'unlock' : 'lock'} this user account?
-                {user.isLocked ? ' The user will be able to log in again.' : ' The user will be prevented from logging in.'}
-              </p>
-            )}
-            {confirmAction.type === 'kyc-verify' && (
-              <p className="mb-6">
-                Are you sure you want to verify this user's KYC? This will grant them full access to all platform features.
-              </p>
-            )}
-            {confirmAction.type === 'kyc-pending' && (
-              <p className="mb-6">
-                Are you sure you want to mark this user's KYC as pending? This will limit their access to some platform features.
-              </p>
-            )}
-            {confirmAction.type === 'kyc-reject' && (
-              <p className="mb-6">
-                Are you sure you want to reject this user's KYC? This will significantly restrict their account functionality.
-              </p>
-            )}
-            
-            <div className="flex justify-end space-x-3">
+          </div>
+        </DashCard>
+      </motion.div>
+
+      {/* ── Bank Accounts ── */}
+      <motion.div variants={dashboardItemVariants}>
+        <DashCard>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400">
+                <Landmark size={16} />
+              </div>
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                Linked Bank Accounts
+              </h3>
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {banks.length} account{banks.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {banks.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-12 h-12 mx-auto bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center text-gray-400 mb-3">
+                <Landmark size={22} />
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">No bank accounts linked yet</p>
               <button
-                className="px-4 py-2 bg-slate-200 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-300"
-                onClick={() => setConfirmAction(null)}
+                onClick={() => navigate("/customer/profile/edit")}
+                className="mt-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
               >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-600 text-slate-50 dark:text-white rounded hover:bg-blue-700"
-                onClick={() => {
-                  if (confirmAction.type === 'activate') {
-                    handleActivateDeactivate();
-                  } else if (confirmAction.type === 'lock') {
-                    handleLockUnlock();
-                  } else if (confirmAction.type === 'kyc-verify') {
-                    handleKycStatusChange('verified');
-                  } else if (confirmAction.type === 'kyc-pending') {
-                    handleKycStatusChange('pending');
-                  } else if (confirmAction.type === 'kyc-reject') {
-                    handleKycStatusChange('rejected');
-                  }
-                }}
-              >
-                Confirm
+                Add a bank account →
               </button>
             </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Render UserTransfer below the details section */}
-      {/* <div className="mt-8">
-        <UserTransfer />
-      </div> */}
-    </motion.div>
+          ) : (
+            <div className="space-y-2">
+              {banks.map((bank: any, i: number) => (
+                <div
+                  key={bank.id || i}
+                  className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400">
+                      <Landmark size={14} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          {bank.bankName || "Bank Account"}
+                        </p>
+                        {bank.isPrimary && (
+                          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+                            PRIMARY
+                          </span>
+                        )}
+                        {bank.isVerified && <CheckCircle2 size={12} className="text-emerald-500" />}
+                      </div>
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        {bank.accountName ? `${bank.accountName} • ` : ""}
+                        ••••{bank.accountNumber?.slice(-4) || "****"} • {bank.currency || "USD"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DashCard>
+      </motion.div>
+    </PageContainer>
   );
 };
 

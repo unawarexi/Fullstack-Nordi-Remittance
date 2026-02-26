@@ -1,374 +1,453 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Save } from 'lucide-react';
-import { getUserById, updateUserById } from '@core/api/UserService';
+// ============================================================================
+// CLIENT USER EDIT — Self-service profile editing
+// Uses useUpdateProfile, useUpdateAddress, useUpdateEmployment mutations
+// Dark mode + DashboardPrimitives + grey borders + responsive
+// ============================================================================
 
-const TABS = [
-  { key: 'personal', label: 'Personal Details' },
-  { key: 'account', label: 'Account Details' },
-  { key: 'financial', label: 'Financial Info' },
-  { key: 'security', label: 'Security Settings' },
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import {
+  User, MapPin, Briefcase, Loader2, Check, Trash2, Edit3,
+} from "@constants/icons";
+import PageHeader from "@components/shared/PageHeader";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
+import { dashboardItemVariants } from "@core/animation/Animation";
+import {
+  useUserProfile, useUserAddress, useUserEmployment,
+  useUpdateProfile, useUpdateAddress, useUpdateEmployment,
+  useUpdateAvatar, useDeleteAvatar,
+} from "@hooks/queries/useUsers";
+
+/* ── Helpers ─────────────────────────────────────────────────────────── */
+const inputCls =
+  "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
+const labelCls =
+  "block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5";
+
+const tabs = [
+  { key: "personal" as const, label: "Personal", icon: <User size={14} /> },
+  { key: "address" as const, label: "Address", icon: <MapPin size={14} /> },
+  { key: "employment" as const, label: "Employment", icon: <Briefcase size={14} /> },
 ];
+type Tab = "personal" | "address" | "employment";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, staggerChildren: 0.1 } }
-};
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
-};
-
-const ClientUserEdit = () => {
-  const { id } = useParams<{ id: string }>();
+/* ══════════════════════════════════════════════════════════════════════════ */
+const ClientUserEdit: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('personal');
-  const [success, setSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("personal");
+
+  /* ── Data hooks ── */
+  const { data: profileData } = useUserProfile();
+  const { data: addressData } = useUserAddress();
+  const { data: employmentData } = useUserEmployment();
+
+  /* ── Mutation hooks ── */
+  const updateProfile = useUpdateProfile();
+  const updateAddress = useUpdateAddress();
+  const updateEmployment = useUpdateEmployment();
+  const updateAvatar = useUpdateAvatar();
+  const deleteAvatar = useDeleteAvatar();
+
+  const p = ((profileData ?? {}) as Record<string, any>);
+  const a = ((addressData ?? {}) as Record<string, any>);
+  const e = ((employmentData ?? {}) as Record<string, any>);
+
+  /* ── Form State ── */
+  const [personal, setPersonal] = useState({
+    firstName: "", lastName: "", middleName: "", phone: "",
+    dateOfBirth: "", gender: "" as string,
+  });
+  const [address, setAddress] = useState({
+    street: "", city: "", state: "", country: "", postalCode: "",
+  });
+  const [employment, setEmployment] = useState({
+    status: "" as string, employer: "", jobTitle: "",
+    industry: "", annualIncome: "", sourceOfFunds: "",
+  });
+
+  /* Seed form from API data */
+  useEffect(() => {
+    if (p.firstName) setPersonal({
+      firstName: p.firstName || "",
+      lastName: p.lastName || "",
+      middleName: p.middleName || "",
+      phone: p.phone || "",
+      dateOfBirth: p.dateOfBirth ? p.dateOfBirth.split("T")[0] : "",
+      gender: p.gender || "",
+    });
+  }, [profileData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (id) fetchUser(id);
-  }, [id]);
+    if (a.street || a.city) setAddress({
+      street: a.street || "",
+      city: a.city || "",
+      state: a.state || "",
+      country: a.country || "",
+      postalCode: a.postalCode || "",
+    });
+  }, [addressData]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchUser = async (userId: string) => {
-    setLoading(true);
-    try {
-      const data = await getUserById(userId);
-      setUser(data.user ? data.user : data);
-      setError(null);
-    } catch (e) {
-      setError('Failed to load user.');
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    if (e.status || e.employer) setEmployment({
+      status: e.status || "",
+      employer: e.employer || "",
+      jobTitle: e.jobTitle || "",
+      industry: e.industry || "",
+      annualIncome: e.annualIncome ? String(e.annualIncome) : "",
+      sourceOfFunds: e.sourceOfFunds || "",
+    });
+  }, [employmentData]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── Handlers ── */
+  const savePersonal = () => {
+    updateProfile.mutate({
+      firstName: personal.firstName || undefined,
+      lastName: personal.lastName || undefined,
+      middleName: personal.middleName || undefined,
+      phone: personal.phone || undefined,
+      dateOfBirth: personal.dateOfBirth || undefined,
+      gender: (personal.gender as any) || undefined,
+    });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
-    setUser((prev: any) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const saveAddress = () => {
+    updateAddress.mutate({
+      street: address.street || undefined,
+      city: address.city || undefined,
+      state: address.state || undefined,
+      country: address.country || undefined,
+      postalCode: address.postalCode || undefined,
+    });
   };
 
-  const handleSave = async () => {
-    if (!user || !id) return;
-    setSaving(true);
-    setError(null);
-    try {
-      await updateUserById(id, user);
-      setSuccess(true);
-      setTimeout(() => navigate(`/admin/users/${id}`), 1200);
-    } catch (e) {
-      setError('Failed to update user.');
-    } finally {
-      setSaving(false);
-    }
+  const saveEmployment = () => {
+    updateEmployment.mutate({
+      status: (employment.status as any) || undefined,
+      employer: employment.employer || undefined,
+      jobTitle: employment.jobTitle || undefined,
+      industry: employment.industry || undefined,
+      annualIncome: employment.annualIncome ? Number(employment.annualIncome) : undefined,
+      sourceOfFunds: employment.sourceOfFunds || undefined,
+    });
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-800 dark:bg-gray-800">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading user...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleAvatarUpload = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
+    if (file) updateAvatar.mutate(file);
+  };
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-800 dark:bg-gray-800">
-        <div className="text-center max-w-md p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md">
-          <div className="text-red-600 text-5xl mb-4">!</div>
-          <h2 className="text-xl font-bold mb-2">Error</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            onClick={() => navigate('/admin/users')}
-          >
-            Back to User List
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
+  const avatarSrc = p.profilePicture || p.avatar;
+  const initials = [p.firstName, p.lastName]
+    .filter(Boolean)
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase() || "?";
 
   return (
-    <motion.div 
-      className="container mx-auto py-6 px-4 max-w-4xl"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header */}
-      <motion.div className="flex justify-between items-center mb-6" variants={itemVariants}>
-        <div className="flex items-center">
-          <button 
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-800 mr-4"
-            onClick={() => navigate(`/admin/users/${id}`)}
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">Edit User</h1>
-            <p className="text-gray-500">Update user information</p>
+    <PageContainer>
+      {/* ── Header ── */}
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Edit Profile"
+          subtitle="Update your personal information"
+          showBackButton
+          onBack={() => navigate("/customer/profile")}
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Profile", href: "/customer/profile" },
+            { label: "Edit" },
+          ]}
+        />
+      </motion.div>
+
+      {/* ── Avatar Section ── */}
+      <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
+        <DashCard>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold overflow-hidden">
+                {avatarSrc ? (
+                  <img src={avatarSrc} alt="" className="w-full h-full object-cover" />
+                ) : initials}
+              </div>
+              <label className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700 transition-colors">
+                <Edit3 size={11} />
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              </label>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Profile Photo</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">JPG, PNG or GIF, max 5MB</p>
+              {avatarSrc && (
+                <button
+                  onClick={() => deleteAvatar.mutate()}
+                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-medium"
+                >
+                  <Trash2 size={12} /> Remove photo
+                </button>
+              )}
+            </div>
           </div>
+        </DashCard>
+      </motion.div>
+
+      {/* ── Tab Navigation ── */}
+      <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
+        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`flex items-center gap-1.5 flex-1 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                activeTab === t.key
+                  ? "bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border border-gray-200 dark:border-gray-700"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              }`}
+            >
+              {t.icon} {t.label}
+            </button>
+          ))}
         </div>
-        <motion.button
-          className={`px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          disabled={saving}
-          onClick={handleSave}
-        >
-          <Save size={16} className="mr-2" />
-          {saving ? 'Saving...' : 'Save Changes'}
-        </motion.button>
       </motion.div>
 
-      {/* Tabs */}
-      <motion.div className="flex border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 mb-6 overflow-x-auto" variants={itemVariants}>
-        {TABS.map(tab => (
-          <button
-            key={tab.key}
-            className={`py-3 px-6 text-sm font-medium border-b-2 ${activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300'}`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Tab Content */}
-      <motion.div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 mb-6" variants={itemVariants}>
-        {activeTab === 'personal' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-            <h3 className="text-lg font-bold mb-4">Personal Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* ── Tab Content ── */}
+      <motion.div variants={dashboardItemVariants}>
+        {/* PERSONAL TAB */}
+        {activeTab === "personal" && (
+          <DashCard>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+              Personal Details
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">First Name</label>
-                <input name="firstName" value={user.firstName || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>First Name</label>
+                <input
+                  className={inputCls}
+                  value={personal.firstName}
+                  onChange={(ev) => setPersonal({ ...personal, firstName: ev.target.value })}
+                  placeholder="Enter first name"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Middle Name</label>
-                <input name="middleName" value={user.middleName || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Last Name</label>
+                <input
+                  className={inputCls}
+                  value={personal.lastName}
+                  onChange={(ev) => setPersonal({ ...personal, lastName: ev.target.value })}
+                  placeholder="Enter last name"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Last Name</label>
-                <input name="lastName" value={user.lastName || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Middle Name</label>
+                <input
+                  className={inputCls}
+                  value={personal.middleName}
+                  onChange={(ev) => setPersonal({ ...personal, middleName: ev.target.value })}
+                  placeholder="Enter middle name"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Date of Birth</label>
-                <input name="dateOfBirth" type="date" value={user.dateOfBirth ? user.dateOfBirth.slice(0,10) : ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Phone Number</label>
+                <input
+                  className={inputCls}
+                  value={personal.phone}
+                  onChange={(ev) => setPersonal({ ...personal, phone: ev.target.value })}
+                  placeholder="+1 234 567 8900"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Gender</label>
-                <select name="gender" value={user.gender || ''} onChange={handleChange} className="input input-bordered w-full">
-                  <option value="">Select</option>
+                <label className={labelCls}>Date of Birth</label>
+                <input
+                  type="date"
+                  className={inputCls}
+                  value={personal.dateOfBirth}
+                  onChange={(ev) => setPersonal({ ...personal, dateOfBirth: ev.target.value })}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Gender</label>
+                <select
+                  className={inputCls}
+                  value={personal.gender}
+                  onChange={(ev) => setPersonal({ ...personal, gender: ev.target.value })}
+                >
+                  <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <motion.button
+                onClick={savePersonal}
+                disabled={updateProfile.isPending}
+                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {updateProfile.isPending ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                Save Personal Info
+              </motion.button>
+            </div>
+          </DashCard>
+        )}
+
+        {/* ADDRESS TAB */}
+        {activeTab === "address" && (
+          <DashCard>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+              Address Information
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className={labelCls}>Street Address</label>
+                <input
+                  className={inputCls}
+                  value={address.street}
+                  onChange={(ev) => setAddress({ ...address, street: ev.target.value })}
+                  placeholder="123 Main Street"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>City</label>
+                <input
+                  className={inputCls}
+                  value={address.city}
+                  onChange={(ev) => setAddress({ ...address, city: ev.target.value })}
+                  placeholder="Enter city"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>State / Province</label>
+                <input
+                  className={inputCls}
+                  value={address.state}
+                  onChange={(ev) => setAddress({ ...address, state: ev.target.value })}
+                  placeholder="Enter state"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Postal Code</label>
+                <input
+                  className={inputCls}
+                  value={address.postalCode}
+                  onChange={(ev) => setAddress({ ...address, postalCode: ev.target.value })}
+                  placeholder="10001"
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Country</label>
+                <input
+                  className={inputCls}
+                  value={address.country}
+                  onChange={(ev) => setAddress({ ...address, country: ev.target.value })}
+                  placeholder="Enter country"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <motion.button
+                onClick={saveAddress}
+                disabled={updateAddress.isPending}
+                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {updateAddress.isPending ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                Save Address
+              </motion.button>
+            </div>
+          </DashCard>
+        )}
+
+        {/* EMPLOYMENT TAB */}
+        {activeTab === "employment" && (
+          <DashCard>
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+              Employment & Financial
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>Employment Status</label>
+                <select
+                  className={inputCls}
+                  value={employment.status}
+                  onChange={(ev) => setEmployment({ ...employment, status: ev.target.value })}
+                >
+                  <option value="">Select status</option>
+                  <option value="employed">Employed</option>
+                  <option value="self_employed">Self Employed</option>
+                  <option value="unemployed">Unemployed</option>
+                  <option value="retired">Retired</option>
+                  <option value="student">Student</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Nationality</label>
-                <input name="nationality" value={user.nationality || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Employer Name</label>
+                <input
+                  className={inputCls}
+                  value={employment.employer}
+                  onChange={(ev) => setEmployment({ ...employment, employer: ev.target.value })}
+                  placeholder="Company name"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Country of Residence</label>
-                <input name="countryOfResidence" value={user.countryOfResidence || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Job Title</label>
+                <input
+                  className={inputCls}
+                  value={employment.jobTitle}
+                  onChange={(ev) => setEmployment({ ...employment, jobTitle: ev.target.value })}
+                  placeholder="Software Engineer"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Marital Status</label>
-                <select name="maritalStatus" value={user.maritalStatus || ''} onChange={handleChange} className="input input-bordered w-full">
-                  <option value="">Select</option>
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
-                  <option value="divorced">Divorced</option>
-                  <option value="widowed">Widowed</option>
-                </select>
+                <label className={labelCls}>Industry</label>
+                <input
+                  className={inputCls}
+                  value={employment.industry}
+                  onChange={(ev) => setEmployment({ ...employment, industry: ev.target.value })}
+                  placeholder="Technology"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Email</label>
-                <input name="email" value={user.email || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Annual Income ($)</label>
+                <input
+                  type="number"
+                  className={inputCls}
+                  value={employment.annualIncome}
+                  onChange={(ev) => setEmployment({ ...employment, annualIncome: ev.target.value })}
+                  placeholder="50000"
+                />
               </div>
               <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Mobile Number</label>
-                <input name="mobileNumber" value={user.mobileNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Alternative Phone</label>
-                <input name="alternativePhone" value={user.alternativePhone || ''} onChange={handleChange} className="input input-bordered w-full" />
+                <label className={labelCls}>Source of Funds</label>
+                <input
+                  className={inputCls}
+                  value={employment.sourceOfFunds}
+                  onChange={(ev) => setEmployment({ ...employment, sourceOfFunds: ev.target.value })}
+                  placeholder="Employment income"
+                />
               </div>
             </div>
-            <h3 className="text-lg font-bold mb-4 mt-8">Address Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Home Address</label>
-                <input name="homeAddress" value={user.homeAddress || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">City</label>
-                <input name="city" value={user.city || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">State/Province</label>
-                <input name="stateProvince" value={user.stateProvince || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Zip/Postal Code</label>
-                <input name="zipCode" value={user.zipCode || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Country</label>
-                <input name="country" value={user.country || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
+            <div className="flex justify-end mt-6">
+              <motion.button
+                onClick={saveEmployment}
+                disabled={updateEmployment.isPending}
+                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {updateEmployment.isPending ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                Save Employment Info
+              </motion.button>
             </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'account' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-            <h3 className="text-lg font-bold mb-4">Account Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Account Type</label>
-                <input name="accountType" value={user.accountType || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Account Number</label>
-                <input name="accountNumber" value={user.accountNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Account Name</label>
-                <input name="accountName" value={user.accountName || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Currency</label>
-                <input name="currency" value={user.currency || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Initial Deposit</label>
-                <input name="initialDeposit" type="number" value={user.initialDeposit || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Referral Code</label>
-                <input name="referralCode" value={user.referralCode || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Invite Code</label>
-                <input name="inviteCode" value={user.inviteCode || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'financial' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-            <h3 className="text-lg font-bold mb-4">Financial Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Source of Income</label>
-                <input name="sourceOfIncome" value={user.sourceOfIncome || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Monthly Income Range</label>
-                <input name="monthlyIncomeRange" value={user.monthlyIncomeRange || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Employment Status</label>
-                <input name="employmentStatus" value={user.employmentStatus || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Employer Name</label>
-                <input name="employerName" value={user.employerName || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Occupation</label>
-                <input name="occupation" value={user.occupation || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tax Identification Number</label>
-                <input name="taxIdentificationNumber" value={user.taxIdentificationNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Social Security Number</label>
-                <input name="socialSecurityNumber" value={user.socialSecurityNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-            </div>
-            <h3 className="text-lg font-bold mb-4 mt-8">Bank Account Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Bank Name</label>
-                <input name="bankName" value={user.bankName || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Bank Address</label>
-                <input name="bankAddress" value={user.bankAddress || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">IBAN Number</label>
-                <input name="ibanNumber" value={user.ibanNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Routing Number</label>
-                <input name="routingNumber" value={user.routingNumber || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">SWIFT/BIC</label>
-                <input name="swiftBic" value={user.swiftBic || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === 'security' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-            <h3 className="text-lg font-bold mb-4">Security Settings</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Enable Two-Factor</label>
-                <input type="checkbox" name="enableTwoFactor" checked={!!user.enableTwoFactor} onChange={handleChange} className="mr-2" />
-                <span>{user.enableTwoFactor ? 'Enabled' : 'Disabled'}</span>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Two-Factor Method</label>
-                <input name="twoFactorMethod" value={user.twoFactorMethod || ''} onChange={handleChange} className="input input-bordered w-full" disabled={!user.enableTwoFactor} />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1">Security Question</label>
-                <input name="securityQuestion" value={user.securityQuestion || ''} onChange={handleChange} className="input input-bordered w-full" />
-              </div>
-            </div>
-          </motion.div>
+          </DashCard>
         )}
       </motion.div>
-
-      {/* Success Message */}
-      {success && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <motion.div 
-            className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 max-w-sm w-full text-center"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="text-green-600 text-4xl mb-2">✓</div>
-            <div className="font-bold mb-2">User updated successfully!</div>
-          </motion.div>
-        </div>
-      )}
-    </motion.div>
+    </PageContainer>
   );
 };
 

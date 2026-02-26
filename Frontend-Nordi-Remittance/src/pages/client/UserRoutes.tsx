@@ -14,6 +14,7 @@ import InstantPayment from "./components/send_money/InstantPayment";
 // Profile (existing)
 import PersonalInformation from "./components/profile_preferences/Personal_Infomation";
 import Communication from "./components/profile_preferences/Communication";
+import ClientUserEdit from "./components/profile_preferences/ClientUserEdit";
 
 // Main section pages
 import MyAccounts from "./components/MyAccounts";
@@ -177,6 +178,7 @@ export default function UserRoutes() {
       {/* Profile & Preferences */}
       <Route path="profile" element={<PersonalInformation />} />
       <Route path="profile/personal" element={<PersonalInformation />} />
+      <Route path="profile/edit" element={<ClientUserEdit />} />
       <Route path="profile/communication" element={<Communication />} />
       <Route path="profile/language" element={<LanguageRegion />} />
       <Route path="profile/documents" element={<DocumentCenter />} />
