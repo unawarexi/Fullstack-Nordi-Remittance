@@ -1,959 +1,632 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+// ============================================================================
+// QUICK TRANSFER — 3-step wizard
+// Steps: 1) Recipient  2) Payment Details  3) Review & Send
+// ============================================================================
+import React, { useState, useMemo } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
-  Zap,
-  Search,
-  ChevronRight,
+  Users,
   User,
   Phone,
   Mail,
   DollarSign,
-  FileText,
-  Clock,
-  Check,
-  X,
-  Loader,
-  AlertCircle,
-  ArrowRight,
-  Lock,
+  Send,
+  Shield,
+  Search,
+  Zap,
+  CreditCard,
   Star,
-  Heart,
-  ChevronDown,
-  BanknoteIcon,
-  Calendar,
-  Repeat,
-  HelpCircle,
-} from "lucide-react";
+  Info,
+  Lock,
+} from "@constants/icons";
+import { useWallets } from "@hooks/queries/useAccounts";
+import {
+  useTransferToUser,
+  useRecentRecipients,
+} from "@hooks/queries/useTransactions";
+import {
+  TransferLayout,
+  StepIndicator,
+  StepContent,
+  WizardNav,
+  TCard,
+  TInput,
+  TTextarea,
+  AccountSelector,
+  ReviewRow,
+  ReviewSection,
+  FeeSummary,
+  TransferResult,
+  safeArray,
+  formatCurrency,
+} from "@components/shared/TransferPrimitives";
+import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
 
-// Mock data for contacts
-const contacts = [
-  { id: 1, name: "John Smith", type: "phone", value: "+1 (555) 123-4567", avatar: "JS", recent: true },
-  { id: 2, name: "Emma Wilson", type: "email", value: "emma.w@example.com", avatar: "EW", recent: true },
-  { id: 3, name: "Michael Johnson", type: "phone", value: "+1 (555) 987-6543", avatar: "MJ", recent: true },
-  { id: 4, name: "Sarah Davis", type: "email", value: "sarah.d@example.com", avatar: "SD", recent: false },
-  { id: 5, name: "Robert Taylor", type: "phone", value: "+1 (555) 234-5678", avatar: "RT", recent: false },
-  { id: 6, name: "Lisa Brown", type: "email", value: "lisa.b@example.com", avatar: "LB", recent: false },
-  { id: 7, name: "David Wilson", type: "phone", value: "+1 (555) 345-6789", avatar: "DW", recent: false },
-  { id: 8, name: "Jennifer Lopez", type: "email", value: "jennifer.l@example.com", avatar: "JL", recent: false },
+// ─── Constants ───────────────────────────────────────────────────────────────
+const STEPS: WizardStep[] = [
+  { label: "Recipient" },
+  { label: "Payment" },
+  { label: "Review" },
 ];
 
-// Mock data for payment methods
-const paymentMethods = [
-  { id: 1, name: "From Account", balance: 12450.75, number: "****3456", type: "checking", default: true },
-  { id: 2, name: "Savings Account", balance: 8750.25, number: "****7890", type: "savings", default: false },
-  { id: 3, name: "Credit Card", balance: 5000, number: "****1234", type: "credit", default: false },
+const P2P_NETWORKS = [
+  { value: "zelle", label: "Zelle", fee: "Free", eta: "Instant" },
+  { value: "venmo", label: "Venmo", fee: "Free", eta: "1-3 days" },
+  { value: "paypal", label: "PayPal", fee: "0.5%", eta: "Instant" },
+  { value: "cashapp", label: "Cash App", fee: "Free", eta: "1-2 days" },
 ];
 
-// Transaction limits
-const limits = {
-  quick: {
-    perTransaction: 2000,
-    daily: 5000,
-    remaining: 4500,
-  }
-};
+const LIMITS = { perTransaction: 2000, daily: 5000, remaining: 4500 };
 
-// P2P Networks
-const p2pNetworks = [
-  { id: 1, name: "Zelle", icon: "🔵", fee: 0, time: "Instant" },
-  { id: 2, name: "Venmo", icon: "🟢", fee: 0, time: "1-3 days" },
-  { id: 3, name: "PayPal", icon: "🔷", fee: 0.5, time: "Instant" },
-  { id: 4, name: "Cash App", icon: "🟩", fee: 0, time: "1-2 days" },
-];
-
-// Form validation schema
-const QuickTransferSchema = Yup.object().shape({
-  recipientType: Yup.string()
-    .required("Recipient type is required"),
-  recipientId: Yup.string()
-    .when("recipientType", {
-      is: "contact",
-      then: Yup.string().required("Recipient is required"),
-    }),
-  recipientPhone: Yup.string()
-    .when("recipientType", {
-      is: "phone",
-      then: Yup.string()
+// ─── Validation ──────────────────────────────────────────────────────────────
+const schema = Yup.object({
+  recipientMethod: Yup.string()
+    .oneOf(["contact", "phone", "email"])
+    .required(),
+  recipientId: Yup.string().when("recipientMethod", {
+    is: "contact",
+    then: (s) => s.required("Select a contact"),
+    otherwise: (s) => s.notRequired(),
+  }),
+  recipientPhone: Yup.string().when("recipientMethod", {
+    is: "phone",
+    then: (s) =>
+      s
         .required("Phone number is required")
-        .matches(/^\+?[1-9]\d{9,14}$/, "Phone number is not valid"),
-    }),
-  recipientEmail: Yup.string()
-    .when("recipientType", {
-      is: "email",
-      then: Yup.string()
-        .required("Email is required")
-        .email("Email is not valid"),
-    }),
+        .matches(/^\+?[1-9]\d{9,14}$/, "Invalid phone number"),
+    otherwise: (s) => s.notRequired(),
+  }),
+  recipientEmail: Yup.string().when("recipientMethod", {
+    is: "email",
+    then: (s) => s.required("Email is required").email("Invalid email"),
+    otherwise: (s) => s.notRequired(),
+  }),
   amount: Yup.number()
-    .required("Amount is required")
-    .positive("Amount must be positive")
-    .max(limits.quick.perTransaction, `Maximum per transaction is $${limits.quick.perTransaction}`)
-    .test(
-      "daily-limit",
-      `Daily limit of $${limits.quick.daily} will be exceeded`,
-      function(value) {
-        return value <= limits.quick.remaining;
-      }
-    ),
-  paymentMethod: Yup.string()
-    .required("Payment method is required"),
-  p2pNetwork: Yup.string()
-    .required("P2P network is required"),
-  memo: Yup.string()
-    .max(100, "Memo cannot exceed 100 characters"),
-  transferCode: Yup.string()
-    .required("Transfer code is required")
-    .matches(/^\d{4}$/, "Transfer code must be 4 digits"),
+    .required("Enter an amount")
+    .positive("Must be positive")
+    .max(LIMITS.perTransaction, `Max $${LIMITS.perTransaction.toLocaleString()} per transfer`),
+  fromAccount: Yup.string().required("Select a payment source"),
+  network: Yup.string().required("Select a transfer network"),
+  memo: Yup.string().max(100),
+  pin: Yup.string()
+    .required("Enter your PIN")
+    .matches(/^\d{4}$/, "4-digit PIN required"),
 });
 
-// Animation variants
-const pageVariants = {
-  initial: { opacity: 0, y: 20 },
-  in: { opacity: 1, y: 0 },
-  out: { opacity: 0, y: -20 }
-};
-
-const cardVariants = {
-  initial: { opacity: 0, y: 10, scale: 0.95 },
-  in: { 
-    opacity: 1, 
-    y: 0, 
-    scale: 1,
-    transition: { 
-      type: "spring",
-      stiffness: 100,
-      damping: 15
-    }
-  },
-  hover: {
-    y: -5,
-    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    transition: { type: "spring", stiffness: 300, damping: 15 }
-  },
-  tap: { scale: 0.98 }
-};
-
-const staggerContainerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.07
-    }
-  }
-};
-
-const staggerItemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
-
+// ─── Component ───────────────────────────────────────────────────────────────
 const QuickTransfer: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedContact, setSelectedContact] = useState<any>(null);
-  const [recipientType, setRecipientType] = useState<"contact" | "phone" | "email">("contact");
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [transferSuccess, setTransferSuccess] = useState(false);
-  const [transactionId, setTransactionId] = useState("");
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(paymentMethods[0]);
-  const [selectedP2PNetwork, setSelectedP2PNetwork] = useState(p2pNetworks[0]);
-  const [filteredContacts, setFilteredContacts] = useState(contacts);
-  const [recentContacts, setRecentContacts] = useState(contacts.filter(c => c.recent));
-  
-  // Filter contacts based on search term
-  useEffect(() => {
-    if (searchTerm) {
-      const filtered = contacts.filter(contact => 
-        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.value.toLowerCase().includes(searchTerm.toLowerCase())
+  const [step, setStep] = useState(0);
+  const [result, setResult] = useState<{
+    success: boolean;
+    reference?: string;
+  } | null>(null);
+  const [contactSearch, setContactSearch] = useState("");
+
+  // Hooks
+  const { data: walletsRaw, isLoading: walletsLoading } = useWallets();
+  const { data: recentRaw, isLoading: recipientsLoading } =
+    useRecentRecipients(20);
+  const transferToUser = useTransferToUser();
+
+  const wallets: AccountOption[] = safeArray(walletsRaw);
+  const recentContacts = safeArray(recentRaw);
+
+  const filteredContacts = useMemo(
+    () =>
+      contactSearch
+        ? recentContacts.filter(
+            (c: any) =>
+              (c.firstName || c.name || "")
+                .toLowerCase()
+                .includes(contactSearch.toLowerCase()) ||
+              (c.email || c.phone || "").includes(contactSearch),
+          )
+        : recentContacts,
+    [recentContacts, contactSearch],
+  );
+
+  // Form
+  const formik = useFormik({
+    initialValues: {
+      recipientMethod: "contact" as "contact" | "phone" | "email",
+      recipientId: "",
+      recipientPhone: "",
+      recipientEmail: "",
+      amount: "",
+      fromAccount: "",
+      network: "zelle",
+      memo: "",
+      pin: "",
+    },
+    validationSchema: schema,
+    onSubmit: (values) => {
+      const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
+      const contact = recentContacts.find(
+        (c: any) => c.id === values.recipientId,
       );
-      setFilteredContacts(filtered);
-    } else {
-      setFilteredContacts(contacts);
-    }
-  }, [searchTerm]);
+      const email =
+        values.recipientMethod === "email"
+          ? values.recipientEmail
+          : values.recipientMethod === "contact"
+            ? contact?.email || ""
+            : "";
 
-  // Generate transaction ID
-  useEffect(() => {
-    const generateTransactionId = () => {
-      return `QT${Math.floor(100000000 + Math.random() * 900000000)}`;
+      transferToUser.mutate(
+        {
+          sourceAccountId: values.fromAccount as any,
+          recipientEmail: email || values.recipientPhone,
+          amount: Number(values.amount),
+          currency: (selectedAccount?.currency || "USD") as any,
+          description: values.memo || undefined,
+          pin: values.pin,
+        },
+        {
+          onSuccess: (data: any) => {
+            setResult({
+              success: true,
+              reference:
+                data?.referenceNumber ||
+                data?.id ||
+                `QT${Date.now().toString().slice(-9)}`,
+            });
+          },
+          onError: () => {
+            setResult({ success: false });
+          },
+        },
+      );
+    },
+  });
+
+  const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setTouched,
+  } = formik;
+
+  const goNext = async () => {
+    const fieldsByStep: Record<number, string[]> = {
+      0:
+        values.recipientMethod === "contact"
+          ? ["recipientId"]
+          : values.recipientMethod === "phone"
+            ? ["recipientPhone"]
+            : ["recipientEmail"],
+      1: ["amount", "fromAccount", "network"],
+      2: ["pin"],
     };
-    
-    setTransactionId(generateTransactionId());
-  }, [transferSuccess]);
-
-  const handleSelectContact = (contact: any) => {
-    setSelectedContact(contact);
-    setRecipientType("contact");
+    const fields = fieldsByStep[step] || [];
+    const touchMap: Record<string, boolean> = {};
+    fields.forEach((f) => (touchMap[f] = true));
+    setTouched(touchMap, true);
+    const errs = await formik.validateForm();
+    if (fields.some((f) => (errs as any)[f])) return;
+    if (step < 2) setStep(step + 1);
+    else handleSubmit();
   };
 
-  const handleSelectRecipientType = (type: "contact" | "phone" | "email") => {
-    setRecipientType(type);
-    if (type !== "contact") {
-      setSelectedContact(null);
-    }
-  };
+  // Derived
+  const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
+  const selectedContact = recentContacts.find(
+    (c: any) => c.id === values.recipientId,
+  );
+  const networkInfo = P2P_NETWORKS.find((n) => n.value === values.network);
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    setLoading(true);
-    
-    // Simulate API call for processing transfer
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitting(false);
-      setStep(2);
-      setTransferSuccess(true);
-    }, 2000);
-  };
+  const recipientDisplay =
+    values.recipientMethod === "contact"
+      ? selectedContact?.firstName ||
+        selectedContact?.name ||
+        "—"
+      : values.recipientMethod === "phone"
+        ? values.recipientPhone
+        : values.recipientEmail;
 
-  const resetForm = () => {
-    setStep(1);
-    setTransferSuccess(false);
-    setSelectedContact(null);
-    setSearchTerm("");
-  };
-
-  const handleSelectPaymentMethod = (paymentMethod: any) => {
-    setSelectedPaymentMethod(paymentMethod);
-  };
-
-  const handleSelectP2PNetwork = (network: any) => {
-    setSelectedP2PNetwork(network);
-  };
-
-  return (
-    <motion.div
-      className="p-6 max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-indigo-900 dark:text-white">Quick Transfer</h1>
-          <p className="text-sm text-purple-500">Send money to contacts or mobile numbers</p>
-        </div>
-        <div className="flex items-center">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center text-white">
-            <Zap size={20} />
-          </div>
-        </div>
-      </div>
-
-      {/* Status Indicators */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <motion.div 
-            className={`flex flex-col items-center ${step >= 1 ? 'text-indigo-600' : 'text-gray-400'}`}
-            animate={{ scale: step === 1 ? 1.05 : 1 }}
-          >
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'}`}>
-              <User size={18} />
-            </div>
-            <span className="text-xs mt-1">Recipient</span>
-          </motion.div>
-          
-          <motion.div 
-            className="flex-1 h-1 mx-2"
-            initial={{ backgroundColor: "#E2E8F0" }}
-            animate={{ backgroundColor: step >= 2 ? "#818CF8" : "#E2E8F0" }}
+  // ─── Result Screen ──────────────────────────────────────────────────
+  if (result) {
+    return (
+      <TransferLayout>
+        <TCard>
+          <TransferResult
+            success={result.success}
+            title={result.success ? "Money Sent!" : "Transfer Failed"}
+            subtitle={
+              result.success
+                ? `Your quick transfer to ${recipientDisplay} is being processed.`
+                : "Something went wrong. Please try again."
+            }
+            reference={result.reference}
+            details={
+              result.success
+                ? [
+                    { label: "Amount", value: formatCurrency(values.amount) },
+                    {
+                      label: "Network",
+                      value: networkInfo?.label || "—",
+                    },
+                    { label: "To", value: recipientDisplay || "—" },
+                    { label: "ETA", value: networkInfo?.eta || "—" },
+                  ]
+                : undefined
+            }
+            onNewTransfer={() => {
+              formik.resetForm();
+              setStep(0);
+              setResult(null);
+            }}
           />
-          
-          <motion.div 
-            className={`flex flex-col items-center ${step >= 2 ? 'text-indigo-600' : 'text-gray-400'}`}
-            animate={{ scale: step === 2 ? 1.05 : 1 }}
-          >
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'}`}>
-              <Check size={18} />
-            </div>
-            <span className="text-xs mt-1">Confirmation</span>
-          </motion.div>
-        </div>
+        </TCard>
+      </TransferLayout>
+    );
+  }
+
+  // ─── Wizard ─────────────────────────────────────────────────────────
+  return (
+    <TransferLayout>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+          Quick Transfer
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Send money instantly to friends and family.
+        </p>
       </div>
 
-      {/* Content based on step */}
-      <AnimatePresence mode="wait">
-        {step === 1 && (
-          <motion.div
-            key="step1"
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-          >
-            {/* Recipient Selection */}
-            <div className="mb-8">
-              <div className="flex space-x-2 mb-6">
-                <motion.button
-                  className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium 
-                    ${recipientType === "contact" ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}
-                  onClick={() => handleSelectRecipientType("contact")}
-                  whileHover={{ backgroundColor: recipientType === "contact" ? "#C7D2FE" : "#F3F4F6" }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center justify-center">
-                    <User size={16} className="mr-2" />
-                    From Contacts
-                  </div>
-                </motion.button>
-                
-                <motion.button
-                  className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium 
-                    ${recipientType === "phone" ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}
-                  onClick={() => handleSelectRecipientType("phone")}
-                  whileHover={{ backgroundColor: recipientType === "phone" ? "#C7D2FE" : "#F3F4F6" }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center justify-center">
-                    <Phone size={16} className="mr-2" />
-                    Phone Number
-                  </div>
-                </motion.button>
-                
-                <motion.button
-                  className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium 
-                    ${recipientType === "email" ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}
-                  onClick={() => handleSelectRecipientType("email")}
-                  whileHover={{ backgroundColor: recipientType === "email" ? "#C7D2FE" : "#F3F4F6" }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center justify-center">
-                    <Mail size={16} className="mr-2" />
-                    Email Address
-                  </div>
-                </motion.button>
+      <TCard>
+        <StepIndicator steps={STEPS} current={step} />
+      </TCard>
+
+      <StepContent step={step}>
+        {/* ── Step 0: Recipient ── */}
+        {step === 0 && (
+          <div className="space-y-6">
+            <TCard title="Choose Recipient" icon={<Users size={18} />}>
+              {/* Method tabs */}
+              <div className="flex gap-2 mb-5">
+                {[
+                  { key: "contact" as const, label: "Contacts", icon: <Users size={14} /> },
+                  { key: "phone" as const, label: "Phone", icon: <Phone size={14} /> },
+                  { key: "email" as const, label: "Email", icon: <Mail size={14} /> },
+                ].map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => {
+                      setFieldValue("recipientMethod", t.key);
+                      setFieldValue("recipientId", "");
+                      setFieldValue("recipientPhone", "");
+                      setFieldValue("recipientEmail", "");
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                      values.recipientMethod === t.key
+                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400"
+                        : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    {t.icon} {t.label}
+                  </button>
+                ))}
               </div>
 
-              {/* Contact selection interface */}
-              {recipientType === "contact" && (
-                <div>
-                  {/* Search bar */}
-                  <div className="relative mb-6">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search size={16} className="text-gray-400" />
-                    </div>
+              {values.recipientMethod === "contact" && (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
                     <input
                       type="text"
-                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Search contacts by name or number..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      value={contactSearch}
+                      onChange={(e) => setContactSearch(e.target.value)}
+                      placeholder="Search contacts…"
+                      className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     />
                   </div>
 
-                  {/* Recent contacts */}
-                  {searchTerm === "" && (
-                    <div className="mb-6">
-                      <h3 className="text-sm font-semibold text-indigo-900 mb-3">Recent Recipients</h3>
-                      <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-indigo-200">
-                        {recentContacts.map((contact) => (
-                          <motion.div
-                            key={contact.id}
-                            className={`flex flex-col items-center p-3 rounded-xl cursor-pointer min-w-[90px] ${
-                              selectedContact?.id === contact.id ? 'bg-indigo-100 border-2 border-indigo-300' : 'bg-gray-50'
-                            }`}
-                            variants={cardVariants}
-                            initial="initial"
-                            animate="in"
-                            whileHover="hover"
-                            whileTap="tap"
-                            onClick={() => handleSelectContact(contact)}
-                          >
-                            <div className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white font-medium mb-2">
-                              {contact.avatar}
-                            </div>
-                            <div className="text-xs font-medium text-center">{contact.name}</div>
-                            <div className="text-xs text-gray-500 truncate w-full text-center">
-                              {contact.type === "phone" ? "📱" : "✉️"} {contact.value.substring(0, 10) + "..."}
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
+                  {recipientsLoading ? (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className="h-14 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  ) : filteredContacts.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
+                      No contacts found
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 sm:grid-cols-2 max-h-72 overflow-y-auto pr-1">
+                      {filteredContacts.map((c: any) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setFieldValue("recipientId", c.id)}
+                          className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                            values.recipientId === c.id
+                              ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
+                              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                          }`}
+                        >
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                            {(c.firstName || c.name || "?")
+                              .charAt(0)
+                              .toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {`${c.firstName || ""} ${c.lastName || ""}`.trim() ||
+                                c.name ||
+                                "—"}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              {c.email || c.phone || "—"}
+                            </p>
+                          </div>
+                          {c.isFavorite && (
+                            <Star
+                              size={12}
+                              className="text-amber-400 flex-shrink-0"
+                            />
+                          )}
+                        </button>
+                      ))}
                     </div>
                   )}
-
-                  {/* All contacts */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-indigo-900 mb-3">
-                      {searchTerm === "" ? "All Contacts" : `Search Results (${filteredContacts.length})`}
-                    </h3>
-                    
-                    <div className="bg-gray-50 rounded-xl p-2 max-h-64 overflow-y-auto">
-                      {filteredContacts.length > 0 ? (
-                        <motion.div
-                          variants={staggerContainerVariants}
-                          initial="hidden"
-                          animate="show"
-                          className="space-y-2"
-                        >
-                          {filteredContacts.map((contact) => (
-                            <motion.div
-                              key={contact.id}
-                              variants={staggerItemVariants}
-                              className={`flex items-center p-3 rounded-lg cursor-pointer ${
-                                selectedContact?.id === contact.id ? 'bg-indigo-100' : 'hover:bg-gray-100'
-                              }`}
-                              onClick={() => handleSelectContact(contact)}
-                            >
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white font-medium mr-3">
-                                {contact.avatar}
-                              </div>
-                              <div className="flex-1">
-                                <div className="font-medium text-indigo-900 dark:text-white">{contact.name}</div>
-                                <div className="text-xs text-gray-500 flex items-center">
-                                  {contact.type === "phone" ? (
-                                    <Phone size={12} className="mr-1" />
-                                  ) : (
-                                    <Mail size={12} className="mr-1" />
-                                  )}
-                                  {contact.value}
-                                </div>
-                              </div>
-                              <div>
-                                <ChevronRight size={18} className="text-gray-400" />
-                              </div>
-                            </motion.div>
-                          ))}
-                        </motion.div>
-                      ) : (
-                        <div className="py-4 text-center text-gray-500">
-                          No contacts found matching your search
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {errors.recipientId && touched.recipientId && (
+                    <p className="text-xs text-red-500">{errors.recipientId}</p>
+                  )}
                 </div>
               )}
 
-              {/* Transfer Form */}
-              <Formik
-                initialValues={{
-                  recipientType: recipientType,
-                  recipientId: selectedContact?.id || "",
-                  recipientPhone: "",
-                  recipientEmail: "",
-                  amount: "",
-                  paymentMethod: selectedPaymentMethod.id,
-                  p2pNetwork: selectedP2PNetwork.id,
-                  memo: "",
-                  transferCode: "",
-                }}
-                validationSchema={QuickTransferSchema}
-                onSubmit={handleSubmit}
-                enableReinitialize
-              >
-                {({ isSubmitting, errors, touched, values, setFieldValue }) => (
-                  <Form className="space-y-6 mt-8">
-                    {/* Recipient details for phone */}
-                    {recipientType === "phone" && (
-                      <div className="space-y-1">
-                        <label htmlFor="recipientPhone" className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          Phone Number
-                        </label>
-                        <div className="relative">
-                          <Field
-                            type="text"
-                            name="recipientPhone"
-                            id="recipientPhone"
-                            className={`
-                              mt-1 block w-full pl-10 pr-3 py-2 text-base border-gray-300 
-                              focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 
-                              sm:text-sm rounded-lg ${errors.recipientPhone && touched.recipientPhone ? 'border-red-300' : ''}
-                            `}
-                            placeholder="Enter recipient's phone number"
-                          />
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Phone size={16} className="text-indigo-500" />
-                          </div>
-                          <ErrorMessage name="recipientPhone" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-                    )}
+              {values.recipientMethod === "phone" && (
+                <TInput
+                  label="Phone Number"
+                  name="recipientPhone"
+                  type="tel"
+                  value={values.recipientPhone}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="+1 234 567 8900"
+                  error={errors.recipientPhone}
+                  touched={touched.recipientPhone}
+                  icon={<Phone size={16} />}
+                />
+              )}
 
-                    {/* Recipient details for email */}
-                    {recipientType === "email" && (
-                      <div className="space-y-1">
-                        <label htmlFor="recipientEmail" className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          Email Address
-                        </label>
-                        <div className="relative">
-                          <Field
-                            type="email"
-                            name="recipientEmail"
-                            id="recipientEmail"
-                            className={`
-                              mt-1 block w-full pl-10 pr-3 py-2 text-base border-gray-300 
-                              focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 
-                              sm:text-sm rounded-lg ${errors.recipientEmail && touched.recipientEmail ? 'border-red-300' : ''}
-                            `}
-                            placeholder="Enter recipient's email address"
-                          />
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Mail size={16} className="text-indigo-500" />
-                          </div>
-                          <ErrorMessage name="recipientEmail" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-                    )}
+              {values.recipientMethod === "email" && (
+                <TInput
+                  label="Email Address"
+                  name="recipientEmail"
+                  type="email"
+                  value={values.recipientEmail}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="recipient@example.com"
+                  error={errors.recipientEmail}
+                  touched={touched.recipientEmail}
+                  icon={<Mail size={16} />}
+                />
+              )}
+            </TCard>
 
-                    {/* Selected recipient display */}
-                    {recipientType === "contact" && selectedContact && (
-                      <div className="bg-indigo-50 p-4 rounded-lg flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white font-medium mr-3">
-                            {selectedContact.avatar}
-                          </div>
-                          <div>
-                            <div className="font-medium text-indigo-900 dark:text-white">{selectedContact.name}</div>
-                            <div className="text-xs text-gray-600 flex items-center">
-                              {selectedContact.type === "phone" ? (
-                                <Phone size={12} className="mr-1" />
-                              ) : (
-                                <Mail size={12} className="mr-1" />
-                              )}
-                              {selectedContact.value}
-                            </div>
-                          </div>
-                        </div>
-                        <button 
-                          type="button"
-                          onClick={() => setSelectedContact(null)}
-                          className="text-indigo-500 hover:text-indigo-700"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Transfer limits info */}
-                    <div className="bg-indigo-50 rounded-xl p-4 mb-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <Clock size={16} className="text-indigo-600 mr-2" />
-                          <span className="text-sm font-medium text-indigo-800">Quick Transfer Limits</span>
-                        </div>
-                        <HelpCircle size={16} className="text-indigo-400" />
-                      </div>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <div className="text-xs text-indigo-500 mb-1">Per Transaction</div>
-                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.perTransaction.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-indigo-500 mb-1">Daily Limit</div>
-                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.daily.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-indigo-500 mb-1">Remaining Today</div>
-                          <div className="text-sm font-semibold text-indigo-900 dark:text-white">${limits.quick.remaining.toLocaleString()}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Amount */}
-                      <div className="space-y-1">
-                        <label htmlFor="amount" className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          Amount
-                        </label>
-                        <div className="relative">
-                          <Field
-                            type="number"
-                            name="amount"
-                            id="amount"
-                            className={`
-                              mt-1 block w-full pl-10 pr-3 py-2 text-base border-gray-300 
-                              focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 
-                              sm:text-sm rounded-lg ${errors.amount && touched.amount ? 'border-red-300' : ''}
-                            `}
-                            placeholder="Enter amount"
-                            step="0.01"
-                          />
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <DollarSign size={16} className="text-indigo-500" />
-                          </div>
-                          <ErrorMessage name="amount" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          From Account
-                        </label>
-                        <div className="mt-1">
-                          <Field name="paymentMethod">
-                            {({ field, form }) => (
-                              <div className="bg-gray-50 rounded-lg overflow-hidden">
-                                {paymentMethods.map((method) => (
-                                  <motion.div
-                                    key={method.id}
-                                    className={`flex items-center p-3 cursor-pointer ${
-                                      parseInt(field.value) === method.id 
-                                        ? 'bg-indigo-100 border-l-4 border-indigo-500' 
-                                        : 'hover:bg-gray-100 border-l-4 border-transparent'
-                                    }`}
-                                    onClick={() => {
-                                      form.setFieldValue(field.name, method.id);
-                                      handleSelectPaymentMethod(method);
-                                    }}
-                                    whileHover={{ x: 3 }}
-                                    whileTap={{ scale: 0.99 }}
-                                  >
-                                    <div className="flex-1">
-                                      <div className="font-medium text-indigo-900 dark:text-white">{method.name}</div>
-                                      <div className="text-xs text-gray-500 flex items-center justify-between">
-                                        <span>{method.number}</span>
-                                        <span className="font-semibold text-indigo-700">${method.balance.toLocaleString()}</span>
-                                      </div>
-                                    </div>
-                                    <div className="ml-3">
-                                      {parseInt(field.value) === method.id && (
-                                        <Check size={16} className="text-indigo-600" />
-                                      )}
-                                    </div>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            )}
-                          </Field>
-                          <ErrorMessage name="paymentMethod" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-
-                      {/* P2P Network */}
-                      <div className="space-y-1">
-                        <label className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          Transfer Method
-                        </label>
-                        <div className="mt-1">
-                          <Field name="p2pNetwork">
-                            {({ field, form }) => (
-                              <div className="grid grid-cols-2 gap-3">
-                                {p2pNetworks.map((network) => (
-                                  <motion.div
-                                    key={network.id}
-                                    className={`
-                                      flex items-center p-3 rounded-lg cursor-pointer border
-                                      ${parseInt(field.value) === network.id 
-                                        ? 'bg-indigo-50 border-indigo-300' 
-                                        : 'bg-white border-gray-200 hover:bg-gray-50'
-                                      }
-                                    `}
-                                    onClick={() => {
-                                      form.setFieldValue(field.name, network.id);
-                                      handleSelectP2PNetwork(network);
-                                    }}
-                                    whileHover={{ y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                  >
-                                    <div className="mr-3">{network.icon}</div>
-                                    <div className="flex-1">
-                                      <div className="font-medium text-indigo-900 dark:text-white">{network.name}</div>
-                                      <div className="text-xs flex justify-between">
-                                        <span className="text-gray-500">Fee: {network.fee > 0 ? `${network.fee}%` : 'Free'}</span>
-                                        <span className="text-indigo-600">{network.time}</span>
-                                        </div>
-                                        </div>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            )}
-                          </Field>
-                          <ErrorMessage name="p2pNetwork" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-
-                      {/* Memo */}
-                      <div className="space-y-1">
-                        <label htmlFor="memo" className="block text-sm font-medium text-indigo-900 dark:text-white">
-                          Memo (Optional)
-                        </label>
-                        <div className="relative">
-                          <Field
-                            as="textarea"
-                            name="memo"
-                            id="memo"
-                            rows={2}
-                            className="mt-1 block w-full pl-10 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg"
-                            placeholder="What's this payment for?"
-                          />
-                          <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
-                            <FileText size={16} className="text-indigo-500" />
-                          </div>
-                          <ErrorMessage name="memo" component="div" className="text-red-500 text-xs mt-1" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Transfer security code */}
-                    <div className="space-y-1 max-w-xs mx-auto mt-6">
-                      <label htmlFor="transferCode" className="block text-sm font-medium text-indigo-900 text-center">
-                        Enter your 4-digit transfer code
-                      </label>
-                      <div className="relative mt-2">
-                        <Field
-                          type="password"
-                          name="transferCode"
-                          id="transferCode"
-                          className={`
-                            block w-full pl-10 pr-3 py-2 text-center text-base border-gray-300 
-                            focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 
-                            sm:text-sm rounded-lg ${errors.transferCode && touched.transferCode ? 'border-red-300' : ''}
-                          `}
-                          placeholder="Enter 4-digit code"
-                          maxLength={4}
-                        />
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock size={16} className="text-indigo-500" />
-                        </div>
-                        <ErrorMessage name="transferCode" component="div" className="text-red-500 text-xs mt-1 text-center" />
-                      </div>
-                      <p className="text-xs text-gray-500 text-center mt-1">
-                        This code helps protect your account
-                      </p>
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="pt-5">
-                      <motion.button
-                        type="submit"
-                        className={`
-                          w-full py-3 px-4 rounded-xl text-white font-medium
-                          ${isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'}
-                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                          flex items-center justify-center
-                        `}
-                        disabled={isSubmitting}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader size={20} className="animate-spin mr-2" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Send Money
-                            <ArrowRight size={18} className="ml-2" />
-                          </>
-                        )}
-                      </motion.button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
-            </div>
-          </motion.div>
-        )}
-
-        {step === 2 && (
-          <motion.div
-            key="step2"
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            className="bg-white p-6 rounded-2xl"
-          >
-            {/* Confirmation Screen */}
-            <div className="text-center mb-8">
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="mx-auto mb-4"
-              >
-                {transferSuccess ? (
-                  <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <Check size={40} className="text-green-500" />
-                  </div>
-                ) : (
-                  <div className="h-20 w-20 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                    <AlertCircle size={40} className="text-red-500" />
-                  </div>
-                )}
-              </motion.div>
-              <h2 className="text-2xl font-bold text-indigo-900 mb-2">
-                {transferSuccess ? "Transfer Successful!" : "Transfer Failed"}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {transferSuccess
-                  ? "Your money is on its way to the recipient."
-                  : "There was an issue processing your transfer. Please try again."}
-              </p>
-            </div>
-
-            {transferSuccess && (
-              <motion.div
-                variants={staggerContainerVariants}
-                initial="hidden"
-                animate="show"
-              >
-                {/* Transaction Details */}
-                <div className="bg-indigo-50 rounded-xl p-6 mb-6">
-                  <h3 className="text-sm font-semibold text-indigo-900 mb-4 flex items-center">
-                    <FileText size={16} className="mr-2" />
-                    Transaction Details
-                  </h3>
-
-                  <motion.div variants={staggerItemVariants} className="space-y-4">
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Transaction ID</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">{transactionId}</span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Date & Time</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
-                        {new Date().toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Amount</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
-                        ${parseFloat("0").toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Recipient</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
-                        {selectedContact?.name || "Recipient"}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Payment Method</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
-                        {selectedPaymentMethod?.name}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2 border-b border-indigo-100">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Network</span>
-                      <span className="text-sm font-medium text-indigo-900 dark:text-white">
-                        {selectedP2PNetwork?.name}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
-                      <span className="text-sm font-medium bg-green-100 text-green-800 py-1 px-3 rounded-full">
-                        Complete
-                      </span>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Receipt Options */}
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-sm font-semibold text-indigo-900 flex items-center">
-                      <Mail size={16} className="mr-2" />
-                      Receipt Options
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <motion.button
-                      className="flex items-center justify-center py-3 px-4 border border-indigo-300 rounded-xl bg-white text-indigo-800 hover:bg-indigo-50"
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Mail size={18} className="mr-2" />
-                      Email Receipt
-                    </motion.button>
-
-                    <motion.button
-                      className="flex items-center justify-center py-3 px-4 border border-indigo-300 rounded-xl bg-white text-indigo-800 hover:bg-indigo-50"
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Phone size={18} className="mr-2" />
-                      Text Receipt
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Save contact and favorite options */}
-                {recipientType !== "contact" && (
-                  <motion.div variants={staggerItemVariants} className="mb-8">
-                    <div className="bg-indigo-50 rounded-xl p-4">
-                      <div className="flex space-x-4">
-                        <motion.button
-                          className="flex-1 flex items-center justify-center py-3 px-4 bg-white border border-indigo-300 rounded-lg text-indigo-800 hover:bg-indigo-50"
-                          whileHover={{ y: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <User size={18} className="mr-2" />
-                          Save as Contact
-                        </motion.button>
-
-                        <motion.button
-                          className="flex-1 flex items-center justify-center py-3 px-4 bg-white border border-indigo-300 rounded-lg text-indigo-800 hover:bg-indigo-50"
-                          whileHover={{ y: -2 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Star size={18} className="mr-2" />
-                          Add to Favorites
-                        </motion.button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex flex-col space-y-4 mt-8">
-              <motion.button
-                className="w-full py-3 px-4 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                onClick={resetForm}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {transferSuccess ? "Make Another Transfer" : "Try Again"}
-              </motion.button>
-
-              {transferSuccess && (
-                <motion.button
-                  className="w-full py-3 px-4 rounded-xl border border-indigo-300 bg-white text-indigo-800 font-medium hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+            {/* Limits info */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                {
+                  label: "Per Transfer",
+                  value: `$${LIMITS.perTransaction.toLocaleString()}`,
+                },
+                {
+                  label: "Daily Limit",
+                  value: `$${LIMITS.daily.toLocaleString()}`,
+                },
+                {
+                  label: "Remaining",
+                  value: `$${LIMITS.remaining.toLocaleString()}`,
+                },
+              ].map((l) => (
+                <div
+                  key={l.label}
+                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center"
                 >
-                  <div className="flex items-center justify-center">
-                    <Calendar size={18} className="mr-2" />
-                    Schedule Recurring Payment
-                  </div>
-                </motion.button>
-              )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {l.label}
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
+                    {l.value}
+                  </p>
+                </div>
+              ))}
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
 
-      {/* Rate limits and legal info */}
-      <div className="mt-8 text-xs text-gray-500">
-        <div className="flex items-center mb-2">
-          <Lock size={12} className="mr-1" />
-          <span>Your information is secured with end-to-end encryption</span>
-        </div>
-        <p>
-          Quick Transfers are subject to daily and transaction limits. All transfers are subject to review and could be delayed or stopped if suspicious activity is detected. See Terms and Conditions for more details.
-        </p>
+        {/* ── Step 1: Payment Details ── */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <TCard title="Payment Details" icon={<DollarSign size={18} />}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TInput
+                  label="Amount"
+                  name="amount"
+                  type="number"
+                  value={values.amount}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="0.00"
+                  error={errors.amount}
+                  touched={touched.amount}
+                  icon={<DollarSign size={16} />}
+                />
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Sending to
+                  </label>
+                  <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <User size={16} className="text-gray-400" />
+                    <span className="text-sm text-gray-900 dark:text-white truncate">
+                      {recipientDisplay}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </TCard>
+
+            <TCard title="Payment Source" icon={<CreditCard size={18} />}>
+              <AccountSelector
+                accounts={wallets}
+                selected={values.fromAccount}
+                onSelect={(id) => setFieldValue("fromAccount", id)}
+                loading={walletsLoading}
+              />
+              {errors.fromAccount && touched.fromAccount && (
+                <p className="text-xs text-red-500 mt-2">
+                  {errors.fromAccount}
+                </p>
+              )}
+            </TCard>
+
+            <TCard title="Transfer Network" icon={<Zap size={18} />}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {P2P_NETWORKS.map((n) => (
+                  <button
+                    key={n.value}
+                    type="button"
+                    onClick={() => setFieldValue("network", n.value)}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      values.network === n.value
+                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/50"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <span className="text-sm font-medium text-gray-900 dark:text-white block">
+                      {n.label}
+                    </span>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Fee: {n.fee}
+                      </span>
+                      <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                        {n.eta}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </TCard>
+
+            <TTextarea
+              label="Memo (optional)"
+              name="memo"
+              value={values.memo}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="What's this for?"
+              rows={2}
+              error={errors.memo}
+              touched={touched.memo}
+            />
+          </div>
+        )}
+
+        {/* ── Step 2: Review & PIN ── */}
+        {step === 2 && (
+          <div className="space-y-6">
+            <ReviewSection title="Transfer Summary" icon={<Send size={16} />}>
+              <ReviewRow
+                label="Amount"
+                value={formatCurrency(values.amount)}
+                highlight
+              />
+              <ReviewRow
+                label="Network"
+                value={networkInfo?.label || "—"}
+              />
+              <ReviewRow label="Fee" value={networkInfo?.fee || "Free"} />
+              <ReviewRow label="ETA" value={networkInfo?.eta || "—"} />
+              {values.memo && (
+                <ReviewRow label="Memo" value={values.memo} />
+              )}
+            </ReviewSection>
+
+            <ReviewSection title="Recipient" icon={<User size={16} />}>
+              <ReviewRow label="To" value={recipientDisplay || "—"} />
+              <ReviewRow
+                label="Method"
+                value={
+                  values.recipientMethod === "contact"
+                    ? "Saved Contact"
+                    : values.recipientMethod === "phone"
+                      ? "Phone Number"
+                      : "Email"
+                }
+              />
+            </ReviewSection>
+
+            <ReviewSection
+              title="Payment Source"
+              icon={<CreditCard size={16} />}
+            >
+              <ReviewRow
+                label="Account"
+                value={
+                  selectedAccount?.name ||
+                  selectedAccount?.walletType ||
+                  "—"
+                }
+              />
+              <ReviewRow
+                label="Balance"
+                value={
+                  typeof selectedAccount?.balance === "number"
+                    ? formatCurrency(selectedAccount.balance)
+                    : "—"
+                }
+              />
+            </ReviewSection>
+
+            {/* PIN */}
+            <TCard title="Security" icon={<Lock size={18} />}>
+              <TInput
+                label="Enter your 4-digit PIN"
+                name="pin"
+                type="password"
+                maxLength={4}
+                value={values.pin}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="••••"
+                error={errors.pin}
+                touched={touched.pin}
+                icon={<Lock size={16} />}
+                className="max-w-xs"
+              />
+            </TCard>
+          </div>
+        )}
+      </StepContent>
+
+      <WizardNav
+        showBack={step > 0}
+        onBack={step > 0 ? () => setStep(step - 1) : undefined}
+        onNext={goNext}
+        nextLabel={step === 2 ? "Send Money" : "Continue"}
+        loading={transferToUser.isPending}
+      />
+
+      <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 justify-center pb-4">
+        <Info size={12} />
+        <span>Quick transfers are instant and secure.</span>
       </div>
-    </motion.div>
+    </TransferLayout>
   );
 };
 

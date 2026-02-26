@@ -164,4 +164,11 @@ export {
   Instagram,
   Youtube,
   Linkedin,
+
+  // Transfer / Print
+  Printer,
+  Share2,
+  Hash,
+  ChevronsUp,
+  ChevronsDown,
 } from 'lucide-react';
