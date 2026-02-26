@@ -44,6 +44,7 @@ import LegalRoutes from './routes/Legal.routes.js';
 import IntegrationRoutes from './routes/Integrations.routes.js';
 import SecurityRoutes from './routes/Security.routes.js';
 import TransferVerificationRoutes from './routes/TransferVerification.routes.js';
+import KycRoutes from './routes/Kyc.routes.js';
 
 // Services
 import { initializeWebSocket } from './services/Websocket.service.js';
@@ -221,6 +222,9 @@ app.use(`${API_PREFIX}/integrations`, IntegrationRoutes);
 // Security routes
 app.use(`${API_PREFIX}/security`, SecurityRoutes);
 
+// KYC routes (Know Your Customer verification)
+app.use(`${API_PREFIX}/kyc`, KycRoutes);
+
 // Secure Transfer Verification routes (3-step verification for transfers/withdrawals)
 app.use(`${API_PREFIX}/transactions/secure-transfer`, TransferVerificationRoutes);
 
@@ -252,6 +256,7 @@ app.get(`${API_PREFIX}`, (req: Request, res: Response) => {
       legal: `${API_PREFIX}/legal`,
       integrations: `${API_PREFIX}/integrations`,
       security: `${API_PREFIX}/security`,
+      kyc: `${API_PREFIX}/kyc`,
     },
     healthCheck: '/health',
   });
