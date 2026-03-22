@@ -8,31 +8,42 @@
 // - Manual transaction creation
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { AdminUsers, AdminPermissions, AdminActionLogs } from '../models/AdminModel.js';
-import Users from '../models/UserModel.js';
-import { Wallets, LedgerEntries } from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { Loans, LoanApplications } from '../models/LoansModel.js';
-import { Cards, CardApplications } from '../models/CardsModel.js';
-import { InvestmentAccounts, Portfolios } from '../models/InvestmentsModel.js';
-import { Notifications } from '../models/NotificationModel.js';
-import { TransactionTaxes } from '../models/TransferVerificationModel.js';
-import { generateReferenceNumber, generateUUID } from '../core/helpers/generator.js';
-import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/response.helper.js';
-import { 
-  UnauthorizedError, 
-  ValidationError, 
-  NotFoundError, 
+import { Response, NextFunction } from "express";
+import mongoose from "mongoose";
+import type { AuthenticatedRequest } from "../types/index.js";
+import {
+  AdminUsers,
+  AdminPermissions,
+  AdminActionLogs,
+} from "../models/AdminModel.js";
+import Users from "../models/UserModel.js";
+import { Wallets, LedgerEntries } from "../models/AccountsModel.js";
+import Transactions from "../models/TransactionModel.js";
+import { Loans, LoanApplications } from "../models/LoansModel.js";
+import { Cards, CardApplications } from "../models/CardsModel.js";
+import { InvestmentAccounts, Portfolios } from "../models/InvestmentsModel.js";
+import { Notifications } from "../models/NotificationModel.js";
+import { TransactionTaxes } from "../models/TransferVerificationModel.js";
+import {
+  generateReferenceNumber,
+  generateUUID,
+} from "../core/helpers/generator.js";
+import {
+  sendSuccess,
+  sendCreated,
+  sendPaginated,
+} from "../core/helpers/response.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
   ForbiddenError,
-  InsufficientBalanceError
-} from '../core/errors/AppError.js';
-import { sendTemplatedMail } from '../services/Mailer.service.js';
-import EmailContentGenerator from '../core/mail/Mail-content.js';
-import { emitToUser } from '../services/Websocket.service.js';
-import { WS } from '../core/constants/ws-events.js';
+  InsufficientBalanceError,
+} from "../core/errors/AppError.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { emitToUser } from "../services/websocket.service.js";
+import { WS } from "../core/constants/ws-events.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -41,8 +52,8 @@ const emailGenerator = new EmailContentGenerator();
 // TAX CONSTANTS
 // ============================================================================
 
-const TAX_RATE = 0.20; // 20% mandatory tax
-const TAX_EXEMPT_TYPES = ['loan', 'loan_disbursement', 'loan_repayment']; // No tax on loans
+const TAX_RATE = 0.2; // 20% mandatory tax
+const TAX_EXEMPT_TYPES = ["loan", "loan_disbursement", "loan_repayment"]; // No tax on loans
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -53,21 +64,21 @@ const TAX_EXEMPT_TYPES = ['loan', 'loan_disbursement', 'loan_repayment']; // No 
  * Tax is NOT applied to loans
  */
 function calculateTransactionTax(
-  amount: number, 
-  transactionType: string
+  amount: number,
+  transactionType: string,
 ): { taxAmount: number; netAmount: number; isTaxExempt: boolean } {
   // Check if transaction type is tax exempt (loans)
-  const isTaxExempt = TAX_EXEMPT_TYPES.some(t => 
-    transactionType.toLowerCase().includes(t.toLowerCase())
+  const isTaxExempt = TAX_EXEMPT_TYPES.some((t) =>
+    transactionType.toLowerCase().includes(t.toLowerCase()),
   );
-  
+
   if (isTaxExempt) {
     return { taxAmount: 0, netAmount: amount, isTaxExempt: true };
   }
-  
+
   const taxAmount = Math.round(amount * TAX_RATE * 100) / 100;
   const netAmount = Math.round((amount - taxAmount) * 100) / 100;
-  
+
   return { taxAmount, netAmount, isTaxExempt: false };
 }
 
@@ -81,23 +92,28 @@ async function createTaxRecord(
   originalAmount: number,
   taxAmount: number,
   currency: string,
-  session?: mongoose.ClientSession
+  session?: mongoose.ClientSession,
 ): Promise<void> {
   if (taxAmount <= 0) return; // No tax to record
-  
+
   const createOptions = session ? { session } : {};
-  await TransactionTaxes.create([{
-    transaction: transactionId.toString(),
-    user: userId.toString(),
-    transactionType,
-    originalAmount,
-    taxRate: TAX_RATE,
-    taxAmount,
-    totalAmount: originalAmount, // User paid the full amount
-    currency,
-    status: 'collected',
-    collectedAt: new Date(),
-  }], createOptions as any);
+  await TransactionTaxes.create(
+    [
+      {
+        transaction: transactionId.toString(),
+        user: userId.toString(),
+        transactionType,
+        originalAmount,
+        taxRate: TAX_RATE,
+        taxAmount,
+        totalAmount: originalAmount, // User paid the full amount
+        currency,
+        status: "collected",
+        collectedAt: new Date(),
+      },
+    ],
+    createOptions as any,
+  );
 }
 
 /**
@@ -114,7 +130,11 @@ function getWalletBalance(wallet: any, currency: string): number {
 /**
  * Update wallet balance for a specific currency
  */
-function updateWalletBalance(wallet: any, currency: string, amount: number): void {
+function updateWalletBalance(
+  wallet: any,
+  currency: string,
+  amount: number,
+): void {
   if (!wallet.balances) {
     wallet.balances = new Map();
   }
@@ -129,17 +149,20 @@ function updateWalletBalance(wallet: any, currency: string, amount: number): voi
 /**
  * Check if admin has specific permission
  */
-async function hasPermission(adminId: string, permission: string): Promise<boolean> {
-  const admin = await AdminUsers.findById(adminId).populate('permissions');
+async function hasPermission(
+  adminId: string,
+  permission: string,
+): Promise<boolean> {
+  const admin = await AdminUsers.findById(adminId).populate("permissions");
   if (!admin) return false;
-  
+
   // Super admin has all permissions
-  if (admin.role === 'super_admin') return true;
-  
+  if (admin.role === "super_admin") return true;
+
   // Check specific permission
   const permissions = await AdminPermissions.findOne({ admin: adminId });
   if (!permissions) return false;
-  
+
   return (permissions as any)[permission] === true;
 }
 
@@ -153,8 +176,8 @@ async function logAdminAction(
   resourceId: string,
   changes: any,
   req: AuthenticatedRequest,
-  status: 'success' | 'failed',
-  failureReason?: string
+  status: "success" | "failed",
+  failureReason?: string,
 ): Promise<void> {
   await AdminActionLogs.create({
     admin: adminId,
@@ -162,8 +185,8 @@ async function logAdminAction(
     resource,
     resourceId,
     changes,
-    ipAddress: req.ip || '',
-    userAgent: req.headers['user-agent'] || '',
+    ipAddress: req.ip || "",
+    userAgent: req.headers["user-agent"] || "",
     status,
     failureReason,
   });
@@ -177,7 +200,7 @@ async function notifyUser(
   title: string,
   message: string,
   type: string,
-  metadata?: any
+  metadata?: any,
 ): Promise<void> {
   await Notifications.create({
     user: userId,
@@ -187,9 +210,9 @@ async function notifyUser(
     metadata,
     isRead: false,
   });
-  
+
   // Real-time notification
-  emitToUser(userId, 'notification', { title, message, type });
+  emitToUser(userId, "notification", { title, message, type });
 }
 
 // ============================================================================
@@ -203,51 +226,59 @@ async function notifyUser(
 export async function creditUserWallet(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canCredit = await hasPermission(req.user.userId, 'canAdjustBalances');
+    const canCredit = await hasPermission(req.user.userId, "canAdjustBalances");
     if (!canCredit) {
-      throw new ForbiddenError('You do not have permission to credit user wallets');
+      throw new ForbiddenError(
+        "You do not have permission to credit user wallets",
+      );
     }
 
     const {
       userId,
       amount,
-      currency = 'USD',
+      currency = "USD",
       description,
-      transactionType = 'deposit', // deposit, funding, bonus, refund, correction
+      transactionType = "deposit", // deposit, funding, bonus, refund, correction
       reference,
       metadata,
     } = req.body;
 
     // Validate amount
     if (!amount || amount <= 0) {
-      throw new ValidationError('Amount must be greater than zero');
+      throw new ValidationError("Amount must be greater than zero");
     }
 
     // Calculate tax (20% - except for loans)
-    const { taxAmount, netAmount, isTaxExempt } = calculateTransactionTax(amount, transactionType);
+    const { taxAmount, netAmount, isTaxExempt } = calculateTransactionTax(
+      amount,
+      transactionType,
+    );
 
     // Get user
     const user = await Users.findById(userId).session(session);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     // Get or create wallet
-    let wallet = await Wallets.findOne({ user: userId, status: 'active' }).session(session);
+    let wallet = await Wallets.findOne({
+      user: userId,
+      status: "active",
+    }).session(session);
     if (!wallet) {
       wallet = new Wallets({
         user: userId,
         walletNumber: `W${Date.now()}${Math.random().toString(36).substring(7)}`,
         balances: new Map([[currency, 0]]),
-        status: 'active',
-        walletType: 'personal',
+        status: "active",
+        walletType: "personal",
         isPrimary: true,
       });
     }
@@ -266,10 +297,10 @@ export async function creditUserWallet(
       wallet: wallet._id,
       referenceNumber,
       type: transactionType,
-      category: 'bankAccounts',
+      category: "bankAccounts",
       amount: creditAmount,
       currency,
-      status: 'completed',
+      status: "completed",
       description: description || `Admin credit: ${transactionType}`,
       initiatedBy: userId,
       fee: taxAmount, // Store tax as fee
@@ -286,9 +317,9 @@ export async function creditUserWallet(
         ...metadata,
       },
       completedAt: new Date(),
-      channel: 'web',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      channel: "web",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     await transaction.save({ session });
@@ -302,27 +333,32 @@ export async function creditUserWallet(
         amount,
         taxAmount,
         currency,
-        session
+        session,
       );
     }
 
     // Create ledger entry
-    await LedgerEntries.create([{
-      wallet: wallet._id,
-      transaction: transaction._id,
-      entryType: 'credit',
-      amount: creditAmount,
-      currency,
-      balance: newBalance,
-      description: `Admin credit: ${description || transactionType}${taxAmount > 0 ? ` (Tax: ${currency} ${taxAmount.toFixed(2)})` : ''}`,
-      accountingDate: new Date(),
-    }], { session });
+    await LedgerEntries.create(
+      [
+        {
+          wallet: wallet._id,
+          transaction: transaction._id,
+          entryType: "credit",
+          amount: creditAmount,
+          currency,
+          balance: newBalance,
+          description: `Admin credit: ${description || transactionType}${taxAmount > 0 ? ` (Tax: ${currency} ${taxAmount.toFixed(2)})` : ""}`,
+          accountingDate: new Date(),
+        },
+      ],
+      { session },
+    );
 
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'CREDIT_USER_WALLET',
-      'wallet',
+      "CREDIT_USER_WALLET",
+      "wallet",
       wallet._id.toString(),
       {
         userId,
@@ -338,59 +374,70 @@ export async function creditUserWallet(
         referenceNumber,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
 
     // Notify user
-    const taxNote = taxAmount > 0 
-      ? ` (${currency} ${taxAmount.toFixed(2)} tax deducted from original ${currency} ${amount.toFixed(2)})` 
-      : '';
+    const taxNote =
+      taxAmount > 0
+        ? ` (${currency} ${taxAmount.toFixed(2)} tax deducted from original ${currency} ${amount.toFixed(2)})`
+        : "";
     await notifyUser(
       userId,
-      'Wallet Credited',
+      "Wallet Credited",
       `Your wallet has been credited with ${currency} ${creditAmount.toFixed(2)}${taxNote}. Reference: ${referenceNumber}`,
-      'transaction',
-      { transactionId: transaction._id, amount: creditAmount, taxAmount, currency }
+      "transaction",
+      {
+        transactionId: transaction._id,
+        amount: creditAmount,
+        taxAmount,
+        currency,
+      },
     );
 
     // Send email notification (using generic notification)
     // Email is optional - log error but don't fail
     try {
       await sendTemplatedMail(String(user.email), {
-        EMAIL_TITLE: 'Wallet Credited',
+        EMAIL_TITLE: "Wallet Credited",
         GREETING: `Hello ${user.firstName},`,
         MAIN_CONTENT: `
           <p>Your wallet has been credited with <strong>${currency} ${creditAmount.toFixed(2)}</strong>.</p>
-          ${taxAmount > 0 ? `<p>Tax Deducted (20%): ${currency} ${taxAmount.toFixed(2)}</p><p>Original Amount: ${currency} ${amount.toFixed(2)}</p>` : ''}
+          ${taxAmount > 0 ? `<p>Tax Deducted (20%): ${currency} ${taxAmount.toFixed(2)}</p><p>Original Amount: ${currency} ${amount.toFixed(2)}</p>` : ""}
           <p>Reference: ${referenceNumber}</p>
           <p>New Balance: ${currency} ${newBalance.toFixed(2)}</p>
         `,
-        COMPANY_NAME: 'Nordea Remittance',
+        COMPANY_NAME: "Nordea Remittance",
         YEAR: new Date().getFullYear(),
-        FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
+        FOOTER_TEXT:
+          "This is an automated notification from Nordea Remittance.",
       } as any);
     } catch (emailError) {
-      console.error('Failed to send credit notification email:', emailError);
+      console.error("Failed to send credit notification email:", emailError);
     }
 
-    sendSuccess(res, {
-      transaction: {
-        id: transaction._id,
-        referenceNumber,
-        type: transactionType,
-        originalAmount: amount,
-        creditedAmount: creditAmount,
-        taxAmount,
-        taxRate: isTaxExempt ? '0%' : '20%',
-        isTaxExempt,
-        currency,
-        status: 'completed',
-        previousBalance,
-        newBalance,
+    sendSuccess(
+      res,
+      {
+        transaction: {
+          id: transaction._id,
+          referenceNumber,
+          type: transactionType,
+          originalAmount: amount,
+          creditedAmount: creditAmount,
+          taxAmount,
+          taxRate: isTaxExempt ? "0%" : "20%",
+          isTaxExempt,
+          currency,
+          status: "completed",
+          previousBalance,
+          newBalance,
+        },
       },
-    }, `Wallet credited successfully${taxAmount > 0 ? ' (20% tax applied)' : ''}`);
+      `Wallet credited successfully${taxAmount > 0 ? " (20% tax applied)" : ""}`,
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -410,26 +457,28 @@ export async function creditUserWallet(
 export async function debitUserWallet(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canDebit = await hasPermission(req.user.userId, 'canAdjustBalances');
+    const canDebit = await hasPermission(req.user.userId, "canAdjustBalances");
     if (!canDebit) {
-      throw new ForbiddenError('You do not have permission to debit user wallets');
+      throw new ForbiddenError(
+        "You do not have permission to debit user wallets",
+      );
     }
 
     const {
       userId,
       amount,
-      currency = 'USD',
+      currency = "USD",
       description,
-      transactionType = 'withdrawal', // withdrawal, fee, penalty, correction
+      transactionType = "withdrawal", // withdrawal, fee, penalty, correction
       reference,
       forceDebit = false, // Allow negative balance (super admin only)
       metadata,
@@ -437,16 +486,19 @@ export async function debitUserWallet(
 
     // Validate amount
     if (!amount || amount <= 0) {
-      throw new ValidationError('Amount must be greater than zero');
+      throw new ValidationError("Amount must be greater than zero");
     }
 
     // Get user
     const user = await Users.findById(userId).session(session);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     // Get wallet
-    const wallet = await Wallets.findOne({ user: userId, status: 'active' }).session(session);
-    if (!wallet) throw new NotFoundError('User wallet not found');
+    const wallet = await Wallets.findOne({
+      user: userId,
+      status: "active",
+    }).session(session);
+    if (!wallet) throw new NotFoundError("User wallet not found");
 
     const previousBalance = getWalletBalance(wallet, currency);
 
@@ -458,8 +510,10 @@ export async function debitUserWallet(
     // Only super admin can force debit
     if (forceDebit) {
       const admin = await AdminUsers.findById(req.user.userId);
-      if (admin?.role !== 'super_admin') {
-        throw new ForbiddenError('Only super admin can force debit with insufficient balance');
+      if (admin?.role !== "super_admin") {
+        throw new ForbiddenError(
+          "Only super admin can force debit with insufficient balance",
+        );
       }
     }
 
@@ -474,10 +528,10 @@ export async function debitUserWallet(
       wallet: wallet._id,
       referenceNumber,
       type: transactionType,
-      category: 'bankAccounts',
+      category: "bankAccounts",
       amount,
       currency,
-      status: 'completed',
+      status: "completed",
       description: description || `Admin debit: ${transactionType}`,
       initiatedBy: userId,
       meta: {
@@ -490,30 +544,35 @@ export async function debitUserWallet(
         ...metadata,
       },
       completedAt: new Date(),
-      channel: 'web',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      channel: "web",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     await transaction.save({ session });
 
     // Create ledger entry
-    await LedgerEntries.create([{
-      wallet: wallet._id,
-      transaction: transaction._id,
-      entryType: 'debit',
-      amount,
-      currency,
-      balance: newBalance,
-      description: `Admin debit: ${description || transactionType}`,
-      accountingDate: new Date(),
-    }], { session });
+    await LedgerEntries.create(
+      [
+        {
+          wallet: wallet._id,
+          transaction: transaction._id,
+          entryType: "debit",
+          amount,
+          currency,
+          balance: newBalance,
+          description: `Admin debit: ${description || transactionType}`,
+          accountingDate: new Date(),
+        },
+      ],
+      { session },
+    );
 
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'DEBIT_USER_WALLET',
-      'wallet',
+      "DEBIT_USER_WALLET",
+      "wallet",
       wallet._id.toString(),
       {
         userId,
@@ -526,7 +585,7 @@ export async function debitUserWallet(
         referenceNumber,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -534,42 +593,47 @@ export async function debitUserWallet(
     // Notify user
     await notifyUser(
       userId,
-      'Wallet Debited',
+      "Wallet Debited",
       `${currency} ${amount.toFixed(2)} has been debited from your wallet. Reference: ${referenceNumber}`,
-      'transaction',
-      { transactionId: transaction._id, amount, currency }
+      "transaction",
+      { transactionId: transaction._id, amount, currency },
     );
 
     // Send email notification (optional)
     try {
       await sendTemplatedMail(String(user.email), {
-        EMAIL_TITLE: 'Wallet Debited',
+        EMAIL_TITLE: "Wallet Debited",
         GREETING: `Hello ${user.firstName},`,
         MAIN_CONTENT: `
           <p>${currency} ${amount.toFixed(2)} has been debited from your wallet.</p>
           <p>Reference: ${referenceNumber}</p>
           <p>New Balance: ${currency} ${newBalance.toFixed(2)}</p>
         `,
-        COMPANY_NAME: 'Nordea Remittance',
+        COMPANY_NAME: "Nordea Remittance",
         YEAR: new Date().getFullYear(),
-        FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
+        FOOTER_TEXT:
+          "This is an automated notification from Nordea Remittance.",
       } as any);
     } catch (emailError) {
-      console.error('Failed to send debit notification email:', emailError);
+      console.error("Failed to send debit notification email:", emailError);
     }
 
-    sendSuccess(res, {
-      transaction: {
-        id: transaction._id,
-        referenceNumber,
-        type: transactionType,
-        amount,
-        currency,
-        status: 'completed',
-        previousBalance,
-        newBalance,
+    sendSuccess(
+      res,
+      {
+        transaction: {
+          id: transaction._id,
+          referenceNumber,
+          type: transactionType,
+          amount,
+          currency,
+          status: "completed",
+          previousBalance,
+          newBalance,
+        },
       },
-    }, 'Wallet debited successfully');
+      "Wallet debited successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -589,36 +653,41 @@ export async function debitUserWallet(
 export async function adminTransfer(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canTransfer = await hasPermission(req.user.userId, 'canAdjustBalances');
+    const canTransfer = await hasPermission(
+      req.user.userId,
+      "canAdjustBalances",
+    );
     if (!canTransfer) {
-      throw new ForbiddenError('You do not have permission to perform transfers');
+      throw new ForbiddenError(
+        "You do not have permission to perform transfers",
+      );
     }
 
     const {
       fromUserId,
       toUserId,
       amount,
-      currency = 'USD',
+      currency = "USD",
       description,
       metadata,
     } = req.body;
 
     if (fromUserId === toUserId) {
-      throw new ValidationError('Cannot transfer to the same account');
+      throw new ValidationError("Cannot transfer to the same account");
     }
 
     // Validate amount
     if (!amount || amount <= 0) {
-      throw new ValidationError('Amount must be greater than zero');
+      throw new ValidationError("Amount must be greater than zero");
     }
 
     // Get users
@@ -627,17 +696,17 @@ export async function adminTransfer(
       Users.findById(toUserId).session(session),
     ]);
 
-    if (!fromUser) throw new NotFoundError('Sender not found');
-    if (!toUser) throw new NotFoundError('Recipient not found');
+    if (!fromUser) throw new NotFoundError("Sender not found");
+    if (!toUser) throw new NotFoundError("Recipient not found");
 
     // Get wallets
     const [fromWallet, toWallet] = await Promise.all([
-      Wallets.findOne({ user: fromUserId, status: 'active' }).session(session),
-      Wallets.findOne({ user: toUserId, status: 'active' }).session(session),
+      Wallets.findOne({ user: fromUserId, status: "active" }).session(session),
+      Wallets.findOne({ user: toUserId, status: "active" }).session(session),
     ]);
 
-    if (!fromWallet) throw new NotFoundError('Sender wallet not found');
-    if (!toWallet) throw new NotFoundError('Recipient wallet not found');
+    if (!fromWallet) throw new NotFoundError("Sender wallet not found");
+    if (!toWallet) throw new NotFoundError("Recipient wallet not found");
 
     const fromPreviousBalance = getWalletBalance(fromWallet, currency);
 
@@ -664,12 +733,12 @@ export async function adminTransfer(
     const fromTransaction = new Transactions({
       wallet: fromWallet._id,
       referenceNumber,
-      type: 'transfer',
-      category: 'bankAccounts',
+      type: "transfer",
+      category: "bankAccounts",
       amount,
       currency,
-      status: 'completed',
-      description: description || 'Admin initiated transfer',
+      status: "completed",
+      description: description || "Admin initiated transfer",
       initiatedBy: fromUserId,
       recipientWallet: toWallet._id,
       recipientName: `${toUser.firstName} ${toUser.lastName}`,
@@ -682,20 +751,20 @@ export async function adminTransfer(
         ...metadata,
       },
       completedAt: new Date(),
-      channel: 'web',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      channel: "web",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     const toTransaction = new Transactions({
       wallet: toWallet._id,
       referenceNumber: `${referenceNumber}-RCV`,
-      type: 'deposit',
-      category: 'bankAccounts',
+      type: "deposit",
+      category: "bankAccounts",
       amount,
       currency,
-      status: 'completed',
-      description: description || 'Admin initiated transfer (received)',
+      status: "completed",
+      description: description || "Admin initiated transfer (received)",
       initiatedBy: toUserId,
       meta: {
         adminInitiated: true,
@@ -707,7 +776,7 @@ export async function adminTransfer(
         ...metadata,
       },
       completedAt: new Date(),
-      channel: 'web',
+      channel: "web",
     });
 
     await fromTransaction.save({ session });
@@ -716,8 +785,8 @@ export async function adminTransfer(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'ADMIN_TRANSFER',
-      'transaction',
+      "ADMIN_TRANSFER",
+      "transaction",
       referenceNumber,
       {
         fromUserId,
@@ -730,7 +799,7 @@ export async function adminTransfer(
         toNewBalance,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -738,39 +807,43 @@ export async function adminTransfer(
     // Notify both users
     await notifyUser(
       fromUserId,
-      'Funds Transferred',
+      "Funds Transferred",
       `${currency} ${amount.toFixed(2)} has been transferred from your account. Reference: ${referenceNumber}`,
-      'transaction',
-      { transactionId: fromTransaction._id, amount, currency }
+      "transaction",
+      { transactionId: fromTransaction._id, amount, currency },
     );
 
     await notifyUser(
       toUserId,
-      'Funds Received',
+      "Funds Received",
       `You have received ${currency} ${amount.toFixed(2)}. Reference: ${referenceNumber}`,
-      'transaction',
-      { transactionId: toTransaction._id, amount, currency }
+      "transaction",
+      { transactionId: toTransaction._id, amount, currency },
     );
 
-    sendSuccess(res, {
-      transfer: {
-        referenceNumber,
-        amount,
-        currency,
-        from: {
-          userId: fromUserId,
-          name: `${fromUser.firstName} ${fromUser.lastName}`,
-          previousBalance: fromPreviousBalance,
-          newBalance: fromNewBalance,
-        },
-        to: {
-          userId: toUserId,
-          name: `${toUser.firstName} ${toUser.lastName}`,
-          previousBalance: toPreviousBalance,
-          newBalance: toNewBalance,
+    sendSuccess(
+      res,
+      {
+        transfer: {
+          referenceNumber,
+          amount,
+          currency,
+          from: {
+            userId: fromUserId,
+            name: `${fromUser.firstName} ${fromUser.lastName}`,
+            previousBalance: fromPreviousBalance,
+            newBalance: fromNewBalance,
+          },
+          to: {
+            userId: toUserId,
+            name: `${toUser.firstName} ${toUser.lastName}`,
+            previousBalance: toPreviousBalance,
+            newBalance: toNewBalance,
+          },
         },
       },
-    }, 'Transfer completed successfully');
+      "Transfer completed successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -790,36 +863,42 @@ export async function adminTransfer(
 export async function approveLoan(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canApprove = await hasPermission(req.user.userId, 'canApproveLoans');
+    const canApprove = await hasPermission(req.user.userId, "canApproveLoans");
     if (!canApprove) {
-      throw new ForbiddenError('You do not have permission to approve loans');
+      throw new ForbiddenError("You do not have permission to approve loans");
     }
 
     const { loanId } = req.params;
-    const { 
-      approvedAmount, 
-      interestRate, 
-      termMonths, 
+    const {
+      approvedAmount,
+      interestRate,
+      termMonths,
       disbursementDate,
       notes,
     } = req.body;
 
     // Get loan application
-    const application = await LoanApplications.findById(loanId).session(session);
-    if (!application) throw new NotFoundError('Loan application not found');
+    const application =
+      await LoanApplications.findById(loanId).session(session);
+    if (!application) throw new NotFoundError("Loan application not found");
 
     // LoanApplication status can be: draft, submitted, under_review, approved, rejected, cancelled
-    if (application.status !== 'submitted' && application.status !== 'under_review') {
-      throw new ValidationError(`Cannot approve loan with status: ${application.status}`);
+    if (
+      application.status !== "submitted" &&
+      application.status !== "under_review"
+    ) {
+      throw new ValidationError(
+        `Cannot approve loan with status: ${application.status}`,
+      );
     }
 
     const finalAmount = approvedAmount || application.requestedAmount;
@@ -827,7 +906,7 @@ export async function approveLoan(
     const finalTerm = termMonths || application.term || 12; // months
 
     // Update application status
-    application.status = 'approved';
+    application.status = "approved";
     application.approvedAmount = finalAmount;
     application.approvedRate = finalRate;
     application.approvedTerm = finalTerm;
@@ -837,16 +916,24 @@ export async function approveLoan(
     await application.save({ session });
 
     // Get user's wallet
-    const wallet = await Wallets.findOne({ user: application.user }).session(session);
-    if (!wallet) throw new NotFoundError('User wallet not found');
+    const wallet = await Wallets.findOne({ user: application.user }).session(
+      session,
+    );
+    if (!wallet) throw new NotFoundError("User wallet not found");
 
     // Calculate loan details
-    const monthlyPayment = calculateMonthlyPayment(finalAmount, finalRate, finalTerm);
-    const totalInterest = (monthlyPayment * finalTerm) - finalAmount;
+    const monthlyPayment = calculateMonthlyPayment(
+      finalAmount,
+      finalRate,
+      finalTerm,
+    );
+    const totalInterest = monthlyPayment * finalTerm - finalAmount;
     const totalRepayment = finalAmount + totalInterest;
 
     // Calculate dates
-    const startDate = disbursementDate ? new Date(disbursementDate) : new Date();
+    const startDate = disbursementDate
+      ? new Date(disbursementDate)
+      : new Date();
     const maturityDate = new Date(startDate);
     maturityDate.setMonth(maturityDate.getMonth() + finalTerm);
 
@@ -854,7 +941,7 @@ export async function approveLoan(
     const loan = new Loans({
       user: application.user,
       wallet: wallet._id,
-      loanType: application.loanType || 'personal',
+      loanType: application.loanType || "personal",
       principalAmount: finalAmount,
       outstandingBalance: totalRepayment,
       interestRate: finalRate,
@@ -864,9 +951,9 @@ export async function approveLoan(
       monthlyPayment,
       totalInterest,
       totalRepayment,
-      status: 'pending', // Will become 'active' after disbursement
-      currency: 'USD',
-      disbursementMethod: 'wallet',
+      status: "pending", // Will become 'active' after disbursement
+      currency: "USD",
+      disbursementMethod: "wallet",
       purpose: application.purpose,
       approvedBy: req.user.userId,
       approvedAt: new Date(),
@@ -883,8 +970,8 @@ export async function approveLoan(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'APPROVE_LOAN',
-      'loan',
+      "APPROVE_LOAN",
+      "loan",
       loan._id.toString(),
       {
         applicationId: application._id,
@@ -893,7 +980,7 @@ export async function approveLoan(
         termMonths: finalTerm,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -902,16 +989,16 @@ export async function approveLoan(
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Loan Approved!',
+        "Loan Approved!",
         `Your loan application for USD ${finalAmount.toFixed(2)} has been approved!`,
-        'loan',
-        { loanId: loan._id, amount: finalAmount }
+        "loan",
+        { loanId: loan._id, amount: finalAmount },
       );
 
       // Send email notification
       try {
         await sendTemplatedMail(String(user.email), {
-          EMAIL_TITLE: 'Loan Application Approved',
+          EMAIL_TITLE: "Loan Application Approved",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `
             <p>Great news! Your loan application has been <strong>approved</strong>.</p>
@@ -925,29 +1012,34 @@ export async function approveLoan(
             </ul>
             <p>The loan will be disbursed to your wallet shortly.</p>
           `,
-          COMPANY_NAME: 'Nordea Remittance',
+          COMPANY_NAME: "Nordea Remittance",
           YEAR: new Date().getFullYear(),
-          FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
+          FOOTER_TEXT:
+            "This is an automated notification from Nordea Remittance.",
         } as any);
       } catch (emailError) {
-        console.error('Failed to send loan approval email:', emailError);
+        console.error("Failed to send loan approval email:", emailError);
       }
     }
 
-    sendSuccess(res, {
-      loan: {
-        id: loan._id,
-        applicationId: application._id,
-        principalAmount: finalAmount,
-        interestRate: finalRate,
-        termMonths: finalTerm,
-        monthlyPayment,
-        totalRepayment,
-        status: loan.status,
-        startDate: loan.startDate,
-        maturityDate: loan.maturityDate,
+    sendSuccess(
+      res,
+      {
+        loan: {
+          id: loan._id,
+          applicationId: application._id,
+          principalAmount: finalAmount,
+          interestRate: finalRate,
+          termMonths: finalTerm,
+          monthlyPayment,
+          totalRepayment,
+          status: loan.status,
+          startDate: loan.startDate,
+          maturityDate: loan.maturityDate,
+        },
       },
-    }, 'Loan approved successfully');
+      "Loan approved successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -963,28 +1055,33 @@ export async function approveLoan(
 export async function rejectLoan(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canManage = await hasPermission(req.user.userId, 'canManageLoans');
+    const canManage = await hasPermission(req.user.userId, "canManageLoans");
     if (!canManage) {
-      throw new ForbiddenError('You do not have permission to reject loans');
+      throw new ForbiddenError("You do not have permission to reject loans");
     }
 
     const { loanId } = req.params;
     const { reason, notes } = req.body;
 
     const application = await LoanApplications.findById(loanId);
-    if (!application) throw new NotFoundError('Loan application not found');
+    if (!application) throw new NotFoundError("Loan application not found");
 
-    if (application.status !== 'submitted' && application.status !== 'under_review') {
-      throw new ValidationError(`Cannot reject loan with status: ${application.status}`);
+    if (
+      application.status !== "submitted" &&
+      application.status !== "under_review"
+    ) {
+      throw new ValidationError(
+        `Cannot reject loan with status: ${application.status}`,
+      );
     }
 
-    application.status = 'rejected';
+    application.status = "rejected";
     application.rejectionReason = reason;
     application.reviewNotes = notes;
     application.reviewedBy = req.user.userId;
@@ -997,28 +1094,28 @@ export async function rejectLoan(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'REJECT_LOAN',
-      'loan_application',
+      "REJECT_LOAN",
+      "loan_application",
       application._id.toString(),
       { reason, notes },
       req,
-      'success'
+      "success",
     );
 
     // Notify user
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Loan Application Update',
+        "Loan Application Update",
         `Your loan application has been reviewed. Unfortunately, we cannot approve it at this time. Reason: ${reason}`,
-        'loan',
-        { applicationId: application._id }
+        "loan",
+        { applicationId: application._id },
       );
 
       // Send email notification
       try {
         await sendTemplatedMail(String(user.email), {
-          EMAIL_TITLE: 'Loan Application Update',
+          EMAIL_TITLE: "Loan Application Update",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `
             <p>We have reviewed your loan application for <strong>USD ${application.requestedAmount.toFixed(2)}</strong>.</p>
@@ -1026,22 +1123,27 @@ export async function rejectLoan(
             <p><strong>Reason:</strong> ${reason}</p>
             <p>If you have any questions or would like to discuss this decision, please contact our support team.</p>
           `,
-          COMPANY_NAME: 'Nordea Remittance',
+          COMPANY_NAME: "Nordea Remittance",
           YEAR: new Date().getFullYear(),
-          FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
+          FOOTER_TEXT:
+            "This is an automated notification from Nordea Remittance.",
         } as any);
       } catch (emailError) {
-        console.error('Failed to send loan rejection email:', emailError);
+        console.error("Failed to send loan rejection email:", emailError);
       }
     }
 
-    sendSuccess(res, {
-      application: {
-        id: application._id,
-        status: application.status,
-        rejectionReason: reason,
+    sendSuccess(
+      res,
+      {
+        application: {
+          id: application._id,
+          status: application.status,
+          rejectionReason: reason,
+        },
       },
-    }, 'Loan application rejected');
+      "Loan application rejected",
+    );
   } catch (error) {
     next(error);
   }
@@ -1054,36 +1156,41 @@ export async function rejectLoan(
 export async function disburseLoan(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canDisburse = await hasPermission(req.user.userId, 'canApproveLoans');
+    const canDisburse = await hasPermission(req.user.userId, "canApproveLoans");
     if (!canDisburse) {
-      throw new ForbiddenError('You do not have permission to disburse loans');
+      throw new ForbiddenError("You do not have permission to disburse loans");
     }
 
     const { loanId } = req.params;
 
     const loan = await Loans.findById(loanId).session(session);
-    if (!loan) throw new NotFoundError('Loan not found');
+    if (!loan) throw new NotFoundError("Loan not found");
 
     // Loan status: pending, active, paid, defaulted, written_off, paused
     // 'pending' is the status after approval but before disbursement
-    if (loan.status !== 'pending') {
-      throw new ValidationError('Loan must be in pending status for disbursement');
+    if (loan.status !== "pending") {
+      throw new ValidationError(
+        "Loan must be in pending status for disbursement",
+      );
     }
 
     // Get user's wallet
-    const wallet = await Wallets.findOne({ user: loan.user, status: 'active' }).session(session);
-    if (!wallet) throw new NotFoundError('User wallet not found');
+    const wallet = await Wallets.findOne({
+      user: loan.user,
+      status: "active",
+    }).session(session);
+    if (!wallet) throw new NotFoundError("User wallet not found");
 
-    const currency = loan.currency || 'USD';
+    const currency = loan.currency || "USD";
     const previousBalance = getWalletBalance(wallet, currency);
 
     // Credit wallet with loan amount
@@ -1097,12 +1204,12 @@ export async function disburseLoan(
     const transaction = new Transactions({
       wallet: wallet._id,
       referenceNumber,
-      type: 'deposit',
-      category: 'loans',
+      type: "deposit",
+      category: "loans",
       categoryItemId: loan._id.toString(),
       amount: loan.principalAmount,
       currency,
-      status: 'completed',
+      status: "completed",
       description: `Loan disbursement - Loan ID: ${loan._id}`,
       initiatedBy: loan.user,
       meta: {
@@ -1113,21 +1220,21 @@ export async function disburseLoan(
         newBalance,
       },
       completedAt: new Date(),
-      channel: 'web',
+      channel: "web",
     });
 
     await transaction.save({ session });
 
     // Update loan status to 'active' (disbursed and active loan)
-    loan.status = 'active';
+    loan.status = "active";
     loan.disbursementDate = new Date();
     await loan.save({ session });
 
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'DISBURSE_LOAN',
-      'loan',
+      "DISBURSE_LOAN",
+      "loan",
       loan._id.toString(),
       {
         amount: loan.principalAmount,
@@ -1137,7 +1244,7 @@ export async function disburseLoan(
         referenceNumber,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -1147,26 +1254,30 @@ export async function disburseLoan(
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Loan Disbursed',
+        "Loan Disbursed",
         `Your loan of ${currency} ${loan.principalAmount.toFixed(2)} has been disbursed to your wallet!`,
-        'loan',
-        { loanId: loan._id, amount: loan.principalAmount }
+        "loan",
+        { loanId: loan._id, amount: loan.principalAmount },
       );
     }
 
-    sendSuccess(res, {
-      loan: {
-        id: loan._id,
-        status: loan.status,
-        disbursedAmount: loan.principalAmount,
-        disbursementDate: loan.disbursementDate,
+    sendSuccess(
+      res,
+      {
+        loan: {
+          id: loan._id,
+          status: loan.status,
+          disbursedAmount: loan.principalAmount,
+          disbursementDate: loan.disbursementDate,
+        },
+        wallet: {
+          previousBalance,
+          newBalance,
+        },
+        transactionReference: referenceNumber,
       },
-      wallet: {
-        previousBalance,
-        newBalance,
-      },
-      transactionReference: referenceNumber,
-    }, 'Loan disbursed successfully');
+      "Loan disbursed successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -1186,15 +1297,15 @@ export async function disburseLoan(
 export async function approveCard(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canManage = await hasPermission(req.user.userId, 'canManageCards');
+    const canManage = await hasPermission(req.user.userId, "canManageCards");
     if (!canManage) {
-      throw new ForbiddenError('You do not have permission to approve cards');
+      throw new ForbiddenError("You do not have permission to approve cards");
     }
 
     const { cardId } = req.params;
@@ -1202,15 +1313,20 @@ export async function approveCard(
 
     // Get card application
     const application = await CardApplications.findById(cardId);
-    if (!application) throw new NotFoundError('Card application not found');
+    if (!application) throw new NotFoundError("Card application not found");
 
     // CardApplication status: pending, under_review, approved, rejected, cancelled
-    if (application.status !== 'pending' && application.status !== 'under_review') {
-      throw new ValidationError(`Cannot approve card with status: ${application.status}`);
+    if (
+      application.status !== "pending" &&
+      application.status !== "under_review"
+    ) {
+      throw new ValidationError(
+        `Cannot approve card with status: ${application.status}`,
+      );
     }
 
     // Update application
-    application.status = 'approved';
+    application.status = "approved";
     application.approvedBy = req.user.userId;
     application.approvedAt = new Date();
     application.reviewNotes = notes;
@@ -1218,7 +1334,7 @@ export async function approveCard(
 
     // Get user's wallet
     const wallet = await Wallets.findOne({ user: application.user });
-    if (!wallet) throw new NotFoundError('User wallet not found');
+    if (!wallet) throw new NotFoundError("User wallet not found");
 
     // Generate card details
     const cardNumber = generateCardNumber();
@@ -1231,18 +1347,24 @@ export async function approveCard(
       user: application.user,
       wallet: wallet._id,
       cardNumber: cardNumber,
-      cardholderName: 'Card Holder', // Should come from user profile
+      cardholderName: "Card Holder", // Should come from user profile
       cardType: application.cardType,
-      cardBrand: 'visa',
+      cardBrand: "visa",
       expiryMonth,
       expiryYear,
       cvv,
-      status: 'pending_activation',
+      status: "pending_activation",
       isPhysical: !application.isVirtual,
-      creditLimit: application.cardType === 'credit' ? (creditLimit || application.requestedLimit || 5000) : undefined,
-      availableCredit: application.cardType === 'credit' ? (creditLimit || application.requestedLimit || 5000) : undefined,
+      creditLimit:
+        application.cardType === "credit"
+          ? creditLimit || application.requestedLimit || 5000
+          : undefined,
+      availableCredit:
+        application.cardType === "credit"
+          ? creditLimit || application.requestedLimit || 5000
+          : undefined,
       billingAddress: application.billingAddress,
-      currency: application.currency || 'USD',
+      currency: application.currency || "USD",
     });
 
     await card.save();
@@ -1257,8 +1379,8 @@ export async function approveCard(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'APPROVE_CARD',
-      'card',
+      "APPROVE_CARD",
+      "card",
       card._id.toString(),
       {
         applicationId: application._id,
@@ -1266,23 +1388,23 @@ export async function approveCard(
         creditLimit: card.creditLimit,
       },
       req,
-      'success'
+      "success",
     );
 
     // Notify user
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Card Approved!',
+        "Card Approved!",
         `Your ${card.cardType} card application has been approved! Card ending in ${cardNumber.slice(-4)}`,
-        'card',
-        { cardId: card._id }
+        "card",
+        { cardId: card._id },
       );
 
       // Send email
       try {
         await sendTemplatedMail(String(user.email), {
-          EMAIL_TITLE: 'Card Application Approved',
+          EMAIL_TITLE: "Card Application Approved",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `
             <p>Your <strong>${card.cardType}</strong> card application has been approved!</p>
@@ -1290,31 +1412,36 @@ export async function approveCard(
             <ul>
               <li>Card Type: ${card.cardType}</li>
               <li>Card Number: **** **** **** ${cardNumber.slice(-4)}</li>
-              <li>Expiry: ${String(expiryMonth).padStart(2, '0')}/${expiryYear}</li>
-              ${card.creditLimit ? `<li>Credit Limit: ${application.currency || 'USD'} ${card.creditLimit.toFixed(2)}</li>` : ''}
+              <li>Expiry: ${String(expiryMonth).padStart(2, "0")}/${expiryYear}</li>
+              ${card.creditLimit ? `<li>Credit Limit: ${application.currency || "USD"} ${card.creditLimit.toFixed(2)}</li>` : ""}
             </ul>
             <p>Your card will need to be activated before use.</p>
           `,
-          COMPANY_NAME: 'Nordea Remittance',
+          COMPANY_NAME: "Nordea Remittance",
           YEAR: new Date().getFullYear(),
-          FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
+          FOOTER_TEXT:
+            "This is an automated notification from Nordea Remittance.",
         } as any);
       } catch (emailError) {
-        console.error('Failed to send card approval email:', emailError);
+        console.error("Failed to send card approval email:", emailError);
       }
     }
 
-    sendSuccess(res, {
-      card: {
-        id: card._id,
-        cardNumberMasked: `**** **** **** ${cardNumber.slice(-4)}`,
-        cardType: card.cardType,
-        status: card.status,
-        creditLimit: card.creditLimit,
-        expiryMonth,
-        expiryYear,
+    sendSuccess(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardNumberMasked: `**** **** **** ${cardNumber.slice(-4)}`,
+          cardType: card.cardType,
+          status: card.status,
+          creditLimit: card.creditLimit,
+          expiryMonth,
+          expiryYear,
+        },
       },
-    }, 'Card approved successfully');
+      "Card approved successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -1327,28 +1454,33 @@ export async function approveCard(
 export async function rejectCard(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canManage = await hasPermission(req.user.userId, 'canManageCards');
+    const canManage = await hasPermission(req.user.userId, "canManageCards");
     if (!canManage) {
-      throw new ForbiddenError('You do not have permission to reject cards');
+      throw new ForbiddenError("You do not have permission to reject cards");
     }
 
     const { cardId } = req.params;
     const { reason, notes } = req.body;
 
     const application = await CardApplications.findById(cardId);
-    if (!application) throw new NotFoundError('Card application not found');
+    if (!application) throw new NotFoundError("Card application not found");
 
-    if (application.status !== 'pending' && application.status !== 'under_review') {
-      throw new ValidationError(`Cannot reject card with status: ${application.status}`);
+    if (
+      application.status !== "pending" &&
+      application.status !== "under_review"
+    ) {
+      throw new ValidationError(
+        `Cannot reject card with status: ${application.status}`,
+      );
     }
 
-    application.status = 'rejected';
+    application.status = "rejected";
     application.rejectionReason = reason;
     application.reviewNotes = notes;
     application.reviewedBy = req.user.userId;
@@ -1361,32 +1493,36 @@ export async function rejectCard(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'REJECT_CARD',
-      'card_application',
+      "REJECT_CARD",
+      "card_application",
       application._id.toString(),
       { reason, notes },
       req,
-      'success'
+      "success",
     );
 
     // Notify user
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Card Application Update',
+        "Card Application Update",
         `Your card application has been reviewed. Unfortunately, we cannot approve it at this time.`,
-        'card',
-        { applicationId: application._id }
+        "card",
+        { applicationId: application._id },
       );
     }
 
-    sendSuccess(res, {
-      application: {
-        id: application._id,
-        status: application.status,
-        rejectionReason: reason,
+    sendSuccess(
+      res,
+      {
+        application: {
+          id: application._id,
+          status: application.status,
+          rejectionReason: reason,
+        },
       },
-    }, 'Card application rejected');
+      "Card application rejected",
+    );
   } catch (error) {
     next(error);
   }
@@ -1403,25 +1539,30 @@ export async function rejectCard(
 export async function approveInvestment(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canManage = await hasPermission(req.user.userId, 'canManageInvestments');
+    const canManage = await hasPermission(
+      req.user.userId,
+      "canManageInvestments",
+    );
     if (!canManage) {
-      throw new ForbiddenError('You do not have permission to approve investments');
+      throw new ForbiddenError(
+        "You do not have permission to approve investments",
+      );
     }
 
     const { investmentId } = req.params;
     const { notes } = req.body;
 
     const investment = await InvestmentAccounts.findById(investmentId);
-    if (!investment) throw new NotFoundError('Investment not found');
+    if (!investment) throw new NotFoundError("Investment not found");
 
     // InvestmentAccount status: active, suspended, closed
-    investment.status = 'active';
+    investment.status = "active";
     await investment.save();
 
     // Get user
@@ -1430,34 +1571,38 @@ export async function approveInvestment(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'APPROVE_INVESTMENT',
-      'investment',
+      "APPROVE_INVESTMENT",
+      "investment",
       investment._id.toString(),
       { notes },
       req,
-      'success'
+      "success",
     );
 
     // Notify user
     if (user) {
       await notifyUser(
         user._id.toString(),
-        'Investment Approved',
+        "Investment Approved",
         `Your investment account has been approved and is now active!`,
-        'investment',
-        { investmentId: investment._id }
+        "investment",
+        { investmentId: investment._id },
       );
     }
 
-    sendSuccess(res, {
-      investment: {
-        id: investment._id,
-        accountType: investment.accountType,
-        status: investment.status,
-        totalInvested: investment.totalInvested,
-        currentValue: investment.currentValue,
+    sendSuccess(
+      res,
+      {
+        investment: {
+          id: investment._id,
+          accountType: investment.accountType,
+          status: investment.status,
+          totalInvested: investment.totalInvested,
+          currentValue: investment.currentValue,
+        },
       },
-    }, 'Investment approved successfully');
+      "Investment approved successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -1471,38 +1616,45 @@ export async function approveInvestment(
 export async function addInvestmentReturns(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canManage = await hasPermission(req.user.userId, 'canManageInvestments');
+    const canManage = await hasPermission(
+      req.user.userId,
+      "canManageInvestments",
+    );
     if (!canManage) {
-      throw new ForbiddenError('You do not have permission to manage investments');
+      throw new ForbiddenError(
+        "You do not have permission to manage investments",
+      );
     }
 
     const { investmentId } = req.params;
     const { amount, description, creditToWallet = false } = req.body;
 
     if (!amount || amount <= 0) {
-      throw new ValidationError('Return amount must be greater than zero');
+      throw new ValidationError("Return amount must be greater than zero");
     }
 
-    const investment = await InvestmentAccounts.findById(investmentId).session(session);
-    if (!investment) throw new NotFoundError('Investment not found');
+    const investment =
+      await InvestmentAccounts.findById(investmentId).session(session);
+    if (!investment) throw new NotFoundError("Investment not found");
 
     // Update investment value and returns (full amount - tax only on wallet credit)
     // InvestmentAccount has: totalInvested, currentValue, totalReturns, returnPercentage
     const previousValue = investment.currentValue || 0;
     investment.currentValue = previousValue + amount;
     investment.totalReturns = (investment.totalReturns || 0) + amount;
-    investment.returnPercentage = investment.totalInvested > 0 
-      ? ((investment.totalReturns / investment.totalInvested) * 100) 
-      : 0;
+    investment.returnPercentage =
+      investment.totalInvested > 0
+        ? (investment.totalReturns / investment.totalInvested) * 100
+        : 0;
     await investment.save({ session });
 
     let walletTransaction = null;
@@ -1510,14 +1662,17 @@ export async function addInvestmentReturns(
 
     // Optionally credit to user's wallet (with 20% tax)
     if (creditToWallet) {
-      const wallet = await Wallets.findOne({ user: investment.user, status: 'active' }).session(session);
+      const wallet = await Wallets.findOne({
+        user: investment.user,
+        status: "active",
+      }).session(session);
       if (wallet) {
-        const currency = investment.currency || 'USD';
-        
+        const currency = investment.currency || "USD";
+
         // Calculate 20% tax on investment returns credited to wallet
-        taxInfo = calculateTransactionTax(amount, 'investment_return');
+        taxInfo = calculateTransactionTax(amount, "investment_return");
         const creditAmount = taxInfo.netAmount;
-        
+
         const walletPrevBalance = getWalletBalance(wallet, currency);
         updateWalletBalance(wallet, currency, creditAmount);
         await wallet.save({ session });
@@ -1527,13 +1682,14 @@ export async function addInvestmentReturns(
         walletTransaction = new Transactions({
           wallet: wallet._id,
           referenceNumber,
-          type: 'deposit',
-          category: 'investments',
+          type: "deposit",
+          category: "investments",
           categoryItemId: investment._id.toString(),
           amount: creditAmount,
           currency,
-          status: 'completed',
-          description: description || `Investment returns (after ${TAX_RATE * 100}% tax)`,
+          status: "completed",
+          description:
+            description || `Investment returns (after ${TAX_RATE * 100}% tax)`,
           initiatedBy: investment.user,
           fee: taxInfo.taxAmount,
           meta: {
@@ -1547,7 +1703,7 @@ export async function addInvestmentReturns(
             taxRate: TAX_RATE,
           },
           completedAt: new Date(),
-          channel: 'web',
+          channel: "web",
         });
 
         await walletTransaction.save({ session });
@@ -1557,33 +1713,38 @@ export async function addInvestmentReturns(
           await createTaxRecord(
             walletTransaction._id,
             investment.user,
-            'investment_return',
+            "investment_return",
             amount,
             taxInfo.taxAmount,
             currency,
-            session
+            session,
           );
         }
 
         // Create ledger entry
-        await LedgerEntries.create([{
-          wallet: wallet._id,
-          transaction: walletTransaction._id,
-          entryType: 'credit',
-          amount: creditAmount,
-          currency,
-          balance: getWalletBalance(wallet, currency),
-          description: `Investment returns: ${currency} ${amount.toFixed(2)} (Tax: ${currency} ${taxInfo.taxAmount.toFixed(2)})`,
-          accountingDate: new Date(),
-        }], { session });
+        await LedgerEntries.create(
+          [
+            {
+              wallet: wallet._id,
+              transaction: walletTransaction._id,
+              entryType: "credit",
+              amount: creditAmount,
+              currency,
+              balance: getWalletBalance(wallet, currency),
+              description: `Investment returns: ${currency} ${amount.toFixed(2)} (Tax: ${currency} ${taxInfo.taxAmount.toFixed(2)})`,
+              accountingDate: new Date(),
+            },
+          ],
+          { session },
+        );
       }
     }
 
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'ADD_INVESTMENT_RETURNS',
-      'investment',
+      "ADD_INVESTMENT_RETURNS",
+      "investment",
       investment._id.toString(),
       {
         amount,
@@ -1594,7 +1755,7 @@ export async function addInvestmentReturns(
         netAmountCredited: taxInfo.netAmount,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -1602,34 +1763,43 @@ export async function addInvestmentReturns(
     // Notify user
     const user = await Users.findById(investment.user);
     if (user) {
-      const taxNote = creditToWallet && taxInfo.taxAmount > 0 
-        ? ` After 20% tax, ${investment.currency || 'USD'} ${taxInfo.netAmount.toFixed(2)} credited to wallet.`
-        : creditToWallet ? ' Funds have been credited to your wallet.' : '';
+      const taxNote =
+        creditToWallet && taxInfo.taxAmount > 0
+          ? ` After 20% tax, ${investment.currency || "USD"} ${taxInfo.netAmount.toFixed(2)} credited to wallet.`
+          : creditToWallet
+            ? " Funds have been credited to your wallet."
+            : "";
       await notifyUser(
         user._id.toString(),
-        'Investment Returns Added',
-        `${investment.currency || 'USD'} ${amount.toFixed(2)} has been added to your investment!${taxNote}`,
-        'investment',
-        { investmentId: investment._id, amount, taxAmount: taxInfo.taxAmount }
+        "Investment Returns Added",
+        `${investment.currency || "USD"} ${amount.toFixed(2)} has been added to your investment!${taxNote}`,
+        "investment",
+        { investmentId: investment._id, amount, taxAmount: taxInfo.taxAmount },
       );
     }
 
-    sendSuccess(res, {
-      investment: {
-        id: investment._id,
-        previousValue,
-        currentValue: investment.currentValue,
-        totalReturns: investment.totalReturns,
-        returnPercentage: investment.returnPercentage,
+    sendSuccess(
+      res,
+      {
+        investment: {
+          id: investment._id,
+          previousValue,
+          currentValue: investment.currentValue,
+          totalReturns: investment.totalReturns,
+          returnPercentage: investment.returnPercentage,
+        },
+        walletTransaction: walletTransaction
+          ? {
+              referenceNumber: walletTransaction.referenceNumber,
+              originalAmount: amount,
+              creditedAmount: taxInfo.netAmount,
+              taxAmount: taxInfo.taxAmount,
+              taxRate: "20%",
+            }
+          : null,
       },
-      walletTransaction: walletTransaction ? {
-        referenceNumber: walletTransaction.referenceNumber,
-        originalAmount: amount,
-        creditedAmount: taxInfo.netAmount,
-        taxAmount: taxInfo.taxAmount,
-        taxRate: '20%',
-      } : null,
-    }, `Investment returns added successfully${creditToWallet && taxInfo.taxAmount > 0 ? ' (20% tax applied on wallet credit)' : ''}`);
+      `Investment returns added successfully${creditToWallet && taxInfo.taxAmount > 0 ? " (20% tax applied on wallet credit)" : ""}`,
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -1649,29 +1819,32 @@ export async function addInvestmentReturns(
 export async function getPendingTransactions(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canView = await hasPermission(req.user.userId, 'canViewTransactions');
+    const canView = await hasPermission(req.user.userId, "canViewTransactions");
     if (!canView) {
-      throw new ForbiddenError('You do not have permission to view transactions');
+      throw new ForbiddenError(
+        "You do not have permission to view transactions",
+      );
     }
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const skip = (page - 1) * limit;
 
-    const filter: any = { status: 'pending' };
+    const filter: any = { status: "pending" };
     if (req.query.type) filter.type = req.query.type;
-    if (req.query.minAmount) filter.amount = { $gte: parseFloat(req.query.minAmount as string) };
+    if (req.query.minAmount)
+      filter.amount = { $gte: parseFloat(req.query.minAmount as string) };
 
     const [transactions, total] = await Promise.all([
       Transactions.find(filter)
-        .populate('wallet', 'walletNumber')
-        .populate('initiatedBy', 'firstName lastName email')
+        .populate("wallet", "walletNumber")
+        .populate("initiatedBy", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -1692,45 +1865,53 @@ export async function getPendingTransactions(
 export async function approveTransaction(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canApprove = await hasPermission(req.user.userId, 'canReverseTransactions');
+    const canApprove = await hasPermission(
+      req.user.userId,
+      "canReverseTransactions",
+    );
     if (!canApprove) {
-      throw new ForbiddenError('You do not have permission to approve transactions');
+      throw new ForbiddenError(
+        "You do not have permission to approve transactions",
+      );
     }
 
     const { transactionId } = req.params;
     const { notes } = req.body;
 
-    const transaction = await Transactions.findById(transactionId).session(session);
-    if (!transaction) throw new NotFoundError('Transaction not found');
+    const transaction =
+      await Transactions.findById(transactionId).session(session);
+    if (!transaction) throw new NotFoundError("Transaction not found");
 
-    if (transaction.status !== 'pending') {
-      throw new ValidationError(`Cannot approve transaction with status: ${transaction.status}`);
+    if (transaction.status !== "pending") {
+      throw new ValidationError(
+        `Cannot approve transaction with status: ${transaction.status}`,
+      );
     }
 
     // Process the transaction based on type
     const wallet = await Wallets.findById(transaction.wallet).session(session);
-    if (!wallet) throw new NotFoundError('Wallet not found');
+    if (!wallet) throw new NotFoundError("Wallet not found");
 
     const currency = transaction.currency;
     const amount = transaction.amount;
 
-    if (transaction.type === 'withdrawal') {
+    if (transaction.type === "withdrawal") {
       // Debit wallet
       const currentBalance = getWalletBalance(wallet, currency);
       if (currentBalance < amount) {
         throw new InsufficientBalanceError(amount, currentBalance);
       }
       updateWalletBalance(wallet, currency, -amount);
-    } else if (transaction.type === 'deposit') {
+    } else if (transaction.type === "deposit") {
       // Credit wallet
       updateWalletBalance(wallet, currency, amount);
     }
@@ -1738,7 +1919,7 @@ export async function approveTransaction(
     await wallet.save({ session });
 
     // Update transaction status
-    transaction.status = 'completed';
+    transaction.status = "completed";
     transaction.completedAt = new Date();
     transaction.meta = {
       ...transaction.meta,
@@ -1751,8 +1932,8 @@ export async function approveTransaction(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'APPROVE_TRANSACTION',
-      'transaction',
+      "APPROVE_TRANSACTION",
+      "transaction",
       transaction._id.toString(),
       {
         referenceNumber: transaction.referenceNumber,
@@ -1761,7 +1942,7 @@ export async function approveTransaction(
         notes,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -1774,14 +1955,18 @@ export async function approveTransaction(
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      transaction: {
-        id: transaction._id,
-        referenceNumber: transaction.referenceNumber,
-        status: transaction.status,
-        completedAt: transaction.completedAt,
+    sendSuccess(
+      res,
+      {
+        transaction: {
+          id: transaction._id,
+          referenceNumber: transaction.referenceNumber,
+          status: transaction.status,
+          completedAt: transaction.completedAt,
+        },
       },
-    }, 'Transaction approved successfully');
+      "Transaction approved successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -1797,28 +1982,35 @@ export async function approveTransaction(
 export async function rejectTransaction(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canReject = await hasPermission(req.user.userId, 'canReverseTransactions');
+    const canReject = await hasPermission(
+      req.user.userId,
+      "canReverseTransactions",
+    );
     if (!canReject) {
-      throw new ForbiddenError('You do not have permission to reject transactions');
+      throw new ForbiddenError(
+        "You do not have permission to reject transactions",
+      );
     }
 
     const { transactionId } = req.params;
     const { reason } = req.body;
 
     const transaction = await Transactions.findById(transactionId);
-    if (!transaction) throw new NotFoundError('Transaction not found');
+    if (!transaction) throw new NotFoundError("Transaction not found");
 
-    if (transaction.status !== 'pending') {
-      throw new ValidationError(`Cannot reject transaction with status: ${transaction.status}`);
+    if (transaction.status !== "pending") {
+      throw new ValidationError(
+        `Cannot reject transaction with status: ${transaction.status}`,
+      );
     }
 
-    transaction.status = 'failed';
+    transaction.status = "failed";
     transaction.failedReason = reason;
     transaction.meta = {
       ...transaction.meta,
@@ -1831,8 +2023,8 @@ export async function rejectTransaction(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'REJECT_TRANSACTION',
-      'transaction',
+      "REJECT_TRANSACTION",
+      "transaction",
       transaction._id.toString(),
       {
         referenceNumber: transaction.referenceNumber,
@@ -1841,26 +2033,30 @@ export async function rejectTransaction(
         reason,
       },
       req,
-      'success'
+      "success",
     );
 
     // Notify user
     await notifyUser(
       transaction.initiatedBy.toString(),
-      'Transaction Rejected',
+      "Transaction Rejected",
       `Your ${transaction.type} transaction of ${transaction.currency} ${transaction.amount.toFixed(2)} was rejected. Reason: ${reason}`,
-      'transaction',
-      { transactionId: transaction._id }
+      "transaction",
+      { transactionId: transaction._id },
     );
 
-    sendSuccess(res, {
-      transaction: {
-        id: transaction._id,
-        referenceNumber: transaction.referenceNumber,
-        status: transaction.status,
-        failedReason: transaction.failedReason,
+    sendSuccess(
+      res,
+      {
+        transaction: {
+          id: transaction._id,
+          referenceNumber: transaction.referenceNumber,
+          status: transaction.status,
+          failedReason: transaction.failedReason,
+        },
       },
-    }, 'Transaction rejected');
+      "Transaction rejected",
+    );
   } catch (error) {
     next(error);
   }
@@ -1873,45 +2069,57 @@ export async function rejectTransaction(
 export async function reverseTransaction(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Check permission
-    const canReverse = await hasPermission(req.user.userId, 'canReverseTransactions');
+    const canReverse = await hasPermission(
+      req.user.userId,
+      "canReverseTransactions",
+    );
     if (!canReverse) {
-      throw new ForbiddenError('You do not have permission to reverse transactions');
+      throw new ForbiddenError(
+        "You do not have permission to reverse transactions",
+      );
     }
 
     const { transactionId } = req.params;
     const { reason, fullRefund = true, refundAmount } = req.body;
 
     if (!reason) {
-      throw new ValidationError('Reversal reason is required');
+      throw new ValidationError("Reversal reason is required");
     }
 
-    const transaction = await Transactions.findById(transactionId).session(session);
-    if (!transaction) throw new NotFoundError('Transaction not found');
+    const transaction =
+      await Transactions.findById(transactionId).session(session);
+    if (!transaction) throw new NotFoundError("Transaction not found");
 
-    if (transaction.status !== 'completed') {
-      throw new ValidationError('Only completed transactions can be reversed');
+    if (transaction.status !== "completed") {
+      throw new ValidationError("Only completed transactions can be reversed");
     }
 
     const wallet = await Wallets.findById(transaction.wallet).session(session);
-    if (!wallet) throw new NotFoundError('Wallet not found');
+    if (!wallet) throw new NotFoundError("Wallet not found");
 
     const currency = transaction.currency;
-    const reverseAmount = fullRefund ? transaction.amount : (refundAmount || transaction.amount);
+    const reverseAmount = fullRefund
+      ? transaction.amount
+      : refundAmount || transaction.amount;
 
     // Reverse the transaction
-    if (transaction.type === 'withdrawal' || transaction.type === 'payment' || transaction.type === 'transfer') {
+    if (
+      transaction.type === "withdrawal" ||
+      transaction.type === "payment" ||
+      transaction.type === "transfer"
+    ) {
       // Original was debit, so credit back
       updateWalletBalance(wallet, currency, reverseAmount);
-    } else if (transaction.type === 'deposit') {
+    } else if (transaction.type === "deposit") {
       // Original was credit, so debit back
       const currentBalance = getWalletBalance(wallet, currency);
       if (currentBalance < reverseAmount) {
@@ -1927,11 +2135,11 @@ export async function reverseTransaction(
     const reversalTransaction = new Transactions({
       wallet: wallet._id,
       referenceNumber: reversalReference,
-      type: 'reversal',
+      type: "reversal",
       category: transaction.category,
       amount: reverseAmount,
       currency,
-      status: 'completed',
+      status: "completed",
       description: `Reversal of ${transaction.referenceNumber}: ${reason}`,
       initiatedBy: transaction.initiatedBy,
       reversalReason: reason,
@@ -1943,13 +2151,13 @@ export async function reverseTransaction(
         fullRefund,
       },
       completedAt: new Date(),
-      channel: 'web',
+      channel: "web",
     });
 
     await reversalTransaction.save({ session });
 
     // Update original transaction
-    transaction.status = 'reversed';
+    transaction.status = "reversed";
     transaction.reversalReason = reason;
     transaction.meta = {
       ...transaction.meta,
@@ -1962,8 +2170,8 @@ export async function reverseTransaction(
     // Log admin action
     await logAdminAction(
       req.user.userId,
-      'REVERSE_TRANSACTION',
-      'transaction',
+      "REVERSE_TRANSACTION",
+      "transaction",
       transaction._id.toString(),
       {
         originalReference: transaction.referenceNumber,
@@ -1973,7 +2181,7 @@ export async function reverseTransaction(
         fullRefund,
       },
       req,
-      'success'
+      "success",
     );
 
     await session.commitTransaction();
@@ -1981,21 +2189,25 @@ export async function reverseTransaction(
     // Notify user
     await notifyUser(
       transaction.initiatedBy.toString(),
-      'Transaction Reversed',
+      "Transaction Reversed",
       `Your transaction ${transaction.referenceNumber} has been reversed. Amount: ${currency} ${reverseAmount.toFixed(2)}`,
-      'transaction',
-      { transactionId: reversalTransaction._id, amount: reverseAmount }
+      "transaction",
+      { transactionId: reversalTransaction._id, amount: reverseAmount },
     );
 
-    sendSuccess(res, {
-      reversal: {
-        id: reversalTransaction._id,
-        referenceNumber: reversalReference,
-        originalTransaction: transaction.referenceNumber,
-        amount: reverseAmount,
-        status: 'completed',
+    sendSuccess(
+      res,
+      {
+        reversal: {
+          id: reversalTransaction._id,
+          referenceNumber: reversalReference,
+          originalTransaction: transaction.referenceNumber,
+          amount: reverseAmount,
+          status: "completed",
+        },
       },
-    }, 'Transaction reversed successfully');
+      "Transaction reversed successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -2015,26 +2227,26 @@ export async function reverseTransaction(
 export async function bulkCredit(
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Only super admin can do bulk operations
     const admin = await AdminUsers.findById(req.user.userId);
-    if (admin?.role !== 'super_admin') {
-      throw new ForbiddenError('Only super admin can perform bulk operations');
+    if (admin?.role !== "super_admin") {
+      throw new ForbiddenError("Only super admin can perform bulk operations");
     }
 
     const { operations, description } = req.body;
     // operations: [{ userId, amount, currency }]
 
     if (!Array.isArray(operations) || operations.length === 0) {
-      throw new ValidationError('Operations array is required');
+      throw new ValidationError("Operations array is required");
     }
 
     if (operations.length > 100) {
-      throw new ValidationError('Maximum 100 operations per batch');
+      throw new ValidationError("Maximum 100 operations per batch");
     }
 
     const results: any[] = [];
@@ -2047,25 +2259,28 @@ export async function bulkCredit(
 
         const user = await Users.findById(op.userId).session(session);
         if (!user) {
-          errors.push({ userId: op.userId, error: 'User not found' });
+          errors.push({ userId: op.userId, error: "User not found" });
           await session.abortTransaction();
           session.endSession();
           continue;
         }
 
-        let wallet = await Wallets.findOne({ user: op.userId, status: 'active' }).session(session);
+        let wallet = await Wallets.findOne({
+          user: op.userId,
+          status: "active",
+        }).session(session);
         if (!wallet) {
           wallet = new Wallets({
             user: op.userId,
             walletNumber: `W${Date.now()}${Math.random().toString(36).substring(7)}`,
-            balances: new Map([[op.currency || 'USD', 0]]),
-            status: 'active',
-            walletType: 'personal',
+            balances: new Map([[op.currency || "USD", 0]]),
+            status: "active",
+            walletType: "personal",
             isPrimary: true,
           });
         }
 
-        const currency = op.currency || 'USD';
+        const currency = op.currency || "USD";
         const previousBalance = getWalletBalance(wallet, currency);
         updateWalletBalance(wallet, currency, op.amount);
         const newBalance = getWalletBalance(wallet, currency);
@@ -2076,12 +2291,12 @@ export async function bulkCredit(
         const transaction = new Transactions({
           wallet: wallet._id,
           referenceNumber,
-          type: 'deposit',
-          category: 'bankAccounts',
+          type: "deposit",
+          category: "bankAccounts",
           amount: op.amount,
           currency,
-          status: 'completed',
-          description: description || 'Bulk credit',
+          status: "completed",
+          description: description || "Bulk credit",
           initiatedBy: op.userId,
           meta: {
             adminInitiated: true,
@@ -2089,7 +2304,7 @@ export async function bulkCredit(
             bulkOperation: true,
           },
           completedAt: new Date(),
-          channel: 'web',
+          channel: "web",
         });
 
         await transaction.save({ session });
@@ -2112,9 +2327,9 @@ export async function bulkCredit(
     // Log bulk operation
     await logAdminAction(
       req.user.userId,
-      'BULK_CREDIT',
-      'wallet',
-      'bulk',
+      "BULK_CREDIT",
+      "wallet",
+      "bulk",
       {
         totalOperations: operations.length,
         successful: results.length,
@@ -2122,7 +2337,7 @@ export async function bulkCredit(
         description,
       },
       req,
-      errors.length === operations.length ? 'failed' : 'success'
+      errors.length === operations.length ? "failed" : "success",
     );
 
     // Notify each credited user via WebSocket
@@ -2136,15 +2351,19 @@ export async function bulkCredit(
       }
     });
 
-    sendSuccess(res, {
-      summary: {
-        total: operations.length,
-        successful: results.length,
-        failed: errors.length,
+    sendSuccess(
+      res,
+      {
+        summary: {
+          total: operations.length,
+          successful: results.length,
+          failed: errors.length,
+        },
+        results,
+        errors: errors.length > 0 ? errors : undefined,
       },
-      results,
-      errors: errors.length > 0 ? errors : undefined,
-    }, `Bulk credit completed: ${results.length}/${operations.length} successful`);
+      `Bulk credit completed: ${results.length}/${operations.length} successful`,
+    );
   } catch (error) {
     next(error);
   }
@@ -2154,23 +2373,36 @@ export async function bulkCredit(
 // HELPER FUNCTIONS FOR LOAN CALCULATIONS
 // ============================================================================
 
-function calculateMonthlyPayment(principal: number, annualRate: number, tenureMonths: number): number {
+function calculateMonthlyPayment(
+  principal: number,
+  annualRate: number,
+  tenureMonths: number,
+): number {
   const monthlyRate = annualRate / 100 / 12;
   if (monthlyRate === 0) return principal / tenureMonths;
-  
-  const payment = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) / 
-                  (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+
+  const payment =
+    (principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths)) /
+    (Math.pow(1 + monthlyRate, tenureMonths) - 1);
   return Math.round(payment * 100) / 100;
 }
 
-function calculateTotalPayable(principal: number, annualRate: number, tenureMonths: number): number {
-  const monthlyPayment = calculateMonthlyPayment(principal, annualRate, tenureMonths);
+function calculateTotalPayable(
+  principal: number,
+  annualRate: number,
+  tenureMonths: number,
+): number {
+  const monthlyPayment = calculateMonthlyPayment(
+    principal,
+    annualRate,
+    tenureMonths,
+  );
   return Math.round(monthlyPayment * tenureMonths * 100) / 100;
 }
 
 function generateCardNumber(): string {
   // Generate a valid-looking card number (for simulation)
-  const prefix = '4'; // Visa prefix
+  const prefix = "4"; // Visa prefix
   let cardNumber = prefix;
   for (let i = 0; i < 15; i++) {
     cardNumber += Math.floor(Math.random() * 10);
@@ -2191,26 +2423,26 @@ export default {
   creditUserWallet,
   debitUserWallet,
   adminTransfer,
-  
+
   // Loan Management
   approveLoan,
   rejectLoan,
   disburseLoan,
-  
+
   // Card Management
   approveCard,
   rejectCard,
-  
+
   // Investment Management
   approveInvestment,
   addInvestmentReturns,
-  
+
   // Transaction Management
   getPendingTransactions,
   approveTransaction,
   rejectTransaction,
   reverseTransaction,
-  
+
   // Bulk Operations
   bulkCredit,
 };

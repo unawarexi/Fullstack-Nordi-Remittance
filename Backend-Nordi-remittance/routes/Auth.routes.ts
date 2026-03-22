@@ -4,13 +4,13 @@
 
 import { Router } from "express";
 import AuthController from "../controllers/Auth.controller.js";
-import { authenticate, optionalAuth } from "../middleware/Auth.middleware.js";
+import { authenticate, optionalAuth } from "../middleware/auth.middleware.js";
 import {
   authRateLimit,
   sanitizeInput,
-} from "../middleware/Security.middleware.js";
-import { requestLoggingMiddleware } from "../middleware/Core.middleware.js";
-import { upload } from "../services/Cloudinary.service.js";
+} from "../middleware/security.middleware.js";
+import { requestLoggingMiddleware } from "../middleware/core.middleware.js";
+import { upload } from "../services/cloudinary.service.js";
 
 const router = Router();
 

@@ -2,11 +2,19 @@
 // LEGAL ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import LegalController from '../controllers/Legal.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus, optionalAuth } from '../middleware/Auth.middleware.js';
-import { sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import LegalController from "../controllers/Legal.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+  optionalAuth,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -23,28 +31,31 @@ router.use(sanitizeInput);
  * @desc    Get all legal documents
  * @access  Public
  */
-router.get('/documents', LegalController.getLegalDocuments);
+router.get("/documents", LegalController.getLegalDocuments);
 
 /**
  * @route   GET /api/legal/documents/:documentId
  * @desc    Get specific legal document
  * @access  Public
  */
-router.get('/documents/:documentId', LegalController.getLegalDocumentById);
+router.get("/documents/:documentId", LegalController.getLegalDocumentById);
 
 /**
  * @route   GET /api/legal/documents/type/:type
  * @desc    Get legal document by type
  * @access  Public
  */
-router.get('/documents/type/:type', LegalController.getLegalDocumentByType);
+router.get("/documents/type/:type", LegalController.getLegalDocumentByType);
 
 /**
  * @route   GET /api/legal/documents/:documentId/versions
  * @desc    Get document version history
  * @access  Public
  */
-router.get('/documents/:documentId/versions', LegalController.getPolicyVersions);
+router.get(
+  "/documents/:documentId/versions",
+  LegalController.getPolicyVersions,
+);
 
 // ============================================================================
 // AUTHENTICATED USER ROUTES
@@ -62,18 +73,14 @@ router.use(verifyAccountStatus);
  * @desc    Get user's consents
  * @access  Private
  */
-router.get('/consents', LegalController.getUserConsents);
+router.get("/consents", LegalController.getUserConsents);
 
 /**
  * @route   POST /api/legal/consents
  * @desc    Record user consent
  * @access  Private
  */
-router.post(
-  '/consents',
-  auditLogMiddleware,
-  LegalController.recordConsent
-);
+router.post("/consents", auditLogMiddleware, LegalController.recordConsent);
 
 /**
  * @route   DELETE /api/legal/consents/:documentId
@@ -81,9 +88,9 @@ router.post(
  * @access  Private
  */
 router.delete(
-  '/consents/:documentId',
+  "/consents/:documentId",
   auditLogMiddleware,
-  LegalController.withdrawConsent
+  LegalController.withdrawConsent,
 );
 
 /**
@@ -91,7 +98,7 @@ router.delete(
  * @desc    Check required consents
  * @access  Private
  */
-router.get('/consents/required', LegalController.checkRequiredConsents);
+router.get("/consents/required", LegalController.checkRequiredConsents);
 
 // ============================================================================
 // DISPUTE CLAIM ROUTES
@@ -102,7 +109,7 @@ router.get('/consents/required', LegalController.checkRequiredConsents);
  * @desc    Get user's dispute claims
  * @access  Private
  */
-router.get('/disputes', LegalController.getDisputeClaims);
+router.get("/disputes", LegalController.getDisputeClaims);
 
 /**
  * @route   POST /api/legal/disputes
@@ -110,9 +117,9 @@ router.get('/disputes', LegalController.getDisputeClaims);
  * @access  Private
  */
 router.post(
-  '/disputes',
+  "/disputes",
   auditLogMiddleware,
-  LegalController.createDisputeClaim
+  LegalController.createDisputeClaim,
 );
 
 /**
@@ -120,17 +127,14 @@ router.post(
  * @desc    Get specific dispute claim
  * @access  Private
  */
-router.get('/disputes/:claimId', LegalController.getDisputeClaimById);
+router.get("/disputes/:claimId", LegalController.getDisputeClaimById);
 
 /**
  * @route   POST /api/legal/disputes/:claimId/comments
  * @desc    Add comment to dispute
  * @access  Private
  */
-router.post(
-  '/disputes/:claimId/comments',
-  LegalController.addDisputeComment
-);
+router.post("/disputes/:claimId/comments", LegalController.addDisputeComment);
 
 // ============================================================================
 // ADMIN ROUTES
@@ -142,10 +146,10 @@ router.post(
  * @access  Admin
  */
 router.post(
-  '/documents',
+  "/documents",
   requireAdmin,
   auditLogMiddleware,
-  LegalController.createLegalDocument
+  LegalController.createLegalDocument,
 );
 
 /**
@@ -154,10 +158,10 @@ router.post(
  * @access  Admin
  */
 router.put(
-  '/documents/:documentId',
+  "/documents/:documentId",
   requireAdmin,
   auditLogMiddleware,
-  LegalController.updateLegalDocument
+  LegalController.updateLegalDocument,
 );
 
 /**
@@ -165,7 +169,11 @@ router.put(
  * @desc    Get all dispute claims
  * @access  Admin
  */
-router.get('/admin/disputes', requireAdmin, LegalController.getAllDisputeClaims);
+router.get(
+  "/admin/disputes",
+  requireAdmin,
+  LegalController.getAllDisputeClaims,
+);
 
 /**
  * @route   PUT /api/legal/admin/disputes/:claimId
@@ -173,10 +181,10 @@ router.get('/admin/disputes', requireAdmin, LegalController.getAllDisputeClaims)
  * @access  Admin
  */
 router.put(
-  '/admin/disputes/:claimId',
+  "/admin/disputes/:claimId",
   requireAdmin,
   auditLogMiddleware,
-  LegalController.updateDisputeClaim
+  LegalController.updateDisputeClaim,
 );
 
 // ============================================================================
@@ -188,7 +196,11 @@ router.put(
  * @desc    Get regulatory filings
  * @access  Admin
  */
-router.get('/admin/regulatory', requireAdmin, LegalController.getRegulatoryFilings);
+router.get(
+  "/admin/regulatory",
+  requireAdmin,
+  LegalController.getRegulatoryFilings,
+);
 
 /**
  * @route   POST /api/legal/admin/regulatory
@@ -196,10 +208,10 @@ router.get('/admin/regulatory', requireAdmin, LegalController.getRegulatoryFilin
  * @access  Admin
  */
 router.post(
-  '/admin/regulatory',
+  "/admin/regulatory",
   requireAdmin,
   auditLogMiddleware,
-  LegalController.createRegulatoryFiling
+  LegalController.createRegulatoryFiling,
 );
 
 /**
@@ -208,10 +220,10 @@ router.post(
  * @access  Admin
  */
 router.post(
-  '/admin/regulatory/:filingId/submit',
+  "/admin/regulatory/:filingId/submit",
   requireAdmin,
   auditLogMiddleware,
-  LegalController.submitRegulatoryFiling
+  LegalController.submitRegulatoryFiling,
 );
 
 export default router;

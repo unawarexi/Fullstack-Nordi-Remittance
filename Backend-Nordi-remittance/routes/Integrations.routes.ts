@@ -2,11 +2,19 @@
 // INTEGRATIONS ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import IntegrationController from '../controllers/Integration.controller.js';
-import { authenticate, requireAdmin, requireSuperAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { sanitizeInput, rateLimit } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import IntegrationController from "../controllers/Integration.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  requireSuperAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput, rateLimit } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -30,7 +38,7 @@ router.use(verifyAccountStatus);
  * @desc    Get user's linked external accounts
  * @access  Private
  */
-router.get('/external-accounts', IntegrationController.getExternalAccounts);
+router.get("/external-accounts", IntegrationController.getExternalAccounts);
 
 /**
  * @route   POST /api/integrations/external-accounts
@@ -51,11 +59,11 @@ router.get('/external-accounts', IntegrationController.getExternalAccounts);
  * @access  Private
  */
 router.post(
-  '/external-accounts/:accountId/verify',
+  "/external-accounts/:accountId/verify",
   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('verify_external_account'),
   auditLogMiddleware,
-  IntegrationController.verifyExternalAccount
+  IntegrationController.verifyExternalAccount,
 );
 
 /**
@@ -86,14 +94,14 @@ router.use(requireAdmin);
  * @desc    Get all integrations
  * @access  Admin
  */
-router.get('/', IntegrationController.getIntegrations);
+router.get("/", IntegrationController.getIntegrations);
 
 /**
  * @route   GET /api/integrations/:integrationId
  * @desc    Get specific integration
  * @access  Admin
  */
-router.get('/:integrationId', IntegrationController.getIntegrationById);
+router.get("/:integrationId", IntegrationController.getIntegrationById);
 
 /**
  * @route   POST /api/integrations
@@ -101,11 +109,11 @@ router.get('/:integrationId', IntegrationController.getIntegrationById);
  * @access  Admin
  */
 router.post(
-  '/',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('create_integration'),
   auditLogMiddleware,
-  IntegrationController.createIntegration
+  IntegrationController.createIntegration,
 );
 
 /**
@@ -114,11 +122,11 @@ router.post(
  * @access  Admin
  */
 router.put(
-  '/:integrationId',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/:integrationId",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('update_integration'),
   auditLogMiddleware,
-  IntegrationController.updateIntegration
+  IntegrationController.updateIntegration,
 );
 
 /**
@@ -127,11 +135,11 @@ router.put(
  * @access  Admin
  */
 router.delete(
-  '/:integrationId',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/:integrationId",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('delete_integration'),
   auditLogMiddleware,
-  IntegrationController.deleteIntegration
+  IntegrationController.deleteIntegration,
 );
 
 /**
@@ -139,14 +147,14 @@ router.delete(
  * @desc    Test integration connection
  * @access  Admin
  */
-router.post('/:integrationId/test', IntegrationController.testIntegration);
+router.post("/:integrationId/test", IntegrationController.testIntegration);
 
 /**
  * @route   GET /api/integrations/:integrationId/logs
  * @desc    Get integration logs
  * @access  Admin
  */
-router.get('/:integrationId/logs', IntegrationController.getIntegrationLogs);
+router.get("/:integrationId/logs", IntegrationController.getIntegrationLogs);
 
 // ============================================================================
 // WEBHOOKS (Admin)
@@ -157,7 +165,7 @@ router.get('/:integrationId/logs', IntegrationController.getIntegrationLogs);
  * @desc    Get all webhooks
  * @access  Admin
  */
-router.get('/webhooks', IntegrationController.getWebhooks);
+router.get("/webhooks", IntegrationController.getWebhooks);
 
 /**
  * @route   POST /api/integrations/webhooks
@@ -165,11 +173,11 @@ router.get('/webhooks', IntegrationController.getWebhooks);
  * @access  Admin
  */
 router.post(
-  '/webhooks',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/webhooks",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('create_webhook'),
   auditLogMiddleware,
-  IntegrationController.createWebhook
+  IntegrationController.createWebhook,
 );
 
 /**
@@ -178,11 +186,11 @@ router.post(
  * @access  Admin
  */
 router.put(
-  '/webhooks/:webhookId',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/webhooks/:webhookId",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('update_webhook'),
   auditLogMiddleware,
-  IntegrationController.updateWebhook
+  IntegrationController.updateWebhook,
 );
 
 /**
@@ -191,11 +199,11 @@ router.put(
  * @access  Admin
  */
 router.delete(
-  '/webhooks/:webhookId',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/webhooks/:webhookId",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('delete_webhook'),
   auditLogMiddleware,
-  IntegrationController.deleteWebhook
+  IntegrationController.deleteWebhook,
 );
 
 /**
@@ -204,11 +212,11 @@ router.delete(
  * @access  Admin
  */
 router.post(
-  '/webhooks/:webhookId/regenerate-secret',
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  "/webhooks/:webhookId/regenerate-secret",
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('regenerate_webhook_secret'),
   auditLogMiddleware,
-  IntegrationController.regenerateWebhookSecret
+  IntegrationController.regenerateWebhookSecret,
 );
 
 // ============================================================================
@@ -220,7 +228,7 @@ router.post(
  * @desc    Get all API keys
  * @access  Admin
  */
-router.get('/api-keys', IntegrationController.getApiKeys);
+router.get("/api-keys", IntegrationController.getApiKeys);
 
 /**
  * @route   POST /api/integrations/api-keys
@@ -228,12 +236,12 @@ router.get('/api-keys', IntegrationController.getApiKeys);
  * @access  Admin
  */
 router.post(
-  '/api-keys',
+  "/api-keys",
   requireSuperAdmin,
-   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('create_api_key'),
   auditLogMiddleware,
-  IntegrationController.createApiKey
+  IntegrationController.createApiKey,
 );
 
 /**
@@ -242,12 +250,12 @@ router.post(
  * @access  Admin
  */
 router.delete(
-  '/api-keys/:keyId',
+  "/api-keys/:keyId",
   requireSuperAdmin,
   rateLimit({ maxRequests: 5, windowMs: 3600000 }),
   // auditLogMiddleware('revoke_api_key'),
   auditLogMiddleware,
-  IntegrationController.revokeApiKey
+  IntegrationController.revokeApiKey,
 );
 
 export default router;

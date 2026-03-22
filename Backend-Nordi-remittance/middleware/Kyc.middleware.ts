@@ -3,7 +3,8 @@
 // ============================================================================
 
 import { Response, NextFunction } from 'express';
-import type { AuthenticatedRequest, KycStatus } from '../types/index.js';
+import { KycStatus } from '../types/index.js';
+import type { AuthenticatedRequest } from '../types/index.js';
 import Users from '../models/UserModel.js';
 import Permissions from '../models/PermissionsModel.js';
 import { 
@@ -37,7 +38,7 @@ export async function requireKycVerified(
       return next(new UnauthorizedError('User not found'));
     }
 
-    if (user.kycStatus !== 'approved') {
+    if (user.kycStatus !== KycStatus.APPROVED) {
       return next(new KycNotVerifiedError(
         `KYC verification required. Current status: ${user.kycStatus}`
       ));
@@ -65,7 +66,7 @@ export function requireKycTier(minimumTier: 'basic' | 'intermediate' | 'advanced
         .select('kycStatus')
         .lean();
 
-      if (!user || user.kycStatus !== 'approved') {
+      if (!user || user.kycStatus !== KycStatus.APPROVED) {
         return next(new KycNotVerifiedError('KYC verification required'));
       }
 
@@ -102,13 +103,13 @@ type FeatureType =
   | 'investment';
 
 const featureKycRequirements: Record<FeatureType, KycStatus | 'any'> = {
-  domestic_transfer: 'pending', // Allow with pending KYC
-  international_transfer: 'approved',
-  card_payments: 'approved',
-  crypto_transfer: 'approved',
-  large_transaction: 'approved',
-  loan_application: 'approved',
-  investment: 'approved',
+  domestic_transfer: KycStatus.PENDING, // Allow with pending KYC
+  international_transfer: KycStatus.APPROVED,
+  card_payments: KycStatus.APPROVED,
+  crypto_transfer: KycStatus.APPROVED,
+  large_transaction: KycStatus.APPROVED,
+  loan_application: KycStatus.APPROVED,
+  investment: KycStatus.APPROVED,
 };
 
 /**
@@ -137,7 +138,7 @@ export function requireFeatureAccess(feature: FeatureType) {
       }
 
       // Check KYC status
-      if (requiredKyc === 'approved' && user.kycStatus !== 'approved') {
+      if (requiredKyc === KycStatus.APPROVED && user.kycStatus !== KycStatus.APPROVED) {
         return next(new KycNotVerifiedError(
           `${feature.replace('_', ' ')} requires KYC verification`
         ));
@@ -181,22 +182,22 @@ interface KycLimits {
 }
 
 const kycStatusLimits: Record<KycStatus, KycLimits> = {
-  pending: {
+  [KycStatus.PENDING]: {
     dailyLimit: 500,
     monthlyLimit: 2000,
     perTransactionLimit: 200,
   },
-  approved: {
+  [KycStatus.APPROVED]: {
     dailyLimit: 50000,
     monthlyLimit: 200000,
     perTransactionLimit: 25000,
   },
-  rejected: {
+  [KycStatus.REJECTED]: {
     dailyLimit: 0,
     monthlyLimit: 0,
     perTransactionLimit: 0,
   },
-  expired: {
+  [KycStatus.EXPIRED]: {
     dailyLimit: 500,
     monthlyLimit: 2000,
     perTransactionLimit: 200,

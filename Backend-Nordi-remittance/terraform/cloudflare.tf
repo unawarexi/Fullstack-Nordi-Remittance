@@ -1,5 +1,5 @@
 # ============================================================================
-# UrbanRide Navii — Cloudflare Configuration
+# Nordi-Remittance — Cloudflare Configuration
 # DNS, WAF, CDN, SSL/TLS, Rate Limiting, Bot Management, DDoS Protection
 # ============================================================================
 
@@ -23,7 +23,7 @@ resource "cloudflare_record" "api" {
   proxied = true
   ttl     = 1  # Auto when proxied
 
-  comment = "UrbanRide Navii API endpoint"
+  comment = "Nordi-Remittance API endpoint"
 }
 
 # WebSocket subdomain for real-time ride tracking
@@ -35,7 +35,7 @@ resource "cloudflare_record" "ws" {
   proxied = true
   ttl     = 1
 
-  comment = "UrbanRide Navii WebSocket endpoint"
+  comment = "Nordi-Remittance WebSocket endpoint"
 }
 
 # Root domain
@@ -107,7 +107,7 @@ resource "cloudflare_zone_settings_override" "settings" {
 # Block known bad bots and scrapers
 resource "cloudflare_ruleset" "waf_custom" {
   zone_id     = var.cloudflare_zone_id
-  name        = "UrbanRide Navii WAF Rules"
+  name        = "Nordi-Remittance WAF Rules"
   description = "Custom WAF rules for ride-hailing API protection"
   kind        = "zone"
   phase       = "http_request_firewall_custom"
@@ -158,7 +158,7 @@ resource "cloudflare_ruleset" "waf_custom" {
 # --------------------------------------------------------------------------
 resource "cloudflare_ruleset" "rate_limiting" {
   zone_id     = var.cloudflare_zone_id
-  name        = "UrbanRide Navii Rate Limiting"
+  name        = "Nordi-Remittance Rate Limiting"
   description = "Rate limiting rules for API endpoints"
   kind        = "zone"
   phase       = "http_ratelimit"
@@ -225,7 +225,7 @@ resource "cloudflare_ruleset" "rate_limiting" {
 # --------------------------------------------------------------------------
 resource "cloudflare_ruleset" "cache_rules" {
   zone_id     = var.cloudflare_zone_id
-  name        = "UrbanRide Navii Cache Rules"
+  name        = "Nordi-Remittance Cache Rules"
   description = "Caching rules for static and semi-static content"
   kind        = "zone"
   phase       = "http_request_cache_settings"
@@ -308,7 +308,7 @@ resource "cloudflare_page_rule" "ws_ssl" {
 # --------------------------------------------------------------------------
 resource "cloudflare_ruleset" "geo_blocking" {
   zone_id     = var.cloudflare_zone_id
-  name        = "UrbanRide Navii Geo Rules"
+  name        = "Nordi-Remittance Geo Rules"
   description = "Geographic access restrictions"
   kind        = "zone"
   phase       = "http_request_firewall_custom"

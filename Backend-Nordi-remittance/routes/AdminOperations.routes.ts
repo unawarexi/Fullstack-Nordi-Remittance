@@ -4,11 +4,19 @@
 // Routes for admin-initiated financial operations
 // ============================================================================
 
-import { Router } from 'express';
-import AdminOperationsController from '../controllers/AdminOperations.controller.js';
-import { authenticate, requireAdmin, requireSuperAdmin, requirePermission } from '../middleware/Auth.middleware.js';
-import { sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import AdminOperationsController from "../controllers/AdminOperations.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  requireSuperAdmin,
+  requirePermission,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -33,9 +41,9 @@ router.use(auditLogMiddleware);
  * @access  Admin with canAdjustBalances permission
  */
 router.post(
-  '/credit',
-  requirePermission('canAdjustBalances'),
-  AdminOperationsController.creditUserWallet
+  "/credit",
+  requirePermission("canAdjustBalances"),
+  AdminOperationsController.creditUserWallet,
 );
 
 /**
@@ -44,9 +52,9 @@ router.post(
  * @access  Admin with canAdjustBalances permission
  */
 router.post(
-  '/debit',
-  requirePermission('canAdjustBalances'),
-  AdminOperationsController.debitUserWallet
+  "/debit",
+  requirePermission("canAdjustBalances"),
+  AdminOperationsController.debitUserWallet,
 );
 
 /**
@@ -55,9 +63,9 @@ router.post(
  * @access  Admin with canAdjustBalances permission
  */
 router.post(
-  '/transfer',
-  requirePermission('canAdjustBalances'),
-  AdminOperationsController.adminTransfer
+  "/transfer",
+  requirePermission("canAdjustBalances"),
+  AdminOperationsController.adminTransfer,
 );
 
 // ============================================================================
@@ -70,9 +78,9 @@ router.post(
  * @access  Admin with canApproveLoans permission
  */
 router.post(
-  '/loans/:loanId/approve',
-  requirePermission('canApproveLoans'),
-  AdminOperationsController.approveLoan
+  "/loans/:loanId/approve",
+  requirePermission("canApproveLoans"),
+  AdminOperationsController.approveLoan,
 );
 
 /**
@@ -81,9 +89,9 @@ router.post(
  * @access  Admin with canManageLoans permission
  */
 router.post(
-  '/loans/:loanId/reject',
-  requirePermission('canManageLoans'),
-  AdminOperationsController.rejectLoan
+  "/loans/:loanId/reject",
+  requirePermission("canManageLoans"),
+  AdminOperationsController.rejectLoan,
 );
 
 /**
@@ -92,9 +100,9 @@ router.post(
  * @access  Admin with canApproveLoans permission
  */
 router.post(
-  '/loans/:loanId/disburse',
-  requirePermission('canApproveLoans'),
-  AdminOperationsController.disburseLoan
+  "/loans/:loanId/disburse",
+  requirePermission("canApproveLoans"),
+  AdminOperationsController.disburseLoan,
 );
 
 // ============================================================================
@@ -107,9 +115,9 @@ router.post(
  * @access  Admin with canManageCards permission
  */
 router.post(
-  '/cards/:cardId/approve',
-  requirePermission('canManageCards'),
-  AdminOperationsController.approveCard
+  "/cards/:cardId/approve",
+  requirePermission("canManageCards"),
+  AdminOperationsController.approveCard,
 );
 
 /**
@@ -118,9 +126,9 @@ router.post(
  * @access  Admin with canManageCards permission
  */
 router.post(
-  '/cards/:cardId/reject',
-  requirePermission('canManageCards'),
-  AdminOperationsController.rejectCard
+  "/cards/:cardId/reject",
+  requirePermission("canManageCards"),
+  AdminOperationsController.rejectCard,
 );
 
 // ============================================================================
@@ -133,9 +141,9 @@ router.post(
  * @access  Admin with canManageInvestments permission
  */
 router.post(
-  '/investments/:investmentId/approve',
-  requirePermission('canManageInvestments'),
-  AdminOperationsController.approveInvestment
+  "/investments/:investmentId/approve",
+  requirePermission("canManageInvestments"),
+  AdminOperationsController.approveInvestment,
 );
 
 /**
@@ -144,9 +152,9 @@ router.post(
  * @access  Admin with canManageInvestments permission
  */
 router.post(
-  '/investments/:investmentId/add-returns',
-  requirePermission('canManageInvestments'),
-  AdminOperationsController.addInvestmentReturns
+  "/investments/:investmentId/add-returns",
+  requirePermission("canManageInvestments"),
+  AdminOperationsController.addInvestmentReturns,
 );
 
 // ============================================================================
@@ -159,9 +167,9 @@ router.post(
  * @access  Admin with canViewTransactions permission
  */
 router.get(
-  '/transactions/pending',
-  requirePermission('canViewTransactions'),
-  AdminOperationsController.getPendingTransactions
+  "/transactions/pending",
+  requirePermission("canViewTransactions"),
+  AdminOperationsController.getPendingTransactions,
 );
 
 /**
@@ -170,9 +178,9 @@ router.get(
  * @access  Admin with canReverseTransactions permission
  */
 router.post(
-  '/transactions/:transactionId/approve',
-  requirePermission('canReverseTransactions'),
-  AdminOperationsController.approveTransaction
+  "/transactions/:transactionId/approve",
+  requirePermission("canReverseTransactions"),
+  AdminOperationsController.approveTransaction,
 );
 
 /**
@@ -181,9 +189,9 @@ router.post(
  * @access  Admin with canReverseTransactions permission
  */
 router.post(
-  '/transactions/:transactionId/reject',
-  requirePermission('canReverseTransactions'),
-  AdminOperationsController.rejectTransaction
+  "/transactions/:transactionId/reject",
+  requirePermission("canReverseTransactions"),
+  AdminOperationsController.rejectTransaction,
 );
 
 /**
@@ -192,9 +200,9 @@ router.post(
  * @access  Admin with canReverseTransactions permission
  */
 router.post(
-  '/transactions/:transactionId/reverse',
-  requirePermission('canReverseTransactions'),
-  AdminOperationsController.reverseTransaction
+  "/transactions/:transactionId/reverse",
+  requirePermission("canReverseTransactions"),
+  AdminOperationsController.reverseTransaction,
 );
 
 // ============================================================================
@@ -207,9 +215,9 @@ router.post(
  * @access  Super Admin only
  */
 router.post(
-  '/bulk/credit',
+  "/bulk/credit",
   requireSuperAdmin,
-  AdminOperationsController.bulkCredit
+  AdminOperationsController.bulkCredit,
 );
 
 export default router;

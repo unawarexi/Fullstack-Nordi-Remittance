@@ -37,10 +37,10 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/Mailer.service.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { env } from "../config/env.config.js";
-import { emitToUser, broadcast } from "../services/Websocket.service.js";
+import { emitToUser, broadcast } from "../services/websocket.service.js";
 import {
   cacheUserProfile,
   getCachedUserProfile,
@@ -60,8 +60,8 @@ import {
   CACHE_TTL,
   cacheSet,
   cacheGet,
-} from "../services/Redis.service.js";
-import { onUserWrite } from "../services/QueryCacheService.js";
+} from "../services/redis.service.js";
+import { onUserWrite } from "../services/query-cache.service.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -1209,11 +1209,11 @@ export async function getAllUsers(
         filter.$text = { $search: search };
       } else {
         // For short queries, use prefix-anchored regex (safe + indexed)
-        const sanitized = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const sanitized = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         filter.$or = [
-          { email: new RegExp(`^${sanitized}`, 'i') },
-          { firstName: new RegExp(`^${sanitized}`, 'i') },
-          { lastName: new RegExp(`^${sanitized}`, 'i') },
+          { email: new RegExp(`^${sanitized}`, "i") },
+          { firstName: new RegExp(`^${sanitized}`, "i") },
+          { lastName: new RegExp(`^${sanitized}`, "i") },
         ];
       }
     }
@@ -1274,7 +1274,9 @@ export async function getUserById(
     const recentTransactions = await Transactions.find({
       $or: [{ sender: String(user._id) }, { recipient: String(user._id) }],
     })
-      .select('type amount currency status referenceNumber createdAt completedAt')
+      .select(
+        "type amount currency status referenceNumber createdAt completedAt",
+      )
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();

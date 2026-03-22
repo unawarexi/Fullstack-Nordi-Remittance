@@ -17,7 +17,7 @@ import { AuditLogs, DataAccessLogs } from "../models/AuditModels.js";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
-} from "../services/Cloudinary.service.js";
+} from "../services/cloudinary.service.js";
 import {
   sendSuccess,
   sendCreated,
@@ -29,16 +29,16 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/Mailer.service.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
-import { emitToUser } from "../services/Websocket.service.js";
+import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
 import {
   cacheKycStatus,
   getCachedKycStatus,
   invalidateKycCache,
   invalidateUserCache,
-} from "../services/Redis.service.js";
+} from "../services/redis.service.js";
 import * as path from "path";
 
 const emailGenerator = new EmailContentGenerator();
@@ -76,8 +76,14 @@ function computeKycLevel(user: any): "none" | "basic" | "enhanced" | "full" {
 /** Build completed / pending step arrays from profile fields */
 function computeSteps(user: any) {
   const steps = [
-    { key: "personal_info", check: !!user.firstName && !!user.lastName && !!user.dateOfBirth },
-    { key: "address", check: !!user.homeAddress && !!user.city && !!user.country },
+    {
+      key: "personal_info",
+      check: !!user.firstName && !!user.lastName && !!user.dateOfBirth,
+    },
+    {
+      key: "address",
+      check: !!user.homeAddress && !!user.city && !!user.country,
+    },
     { key: "identity_document", check: !!user.governmentId },
     { key: "proof_of_address", check: !!user.proofOfAddress },
     { key: "selfie", check: !!user.selfieWithId },
@@ -91,11 +97,26 @@ function computeSteps(user: any) {
 
 /** Transaction limits based on KYC level */
 function limitsForLevel(level: string) {
-  const tiers: Record<string, { dailyTransaction: number; monthlyTransaction: number; maxBalance: number }> = {
+  const tiers: Record<
+    string,
+    { dailyTransaction: number; monthlyTransaction: number; maxBalance: number }
+  > = {
     none: { dailyTransaction: 0, monthlyTransaction: 0, maxBalance: 0 },
-    basic: { dailyTransaction: 1_000, monthlyTransaction: 5_000, maxBalance: 10_000 },
-    enhanced: { dailyTransaction: 10_000, monthlyTransaction: 50_000, maxBalance: 100_000 },
-    full: { dailyTransaction: 50_000, monthlyTransaction: 250_000, maxBalance: 1_000_000 },
+    basic: {
+      dailyTransaction: 1_000,
+      monthlyTransaction: 5_000,
+      maxBalance: 10_000,
+    },
+    enhanced: {
+      dailyTransaction: 10_000,
+      monthlyTransaction: 50_000,
+      maxBalance: 100_000,
+    },
+    full: {
+      dailyTransaction: 50_000,
+      monthlyTransaction: 250_000,
+      maxBalance: 1_000_000,
+    },
   };
   return tiers[level] || tiers.none;
 }
@@ -123,7 +144,7 @@ export async function getStatus(
     const user = await Users.findById(req.user.userId)
       .select(
         "firstName lastName kycStatus governmentId proofOfAddress selfieWithId signature " +
-        "homeAddress city country dateOfBirth idType idNumber idExpiryDate addressDocType",
+          "homeAddress city country dateOfBirth idType idNumber idExpiryDate addressDocType",
       )
       .lean();
 
@@ -181,7 +202,7 @@ export async function getRequirements(
     const user = await Users.findById(req.user.userId)
       .select(
         "kycStatus governmentId proofOfAddress selfieWithId signature " +
-        "homeAddress city country firstName lastName dateOfBirth",
+          "homeAddress city country firstName lastName dateOfBirth",
       )
       .lean();
 
@@ -206,7 +227,8 @@ export async function getRequirements(
         description: "Full name, date of birth, nationality",
         required: true,
         minLevel: "basic",
-        check: !!user.firstName && !!user.lastName && !!(user as any).dateOfBirth,
+        check:
+          !!user.firstName && !!user.lastName && !!(user as any).dateOfBirth,
       },
       {
         step: "address",
@@ -251,7 +273,10 @@ export async function getRequirements(
     ];
 
     const requirements = allRequirements
-      .filter((r) => levelOrder.indexOf(r.minLevel) <= levelOrder.indexOf(targetLevel))
+      .filter(
+        (r) =>
+          levelOrder.indexOf(r.minLevel) <= levelOrder.indexOf(targetLevel),
+      )
       .map((r) => ({
         step: r.step,
         name: r.name,
@@ -261,18 +286,35 @@ export async function getRequirements(
       }));
 
     const benefitMap: Record<string, string[]> = {
-      basic: ["Send up to $1,000/day", "Receive money", "Basic account features"],
-      enhanced: ["Send up to $10,000/day", "International transfers", "Loan applications"],
-      full: ["Send up to $50,000/day", "Premium features", "Investment access", "Priority support"],
+      basic: [
+        "Send up to $1,000/day",
+        "Receive money",
+        "Basic account features",
+      ],
+      enhanced: [
+        "Send up to $10,000/day",
+        "International transfers",
+        "Loan applications",
+      ],
+      full: [
+        "Send up to $50,000/day",
+        "Premium features",
+        "Investment access",
+        "Priority support",
+      ],
     };
 
-    sendSuccess(res, {
-      currentLevel,
-      targetLevel,
-      requirements,
-      benefits: benefitMap[targetLevel] || [],
-      newLimits: limitsForLevel(targetLevel),
-    }, "KYC requirements retrieved");
+    sendSuccess(
+      res,
+      {
+        currentLevel,
+        targetLevel,
+        requirements,
+        benefits: benefitMap[targetLevel] || [],
+        newLimits: limitsForLevel(targetLevel),
+      },
+      "KYC requirements retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -300,7 +342,9 @@ export async function getDocuments(
 
     // Also include profile-level docs (governmentId, proofOfAddress, etc.)
     const user = await Users.findById(req.user.userId)
-      .select("governmentId proofOfAddress selfieWithId signature idType idNumber idExpiryDate addressDocType profilePicture")
+      .select(
+        "governmentId proofOfAddress selfieWithId signature idType idNumber idExpiryDate addressDocType profilePicture",
+      )
       .lean();
 
     const profileDocuments = [];
@@ -347,23 +391,27 @@ export async function getDocuments(
       }
     }
 
-    sendSuccess(res, {
-      documents: [
-        ...documents.map((doc: any) => ({
-          id: doc._id,
-          type: doc.tags?.[0] || doc.category,
-          documentType: doc.metadata?.documentType || doc.category,
-          documentNumber: doc.metadata?.documentNumber,
-          expiryDate: doc.metadata?.expiryDate,
-          frontImageUrl: doc.fileUrl,
-          status: doc.metadata?.reviewStatus || "pending",
-          rejectionReason: doc.metadata?.reviewNotes,
-          uploadedAt: doc.createdAt,
-          source: "attachment",
-        })),
-        ...profileDocuments,
-      ],
-    }, "KYC documents retrieved");
+    sendSuccess(
+      res,
+      {
+        documents: [
+          ...documents.map((doc: any) => ({
+            id: doc._id,
+            type: doc.tags?.[0] || doc.category,
+            documentType: doc.metadata?.documentType || doc.category,
+            documentNumber: doc.metadata?.documentNumber,
+            expiryDate: doc.metadata?.expiryDate,
+            frontImageUrl: doc.fileUrl,
+            status: doc.metadata?.reviewStatus || "pending",
+            rejectionReason: doc.metadata?.reviewNotes,
+            uploadedAt: doc.createdAt,
+            source: "attachment",
+          })),
+          ...profileDocuments,
+        ],
+      },
+      "KYC documents retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -392,19 +440,24 @@ export async function getDocumentById(
 
     if (!document) throw new NotFoundError("Document not found");
 
-    sendSuccess(res, {
-      document: {
-        id: document._id,
-        type: (document as any).tags?.[0] || document.category,
-        documentType: (document as any).metadata?.documentType || document.category,
-        documentNumber: (document as any).metadata?.documentNumber,
-        expiryDate: (document as any).metadata?.expiryDate,
-        frontImageUrl: document.fileUrl,
-        status: (document as any).metadata?.reviewStatus || "pending",
-        rejectionReason: (document as any).metadata?.reviewNotes,
-        uploadedAt: document.createdAt,
+    sendSuccess(
+      res,
+      {
+        document: {
+          id: document._id,
+          type: (document as any).tags?.[0] || document.category,
+          documentType:
+            (document as any).metadata?.documentType || document.category,
+          documentNumber: (document as any).metadata?.documentNumber,
+          expiryDate: (document as any).metadata?.expiryDate,
+          frontImageUrl: document.fileUrl,
+          status: (document as any).metadata?.reviewStatus || "pending",
+          rejectionReason: (document as any).metadata?.reviewNotes,
+          uploadedAt: document.createdAt,
+        },
       },
-    }, "Document retrieved");
+      "Document retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -423,8 +476,11 @@ export async function uploadIdentityDocument(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    const frontImage = files?.frontImage?.[0] || (req.file as Express.Multer.File | undefined);
+    const files = req.files as
+      | { [fieldname: string]: Express.Multer.File[] }
+      | undefined;
+    const frontImage =
+      files?.frontImage?.[0] || (req.file as Express.Multer.File | undefined);
     const backImage = files?.backImage?.[0];
 
     if (!frontImage) throw new ValidationError("Front image is required");
@@ -433,20 +489,33 @@ export async function uploadIdentityDocument(
 
     const validTypes = ["passport", "national_id", "drivers_license"];
     if (!type || !validTypes.includes(type)) {
-      throw new ValidationError("Invalid document type. Must be: passport, national_id, or drivers_license");
+      throw new ValidationError(
+        "Invalid document type. Must be: passport, national_id, or drivers_license",
+      );
     }
 
     // Upload front image to Cloudinary
     const folder = `remit/kyc/${req.user.userId}`;
-    const frontResult = await uploadToCloudinary(frontImage.buffer, frontImage.originalname, folder);
+    const frontResult = await uploadToCloudinary(
+      frontImage.buffer,
+      frontImage.originalname,
+      folder,
+    );
 
     let backResult = null;
     if (backImage) {
-      backResult = await uploadToCloudinary(backImage.buffer, backImage.originalname, folder);
+      backResult = await uploadToCloudinary(
+        backImage.buffer,
+        backImage.originalname,
+        folder,
+      );
     }
 
     // Create attachment record
-    const fileExtension = path.extname(frontImage.originalname).toLowerCase().slice(1);
+    const fileExtension = path
+      .extname(frontImage.originalname)
+      .toLowerCase()
+      .slice(1);
     const attachment = new Attachments({
       user: req.user.userId,
       relatedEntity: "kyc",
@@ -498,18 +567,22 @@ export async function uploadIdentityDocument(
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      document: {
-        id: attachment._id,
-        type,
-        documentNumber,
-        expiryDate,
-        frontImageUrl: frontResult.url,
-        backImageUrl: backResult?.url || null,
-        status: "pending",
-        uploadedAt: attachment.createdAt,
+    sendCreated(
+      res,
+      {
+        document: {
+          id: attachment._id,
+          type,
+          documentNumber,
+          expiryDate,
+          frontImageUrl: frontResult.url,
+          backImageUrl: backResult?.url || null,
+          status: "pending",
+          uploadedAt: attachment.createdAt,
+        },
       },
-    }, "Identity document uploaded successfully");
+      "Identity document uploaded successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -534,13 +607,22 @@ export async function uploadProofOfAddress(
     const { type, issueDate } = req.body;
     const validTypes = ["utility_bill", "bank_statement"];
     if (!type || !validTypes.includes(type)) {
-      throw new ValidationError("Invalid document type. Must be: utility_bill or bank_statement");
+      throw new ValidationError(
+        "Invalid document type. Must be: utility_bill or bank_statement",
+      );
     }
 
     const folder = `remit/kyc/${req.user.userId}`;
-    const uploadResult = await uploadToCloudinary(file.buffer, file.originalname, folder);
+    const uploadResult = await uploadToCloudinary(
+      file.buffer,
+      file.originalname,
+      folder,
+    );
 
-    const fileExtension = path.extname(file.originalname).toLowerCase().slice(1);
+    const fileExtension = path
+      .extname(file.originalname)
+      .toLowerCase()
+      .slice(1);
     const attachment = new Attachments({
       user: req.user.userId,
       relatedEntity: "kyc",
@@ -582,16 +664,20 @@ export async function uploadProofOfAddress(
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      document: {
-        id: attachment._id,
-        type: "proof_of_address",
-        documentType: type,
-        frontImageUrl: uploadResult.url,
-        status: "pending",
-        uploadedAt: attachment.createdAt,
+    sendCreated(
+      res,
+      {
+        document: {
+          id: attachment._id,
+          type: "proof_of_address",
+          documentType: type,
+          frontImageUrl: uploadResult.url,
+          status: "pending",
+          uploadedAt: attachment.createdAt,
+        },
       },
-    }, "Proof of address uploaded successfully");
+      "Proof of address uploaded successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -614,9 +700,16 @@ export async function uploadSelfie(
     if (!file) throw new ValidationError("Selfie image is required");
 
     const folder = `remit/kyc/${req.user.userId}`;
-    const uploadResult = await uploadToCloudinary(file.buffer, file.originalname, folder);
+    const uploadResult = await uploadToCloudinary(
+      file.buffer,
+      file.originalname,
+      folder,
+    );
 
-    const fileExtension = path.extname(file.originalname).toLowerCase().slice(1);
+    const fileExtension = path
+      .extname(file.originalname)
+      .toLowerCase()
+      .slice(1);
     const attachment = new Attachments({
       user: req.user.userId,
       relatedEntity: "kyc",
@@ -656,15 +749,19 @@ export async function uploadSelfie(
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      document: {
-        id: attachment._id,
-        type: "selfie",
-        frontImageUrl: uploadResult.url,
-        status: "pending",
-        uploadedAt: attachment.createdAt,
+    sendCreated(
+      res,
+      {
+        document: {
+          id: attachment._id,
+          type: "selfie",
+          frontImageUrl: uploadResult.url,
+          status: "pending",
+          uploadedAt: attachment.createdAt,
+        },
       },
-    }, "Selfie uploaded successfully");
+      "Selfie uploaded successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -694,25 +791,36 @@ export async function deleteDocument(
     if (!attachment) throw new NotFoundError("Document not found");
 
     // Don't allow deletion of approved documents
-    if ((attachment as any).metadata?.reviewStatus === "approved" || attachment.isVerified) {
+    if (
+      (attachment as any).metadata?.reviewStatus === "approved" ||
+      attachment.isVerified
+    ) {
       throw new ForbiddenError("Cannot delete an approved document");
     }
 
     // Delete from Cloudinary
     if (attachment.storagePath) {
-      await deleteFromCloudinary(attachment.storagePath as string).catch(() => {});
+      await deleteFromCloudinary(attachment.storagePath as string).catch(
+        () => {},
+      );
     }
     // Delete back image if present
     if ((attachment as any).metadata?.backImagePublicId) {
-      await deleteFromCloudinary((attachment as any).metadata.backImagePublicId).catch(() => {});
+      await deleteFromCloudinary(
+        (attachment as any).metadata.backImagePublicId,
+      ).catch(() => {});
     }
 
     // Determine which User model field to clear
-    const docType = (attachment as any).tags?.[0] || (attachment as any).metadata?.documentType;
+    const docType =
+      (attachment as any).tags?.[0] ||
+      (attachment as any).metadata?.documentType;
     const clearFields: any = {};
     if (["passport", "national_id", "drivers_license"].includes(docType)) {
       clearFields.governmentId = null;
-    } else if (["proof_of_address", "utility_bill", "bank_statement"].includes(docType)) {
+    } else if (
+      ["proof_of_address", "utility_bill", "bank_statement"].includes(docType)
+    ) {
       clearFields.proofOfAddress = null;
     } else if (docType === "selfie") {
       clearFields.selfieWithId = null;
@@ -752,14 +860,18 @@ export async function submitVerification(
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId)
-      .select("firstName lastName email kycStatus governmentId proofOfAddress selfieWithId")
+      .select(
+        "firstName lastName email kycStatus governmentId proofOfAddress selfieWithId",
+      )
       .lean();
 
     if (!user) throw new NotFoundError("User not found");
 
     // Must have at least a government ID to submit
     if (!(user as any).governmentId) {
-      throw new ValidationError("You must upload a government ID before submitting for verification");
+      throw new ValidationError(
+        "You must upload a government ID before submitting for verification",
+      );
     }
 
     const currentStatus = (user as any).kycStatus;
@@ -782,7 +894,8 @@ export async function submitVerification(
     const emailContent = emailGenerator.kycStatusEmail({
       firstName: user.firstName as string,
       status: "pending",
-      notes: "Your KYC documents have been submitted for review. We will notify you once the review is complete.",
+      notes:
+        "Your KYC documents have been submitted for review. We will notify you once the review is complete.",
       userId: req.user.userId,
     });
     await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
@@ -802,7 +915,10 @@ export async function submitVerification(
       actorType: "user",
       resource: "kyc",
       resourceId: req.user.userId,
-      changes: { before: { kycStatus: currentStatus }, after: { kycStatus: "in_review" } },
+      changes: {
+        before: { kycStatus: currentStatus },
+        after: { kycStatus: "in_review" },
+      },
       ipAddress: req.clientIp,
       userAgent: req.headers["user-agent"],
       severity: "info",
@@ -810,11 +926,15 @@ export async function submitVerification(
       metadata: { requestId: req.requestId },
     }).catch(() => {});
 
-    sendSuccess(res, {
-      verificationId: req.user.userId,
-      status: "in_review",
-      message: "Your documents have been submitted for verification",
-    }, "Verification submitted");
+    sendSuccess(
+      res,
+      {
+        verificationId: req.user.userId,
+        status: "in_review",
+        message: "Your documents have been submitted for verification",
+      },
+      "Verification submitted",
+    );
   } catch (error) {
     next(error);
   }
@@ -836,7 +956,7 @@ export async function getVerificationStatus(
     const user = await Users.findById(req.user.userId)
       .select(
         "kycStatus governmentId proofOfAddress selfieWithId signature " +
-        "firstName lastName kycApprovedAt kycRejectedAt kycRejectionReason",
+          "firstName lastName kycApprovedAt kycRejectedAt kycRejectionReason",
       )
       .lean();
 
@@ -856,20 +976,31 @@ export async function getVerificationStatus(
     const steps = [
       {
         name: "Document Upload",
-        status: completedSteps.includes("identity_document") ? "completed" : "pending",
+        status: completedSteps.includes("identity_document")
+          ? "completed"
+          : "pending",
       },
       {
         name: "Document Review",
-        status: (user as any).kycStatus === "approved" ? "completed"
-          : (user as any).kycStatus === "in_review" ? "processing"
-          : "pending",
+        status:
+          (user as any).kycStatus === "approved"
+            ? "completed"
+            : (user as any).kycStatus === "in_review"
+              ? "processing"
+              : "pending",
       },
       {
         name: "Identity Verification",
-        status: (user as any).kycStatus === "approved" ? "completed"
-          : (user as any).kycStatus === "rejected" ? "failed"
-          : "pending",
-        message: (user as any).kycStatus === "rejected" ? (user as any).kycRejectionReason : undefined,
+        status:
+          (user as any).kycStatus === "approved"
+            ? "completed"
+            : (user as any).kycStatus === "rejected"
+              ? "failed"
+              : "pending",
+        message:
+          (user as any).kycStatus === "rejected"
+            ? (user as any).kycRejectionReason
+            : undefined,
       },
     ];
 
@@ -918,7 +1049,9 @@ export async function requestReverification(
 
     const kycStatus = (user as any).kycStatus;
     if (kycStatus !== "rejected" && kycStatus !== "expired") {
-      throw new ValidationError("Re-verification can only be requested for rejected or expired KYC");
+      throw new ValidationError(
+        "Re-verification can only be requested for rejected or expired KYC",
+      );
     }
 
     await Users.findByIdAndUpdate(req.user.userId, {
@@ -935,7 +1068,8 @@ export async function requestReverification(
     const emailContent = emailGenerator.kycStatusEmail({
       firstName: user.firstName as string,
       status: "pending",
-      notes: "Your re-verification request has been accepted. Please upload updated documents.",
+      notes:
+        "Your re-verification request has been accepted. Please upload updated documents.",
       userId: req.user.userId,
     });
     await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
@@ -961,7 +1095,11 @@ export async function requestReverification(
       metadata: { reason, requestId: req.requestId },
     }).catch(() => {});
 
-    sendSuccess(res, { message: "Re-verification request submitted" }, "Re-verification requested");
+    sendSuccess(
+      res,
+      { message: "Re-verification request submitted" },
+      "Re-verification requested",
+    );
   } catch (error) {
     next(error);
   }
@@ -983,7 +1121,7 @@ export async function getAdminPendingReviews(
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const skip = (page - 1) * limit;
-    const statusFilter = req.query.status as string || "in_review";
+    const statusFilter = (req.query.status as string) || "in_review";
 
     const filter: any = {};
     if (statusFilter === "all") {
@@ -994,7 +1132,9 @@ export async function getAdminPendingReviews(
 
     const [users, total] = await Promise.all([
       Users.find(filter)
-        .select("firstName lastName email kycStatus profilePicture governmentId proofOfAddress selfieWithId signature createdAt kycSubmittedAt")
+        .select(
+          "firstName lastName email kycStatus profilePicture governmentId proofOfAddress selfieWithId signature createdAt kycSubmittedAt",
+        )
         .sort({ kycSubmittedAt: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -1017,7 +1157,12 @@ export async function getAdminPendingReviews(
       createdAt: u.createdAt,
     }));
 
-    sendPaginated(res, usersWithLevel, { page, limit, total }, "Pending KYC reviews retrieved");
+    sendPaginated(
+      res,
+      usersWithLevel,
+      { page, limit, total },
+      "Pending KYC reviews retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -1041,9 +1186,9 @@ export async function getAdminUserKyc(
     const user = await Users.findById(userId)
       .select(
         "firstName lastName email kycStatus governmentId proofOfAddress selfieWithId signature " +
-        "profilePicture idType idNumber idExpiryDate addressDocType homeAddress city stateProvince " +
-        "zipCode country dateOfBirth nationality gender kycNotes kycSubmittedAt kycApprovedAt " +
-        "kycRejectedAt kycRejectionReason createdAt",
+          "profilePicture idType idNumber idExpiryDate addressDocType homeAddress city stateProvince " +
+          "zipCode country dateOfBirth nationality gender kycNotes kycSubmittedAt kycApprovedAt " +
+          "kycRejectedAt kycRejectionReason createdAt",
       )
       .lean();
 
@@ -1069,61 +1214,71 @@ export async function getAdminUserKyc(
       dataType: "kyc",
       accessReason: "KYC review",
       accessMethod: "view",
-      dataFields: ["governmentId", "proofOfAddress", "selfieWithId", "signature", "idNumber"],
+      dataFields: [
+        "governmentId",
+        "proofOfAddress",
+        "selfieWithId",
+        "signature",
+        "idNumber",
+      ],
       ipAddress: req.clientIp as string,
       userAgent: req.headers["user-agent"] as string,
       consentObtained: true,
     }).catch(() => {});
 
-    sendSuccess(res, {
-      user: {
-        id: (user as any)._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        dateOfBirth: (user as any).dateOfBirth,
-        nationality: (user as any).nationality,
-        gender: (user as any).gender,
-        address: {
-          street: (user as any).homeAddress,
-          city: (user as any).city,
-          state: (user as any).stateProvince,
-          postalCode: (user as any).zipCode,
-          country: (user as any).country,
+    sendSuccess(
+      res,
+      {
+        user: {
+          id: (user as any)._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          dateOfBirth: (user as any).dateOfBirth,
+          nationality: (user as any).nationality,
+          gender: (user as any).gender,
+          address: {
+            street: (user as any).homeAddress,
+            city: (user as any).city,
+            state: (user as any).stateProvince,
+            postalCode: (user as any).zipCode,
+            country: (user as any).country,
+          },
         },
+        kyc: {
+          status: (user as any).kycStatus,
+          level,
+          completedSteps,
+          pendingSteps,
+          notes: (user as any).kycNotes,
+          submittedAt: (user as any).kycSubmittedAt,
+          approvedAt: (user as any).kycApprovedAt,
+          rejectedAt: (user as any).kycRejectedAt,
+          rejectionReason: (user as any).kycRejectionReason,
+        },
+        identity: {
+          idType: (user as any).idType,
+          idNumber: (user as any).idNumber,
+          idExpiryDate: (user as any).idExpiryDate,
+          governmentIdUrl: (user as any).governmentId,
+          addressDocType: (user as any).addressDocType,
+          proofOfAddressUrl: (user as any).proofOfAddress,
+          selfieUrl: (user as any).selfieWithId,
+          signatureUrl: (user as any).signature,
+        },
+        documents: documents.map((doc: any) => ({
+          id: doc._id,
+          type: doc.tags?.[0] || doc.category,
+          fileUrl: doc.fileUrl,
+          status: doc.metadata?.reviewStatus || "pending",
+          reviewNotes: doc.metadata?.reviewNotes,
+          uploadedAt: doc.createdAt,
+          reviewedAt: doc.verifiedAt,
+          reviewedBy: doc.verifiedBy,
+        })),
       },
-      kyc: {
-        status: (user as any).kycStatus,
-        level,
-        completedSteps,
-        pendingSteps,
-        notes: (user as any).kycNotes,
-        submittedAt: (user as any).kycSubmittedAt,
-        approvedAt: (user as any).kycApprovedAt,
-        rejectedAt: (user as any).kycRejectedAt,
-        rejectionReason: (user as any).kycRejectionReason,
-      },
-      identity: {
-        idType: (user as any).idType,
-        idNumber: (user as any).idNumber,
-        idExpiryDate: (user as any).idExpiryDate,
-        governmentIdUrl: (user as any).governmentId,
-        addressDocType: (user as any).addressDocType,
-        proofOfAddressUrl: (user as any).proofOfAddress,
-        selfieUrl: (user as any).selfieWithId,
-        signatureUrl: (user as any).signature,
-      },
-      documents: documents.map((doc: any) => ({
-        id: doc._id,
-        type: doc.tags?.[0] || doc.category,
-        fileUrl: doc.fileUrl,
-        status: doc.metadata?.reviewStatus || "pending",
-        reviewNotes: doc.metadata?.reviewNotes,
-        uploadedAt: doc.createdAt,
-        reviewedAt: doc.verifiedAt,
-        reviewedBy: doc.verifiedBy,
-      })),
-    }, "User KYC detail retrieved");
+      "User KYC detail retrieved",
+    );
   } catch (error) {
     next(error);
   }
@@ -1147,7 +1302,9 @@ export async function adminReviewKyc(
 
     const validStatuses = ["approved", "rejected", "pending"];
     if (!status || !validStatuses.includes(status)) {
-      throw new ValidationError("Invalid status. Must be: approved, rejected, or pending");
+      throw new ValidationError(
+        "Invalid status. Must be: approved, rejected, or pending",
+      );
     }
 
     const user = await Users.findById(userId)
@@ -1225,7 +1382,10 @@ export async function adminReviewKyc(
       actorType: "admin",
       resource: "kyc",
       resourceId: userIdStr,
-      changes: { before: { kycStatus: previousStatus }, after: { kycStatus: status } },
+      changes: {
+        before: { kycStatus: previousStatus },
+        after: { kycStatus: status },
+      },
       ipAddress: req.clientIp as string,
       userAgent: req.headers["user-agent"] as string,
       severity: status === "rejected" ? "warning" : "info",
@@ -1234,11 +1394,21 @@ export async function adminReviewKyc(
     }).catch(() => {});
 
     // Send email notification to user
-    const kycEmailStatus = status === "approved" ? "approved" : status === "rejected" ? "rejected" : "pending";
+    const kycEmailStatus =
+      status === "approved"
+        ? "approved"
+        : status === "rejected"
+          ? "rejected"
+          : "pending";
     const emailContent = emailGenerator.kycStatusEmail({
       firstName: user.firstName as string,
       status: kycEmailStatus as "approved" | "rejected" | "pending",
-      notes: status === "rejected" ? notes : status === "approved" ? "Your identity has been verified. You now have full access." : undefined,
+      notes:
+        status === "rejected"
+          ? notes
+          : status === "approved"
+            ? "Your identity has been verified. You now have full access."
+            : undefined,
       userId: userIdStr,
     });
     await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
@@ -1292,9 +1462,7 @@ export async function getAdminKycStats(
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const [statusCounts, recentSubmissions] = await Promise.all([
-      Users.aggregate([
-        { $group: { _id: "$kycStatus", count: { $sum: 1 } } },
-      ]),
+      Users.aggregate([{ $group: { _id: "$kycStatus", count: { $sum: 1 } } }]),
       Users.find({ kycStatus: "in_review" })
         .select("firstName lastName email kycSubmittedAt")
         .sort({ kycSubmittedAt: -1 })
@@ -1318,15 +1486,19 @@ export async function getAdminKycStats(
       }
     });
 
-    sendSuccess(res, {
-      stats,
-      recentSubmissions: recentSubmissions.map((u: any) => ({
-        id: u._id,
-        name: `${u.firstName} ${u.lastName}`,
-        email: u.email,
-        submittedAt: u.kycSubmittedAt,
-      })),
-    }, "KYC statistics retrieved");
+    sendSuccess(
+      res,
+      {
+        stats,
+        recentSubmissions: recentSubmissions.map((u: any) => ({
+          id: u._id,
+          name: `${u.firstName} ${u.lastName}`,
+          email: u.email,
+          submittedAt: u.kycSubmittedAt,
+        })),
+      },
+      "KYC statistics retrieved",
+    );
   } catch (error) {
     next(error);
   }

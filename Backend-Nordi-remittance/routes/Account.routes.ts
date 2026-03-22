@@ -2,11 +2,18 @@
 // ACCOUNT ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import AccountsController from '../controllers/Accounts.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { rateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import AccountsController from "../controllers/Accounts.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import { rateLimit, sanitizeInput } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -24,7 +31,7 @@ router.use(authenticate); // All account routes require authentication
  * @desc    Get user's wallets
  * @access  Private
  */
-router.get('/wallets', AccountsController.getWallets);
+router.get("/wallets", AccountsController.getWallets);
 
 /**
  * @route   POST /api/accounts/wallets
@@ -32,10 +39,10 @@ router.get('/wallets', AccountsController.getWallets);
  * @access  Private
  */
 router.post(
-  '/wallets',
+  "/wallets",
   verifyAccountStatus,
   rateLimit({ maxRequests: 5, windowMs: 3600000 }), // 5 wallets per hour
-  AccountsController.createWallet
+  AccountsController.createWallet,
 );
 
 /**
@@ -43,14 +50,14 @@ router.post(
  * @desc    Get specific wallet
  * @access  Private
  */
-router.get('/wallets/:id', AccountsController.getWalletById);
+router.get("/wallets/:id", AccountsController.getWalletById);
 
 /**
  * @route   PATCH /api/accounts/wallets/:id
  * @desc    Update wallet settings
  * @access  Private
  */
-router.patch('/wallets/:id', AccountsController.updateWallet);
+router.patch("/wallets/:id", AccountsController.updateWallet);
 
 /**
  * @route   POST /api/accounts/wallets/:id/close
@@ -58,9 +65,9 @@ router.patch('/wallets/:id', AccountsController.updateWallet);
  * @access  Private
  */
 router.post(
-  '/wallets/:id/close',
+  "/wallets/:id/close",
   auditLogMiddleware,
-  AccountsController.closeWallet
+  AccountsController.closeWallet,
 );
 
 /**
@@ -68,7 +75,7 @@ router.post(
  * @desc    Get wallet balance history (ledger entries)
  * @access  Private
  */
-router.get('/wallets/:id/history', AccountsController.getBalanceHistory);
+router.get("/wallets/:id/history", AccountsController.getBalanceHistory);
 
 // ============================================================================
 // ACCOUNT INFO ROUTES
@@ -79,14 +86,14 @@ router.get('/wallets/:id/history', AccountsController.getBalanceHistory);
  * @desc    Get account limits and usage
  * @access  Private
  */
-router.get('/limits', AccountsController.getAccountLimits);
+router.get("/limits", AccountsController.getAccountLimits);
 
 /**
  * @route   GET /api/accounts/summary
  * @desc    Get account summary/dashboard data
  * @access  Private
  */
-router.get('/summary', AccountsController.getAccountSummary);
+router.get("/summary", AccountsController.getAccountSummary);
 
 // ============================================================================
 // BENEFICIARY ROUTES
@@ -97,7 +104,7 @@ router.get('/summary', AccountsController.getAccountSummary);
  * @desc    Get saved beneficiaries
  * @access  Private
  */
-router.get('/beneficiaries', AccountsController.getBeneficiaries);
+router.get("/beneficiaries", AccountsController.getBeneficiaries);
 
 /**
  * @route   POST /api/accounts/beneficiaries
@@ -105,9 +112,9 @@ router.get('/beneficiaries', AccountsController.getBeneficiaries);
  * @access  Private
  */
 router.post(
-  '/beneficiaries',
+  "/beneficiaries",
   rateLimit({ maxRequests: 10, windowMs: 3600000 }), // 10 beneficiaries per hour
-  AccountsController.addBeneficiary
+  AccountsController.addBeneficiary,
 );
 
 /**
@@ -115,7 +122,7 @@ router.post(
  * @desc    Remove beneficiary
  * @access  Private
  */
-router.delete('/beneficiaries/:id', AccountsController.removeBeneficiary);
+router.delete("/beneficiaries/:id", AccountsController.removeBeneficiary);
 
 // ============================================================================
 // ADMIN ROUTES
@@ -126,7 +133,7 @@ router.delete('/beneficiaries/:id', AccountsController.removeBeneficiary);
  * @desc    Get all wallets (admin only)
  * @access  Private/Admin
  */
-router.get('/admin/wallets', requireAdmin, AccountsController.getAllWallets);
+router.get("/admin/wallets", requireAdmin, AccountsController.getAllWallets);
 
 /**
  * @route   PATCH /api/accounts/admin/wallets/:id/status
@@ -134,10 +141,10 @@ router.get('/admin/wallets', requireAdmin, AccountsController.getAllWallets);
  * @access  Private/Admin
  */
 router.patch(
-  '/admin/wallets/:id/status',
+  "/admin/wallets/:id/status",
   requireAdmin,
   auditLogMiddleware,
-  AccountsController.updateWalletStatus
+  AccountsController.updateWalletStatus,
 );
 
 // ============================================================================

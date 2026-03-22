@@ -2,21 +2,44 @@
 // CARD CONTROLLER
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { Cards, CardTokens, CardTransactions, CardControls, CardLimits } from '../models/CardsModel.js';
-import { Wallets, LedgerEntries } from '../models/AccountsModel.js';
-import Users from '../models/UserModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { generateCardNumber, generateCVV, generateReferenceNumber } from '../core/helpers/generator.js';
-import { encrypt, decrypt, maskCardNumber } from '../core/helpers/crypto.helper.js';
-import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/response.helper.js';
-import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
-import { sendTemplatedMail } from '../services/Mailer.service.js';
-import EmailContentGenerator from '../core/mail/Mail-content.js';
-import { emitToUser } from '../services/Websocket.service.js';
-import { WS } from '../core/constants/ws-events.js';
+import { Response, NextFunction } from "express";
+import mongoose from "mongoose";
+import type { AuthenticatedRequest } from "../types/index.js";
+import {
+  Cards,
+  CardTokens,
+  CardTransactions,
+  CardControls,
+  CardLimits,
+} from "../models/CardsModel.js";
+import { Wallets, LedgerEntries } from "../models/AccountsModel.js";
+import Users from "../models/UserModel.js";
+import Transactions from "../models/TransactionModel.js";
+import {
+  generateCardNumber,
+  generateCVV,
+  generateReferenceNumber,
+} from "../core/helpers/generator.js";
+import {
+  encrypt,
+  decrypt,
+  maskCardNumber,
+} from "../core/helpers/crypto.helper.js";
+import {
+  sendSuccess,
+  sendCreated,
+  sendPaginated,
+} from "../core/helpers/response.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+  ForbiddenError,
+} from "../core/errors/AppError.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { emitToUser } from "../services/websocket.service.js";
+import { WS } from "../core/constants/ws-events.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -26,16 +49,20 @@ function getWalletBalance(wallet: any, currency: string): number {
   if (wallet.balances instanceof Map) {
     return wallet.balances.get(currency) || 0;
   }
-  if (wallet.balances && typeof wallet.balances === 'object') {
+  if (wallet.balances && typeof wallet.balances === "object") {
     return wallet.balances[currency] || 0;
   }
   return 0;
 }
 
-function updateWalletBalance(wallet: any, currency: string, newBalance: number): void {
+function updateWalletBalance(
+  wallet: any,
+  currency: string,
+  newBalance: number,
+): void {
   if (wallet.balances instanceof Map) {
     wallet.balances.set(currency, newBalance);
-  } else if (wallet.balances && typeof wallet.balances === 'object') {
+  } else if (wallet.balances && typeof wallet.balances === "object") {
     wallet.balances[currency] = newBalance;
   } else {
     wallet.balances = new Map([[currency, newBalance]]);
@@ -45,33 +72,37 @@ function updateWalletBalance(wallet: any, currency: string, newBalance: number):
 function getWalletCurrency(wallet: any): string {
   if (wallet.balances instanceof Map) {
     const keys = Array.from(wallet.balances.keys());
-    return keys.length > 0 ? String(keys[0]) : 'USD';
+    return keys.length > 0 ? String(keys[0]) : "USD";
   }
-  if (wallet.balances && typeof wallet.balances === 'object') {
-    return Object.keys(wallet.balances)[0] || 'USD';
+  if (wallet.balances && typeof wallet.balances === "object") {
+    return Object.keys(wallet.balances)[0] || "USD";
   }
-  return 'USD';
+  return "USD";
 }
 
 // ============================================================================
 // GET USER CARDS
 // ============================================================================
 
-export async function getCards(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getCards(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const cards = await Cards.find({ user: req.user.userId })
-      .populate('wallet', 'walletNumber currency balance')
-      .populate('limits')
-      .populate('controls')
+      .populate("wallet", "walletNumber currency balance")
+      .populate("limits")
+      .populate("controls")
       .lean();
 
     // Mask card numbers for security
-    const maskedCards = cards.map(card => ({
+    const maskedCards = cards.map((card) => ({
       ...card,
       cardNumber: maskCardNumber(card.cardNumber),
-      cvv: '***',
+      cvv: "***",
       pin: undefined,
     }));
 
@@ -85,26 +116,30 @@ export async function getCards(req: AuthenticatedRequest, res: Response, next: N
 // GET SINGLE CARD
 // ============================================================================
 
-export async function getCardById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getCardById(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
 
-    const card = await Cards.findOne({ 
+    const card = await Cards.findOne({
       $or: [{ _id: id }, { cardId: id }],
-      user: req.user.userId 
+      user: req.user.userId,
     })
-      .populate('wallet', 'walletNumber currency balance availableBalance')
-      .populate('limits')
-      .populate('controls')
+      .populate("wallet", "walletNumber currency balance availableBalance")
+      .populate("limits")
+      .populate("controls")
       .lean();
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
     // Get recent transactions
     const recentTransactions = await CardTransactions.find({ card: card._id })
-      .select('transactionType amount currency merchantName status createdAt')
+      .select("transactionType amount currency merchantName status createdAt")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
@@ -113,7 +148,7 @@ export async function getCardById(req: AuthenticatedRequest, res: Response, next
       card: {
         ...card,
         cardNumber: maskCardNumber(card.cardNumber),
-        cvv: '***',
+        cvv: "***",
         pin: undefined,
       },
       recentTransactions,
@@ -127,41 +162,46 @@ export async function getCardById(req: AuthenticatedRequest, res: Response, next
 // CREATE VIRTUAL CARD
 // ============================================================================
 
-export async function createVirtualCard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createVirtualCard(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { walletId, cardType, cardBrand, cardholderName, currency } = req.body;
+    const { walletId, cardType, cardBrand, cardholderName, currency } =
+      req.body;
 
     // Verify user
     const user = await Users.findById(req.user.userId).session(session);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     // KYC check
-    if (user.kycStatus !== 'approved') {
-      throw new ForbiddenError('KYC verification required to create cards');
+    if (user.kycStatus !== "approved") {
+      throw new ForbiddenError("KYC verification required to create cards");
     }
 
     // Verify wallet
     const wallet = await Wallets.findOne({
       _id: walletId,
       userId: req.user.userId,
-      status: 'active',
+      status: "active",
     }).session(session);
 
-    if (!wallet) throw new NotFoundError('Wallet not found');
+    if (!wallet) throw new NotFoundError("Wallet not found");
 
     // Check card limit (max 5 cards per user)
     const existingCards = await Cards.countDocuments({ user: req.user.userId });
     if (existingCards >= 5) {
-      throw new ForbiddenError('Maximum card limit reached (5 cards)');
+      throw new ForbiddenError("Maximum card limit reached (5 cards)");
     }
 
     // Generate card details
-    const cardNumber = generateCardNumber(cardBrand || 'visa');
+    const cardNumber = generateCardNumber(cardBrand || "visa");
     const cvv = generateCVV();
     const expiryDate = new Date();
     expiryDate.setFullYear(expiryDate.getFullYear() + 3);
@@ -172,13 +212,15 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
       user: req.user.userId,
       wallet: wallet._id,
       cardNumber: encrypt(cardNumber),
-      cardholderName: cardholderName || `${(user as any).firstName} ${(user as any).lastName}`,
-      cardType: cardType || 'debit',
-      cardBrand: cardBrand || 'visa',
+      cardholderName:
+        cardholderName ||
+        `${(user as any).firstName} ${(user as any).lastName}`,
+      cardType: cardType || "debit",
+      cardBrand: cardBrand || "visa",
       expiryMonth: expiryDate.getMonth() + 1,
       expiryYear: expiryDate.getFullYear(),
       cvv: encrypt(cvv),
-      status: 'active',
+      status: "active",
       isPhysical: false,
       currency: walletCurrency,
       isInternationalEnabled: false,
@@ -211,7 +253,7 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
       allowAtm: false,
       allowContactless: true,
       allowMagStripe: true,
-      blockedMerchantCategories: ['gambling', 'adult'],
+      blockedMerchantCategories: ["gambling", "adult"],
     });
 
     await controls.save({ session });
@@ -225,13 +267,15 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
 
     // Send notification using template
     const emailContent = emailGenerator.cardIssuedEmail({
-      cardholderName: cardholderName || `${(user as any).firstName} ${(user as any).lastName}`,
-      cardType: 'Virtual Card',
-      cardBrand: (cardBrand || 'visa').toUpperCase(),
+      cardholderName:
+        cardholderName ||
+        `${(user as any).firstName} ${(user as any).lastName}`,
+      cardType: "Virtual Card",
+      cardBrand: (cardBrand || "visa").toUpperCase(),
       lastFour: cardNumber.slice(-4),
       expiryMonth: String(card.expiryMonth),
       expiryYear: String(card.expiryYear),
-      status: 'active',
+      status: "active",
       cardId: card.cardId || card._id.toString(),
     });
 
@@ -247,21 +291,25 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      card: {
-        id: card._id,
-        cardId: card.cardId,
-        cardNumber: maskCardNumber(cardNumber),
-        last4: cardNumber.slice(-4),
-        cardholderName: card.cardholderName,
-        cardType: card.cardType,
-        cardBrand: card.cardBrand,
-        expiryMonth: card.expiryMonth,
-        expiryYear: card.expiryYear,
-        status: card.status,
-        currency: card.currency,
+    sendCreated(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardId: card.cardId,
+          cardNumber: maskCardNumber(cardNumber),
+          last4: cardNumber.slice(-4),
+          cardholderName: card.cardholderName,
+          cardType: card.cardType,
+          cardBrand: card.cardBrand,
+          expiryMonth: card.expiryMonth,
+          expiryYear: card.expiryYear,
+          status: card.status,
+          currency: card.currency,
+        },
       },
-    }, 'Virtual card created successfully');
+      "Virtual card created successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -274,34 +322,42 @@ export async function createVirtualCard(req: AuthenticatedRequest, res: Response
 // REQUEST PHYSICAL CARD
 // ============================================================================
 
-export async function requestPhysicalCard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function requestPhysicalCard(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { walletId, cardBrand, shippingAddress } = req.body;
 
     const user = await Users.findById(req.user.userId).session(session);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
-    if (user.kycStatus !== 'approved') {
-      throw new ForbiddenError('KYC verification required');
+    if (user.kycStatus !== "approved") {
+      throw new ForbiddenError("KYC verification required");
     }
 
     // Validate shipping address
-    if (!shippingAddress?.street || !shippingAddress?.city || !shippingAddress?.country) {
-      throw new ValidationError('Complete shipping address required');
+    if (
+      !shippingAddress?.street ||
+      !shippingAddress?.city ||
+      !shippingAddress?.country
+    ) {
+      throw new ValidationError("Complete shipping address required");
     }
 
     const wallet = await Wallets.findOne({
       _id: walletId,
       userId: req.user.userId,
-      status: 'active',
+      status: "active",
     }).session(session);
 
-    if (!wallet) throw new NotFoundError('Wallet not found');
+    if (!wallet) throw new NotFoundError("Wallet not found");
 
     // Get wallet currency
     const walletCurrency = getWalletCurrency(wallet);
@@ -310,22 +366,24 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
     const existingPhysical = await Cards.findOne({
       user: req.user.userId,
       isPhysical: true,
-      status: { $in: ['pending_activation', 'active'] },
+      status: { $in: ["pending_activation", "active"] },
     }).session(session);
 
     if (existingPhysical) {
-      throw new ValidationError('You already have a physical card');
+      throw new ValidationError("You already have a physical card");
     }
 
     // Card issuance fee
     const issuanceFee = 10;
     const currentBalance = getWalletBalance(wallet, walletCurrency);
     if (currentBalance < issuanceFee) {
-      throw new ValidationError(`Insufficient balance for card issuance fee ($${issuanceFee})`);
+      throw new ValidationError(
+        `Insufficient balance for card issuance fee ($${issuanceFee})`,
+      );
     }
 
     // Generate card details
-    const cardNumber = generateCardNumber(cardBrand || 'visa');
+    const cardNumber = generateCardNumber(cardBrand || "visa");
     const cvv = generateCVV();
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
     const expiryDate = new Date();
@@ -337,13 +395,13 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
       wallet: wallet._id,
       cardNumber: encrypt(cardNumber),
       cardholderName: `${(user as any).firstName} ${(user as any).lastName}`,
-      cardType: 'debit',
-      cardBrand: cardBrand || 'visa',
+      cardType: "debit",
+      cardBrand: cardBrand || "visa",
       expiryMonth: expiryDate.getMonth() + 1,
       expiryYear: expiryDate.getFullYear(),
       cvv: encrypt(cvv),
       pin: encrypt(pin),
-      status: 'pending_activation',
+      status: "pending_activation",
       isPhysical: true,
       currency: walletCurrency,
       billingAddress: shippingAddress,
@@ -364,30 +422,35 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
     const reference = generateReferenceNumber();
     const transaction = new Transactions({
       wallet: wallet._id,
-      type: 'fee',
-      category: 'cards',
+      type: "fee",
+      category: "cards",
       categoryItemId: card._id.toString(),
       amount: issuanceFee,
       currency: walletCurrency,
-      status: 'completed',
+      status: "completed",
       referenceNumber: reference,
       initiatedBy: req.user.userId,
-      description: 'Physical card issuance fee',
+      description: "Physical card issuance fee",
       completedAt: new Date(),
     });
     await transaction.save({ session });
 
     // Create ledger entry
-    await LedgerEntries.create([{
-      wallet: wallet._id,
-      transaction: transaction._id,
-      entryType: 'debit',
-      amount: issuanceFee,
-      currency: walletCurrency,
-      balance: newBalance,
-      description: 'Physical card issuance fee',
-      accountingDate: new Date(),
-    }], { session });
+    await LedgerEntries.create(
+      [
+        {
+          wallet: wallet._id,
+          transaction: transaction._id,
+          entryType: "debit",
+          amount: issuanceFee,
+          currency: walletCurrency,
+          balance: newBalance,
+          description: "Physical card issuance fee",
+          accountingDate: new Date(),
+        },
+      ],
+      { session },
+    );
 
     // Create limits
     const limits = new CardLimits({
@@ -417,19 +480,23 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      card: {
-        id: card._id,
-        cardId: card.cardId,
-        cardNumber: maskCardNumber(cardNumber),
-        last4: cardNumber.slice(-4),
-        status: card.status,
-        isPhysical: true,
-        shippingAddress,
-        estimatedDelivery: '7-10 business days',
+    sendCreated(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardId: card.cardId,
+          cardNumber: maskCardNumber(cardNumber),
+          last4: cardNumber.slice(-4),
+          status: card.status,
+          isPhysical: true,
+          shippingAddress,
+          estimatedDelivery: "7-10 business days",
+        },
+        fee: issuanceFee,
       },
-      fee: issuanceFee,
-    }, 'Physical card requested successfully');
+      "Physical card requested successfully",
+    );
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -442,9 +509,13 @@ export async function requestPhysicalCard(req: AuthenticatedRequest, res: Respon
 // ACTIVATE CARD
 // ============================================================================
 
-export async function activateCard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function activateCard(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { last4Digits, cvv } = req.body;
@@ -452,24 +523,24 @@ export async function activateCard(req: AuthenticatedRequest, res: Response, nex
     const card = await Cards.findOne({
       $or: [{ _id: id }, { cardId: id }],
       user: req.user.userId,
-      status: 'pending_activation',
+      status: "pending_activation",
     });
 
-    if (!card) throw new NotFoundError('Card not found or already activated');
+    if (!card) throw new NotFoundError("Card not found or already activated");
 
     // Verify card details
     const decryptedCardNumber = decrypt(card.cardNumber);
     const decryptedCvv = decrypt(card.cvv);
 
     if (decryptedCardNumber.slice(-4) !== last4Digits) {
-      throw new ValidationError('Invalid card details');
+      throw new ValidationError("Invalid card details");
     }
 
     if (decryptedCvv !== cvv) {
-      throw new ValidationError('Invalid CVV');
+      throw new ValidationError("Invalid CVV");
     }
 
-    card.status = 'active';
+    card.status = "active";
     card.activationDate = new Date();
     await card.save();
 
@@ -480,14 +551,18 @@ export async function activateCard(req: AuthenticatedRequest, res: Response, nex
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      card: {
-        id: card._id,
-        cardId: card.cardId,
-        status: card.status,
-        activationDate: card.activationDate,
+    sendSuccess(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardId: card.cardId,
+          status: card.status,
+          activationDate: card.activationDate,
+        },
       },
-    }, 'Card activated successfully');
+      "Card activated successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -497,9 +572,13 @@ export async function activateCard(req: AuthenticatedRequest, res: Response, nex
 // BLOCK/UNBLOCK CARD
 // ============================================================================
 
-export async function blockCard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function blockCard(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { reason } = req.body;
@@ -507,26 +586,28 @@ export async function blockCard(req: AuthenticatedRequest, res: Response, next: 
     const card = await Cards.findOne({
       $or: [{ _id: id }, { cardId: id }],
       user: req.user.userId,
-      status: { $in: ['active', 'pending_activation'] },
+      status: { $in: ["active", "pending_activation"] },
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
-    card.status = 'blocked';
-    card.blockedReason = reason || 'User requested';
+    card.status = "blocked";
+    card.blockedReason = reason || "User requested";
     card.blockedAt = new Date();
     await card.save();
 
     const user = await Users.findById(req.user.userId);
     if (user) {
       const emailContent = emailGenerator.cardBlockedEmail({
-        cardholderName: card.cardholderName || `${(user as any).firstName} ${(user as any).lastName}`,
+        cardholderName:
+          card.cardholderName ||
+          `${(user as any).firstName} ${(user as any).lastName}`,
         cardId: card.cardId || card._id.toString(),
         lastFour: maskCardNumber(decrypt(card.cardNumber)).slice(-4),
-        cardType: card.cardBrand?.toUpperCase() || 'CARD',
+        cardType: card.cardBrand?.toUpperCase() || "CARD",
         blockedAt: new Date().toISOString(),
-        reason: reason || 'User requested',
-        blockedBy: 'user',
+        reason: reason || "User requested",
+        blockedBy: "user",
       });
 
       sendTemplatedMail((user as any).email, emailContent).catch(console.error);
@@ -535,39 +616,47 @@ export async function blockCard(req: AuthenticatedRequest, res: Response, next: 
     emitToUser(req.user!.userId, WS.CARD.BLOCKED, {
       cardId: card.cardId || card._id,
       status: card.status,
-      reason: reason || 'User requested',
+      reason: reason || "User requested",
       blockedAt: card.blockedAt,
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      card: {
-        id: card._id,
-        cardId: card.cardId,
-        status: card.status,
-        blockedAt: card.blockedAt,
+    sendSuccess(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardId: card.cardId,
+          status: card.status,
+          blockedAt: card.blockedAt,
+        },
       },
-    }, 'Card blocked successfully');
+      "Card blocked successfully",
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function unblockCard(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function unblockCard(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
 
     const card = await Cards.findOne({
       $or: [{ _id: id }, { cardId: id }],
       user: req.user.userId,
-      status: 'blocked',
+      status: "blocked",
     });
 
-    if (!card) throw new NotFoundError('Card not found or not blocked');
+    if (!card) throw new NotFoundError("Card not found or not blocked");
 
-    card.status = 'active';
+    card.status = "active";
     card.blockedReason = undefined;
     card.blockedAt = undefined;
     await card.save();
@@ -578,13 +667,17 @@ export async function unblockCard(req: AuthenticatedRequest, res: Response, next
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      card: {
-        id: card._id,
-        cardId: card.cardId,
-        status: card.status,
+    sendSuccess(
+      res,
+      {
+        card: {
+          id: card._id,
+          cardId: card.cardId,
+          status: card.status,
+        },
       },
-    }, 'Card unblocked successfully');
+      "Card unblocked successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -594,9 +687,13 @@ export async function unblockCard(req: AuthenticatedRequest, res: Response, next
 // REPORT LOST/STOLEN
 // ============================================================================
 
-export async function reportLostStolen(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function reportLostStolen(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { type, description } = req.body; // type: 'lost' | 'stolen'
@@ -606,9 +703,9 @@ export async function reportLostStolen(req: AuthenticatedRequest, res: Response,
       user: req.user.userId,
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
-    card.status = type === 'stolen' ? 'stolen' : 'lost';
+    card.status = type === "stolen" ? "stolen" : "lost";
     card.blockedReason = description || `Reported ${type}`;
     card.blockedAt = new Date();
     await card.save();
@@ -616,11 +713,13 @@ export async function reportLostStolen(req: AuthenticatedRequest, res: Response,
     const user = await Users.findById(req.user.userId);
     if (user) {
       const emailContent = emailGenerator.cardReportedEmail({
-        cardholderName: card.cardholderName || `${(user as any).firstName} ${(user as any).lastName}`,
+        cardholderName:
+          card.cardholderName ||
+          `${(user as any).firstName} ${(user as any).lastName}`,
         cardId: card.cardId || card._id.toString(),
         lastFour: maskCardNumber(decrypt(card.cardNumber)).slice(-4),
-        cardType: card.cardBrand?.toUpperCase() || 'CARD',
-        reportType: type as 'lost' | 'stolen' | 'damaged',
+        cardType: card.cardBrand?.toUpperCase() || "CARD",
+        reportType: type as "lost" | "stolen" | "damaged",
         reportedAt: new Date().toISOString(),
       });
 
@@ -647,9 +746,13 @@ export async function reportLostStolen(req: AuthenticatedRequest, res: Response,
 // UPDATE CARD LIMITS
 // ============================================================================
 
-export async function updateCardLimits(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateCardLimits(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const {
@@ -664,10 +767,10 @@ export async function updateCardLimits(req: AuthenticatedRequest, res: Response,
       user: req.user.userId,
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
     const limits = await CardLimits.findOne({ card: card._id });
-    if (!limits) throw new NotFoundError('Card limits not found');
+    if (!limits) throw new NotFoundError("Card limits not found");
 
     // Update limits (with max caps) - using correct schema field names
     if (dailyTransactionLimit !== undefined) {
@@ -687,11 +790,15 @@ export async function updateCardLimits(req: AuthenticatedRequest, res: Response,
 
     emitToUser(req.user!.userId, WS.CARD.LIMITS_UPDATED, {
       cardId: card.cardId || card._id,
-      limits: { dailyLimit: limits.dailyLimit, monthlyLimit: limits.monthlyLimit, perTransactionLimit: limits.perTransactionLimit },
+      limits: {
+        dailyLimit: limits.dailyLimit,
+        monthlyLimit: limits.monthlyLimit,
+        perTransactionLimit: limits.perTransactionLimit,
+      },
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { limits }, 'Card limits updated successfully');
+    sendSuccess(res, { limits }, "Card limits updated successfully");
   } catch (error) {
     next(error);
   }
@@ -701,9 +808,13 @@ export async function updateCardLimits(req: AuthenticatedRequest, res: Response,
 // UPDATE CARD CONTROLS
 // ============================================================================
 
-export async function updateCardControls(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateCardControls(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const {
@@ -720,13 +831,16 @@ export async function updateCardControls(req: AuthenticatedRequest, res: Respons
       user: req.user.userId,
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
     // Update card settings
-    if (isInternationalEnabled !== undefined) card.isInternationalEnabled = isInternationalEnabled;
+    if (isInternationalEnabled !== undefined)
+      card.isInternationalEnabled = isInternationalEnabled;
     if (isOnlineEnabled !== undefined) card.isOnlineEnabled = isOnlineEnabled;
-    if (isContactlessEnabled !== undefined) card.isContactlessEnabled = isContactlessEnabled;
-    if (isAtmEnabled !== undefined && card.isPhysical) card.isAtmEnabled = isAtmEnabled;
+    if (isContactlessEnabled !== undefined)
+      card.isContactlessEnabled = isContactlessEnabled;
+    if (isAtmEnabled !== undefined && card.isPhysical)
+      card.isAtmEnabled = isAtmEnabled;
 
     await card.save();
 
@@ -734,7 +848,8 @@ export async function updateCardControls(req: AuthenticatedRequest, res: Respons
     if (blockedMerchantCategories || blockedCountries) {
       const controls = await CardControls.findOne({ card: card._id });
       if (controls) {
-        if (blockedMerchantCategories) controls.blockedMerchantCategories = blockedMerchantCategories;
+        if (blockedMerchantCategories)
+          controls.blockedMerchantCategories = blockedMerchantCategories;
         if (blockedCountries) controls.blockedCountries = blockedCountries;
         await controls.save();
       }
@@ -751,15 +866,19 @@ export async function updateCardControls(req: AuthenticatedRequest, res: Respons
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      card: {
-        id: card._id,
-        isInternationalEnabled: card.isInternationalEnabled,
-        isOnlineEnabled: card.isOnlineEnabled,
-        isContactlessEnabled: card.isContactlessEnabled,
-        isAtmEnabled: card.isAtmEnabled,
+    sendSuccess(
+      res,
+      {
+        card: {
+          id: card._id,
+          isInternationalEnabled: card.isInternationalEnabled,
+          isOnlineEnabled: card.isOnlineEnabled,
+          isContactlessEnabled: card.isContactlessEnabled,
+          isAtmEnabled: card.isAtmEnabled,
+        },
       },
-    }, 'Card controls updated successfully');
+      "Card controls updated successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -769,9 +888,13 @@ export async function updateCardControls(req: AuthenticatedRequest, res: Respons
 // GET CARD TRANSACTIONS
 // ============================================================================
 
-export async function getCardTransactions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getCardTransactions(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const page = parseInt(req.query.page as string) || 1;
@@ -783,7 +906,7 @@ export async function getCardTransactions(req: AuthenticatedRequest, res: Respon
       user: req.user.userId,
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
     const filter: any = { card: card._id };
 
@@ -792,7 +915,9 @@ export async function getCardTransactions(req: AuthenticatedRequest, res: Respon
 
     const [transactions, total] = await Promise.all([
       CardTransactions.find(filter)
-        .select('transactionType amount currency merchantName merchantCategory status authorizationCode createdAt')
+        .select(
+          "transactionType amount currency merchantName merchantCategory status authorizationCode createdAt",
+        )
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -810,15 +935,19 @@ export async function getCardTransactions(req: AuthenticatedRequest, res: Respon
 // CHANGE PIN
 // ============================================================================
 
-export async function changePin(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function changePin(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { currentPin, newPin } = req.body;
 
     if (!newPin || newPin.length !== 4 || !/^\d+$/.test(newPin)) {
-      throw new ValidationError('PIN must be 4 digits');
+      throw new ValidationError("PIN must be 4 digits");
     }
 
     const card = await Cards.findOne({
@@ -827,11 +956,11 @@ export async function changePin(req: AuthenticatedRequest, res: Response, next: 
       isPhysical: true,
     });
 
-    if (!card) throw new NotFoundError('Physical card not found');
+    if (!card) throw new NotFoundError("Physical card not found");
 
     // Verify current PIN
     if (card.pin && decrypt(card.pin) !== currentPin) {
-      throw new ValidationError('Current PIN is incorrect');
+      throw new ValidationError("Current PIN is incorrect");
     }
 
     card.pin = encrypt(newPin);
@@ -842,7 +971,7 @@ export async function changePin(req: AuthenticatedRequest, res: Response, next: 
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'PIN changed successfully');
+    sendSuccess(res, null, "PIN changed successfully");
   } catch (error) {
     next(error);
   }
@@ -852,19 +981,23 @@ export async function changePin(req: AuthenticatedRequest, res: Response, next: 
 // GET CARD DETAILS (Full - for display)
 // ============================================================================
 
-export async function getCardDetails(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getCardDetails(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
 
     const card = await Cards.findOne({
       $or: [{ _id: id }, { cardId: id }],
       user: req.user.userId,
-      status: 'active',
+      status: "active",
     });
 
-    if (!card) throw new NotFoundError('Card not found');
+    if (!card) throw new NotFoundError("Card not found");
 
     // Return full card details (for in-app display with proper security)
     sendSuccess(res, {
@@ -883,9 +1016,13 @@ export async function getCardDetails(req: AuthenticatedRequest, res: Response, n
 // ADMIN: GET ALL CARDS
 // ============================================================================
 
-export async function getAllCards(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAllCards(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
@@ -898,7 +1035,7 @@ export async function getAllCards(req: AuthenticatedRequest, res: Response, next
 
     const [cards, total] = await Promise.all([
       Cards.find(filter)
-        .populate('user', 'firstName lastName email')
+        .populate("user", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -906,10 +1043,10 @@ export async function getAllCards(req: AuthenticatedRequest, res: Response, next
       Cards.countDocuments(filter),
     ]);
 
-    const maskedCards = cards.map(card => ({
+    const maskedCards = cards.map((card) => ({
       ...card,
       cardNumber: maskCardNumber(card.cardNumber),
-      cvv: '***',
+      cvv: "***",
       pin: undefined,
     }));
 

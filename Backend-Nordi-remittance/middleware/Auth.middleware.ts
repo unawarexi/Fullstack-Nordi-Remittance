@@ -286,7 +286,7 @@ export function requirePermission(permission: string) {
         return next(new ForbiddenError('Permissions not configured'));
       }
 
-      const permissions = admin.permissions as Record<string, boolean>;
+      const permissions = admin.permissions as unknown as Record<string, boolean>;
       
       if (!permissions[permission]) {
         return next(new ForbiddenError(`Permission '${permission}' is required for this action`));
@@ -322,7 +322,7 @@ export function requirePermissions(...permissions: string[]) {
         return next(new ForbiddenError('Permissions not configured'));
       }
 
-      const adminPermissions = admin.permissions as Record<string, boolean>;
+      const adminPermissions = admin.permissions as unknown as Record<string, boolean>;
       const missingPermissions = permissions.filter(p => !adminPermissions[p]);
 
       if (missingPermissions.length > 0) {

@@ -180,7 +180,7 @@ export function isValidAmount(amount: number): boolean {
 }
 
 export function isValidCurrency(currency: string): boolean {
-  return constants.SUPPORTED_CURRENCIES.includes(currency.toUpperCase());
+  return (constants.SUPPORTED_CURRENCIES as readonly string[]).includes(currency.toUpperCase());
 }
 
 // ============================================================================

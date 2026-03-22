@@ -2,12 +2,22 @@
 // CARD ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import CardController from '../controllers/Card.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { transactionRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
-import { requireKycVerified } from '../middleware/Kyc.middleware.js';
+import { Router } from "express";
+import CardController from "../controllers/Card.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import {
+  transactionRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
+import { requireKycVerified } from "../middleware/kyc.middleware.js";
 
 const router = Router();
 
@@ -26,28 +36,32 @@ router.use(verifyAccountStatus);
  * @desc    Get all user's cards
  * @access  Private
  */
-router.get('/', CardController.getCards);
+router.get("/", CardController.getCards);
 
 /**
  * @route   GET /api/cards/:cardId
  * @desc    Get specific card details
  * @access  Private
  */
-router.get('/:cardId', CardController.getCardById);
+router.get("/:cardId", CardController.getCardById);
 
 /**
  * @route   GET /api/cards/:cardId/details
  * @desc    Get full card details (decrypted)
  * @access  Private
  */
-router.get('/:cardId/details', transactionRateLimit, CardController.getCardDetails);
+router.get(
+  "/:cardId/details",
+  transactionRateLimit,
+  CardController.getCardDetails,
+);
 
 /**
  * @route   GET /api/cards/:cardId/transactions
  * @desc    Get card transactions
  * @access  Private
  */
-router.get('/:cardId/transactions', CardController.getCardTransactions);
+router.get("/:cardId/transactions", CardController.getCardTransactions);
 
 /**
  * @route   POST /api/cards/virtual
@@ -55,11 +69,11 @@ router.get('/:cardId/transactions', CardController.getCardTransactions);
  * @access  Private
  */
 router.post(
-  '/virtual',
+  "/virtual",
   transactionRateLimit,
   requireKycVerified,
   auditLogMiddleware,
-  CardController.createVirtualCard
+  CardController.createVirtualCard,
 );
 
 /**
@@ -68,11 +82,11 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/physical',
+  "/physical",
   transactionRateLimit,
   requireKycVerified,
   auditLogMiddleware,
-  CardController.requestPhysicalCard
+  CardController.requestPhysicalCard,
 );
 
 /**
@@ -81,9 +95,9 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/:cardId/activate',
+  "/:cardId/activate",
   auditLogMiddleware,
-  CardController.activateCard
+  CardController.activateCard,
 );
 
 /**
@@ -91,22 +105,14 @@ router.post(
  * @desc    Block a card
  * @access  Private
  */
-router.post(
-  '/:cardId/block',
-  auditLogMiddleware,
-  CardController.blockCard
-);
+router.post("/:cardId/block", auditLogMiddleware, CardController.blockCard);
 
 /**
  * @route   POST /api/cards/:cardId/unblock
  * @desc    Unblock a card
  * @access  Private
  */
-router.post(
-  '/:cardId/unblock',
-  auditLogMiddleware,
-  CardController.unblockCard
-);
+router.post("/:cardId/unblock", auditLogMiddleware, CardController.unblockCard);
 
 /**
  * @route   POST /api/cards/:cardId/report-lost
@@ -114,9 +120,9 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/:cardId/report-lost',
+  "/:cardId/report-lost",
   auditLogMiddleware,
-  CardController.reportLostStolen
+  CardController.reportLostStolen,
 );
 
 /**
@@ -125,9 +131,9 @@ router.post(
  * @access  Private
  */
 router.put(
-  '/:cardId/limits',
+  "/:cardId/limits",
   auditLogMiddleware,
-  CardController.updateCardLimits
+  CardController.updateCardLimits,
 );
 
 /**
@@ -136,9 +142,9 @@ router.put(
  * @access  Private
  */
 router.put(
-  '/:cardId/controls',
+  "/:cardId/controls",
   auditLogMiddleware,
-  CardController.updateCardControls
+  CardController.updateCardControls,
 );
 
 /**
@@ -147,10 +153,10 @@ router.put(
  * @access  Private
  */
 router.post(
-  '/:cardId/change-pin',
+  "/:cardId/change-pin",
   transactionRateLimit,
   auditLogMiddleware,
-  CardController.changePin
+  CardController.changePin,
 );
 
 // ============================================================================
@@ -162,6 +168,6 @@ router.post(
  * @desc    Get all cards in the system
  * @access  Admin
  */
-router.get('/admin/all', requireAdmin, CardController.getAllCards);
+router.get("/admin/all", requireAdmin, CardController.getAllCards);
 
 export default router;

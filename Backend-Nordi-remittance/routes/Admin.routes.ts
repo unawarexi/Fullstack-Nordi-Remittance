@@ -2,11 +2,21 @@
 // ADMIN ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import AdminController from '../controllers/Admin.controller.js';
-import { authenticate, requireAdmin, requireSuperAdmin } from '../middleware/Auth.middleware.js';
-import { authRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import AdminController from "../controllers/Admin.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  requireSuperAdmin,
+} from "../middleware/auth.middleware.js";
+import {
+  authRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -23,7 +33,7 @@ router.use(sanitizeInput);
  * @desc    Admin login
  * @access  Public
  */
-router.post('/login', authRateLimit, AdminController.adminLogin);
+router.post("/login", authRateLimit, AdminController.adminLogin);
 
 // ============================================================================
 // PROTECTED ADMIN ROUTES
@@ -38,7 +48,7 @@ router.use(requireAdmin);
  * @desc    Admin logout
  * @access  Admin
  */
-router.post('/logout', AdminController.adminLogout);
+router.post("/logout", AdminController.adminLogout);
 
 // ============================================================================
 // DASHBOARD & ANALYTICS
@@ -49,14 +59,14 @@ router.post('/logout', AdminController.adminLogout);
  * @desc    Get admin dashboard data
  * @access  Admin
  */
-router.get('/dashboard', AdminController.getDashboard);
+router.get("/dashboard", AdminController.getDashboard);
 
 /**
  * @route   GET /api/admin/analytics
  * @desc    Get platform analytics
  * @access  Admin
  */
-router.get('/analytics', AdminController.getAnalytics);
+router.get("/analytics", AdminController.getAnalytics);
 
 // ============================================================================
 // USER MANAGEMENT
@@ -67,14 +77,14 @@ router.get('/analytics', AdminController.getAnalytics);
  * @desc    Search users
  * @access  Admin
  */
-router.get('/users/search', AdminController.searchUsers);
+router.get("/users/search", AdminController.searchUsers);
 
 /**
  * @route   GET /api/admin/users/:userId
  * @desc    Get user details
  * @access  Admin
  */
-router.get('/users/:userId', AdminController.getUserDetails);
+router.get("/users/:userId", AdminController.getUserDetails);
 
 /**
  * @route   PUT /api/admin/users/:userId/status
@@ -82,10 +92,10 @@ router.get('/users/:userId', AdminController.getUserDetails);
  * @access  Admin
  */
 router.put(
-  '/users/:userId/status',
+  "/users/:userId/status",
   // auditLogMiddleware('admin_update_user_status'),
   auditLogMiddleware,
-  AdminController.updateUserStatus
+  AdminController.updateUserStatus,
 );
 
 /**
@@ -94,10 +104,10 @@ router.put(
  * @access  Admin
  */
 router.post(
-  '/users/:userId/reset-password',
+  "/users/:userId/reset-password",
   // auditLogMiddleware('admin_reset_user_password'),
   auditLogMiddleware,
-  AdminController.resetUserPassword
+  AdminController.resetUserPassword,
 );
 
 // ============================================================================
@@ -109,7 +119,7 @@ router.post(
  * @desc    Get all admin users
  * @access  Super Admin
  */
-router.get('/admins', requireSuperAdmin, AdminController.getAdminUsers);
+router.get("/admins", requireSuperAdmin, AdminController.getAdminUsers);
 
 /**
  * @route   POST /api/admin/admins
@@ -117,11 +127,11 @@ router.get('/admins', requireSuperAdmin, AdminController.getAdminUsers);
  * @access  Super Admin
  */
 router.post(
-  '/admins',
+  "/admins",
   requireSuperAdmin,
   // auditLogMiddleware('create_admin'),
   auditLogMiddleware,
-  AdminController.createAdminUser
+  AdminController.createAdminUser,
 );
 
 /**
@@ -130,11 +140,11 @@ router.post(
  * @access  Super Admin
  */
 router.put(
-  '/admins/:adminId',
+  "/admins/:adminId",
   requireSuperAdmin,
   // auditLogMiddleware('update_admin'),
   auditLogMiddleware,
-  AdminController.updateAdminUser
+  AdminController.updateAdminUser,
 );
 
 /**
@@ -143,11 +153,11 @@ router.put(
  * @access  Super Admin
  */
 router.delete(
-  '/admins/:adminId',
+  "/admins/:adminId",
   requireSuperAdmin,
   // auditLogMiddleware('deactivate_admin'),
   auditLogMiddleware,
-  AdminController.deactivateAdminUser
+  AdminController.deactivateAdminUser,
 );
 
 // ============================================================================
@@ -159,7 +169,7 @@ router.delete(
  * @desc    Get system settings
  * @access  Admin
  */
-router.get('/settings', AdminController.getSystemSettings);
+router.get("/settings", AdminController.getSystemSettings);
 
 /**
  * @route   PUT /api/admin/settings/:key
@@ -167,11 +177,11 @@ router.get('/settings', AdminController.getSystemSettings);
  * @access  Super Admin
  */
 router.put(
-  '/settings/:key',
+  "/settings/:key",
   requireSuperAdmin,
   // auditLogMiddleware('update_system_setting'),
   auditLogMiddleware,
-  AdminController.updateSystemSetting
+  AdminController.updateSystemSetting,
 );
 
 // ============================================================================
@@ -183,7 +193,7 @@ router.put(
  * @desc    Get audit logs
  * @access  Admin
  */
-router.get('/audit-logs', AdminController.getAuditLogs);
+router.get("/audit-logs", AdminController.getAuditLogs);
 
 // ============================================================================
 // OPERATIONAL TASKS
@@ -194,7 +204,7 @@ router.get('/audit-logs', AdminController.getAuditLogs);
  * @desc    Get operational tasks
  * @access  Admin
  */
-router.get('/tasks', AdminController.getOperationalTasks);
+router.get("/tasks", AdminController.getOperationalTasks);
 
 /**
  * @route   POST /api/admin/tasks
@@ -202,10 +212,10 @@ router.get('/tasks', AdminController.getOperationalTasks);
  * @access  Admin
  */
 router.post(
-  '/tasks',
+  "/tasks",
   // auditLogMiddleware('create_task'),
   auditLogMiddleware,
-  AdminController.createOperationalTask
+  AdminController.createOperationalTask,
 );
 
 /**
@@ -214,10 +224,10 @@ router.post(
  * @access  Admin
  */
 router.put(
-  '/tasks/:taskId',
+  "/tasks/:taskId",
   // auditLogMiddleware('update_task'),
   auditLogMiddleware,
-  AdminController.updateOperationalTask
+  AdminController.updateOperationalTask,
 );
 
 // ============================================================================
@@ -229,7 +239,7 @@ router.put(
  * @desc    Get current admin profile
  * @access  Admin
  */
-router.get('/profile', AdminController.getAdminProfile);
+router.get("/profile", AdminController.getAdminProfile);
 
 /**
  * @route   PUT /api/admin/profile
@@ -237,10 +247,10 @@ router.get('/profile', AdminController.getAdminProfile);
  * @access  Admin
  */
 router.put(
-  '/profile',
+  "/profile",
   // auditLogMiddleware('update_admin_profile'),
   auditLogMiddleware,
-  AdminController.updateAdminProfile
+  AdminController.updateAdminProfile,
 );
 
 /**
@@ -248,7 +258,7 @@ router.put(
  * @desc    Request OTP for sensitive operations
  * @access  Admin
  */
-router.post('/request-otp', AdminController.requestOtp);
+router.post("/request-otp", AdminController.requestOtp);
 
 /**
  * @route   PUT /api/admin/change-password
@@ -256,10 +266,10 @@ router.post('/request-otp', AdminController.requestOtp);
  * @access  Admin
  */
 router.put(
-  '/change-password',
+  "/change-password",
   // auditLogMiddleware('change_admin_password'),
   auditLogMiddleware,
-  AdminController.changeAdminPassword
+  AdminController.changeAdminPassword,
 );
 
 /**
@@ -268,10 +278,10 @@ router.put(
  * @access  Admin
  */
 router.put(
-  '/change-email',
+  "/change-email",
   // auditLogMiddleware('change_admin_email'),
   auditLogMiddleware,
-  AdminController.changeAdminEmail
+  AdminController.changeAdminEmail,
 );
 
 // ============================================================================
@@ -283,7 +293,7 @@ router.put(
  * @desc    Get all available permissions
  * @access  Admin
  */
-router.get('/permissions/available', AdminController.getAvailablePermissions);
+router.get("/permissions/available", AdminController.getAvailablePermissions);
 
 /**
  * @route   GET /api/admin/admins/:adminId/permissions
@@ -291,9 +301,9 @@ router.get('/permissions/available', AdminController.getAvailablePermissions);
  * @access  Super Admin
  */
 router.get(
-  '/admins/:adminId/permissions',
+  "/admins/:adminId/permissions",
   requireSuperAdmin,
-  AdminController.getAdminPermissions
+  AdminController.getAdminPermissions,
 );
 
 /**
@@ -302,11 +312,11 @@ router.get(
  * @access  Super Admin
  */
 router.put(
-  '/admins/:adminId/permissions',
+  "/admins/:adminId/permissions",
   requireSuperAdmin,
   // auditLogMiddleware('update_admin_permissions'),
   auditLogMiddleware,
-  AdminController.updateAdminPermissions
+  AdminController.updateAdminPermissions,
 );
 
 /**
@@ -315,10 +325,10 @@ router.put(
  * @access  Super Admin
  */
 router.post(
-  '/admins/:adminId/permissions/preset',
+  "/admins/:adminId/permissions/preset",
   requireSuperAdmin,
   // auditLogMiddleware('set_permission_preset'),
-  AdminController.setPermissionPreset
+  AdminController.setPermissionPreset,
 );
 
 /**
@@ -327,10 +337,10 @@ router.post(
  * @access  Super Admin
  */
 router.delete(
-  '/admins/:adminId/permissions',
+  "/admins/:adminId/permissions",
   requireSuperAdmin,
   // auditLogMiddleware('revoke_all_permissions'),
-  AdminController.revokeAllPermissions
+  AdminController.revokeAllPermissions,
 );
 
 export default router;

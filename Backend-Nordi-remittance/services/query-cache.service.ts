@@ -6,7 +6,7 @@
 // NEVER cache sensitive financial data without validation.
 // ============================================================================
 
-import { getRedisClient } from "./Redis.service";
+import { getRedisClient } from "./redis.service";
 
 // Cache key prefixes
 const CACHE_PREFIX = {
@@ -47,7 +47,7 @@ export async function cacheQuery<T>(
   ttl: number = TTL.SHORT,
 ): Promise<T> {
   try {
-    const redis = getRedisClient();
+    const redis = await getRedisClient();
     if (!redis) {
       // Redis unavailable — fall through to DB
       return await queryFn();
@@ -56,7 +56,7 @@ export async function cacheQuery<T>(
     // Try cache first
     const cached = await redis.get(cacheKey);
     if (cached) {
-      return JSON.parse(cached) as T;
+      return JSON.parse(cached as string) as T;
     }
 
     // Execute query
@@ -65,7 +65,9 @@ export async function cacheQuery<T>(
     // Cache the result (non-blocking)
     redis
       .setEx(cacheKey, ttl, JSON.stringify(result))
-      .catch((err: Error) => console.error("Redis cache write error:", err.message));
+      .catch((err: Error) =>
+        console.error("Redis cache write error:", err.message),
+      );
 
     return result;
   } catch {
@@ -79,7 +81,7 @@ export async function cacheQuery<T>(
  */
 export async function invalidateCache(cacheKey: string): Promise<void> {
   try {
-    const redis = getRedisClient();
+    const redis = await getRedisClient();
     if (redis) {
       await redis.del(cacheKey);
     }
@@ -93,7 +95,7 @@ export async function invalidateCache(cacheKey: string): Promise<void> {
  */
 export async function invalidateCachePattern(pattern: string): Promise<void> {
   try {
-    const redis = getRedisClient();
+    const redis = await getRedisClient();
     if (!redis) return;
 
     const keys = await redis.keys(pattern);
@@ -113,7 +115,9 @@ export function getDashboardCacheKey(): string {
   return CACHE_PREFIX.DASHBOARD;
 }
 
-export async function getCachedDashboard<T>(queryFn: () => Promise<T>): Promise<T> {
+export async function getCachedDashboard<T>(
+  queryFn: () => Promise<T>,
+): Promise<T> {
   return cacheQuery(CACHE_PREFIX.DASHBOARD, queryFn, TTL.SHORT);
 }
 
@@ -129,7 +133,9 @@ export function getPlatformStatsCacheKey(): string {
   return CACHE_PREFIX.PLATFORM_STATS;
 }
 
-export async function getCachedPlatformStats<T>(queryFn: () => Promise<T>): Promise<T> {
+export async function getCachedPlatformStats<T>(
+  queryFn: () => Promise<T>,
+): Promise<T> {
   return cacheQuery(CACHE_PREFIX.PLATFORM_STATS, queryFn, TTL.SHORT);
 }
 
@@ -152,7 +158,9 @@ export async function getCachedUserWallets<T>(
   return cacheQuery(getUserWalletsCacheKey(userId), queryFn, TTL.MEDIUM);
 }
 
-export async function invalidateUserWalletsCache(userId: string): Promise<void> {
+export async function invalidateUserWalletsCache(
+  userId: string,
+): Promise<void> {
   await invalidateCache(getUserWalletsCacheKey(userId));
 }
 
@@ -171,7 +179,9 @@ export async function getCachedUserPermissions<T>(
   return cacheQuery(getUserPermissionsCacheKey(userId), queryFn, TTL.LONG);
 }
 
-export async function invalidateUserPermissionsCache(userId: string): Promise<void> {
+export async function invalidateUserPermissionsCache(
+  userId: string,
+): Promise<void> {
   await invalidateCache(getUserPermissionsCacheKey(userId));
 }
 

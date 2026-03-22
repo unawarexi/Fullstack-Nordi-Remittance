@@ -4,7 +4,7 @@
 // Routes for the 3-step security verification process
 // ============================================================================
 
-import { Router } from 'express';
+import { Router } from "express";
 import {
   initiateSecureTransfer,
   requestVerificationCode,
@@ -12,24 +12,22 @@ import {
   getVerificationStatus,
   cancelVerification,
   getPendingVerifications,
-} from '../controllers/TransferVerification.controller.js';
-import { authenticate } from '../middleware/Auth.middleware.js';
-import { 
-  requireKycVerified, 
+} from "../controllers/TransferVerification.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import {
+  requireKycVerified,
   enforceKycLimits,
   amlScreening,
-} from '../middleware/Kyc.middleware.js';
-import { 
-  transactionRateLimit,
-} from '../middleware/Security.middleware.js';
-import { 
+} from "../middleware/kyc.middleware.js";
+import { transactionRateLimit } from "../middleware/security.middleware.js";
+import {
   idempotencyMiddleware,
   validateTransferRequest,
   checkSufficientBalance,
   checkTransactionLimits,
   basicFraudCheck,
-} from '../middleware/Transaction.middleware.js';
-import { auditLogMiddleware } from '../middleware/Core.middleware.js';
+} from "../middleware/transaction.middleware.js";
+import { auditLogMiddleware } from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -80,7 +78,7 @@ const verificationMiddleware = [
  *            details: { amount, tax, taxRate, totalDeducted, currency, recipient }
  *          }
  */
-router.post('/initiate', transferInitMiddleware, initiateSecureTransfer);
+router.post("/initiate", transferInitMiddleware, initiateSecureTransfer);
 
 /**
  * @route   POST /api/transactions/secure-transfer/request-code
@@ -92,7 +90,7 @@ router.post('/initiate', transferInitMiddleware, initiateSecureTransfer);
  *            nextAction: string
  *          }
  */
-router.post('/request-code', verificationMiddleware, requestVerificationCode);
+router.post("/request-code", verificationMiddleware, requestVerificationCode);
 
 /**
  * @route   POST /api/transactions/secure-transfer/verify-code
@@ -105,7 +103,7 @@ router.post('/request-code', verificationMiddleware, requestVerificationCode);
  *            transaction?: { status }       // If fully verified
  *          }
  */
-router.post('/verify-code', verificationMiddleware, verifySecurityCode);
+router.post("/verify-code", verificationMiddleware, verifySecurityCode);
 
 /**
  * @route   GET /api/transactions/secure-transfer/status/:verificationId
@@ -120,7 +118,7 @@ router.post('/verify-code', verificationMiddleware, verifySecurityCode);
  *            transaction: Transaction
  *          }
  */
-router.get('/status/:verificationId', authenticate, getVerificationStatus);
+router.get("/status/:verificationId", authenticate, getVerificationStatus);
 
 /**
  * @route   POST /api/transactions/secure-transfer/cancel
@@ -129,7 +127,7 @@ router.get('/status/:verificationId', authenticate, getVerificationStatus);
  * @body    { verificationId: string }
  * @returns { message: string, verification: { id, status } }
  */
-router.post('/cancel', authenticate, auditLogMiddleware, cancelVerification);
+router.post("/cancel", authenticate, auditLogMiddleware, cancelVerification);
 
 /**
  * @route   GET /api/transactions/secure-transfer/pending
@@ -137,6 +135,6 @@ router.post('/cancel', authenticate, auditLogMiddleware, cancelVerification);
  * @access  Private (Authenticated)
  * @returns { count: number, verifications: Verification[] }
  */
-router.get('/pending', authenticate, getPendingVerifications);
+router.get("/pending", authenticate, getPendingVerifications);
 
 export default router;

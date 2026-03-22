@@ -1,11 +1,11 @@
 # ============================================================================
-# UrbanRide Navii — RDS PostgreSQL (for Prisma)
+# Nordi-Remittance — RDS PostgreSQL (for Prisma)
 # ============================================================================
 
 # --------------------------------------------------------------------------
 # DB Subnet Group
 # --------------------------------------------------------------------------
-resource "aws_db_subnet_group" "navii" {
+resource "aws_db_subnet_group" "remit" {
   name       = "${var.project_name}-db-subnet"
   subnet_ids = module.vpc.private_subnets
 
@@ -21,14 +21,14 @@ resource "aws_db_subnet_group" "navii" {
 resource "aws_security_group" "rds" {
   name_prefix = "${var.project_name}-rds-"
   vpc_id      = module.vpc.vpc_id
-  description = "Security group for UrbanRide Navii PostgreSQL"
+  description = "Security group for Nordi-Remittance PostgreSQL"
 
   # Allow inbound from EKS worker nodes
   ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.navii_api.id]
+    security_groups = [aws_security_group.remit_api.id]
     description     = "PostgreSQL from API pods"
   }
 
@@ -48,7 +48,7 @@ resource "aws_security_group" "rds" {
 # --------------------------------------------------------------------------
 # RDS PostgreSQL Instance
 # --------------------------------------------------------------------------
-resource "aws_db_instance" "navii" {
+resource "aws_db_instance" "remit" {
   identifier = "${var.project_name}-postgres"
 
   engine         = "postgres"
@@ -64,7 +64,7 @@ resource "aws_db_instance" "navii" {
   username = var.db_username
   password = var.db_password
 
-  db_subnet_group_name   = aws_db_subnet_group.navii.name
+  db_subnet_group_name   = aws_db_subnet_group.remit.name
   vpc_security_group_ids = [aws_security_group.rds.id]
 
   # High availability
@@ -80,7 +80,7 @@ resource "aws_db_instance" "navii" {
   performance_insights_retention_period = 7
 
   # Parameters
-  parameter_group_name = aws_db_parameter_group.navii.name
+  parameter_group_name = aws_db_parameter_group.remit.name
 
   # Deletion protection
   deletion_protection = var.environment == "production"
@@ -95,9 +95,9 @@ resource "aws_db_instance" "navii" {
 }
 
 # --------------------------------------------------------------------------
-# DB Parameter Group (optimized for ride-hailing workload)
+# DB Parameter Group (optimized for remittance workload)
 # --------------------------------------------------------------------------
-resource "aws_db_parameter_group" "navii" {
+resource "aws_db_parameter_group" "remit" {
   family = "postgres16"
   name   = "${var.project_name}-pg-params"
 
@@ -113,7 +113,7 @@ resource "aws_db_parameter_group" "navii" {
 
   parameter {
     name  = "max_connections"
-    value = "200"
+    value = "500" # Increased for financial services
   }
 
   parameter {

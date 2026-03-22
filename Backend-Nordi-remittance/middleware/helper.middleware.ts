@@ -1,11 +1,8 @@
 // ============================================================================
-// DEPRECATED — Token management is consolidated in:
-//   - core/helpers/token.helper.ts
+// DEPRECATED — multerErrorHandler is consolidated in:
+//   - services/cloudinary.service.ts
 //
 // This file re-exports for backwards compatibility.
 // ============================================================================
 
-export {
-  generateAccessToken as generateToken,
-  verifyAccessToken as verifyToken,
-} from "./token.helper.js";
+export { multerErrorHandler } from "../services/cloudinary.service.js";

@@ -2,28 +2,40 @@
 // STATISTICS CONTROLLER
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import type { AuthenticatedRequest } from '../types/index.js';
-import Statistics from '../models/StatisticsModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { Wallets } from '../models/AccountsModel.js';
-import { Loans } from '../models/LoansModel.js';
-import { Cards } from '../models/CardsModel.js';
-import { SavingsGoals, InvestmentAccounts } from '../models/InvestmentsModel.js';
-import Users from '../models/UserModel.js';
-import { sendSuccess, sendPaginated } from '../core/helpers/response.helper.js';
-import { UnauthorizedError, NotFoundError } from '../core/errors/AppError.js';
-import { cacheSet, cacheGet, CACHE_KEYS, CACHE_TTL } from '../services/Redis.service.js';
-import { broadcast } from '../services/Websocket.service.js';
-import { getCachedPlatformStats } from '../services/QueryCacheService.js';
+import { Response, NextFunction } from "express";
+import type { AuthenticatedRequest } from "../types/index.js";
+import Statistics from "../models/StatisticsModel.js";
+import Transactions from "../models/TransactionModel.js";
+import { Wallets } from "../models/AccountsModel.js";
+import { Loans } from "../models/LoansModel.js";
+import { Cards } from "../models/CardsModel.js";
+import {
+  SavingsGoals,
+  InvestmentAccounts,
+} from "../models/InvestmentsModel.js";
+import Users from "../models/UserModel.js";
+import { sendSuccess, sendPaginated } from "../core/helpers/response.helper.js";
+import { UnauthorizedError, NotFoundError } from "../core/errors/AppError.js";
+import {
+  cacheSet,
+  cacheGet,
+  CACHE_KEYS,
+  CACHE_TTL,
+} from "../services/redis.service.js";
+import { broadcast } from "../services/websocket.service.js";
+import { getCachedPlatformStats } from "../services/query-cache.service.js";
 
 // ============================================================================
 // USER STATISTICS
 // ============================================================================
 
-export async function getUserStatistics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getUserStatistics(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
     const userId = req.user.userId;
     // Try Redis cache first
     const cacheKey = CACHE_KEYS.USER_STATS(userId);
@@ -33,35 +45,40 @@ export async function getUserStatistics(req: AuthenticatedRequest, res: Response
       return;
     }
     // ...existing code for stats calculation...
-    const wallets = await Wallets.find({ user: userId, status: 'active' });
+    const wallets = await Wallets.find({ user: userId, status: "active" });
     const getWalletTotalBalance = (wallet: any): number => {
       if (wallet.balances instanceof Map) {
         let total = 0;
-        wallet.balances.forEach((value: number) => { total += value; });
+        wallet.balances.forEach((value: number) => {
+          total += value;
+        });
         return total;
       }
       return 0;
     };
-    const totalBalance = wallets.reduce((sum, w) => sum + getWalletTotalBalance(w), 0);
+    const totalBalance = wallets.reduce(
+      (sum, w) => sum + getWalletTotalBalance(w),
+      0,
+    );
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const transactionStats = await Transactions.aggregate([
       {
         $match: {
           $or: [{ sender: userId }, { recipient: userId }],
           createdAt: { $gte: thirtyDaysAgo },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
           _id: {
-            type: '$type',
+            type: "$type",
             direction: {
-              $cond: [{ $eq: ['$sender', userId] }, 'sent', 'received'],
+              $cond: [{ $eq: ["$sender", userId] }, "sent", "received"],
             },
           },
           count: { $sum: 1 },
-          total: { $sum: '$amount' },
+          total: { $sum: "$amount" },
         },
       },
     ]);
@@ -70,13 +87,13 @@ export async function getUserStatistics(req: AuthenticatedRequest, res: Response
         $match: {
           sender: userId,
           createdAt: { $gte: thirtyDaysAgo },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: '$category',
-          total: { $sum: '$amount' },
+          _id: "$category",
+          total: { $sum: "$amount" },
           count: { $sum: 1 },
         },
       },
@@ -87,38 +104,47 @@ export async function getUserStatistics(req: AuthenticatedRequest, res: Response
         $match: {
           sender: userId,
           createdAt: { $gte: thirtyDaysAgo },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          spent: { $sum: '$amount' },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          spent: { $sum: "$amount" },
           count: { $sum: 1 },
         },
       },
       { $sort: { _id: 1 } },
     ]);
-    const [activeLoans, activeCards, savingsGoals, investmentAccount] = await Promise.all([
-      Loans.countDocuments({ user: userId, status: { $in: ['active', 'disbursed'] } }),
-      Cards.countDocuments({ user: userId, status: 'active' }),
-      SavingsGoals.find({ user: userId, status: 'active' }).lean(),
-      InvestmentAccounts.findOne({ user: userId, status: 'active' }).lean(),
-    ]);
-    const totalSavings = savingsGoals.reduce((sum, g) => sum + g.currentAmount, 0);
+    const [activeLoans, activeCards, savingsGoals, investmentAccount] =
+      await Promise.all([
+        Loans.countDocuments({
+          user: userId,
+          status: { $in: ["active", "disbursed"] },
+        }),
+        Cards.countDocuments({ user: userId, status: "active" }),
+        SavingsGoals.find({ user: userId, status: "active" }).lean(),
+        InvestmentAccounts.findOne({ user: userId, status: "active" }).lean(),
+      ]);
+    const totalSavings = savingsGoals.reduce(
+      (sum, g) => sum + g.currentAmount,
+      0,
+    );
     const stats = {
       wallets: {
         count: wallets.length,
         totalBalance,
-        currencies: wallets.map(w => {
-          const balances: Array<{ currency: string; balance: number }> = [];
-          if (w.balances instanceof Map) {
-            w.balances.forEach((balance, currency) => {
-              balances.push({ currency, balance });
-            });
-          }
-          return balances;
-        }).flat(),
+        currencies: wallets
+          .map((w) => {
+            const balances: Array<{ currency: string; balance: number }> = [];
+            if (w.balances instanceof Map) {
+              w.balances.forEach((balance, currency) => {
+                balances.push({ currency, balance });
+              });
+            }
+            return balances;
+          })
+          .flat(),
       },
       transactions: {
         last30Days: transactionStats,
@@ -145,22 +171,26 @@ export async function getUserStatistics(req: AuthenticatedRequest, res: Response
 // TRANSACTION ANALYTICS
 // ============================================================================
 
-export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getTransactionAnalytics(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const userId = req.user.userId;
     const { period } = req.query; // 'week' | 'month' | 'quarter' | 'year'
 
     let startDate = new Date();
     switch (period) {
-      case 'week':
+      case "week":
         startDate.setDate(startDate.getDate() - 7);
         break;
-      case 'quarter':
+      case "quarter":
         startDate.setMonth(startDate.getMonth() - 3);
         break;
-      case 'year':
+      case "year":
         startDate.setFullYear(startDate.getFullYear() - 1);
         break;
       default: // month
@@ -173,27 +203,23 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
         $match: {
           $or: [{ sender: userId }, { recipient: userId }],
           createdAt: { $gte: startDate },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $project: {
           amount: 1,
           type: {
-            $cond: [
-              { $eq: ['$recipient', userId] },
-              'income',
-              'expense',
-            ],
+            $cond: [{ $eq: ["$recipient", userId] }, "income", "expense"],
           },
         },
       },
       {
         $group: {
-          _id: '$type',
-          total: { $sum: '$amount' },
+          _id: "$type",
+          total: { $sum: "$amount" },
           count: { $sum: 1 },
-          avg: { $avg: '$amount' },
+          avg: { $avg: "$amount" },
         },
       },
     ]);
@@ -204,13 +230,13 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
         $match: {
           sender: userId,
           createdAt: { $gte: startDate },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: '$recipient',
-          total: { $sum: '$amount' },
+          _id: "$recipient",
+          total: { $sum: "$amount" },
           count: { $sum: 1 },
         },
       },
@@ -218,17 +244,17 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
       { $limit: 5 },
       {
         $lookup: {
-          from: 'users',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'user',
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
         },
       },
       {
         $project: {
           total: 1,
           count: 1,
-          name: { $arrayElemAt: ['$user.firstName', 0] },
+          name: { $arrayElemAt: ["$user.firstName", 0] },
         },
       },
     ]);
@@ -239,14 +265,14 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
         $match: {
           sender: userId,
           createdAt: { $gte: startDate },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: { $dayOfWeek: '$createdAt' },
+          _id: { $dayOfWeek: "$createdAt" },
           count: { $sum: 1 },
-          total: { $sum: '$amount' },
+          total: { $sum: "$amount" },
         },
       },
       { $sort: { _id: 1 } },
@@ -258,12 +284,12 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
         $match: {
           sender: userId,
           createdAt: { $gte: startDate },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: { $hour: '$createdAt' },
+          _id: { $hour: "$createdAt" },
           count: { $sum: 1 },
         },
       },
@@ -279,7 +305,7 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
         byDayOfWeek,
         peakHours: byHour,
         netFlow: incomeExpense.reduce((net, ie) => {
-          return ie._id === 'income' ? net + ie.total : net - ie.total;
+          return ie._id === "income" ? net + ie.total : net - ie.total;
         }, 0),
       },
     });
@@ -292,9 +318,13 @@ export async function getTransactionAnalytics(req: AuthenticatedRequest, res: Re
 // SPENDING INSIGHTS
 // ============================================================================
 
-export async function getSpendingInsights(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getSpendingInsights(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const userId = req.user.userId;
     const currentMonth = new Date();
@@ -310,13 +340,13 @@ export async function getSpendingInsights(req: AuthenticatedRequest, res: Respon
         $match: {
           sender: userId,
           createdAt: { $gte: currentMonth },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: '$category',
-          total: { $sum: '$amount' },
+          _id: "$category",
+          total: { $sum: "$amount" },
           count: { $sum: 1 },
         },
       },
@@ -328,20 +358,22 @@ export async function getSpendingInsights(req: AuthenticatedRequest, res: Respon
         $match: {
           sender: userId,
           createdAt: { $gte: lastMonth, $lt: currentMonth },
-          status: 'completed',
+          status: "completed",
         },
       },
       {
         $group: {
-          _id: '$category',
-          total: { $sum: '$amount' },
+          _id: "$category",
+          total: { $sum: "$amount" },
         },
       },
     ]);
 
     // Compare and generate insights
-    const lastMonthMap = new Map(lastMonthSpending.map(l => [l._id, l.total]));
-    
+    const lastMonthMap = new Map(
+      lastMonthSpending.map((l) => [l._id, l.total]),
+    );
+
     const insights: any[] = [];
     let totalCurrentMonth = 0;
     let totalLastMonth = lastMonthSpending.reduce((sum, l) => sum + l.total, 0);
@@ -349,28 +381,31 @@ export async function getSpendingInsights(req: AuthenticatedRequest, res: Respon
     for (const current of currentSpending) {
       totalCurrentMonth += current.total;
       const lastAmount = lastMonthMap.get(current._id) || 0;
-      const change = lastAmount > 0 
-        ? ((current.total - lastAmount) / lastAmount) * 100 
-        : 100;
+      const change =
+        lastAmount > 0
+          ? ((current.total - lastAmount) / lastAmount) * 100
+          : 100;
 
       if (Math.abs(change) > 20) {
         insights.push({
-          category: current._id || 'Other',
+          category: current._id || "Other",
           currentMonth: current.total,
           lastMonth: lastAmount,
           changePercent: Math.round(change),
-          trend: change > 0 ? 'increase' : 'decrease',
-          message: change > 0 
-            ? `Your ${current._id || 'other'} spending increased by ${Math.round(change)}%`
-            : `You saved ${Math.round(Math.abs(change))}% on ${current._id || 'other'}`,
+          trend: change > 0 ? "increase" : "decrease",
+          message:
+            change > 0
+              ? `Your ${current._id || "other"} spending increased by ${Math.round(change)}%`
+              : `You saved ${Math.round(Math.abs(change))}% on ${current._id || "other"}`,
         });
       }
     }
 
     // Overall change
-    const overallChange = totalLastMonth > 0 
-      ? ((totalCurrentMonth - totalLastMonth) / totalLastMonth) * 100 
-      : 0;
+    const overallChange =
+      totalLastMonth > 0
+        ? ((totalCurrentMonth - totalLastMonth) / totalLastMonth) * 100
+        : 0;
 
     sendSuccess(res, {
       insights: {
@@ -392,21 +427,28 @@ export async function getSpendingInsights(req: AuthenticatedRequest, res: Respon
   }
 }
 
-function generateRecommendations(insights: any[], overallChange: number): string[] {
+function generateRecommendations(
+  insights: any[],
+  overallChange: number,
+): string[] {
   const recommendations: string[] = [];
 
   if (overallChange > 20) {
-    recommendations.push('Consider reviewing your spending habits - overall spending is up significantly.');
+    recommendations.push(
+      "Consider reviewing your spending habits - overall spending is up significantly.",
+    );
   }
 
   for (const insight of insights) {
-    if (insight.trend === 'increase' && insight.changePercent > 50) {
-      recommendations.push(`Review your ${insight.category} expenses - they've increased significantly.`);
+    if (insight.trend === "increase" && insight.changePercent > 50) {
+      recommendations.push(
+        `Review your ${insight.category} expenses - they've increased significantly.`,
+      );
     }
   }
 
   if (recommendations.length === 0) {
-    recommendations.push('Great job maintaining consistent spending patterns!');
+    recommendations.push("Great job maintaining consistent spending patterns!");
   }
 
   return recommendations.slice(0, 3);
@@ -416,9 +458,13 @@ function generateRecommendations(insights: any[], overallChange: number): string
 // ADMIN: PLATFORM STATISTICS
 // ============================================================================
 
-export async function getPlatformStatistics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getPlatformStatistics(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Cache platform stats for 30 seconds — high-frequency admin endpoint
     const stats = await getCachedPlatformStats(async () => {
@@ -447,28 +493,33 @@ export async function getPlatformStatistics(req: AuthenticatedRequest, res: Resp
         Users.estimatedDocumentCount(),
         Users.countDocuments({ createdAt: { $gte: today } }),
         Users.countDocuments({ createdAt: { $gte: thisMonth } }),
-        Users.countDocuments({ lastActive: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }),
-        Transactions.countDocuments({ status: 'completed' }),
-        Transactions.countDocuments({ createdAt: { $gte: today }, status: 'completed' }),
+        Users.countDocuments({
+          lastActive: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        }),
+        Transactions.countDocuments({ status: "completed" }),
+        Transactions.countDocuments({
+          createdAt: { $gte: today },
+          status: "completed",
+        }),
         Transactions.aggregate([
-          { $match: { status: 'completed' } },
-          { $group: { _id: null, total: { $sum: '$amount' } } },
+          { $match: { status: "completed" } },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
         Transactions.aggregate([
-          { $match: { createdAt: { $gte: today }, status: 'completed' } },
-          { $group: { _id: null, total: { $sum: '$amount' } } },
+          { $match: { createdAt: { $gte: today }, status: "completed" } },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
-        Wallets.countDocuments({ status: 'active' }),
+        Wallets.countDocuments({ status: "active" }),
         Wallets.aggregate([
-          { $match: { status: 'active' } },
-          { $group: { _id: null, total: { $sum: '$balance' } } },
+          { $match: { status: "active" } },
+          { $group: { _id: null, total: { $sum: "$balance" } } },
         ]),
-        Loans.countDocuments({ status: { $in: ['active', 'disbursed'] } }),
+        Loans.countDocuments({ status: { $in: ["active", "disbursed"] } }),
         Loans.aggregate([
-          { $match: { status: { $in: ['active', 'disbursed'] } } },
-          { $group: { _id: null, total: { $sum: '$principalAmount' } } },
+          { $match: { status: { $in: ["active", "disbursed"] } } },
+          { $group: { _id: null, total: { $sum: "$principalAmount" } } },
         ]),
-        Cards.countDocuments({ status: 'active' }),
+        Cards.countDocuments({ status: "active" }),
       ]);
 
       return {
@@ -499,7 +550,7 @@ export async function getPlatformStatistics(req: AuthenticatedRequest, res: Resp
     });
 
     // Broadcast to all clients
-    broadcast('platform:stats_updated', stats);
+    broadcast("platform:stats_updated", stats);
     sendSuccess(res, { statistics: stats });
   } catch (error) {
     next(error);
@@ -510,26 +561,30 @@ export async function getPlatformStatistics(req: AuthenticatedRequest, res: Resp
 // ADMIN: GROWTH METRICS
 // ============================================================================
 
-export async function getGrowthMetrics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getGrowthMetrics(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { period } = req.query; // 'week' | 'month' | 'quarter' | 'year'
 
     let startDate = new Date();
-    let groupFormat = '%Y-%m-%d';
+    let groupFormat = "%Y-%m-%d";
 
     switch (period) {
-      case 'week':
+      case "week":
         startDate.setDate(startDate.getDate() - 7);
         break;
-      case 'quarter':
+      case "quarter":
         startDate.setMonth(startDate.getMonth() - 3);
-        groupFormat = '%Y-%U'; // Week number
+        groupFormat = "%Y-%U"; // Week number
         break;
-      case 'year':
+      case "year":
         startDate.setFullYear(startDate.getFullYear() - 1);
-        groupFormat = '%Y-%m';
+        groupFormat = "%Y-%m";
         break;
       default: // month
         startDate.setMonth(startDate.getMonth() - 1);
@@ -540,7 +595,7 @@ export async function getGrowthMetrics(req: AuthenticatedRequest, res: Response,
       { $match: { createdAt: { $gte: startDate } } },
       {
         $group: {
-          _id: { $dateToString: { format: groupFormat, date: '$createdAt' } },
+          _id: { $dateToString: { format: groupFormat, date: "$createdAt" } },
           count: { $sum: 1 },
         },
       },
@@ -549,12 +604,12 @@ export async function getGrowthMetrics(req: AuthenticatedRequest, res: Response,
 
     // Transaction growth
     const transactionGrowth = await Transactions.aggregate([
-      { $match: { createdAt: { $gte: startDate }, status: 'completed' } },
+      { $match: { createdAt: { $gte: startDate }, status: "completed" } },
       {
         $group: {
-          _id: { $dateToString: { format: groupFormat, date: '$createdAt' } },
+          _id: { $dateToString: { format: groupFormat, date: "$createdAt" } },
           count: { $sum: 1 },
-          volume: { $sum: '$amount' },
+          volume: { $sum: "$amount" },
         },
       },
       { $sort: { _id: 1 } },
@@ -562,12 +617,12 @@ export async function getGrowthMetrics(req: AuthenticatedRequest, res: Response,
 
     // Transaction type distribution
     const transactionTypes = await Transactions.aggregate([
-      { $match: { createdAt: { $gte: startDate }, status: 'completed' } },
+      { $match: { createdAt: { $gte: startDate }, status: "completed" } },
       {
         $group: {
-          _id: '$type',
+          _id: "$type",
           count: { $sum: 1 },
-          volume: { $sum: '$amount' },
+          volume: { $sum: "$amount" },
         },
       },
       { $sort: { volume: -1 } },
@@ -590,9 +645,13 @@ export async function getGrowthMetrics(req: AuthenticatedRequest, res: Response,
 // ADMIN: DAILY REPORT
 // ============================================================================
 
-export async function generateDailyReport(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function generateDailyReport(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { date } = req.query;
     const targetDate = date ? new Date(date as string) : new Date();
@@ -616,23 +675,33 @@ export async function generateDailyReport(req: AuthenticatedRequest, res: Respon
         newCards,
       ] = await Promise.all([
         Users.countDocuments({ createdAt: { $gte: targetDate, $lt: nextDay } }),
-        Users.countDocuments({ lastActive: { $gte: targetDate, $lt: nextDay } }),
-        Transactions.countDocuments({ createdAt: { $gte: targetDate, $lt: nextDay }, status: 'completed' }),
+        Users.countDocuments({
+          lastActive: { $gte: targetDate, $lt: nextDay },
+        }),
+        Transactions.countDocuments({
+          createdAt: { $gte: targetDate, $lt: nextDay },
+          status: "completed",
+        }),
         Transactions.aggregate([
-          { $match: { createdAt: { $gte: targetDate, $lt: nextDay }, status: 'completed' } },
-          { $group: { _id: null, total: { $sum: '$amount' } } },
+          {
+            $match: {
+              createdAt: { $gte: targetDate, $lt: nextDay },
+              status: "completed",
+            },
+          },
+          { $group: { _id: null, total: { $sum: "$amount" } } },
         ]),
         Loans.countDocuments({ createdAt: { $gte: targetDate, $lt: nextDay } }),
         Loans.aggregate([
           { $match: { disbursementDate: { $gte: targetDate, $lt: nextDay } } },
-          { $group: { _id: null, total: { $sum: '$principalAmount' } } },
+          { $group: { _id: null, total: { $sum: "$principalAmount" } } },
         ]),
         Cards.countDocuments({ createdAt: { $gte: targetDate, $lt: nextDay } }),
       ]);
 
       report = new Statistics({
         date: targetDate,
-        period: 'daily',
+        period: "daily",
         users: {
           new: newUsers,
           active: activeUsers,
@@ -644,7 +713,7 @@ export async function generateDailyReport(req: AuthenticatedRequest, res: Respon
         transactions: {
           total: transactions,
           volume: transactionVolume[0]?.total || 0,
-          currency: 'USD',
+          currency: "USD",
           byType: {
             deposit: 0,
             withdrawal: 0,

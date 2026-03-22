@@ -6,6 +6,7 @@
 
 import { createClient, RedisClientType } from 'redis';
 import { env } from '../config/env.config.js';
+import Logger from '../logs/logger.js';
 
 // ============================================================================
 // TYPES
@@ -60,10 +61,10 @@ async function initializeRedis(): Promise<void> {
       password: env.REDIS_PASSWORD,
       socket: {
         host: env.REDIS_HOST,
-        port: 10744,
+        port: env.REDIS_PORT,
         reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.error('[Redis] Max reconnection attempts reached');
+            Logger.error('[Redis] Max reconnection attempts reached');
             return new Error('Max reconnection attempts reached');
           }
           return Math.min(retries * 100, 3000);
@@ -72,29 +73,29 @@ async function initializeRedis(): Promise<void> {
     });
 
     redisClient.on('error', (err) => {
-      console.error('[Redis] Client Error:', err.message);
+      Logger.error(`[Redis] Client Error: ${err.message}`);
       isConnected = false;
     });
 
     redisClient.on('connect', () => {
-      console.log('[Redis] ✅ Connected to Redis Cloud');
+      Logger.info('[Redis] ✅ Connected to Redis Cloud');
       isConnected = true;
     });
 
     redisClient.on('reconnecting', () => {
-      console.log('[Redis] 🔄 Reconnecting...');
+      Logger.warn('[Redis] 🔄 Reconnecting...');
     });
 
     redisClient.on('end', () => {
-      console.log('[Redis] Connection closed');
+      Logger.info('[Redis] Connection closed');
       isConnected = false;
     });
 
     await redisClient.connect();
     isConnected = true;
-    console.log('[Redis] ✅ Redis Cloud connection established');
+    Logger.info('[Redis] ✅ Redis Cloud connection established');
   } catch (error) {
-    console.error('[Redis] Failed to connect:', error);
+    Logger.error('[Redis] Failed to connect', { error });
     isConnected = false;
     throw error;
   }
@@ -109,7 +110,7 @@ export async function disconnectRedis(): Promise<void> {
     isConnected = false;
     redisClient = null;
     connectionPromise = null;
-    console.log('[Redis] Disconnected');
+    Logger.info('[Redis] Disconnected');
   }
 }
 
@@ -118,6 +119,17 @@ export async function disconnectRedis(): Promise<void> {
  */
 export function isRedisConnected(): boolean {
   return isConnected;
+}
+
+/**
+ * Get internal redis service object for middleware usage
+ */
+export function getRedisService() {
+  return {
+    getIsConnected: isRedisConnected,
+    checkRateLimit,
+    healthCheck,
+  };
 }
 
 // ============================================================================
@@ -229,7 +241,7 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
     const client = await getRedisClient();
     const value = await client.get(key);
     if (!value) return null;
-    return JSON.parse(value) as T;
+    return JSON.parse(value as string) as T;
   } catch (error) {
     console.error(`[Redis] Cache get error for ${key}:`, error);
     return null;
@@ -316,7 +328,7 @@ export async function cacheExists(key: string): Promise<boolean> {
 export async function cacheExpire(key: string, ttlSeconds: number): Promise<boolean> {
   try {
     const client = await getRedisClient();
-    return await client.expire(key, ttlSeconds);
+    return !!(await client.expire(key, ttlSeconds));
   } catch (error) {
     console.error(`[Redis] Cache expire error for ${key}:`, error);
     return false;
@@ -591,7 +603,7 @@ export async function isLoginLocked(email: string): Promise<boolean> {
     const client = await getRedisClient();
     const key = CACHE_KEYS.LOGIN_ATTEMPTS(email.toLowerCase());
     const attempts = await client.get(key);
-    return attempts !== null && parseInt(attempts, 10) >= 5;
+    return attempts !== null && parseInt(attempts as string, 10) >= 5;
   } catch (error) {
     return false;
   }
@@ -811,7 +823,7 @@ export async function getUnreadCount(userId: string): Promise<number> {
   try {
     const client = await getRedisClient();
     const count = await client.get(CACHE_KEYS.UNREAD_COUNT(userId));
-    return count ? parseInt(count, 10) : 0;
+    return count ? parseInt(count as string, 10) : 0;
   } catch (error) {
     return 0;
   }

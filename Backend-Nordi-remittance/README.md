@@ -59,17 +59,18 @@ Backend-remittance/
 │   ├── Auth.middleware.ts
 │   ├── Security.middleware.ts
 │   ├── Kyc.middleware.ts
-│   └── Core.middleware.ts
+│   ├── core.middleware.ts
 ├── models/               # Mongoose schemas
 │   ├── UserModel.ts
 │   ├── TransactionModel.ts
 │   └── ... (15+ models)
 ├── routes/               # API routes
 ├── services/             # External services
-│   ├── Cloudinary.service.ts
-│   ├── Mailer.service.ts
-│   ├── Redis.service.ts
-│   └── Websocket.service.ts
+│   ├── cloudinary.service.ts
+│   ├── kafka.service.ts
+│   ├── mailer.service.ts
+│   ├── redis.service.ts
+│   └── websocket.service.ts
 ├── k8s/                  # Kubernetes manifests
 ├── nginx/                # Nginx configuration
 ├── scripts/              # Build and utility scripts

@@ -2,11 +2,15 @@
 // STATISTICS ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import StatisticsController from '../controllers/Statistics.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import StatisticsController from "../controllers/Statistics.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
+import { requestLoggingMiddleware } from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -25,21 +29,21 @@ router.use(verifyAccountStatus);
  * @desc    Get user's statistics and metrics
  * @access  Private
  */
-router.get('/user', StatisticsController.getUserStatistics);
+router.get("/user", StatisticsController.getUserStatistics);
 
 /**
  * @route   GET /api/statistics/transactions
  * @desc    Get user's transaction analytics
  * @access  Private
  */
-router.get('/transactions', StatisticsController.getTransactionAnalytics);
+router.get("/transactions", StatisticsController.getTransactionAnalytics);
 
 /**
  * @route   GET /api/statistics/spending
  * @desc    Get user's spending insights
  * @access  Private
  */
-router.get('/spending', StatisticsController.getSpendingInsights);
+router.get("/spending", StatisticsController.getSpendingInsights);
 
 // ============================================================================
 // ADMIN STATISTICS
@@ -50,20 +54,28 @@ router.get('/spending', StatisticsController.getSpendingInsights);
  * @desc    Get platform-wide statistics
  * @access  Admin
  */
-router.get('/platform', requireAdmin, StatisticsController.getPlatformStatistics);
+router.get(
+  "/platform",
+  requireAdmin,
+  StatisticsController.getPlatformStatistics,
+);
 
 /**
  * @route   GET /api/statistics/growth
  * @desc    Get platform growth metrics
  * @access  Admin
  */
-router.get('/growth', requireAdmin, StatisticsController.getGrowthMetrics);
+router.get("/growth", requireAdmin, StatisticsController.getGrowthMetrics);
 
 /**
  * @route   POST /api/statistics/reports/daily
  * @desc    Generate daily report
  * @access  Admin
  */
-router.post('/reports/daily', requireAdmin, StatisticsController.generateDailyReport);
+router.post(
+  "/reports/daily",
+  requireAdmin,
+  StatisticsController.generateDailyReport,
+);
 
 export default router;

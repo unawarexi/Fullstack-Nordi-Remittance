@@ -13,13 +13,13 @@ import {
   authenticate,
   requireAdmin,
   verifyAccountStatus,
-} from "../middleware/Auth.middleware.js";
-import { sanitizeInput } from "../middleware/Security.middleware.js";
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
 import {
   requestLoggingMiddleware,
   auditLogMiddleware,
-} from "../middleware/Core.middleware.js";
-import { upload } from "../services/Cloudinary.service.js";
+} from "../middleware/core.middleware.js";
+import { upload } from "../services/cloudinary.service.js";
 
 const router = Router();
 
@@ -165,18 +165,18 @@ router.get("/admin/stats", requireAdmin, KycController.getAdminKycStats);
  * @access  Admin
  * @query   page, limit, status (default: in_review)
  */
-router.get("/admin/pending", requireAdmin, KycController.getAdminPendingReviews);
+router.get(
+  "/admin/pending",
+  requireAdmin,
+  KycController.getAdminPendingReviews,
+);
 
 /**
  * @route   GET /api/v1/kyc/admin/users/:userId
  * @desc    Get complete KYC detail for a specific user
  * @access  Admin
  */
-router.get(
-  "/admin/users/:userId",
-  requireAdmin,
-  KycController.getAdminUserKyc,
-);
+router.get("/admin/users/:userId", requireAdmin, KycController.getAdminUserKyc);
 
 /**
  * @route   PATCH /api/v1/kyc/admin/users/:userId/review

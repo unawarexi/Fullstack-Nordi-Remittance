@@ -62,6 +62,17 @@ interface EnvConfig {
   ENABLE_2FA: boolean;
   ENABLE_KYC_VERIFICATION: boolean;
   ENABLE_FRAUD_DETECTION: boolean;
+
+  // Kafka
+  KAFKA_BROKERS: string;
+  KAFKA_CLIENT_ID: string;
+  KAFKA_GROUP_ID: string;
+  KAFKA_SSL: boolean;
+  KAFKA_SASL_USERNAME?: string;
+  KAFKA_SASL_PASSWORD?: string;
+
+  // Monitoring
+  SENTRY_DSN?: string;
 }
 
 function getEnvString(key: string, defaultValue?: string): string {
@@ -158,6 +169,17 @@ export const env: EnvConfig = {
   ENABLE_2FA: getEnvBoolean("ENABLE_2FA", true),
   ENABLE_KYC_VERIFICATION: getEnvBoolean("ENABLE_KYC_VERIFICATION", true),
   ENABLE_FRAUD_DETECTION: getEnvBoolean("ENABLE_FRAUD_DETECTION", true),
+
+  // Kafka
+  KAFKA_BROKERS: getEnvString("KAFKA_BROKERS", "localhost:9092"),
+  KAFKA_CLIENT_ID: getEnvString("KAFKA_CLIENT_ID", "nordi-remit-api"),
+  KAFKA_GROUP_ID: getEnvString("KAFKA_GROUP_ID", "nordi-remit-group"),
+  KAFKA_SSL: getEnvBoolean("KAFKA_SSL", false),
+  KAFKA_SASL_USERNAME: process.env.KAFKA_SASL_USERNAME,
+  KAFKA_SASL_PASSWORD: process.env.KAFKA_SASL_PASSWORD,
+
+  // Monitoring
+  SENTRY_DSN: process.env.SENTRY_DSN,
 };
 
 // ============================================================================
@@ -328,5 +350,21 @@ export const HttpStatus = {
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
 } as const;
+
+// ============================================================================
+// ENVIRONMENT HELPERS
+// ============================================================================
+
+export function isProduction(): boolean {
+  return env.NODE_ENV === "production";
+}
+
+export function isDevelopment(): boolean {
+  return env.NODE_ENV === "development";
+}
+
+export function isTest(): boolean {
+  return env.NODE_ENV === "test";
+}
 
 export default env;

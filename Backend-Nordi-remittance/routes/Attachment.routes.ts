@@ -2,11 +2,18 @@
 // ATTACHMENT ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import AttachmentController from '../controllers/Attachment.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import AttachmentController from "../controllers/Attachment.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -25,32 +32,28 @@ router.use(verifyAccountStatus);
  * @desc    Get user's attachments
  * @access  Private
  */
-router.get('/', AttachmentController.getAttachments);
+router.get("/", AttachmentController.getAttachments);
 
 /**
  * @route   GET /api/attachments/categories
  * @desc    Get attachment categories
  * @access  Private
  */
-router.get('/categories', AttachmentController.getCategories);
+router.get("/categories", AttachmentController.getCategories);
 
 /**
  * @route   GET /api/attachments/:attachmentId
  * @desc    Get specific attachment
  * @access  Private
  */
-router.get('/:attachmentId', AttachmentController.getAttachmentById);
+router.get("/:attachmentId", AttachmentController.getAttachmentById);
 
 /**
  * @route   POST /api/attachments
  * @desc    Upload new attachment
  * @access  Private
  */
-router.post(
-  '/',
-  auditLogMiddleware,
-  AttachmentController.uploadAttachment
-);
+router.post("/", auditLogMiddleware, AttachmentController.uploadAttachment);
 
 /**
  * @route   PUT /api/attachments/:attachmentId
@@ -58,9 +61,9 @@ router.post(
  * @access  Private
  */
 router.put(
-  '/:attachmentId',
+  "/:attachmentId",
   auditLogMiddleware,
-  AttachmentController.updateAttachment
+  AttachmentController.updateAttachment,
 );
 
 /**
@@ -69,9 +72,9 @@ router.put(
  * @access  Private
  */
 router.delete(
-  '/:attachmentId',
+  "/:attachmentId",
   auditLogMiddleware,
-  AttachmentController.deleteAttachment
+  AttachmentController.deleteAttachment,
 );
 
 // ============================================================================
@@ -83,7 +86,7 @@ router.delete(
  * @desc    Get user's KYC documents
  * @access  Private
  */
-router.get('/kyc/documents', AttachmentController.getKycDocuments);
+router.get("/kyc/documents", AttachmentController.getKycDocuments);
 
 /**
  * @route   POST /api/attachments/kyc/documents
@@ -91,9 +94,9 @@ router.get('/kyc/documents', AttachmentController.getKycDocuments);
  * @access  Private
  */
 router.post(
-  '/kyc/documents',
+  "/kyc/documents",
   auditLogMiddleware,
-  AttachmentController.uploadKycDocument
+  AttachmentController.uploadKycDocument,
 );
 
 // ============================================================================
@@ -105,14 +108,18 @@ router.post(
  * @desc    Get all attachments (admin)
  * @access  Admin
  */
-router.get('/admin/all', requireAdmin, AttachmentController.getAllAttachments);
+router.get("/admin/all", requireAdmin, AttachmentController.getAllAttachments);
 
 /**
  * @route   GET /api/attachments/admin/users/:userId/kyc
  * @desc    Get user's KYC documents (admin)
  * @access  Admin
  */
-router.get('/admin/users/:userId/kyc', requireAdmin, AttachmentController.getUserKycDocuments);
+router.get(
+  "/admin/users/:userId/kyc",
+  requireAdmin,
+  AttachmentController.getUserKycDocuments,
+);
 
 /**
  * @route   PUT /api/attachments/admin/kyc/:documentId/review
@@ -120,10 +127,10 @@ router.get('/admin/users/:userId/kyc', requireAdmin, AttachmentController.getUse
  * @access  Admin
  */
 router.put(
-  '/admin/kyc/:documentId/review',
+  "/admin/kyc/:documentId/review",
   requireAdmin,
   auditLogMiddleware,
-  AttachmentController.reviewKycDocument
+  AttachmentController.reviewKycDocument,
 );
 
 export default router;

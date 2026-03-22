@@ -95,13 +95,13 @@ afterEach(async () => {
 // ============================================================================
 
 // Mock email service
-vi.mock('../services/Mailer.service.js', () => ({
+vi.mock('../services/mailer.service.js', () => ({
   sendTemplatedMail: vi.fn().mockResolvedValue(true),
   sendMail: vi.fn().mockResolvedValue(true),
 }));
 
-// Mock Redis service
-vi.mock('../services/Redis.service.js', () => ({
+// Mock redis.service
+vi.mock('../services/redis.service.js', () => ({
   default: {
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue('OK'),
@@ -126,15 +126,15 @@ vi.mock('../services/Redis.service.js', () => ({
 }));
 
 // Mock WebSocket service
-vi.mock('../services/Websocket.service.js', () => ({
+vi.mock('../services/websocket.service.js', () => ({
   initializeWebSocket: vi.fn(),
   emitToUser: vi.fn(),
   emitToRoom: vi.fn(),
   emitToAll: vi.fn(),
 }));
 
-// Mock Cloudinary service
-vi.mock('../services/Cloudinary.service.js', () => ({
+// Mock cloudinary.service
+vi.mock('../services/cloudinary.service.js', () => ({
   uploadToCloudinary: vi.fn().mockResolvedValue({
     secure_url: 'https://test-cloudinary.com/image.jpg',
     public_id: 'test-public-id',

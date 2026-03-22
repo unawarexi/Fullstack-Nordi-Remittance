@@ -1,5 +1,5 @@
 # ============================================================================
-# UrbanRide Navii — Terraform Variables
+# Nordi-Remittance — Terraform Variables
 # ============================================================================
 
 # --------------------------------------------------------------------------
@@ -18,7 +18,7 @@ variable "environment" {
 variable "project_name" {
   description = "Project name used for resource naming"
   type        = string
-  default     = "urbanride-navii"
+  default     = "nordi-remittance"
 }
 
 # --------------------------------------------------------------------------
@@ -48,7 +48,7 @@ variable "availability_zones" {
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-  default     = "navii-cluster"
+  default     = "nordi-remit-cluster"
 }
 
 variable "cluster_version" {
@@ -105,13 +105,13 @@ variable "db_max_allocated_storage" {
 variable "db_name" {
   description = "PostgreSQL database name"
   type        = string
-  default     = "urbanride_navii"
+  default     = "nordi_remittance"
 }
 
 variable "db_username" {
   description = "Master database username"
   type        = string
-  default     = "navii_admin"
+  default     = "remit_admin"
   sensitive   = true
 }
 
@@ -153,5 +153,5 @@ variable "cloudflare_zone_id" {
 variable "domain_name" {
   description = "Primary domain name"
   type        = string
-  default     = "urbanride-navii.com"
+  default     = "nordi-remittance.com"
 }

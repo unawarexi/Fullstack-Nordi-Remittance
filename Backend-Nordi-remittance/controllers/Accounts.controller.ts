@@ -38,14 +38,14 @@ import {
   CACHE_TTL,
   cacheUserWallets,
   getCachedUserWallets,
-} from "../services/Redis.service.js";
+} from "../services/redis.service.js";
 
 // WebSocket imports for real-time notifications
 import {
   emitToUser,
   broadcast,
   emitToRoom,
-} from "../services/Websocket.service.js";
+} from "../services/websocket.service.js";
 
 // WebSocket event constants
 const WS_EVENTS = {
@@ -108,7 +108,7 @@ export async function getWallets(
     );
 
     // Cache the wallets data
-    await cacheSet(cacheKey, walletsWithStats, CACHE_TTL.ACCOUNTS);
+    await cacheSet(cacheKey, walletsWithStats, CACHE_TTL.ACCOUNT);
 
     sendSuccess(res, { wallets: walletsWithStats });
   } catch (error) {
@@ -135,7 +135,7 @@ export async function getWalletById(
 
     // Try cache first for individual wallet
     const cacheKey = `${CACHE_KEYS.WALLET}${userId}:${id}`;
-    const cachedWallet = await cacheGet(cacheKey);
+    const cachedWallet = await cacheGet<Record<string, unknown>>(cacheKey);
 
     if (cachedWallet) {
       sendSuccess(res, { ...cachedWallet, cached: true });
@@ -169,7 +169,7 @@ export async function getWalletById(
     };
 
     // Cache wallet details
-    await cacheSet(cacheKey, walletData, CACHE_TTL.ACCOUNTS);
+    await cacheSet(cacheKey, walletData, CACHE_TTL.ACCOUNT);
 
     sendSuccess(res, {
       wallet,
@@ -975,7 +975,7 @@ export async function updateWalletStatus(
       throw new NotFoundError("Wallet not found");
     }
 
-    emitToUser(String(wallet.userId), WS_EVENTS.WALLET_STATUS_CHANGED, {
+    emitToUser(String(wallet.user), WS_EVENTS.WALLET_STATUS_CHANGED, {
       walletId: wallet._id,
       status,
       reason: reason || undefined,

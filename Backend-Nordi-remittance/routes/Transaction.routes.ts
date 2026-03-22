@@ -2,11 +2,21 @@
 // TRANSACTION ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import TransactionController from '../controllers/Transaction.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { transactionRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import TransactionController from "../controllers/Transaction.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import {
+  transactionRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 import {
   validateTransactionRequest,
   validateTransferRequest,
@@ -15,8 +25,13 @@ import {
   idempotencyMiddleware,
   detectDuplicateTransaction,
   basicFraudCheck,
-} from '../middleware/Transaction.middleware.js';
-import { requireKycVerified, enforceKycLimits, checkGeographicRestrictions, amlScreening } from '../middleware/Kyc.middleware.js';
+} from "../middleware/transaction.middleware.js";
+import {
+  requireKycVerified,
+  enforceKycLimits,
+  checkGeographicRestrictions,
+  amlScreening,
+} from "../middleware/kyc.middleware.js";
 
 const router = Router();
 
@@ -36,7 +51,7 @@ router.use(verifyAccountStatus); // Verify account is active
  * @access  Private
  */
 router.post(
-  '/transfer',
+  "/transfer",
   transactionRateLimit,
   idempotencyMiddleware,
   requireKycVerified,
@@ -49,7 +64,7 @@ router.post(
   amlScreening,
   basicFraudCheck,
   auditLogMiddleware,
-  TransactionController.internalTransfer
+  TransactionController.internalTransfer,
 );
 
 /**
@@ -58,13 +73,13 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/deposit',
+  "/deposit",
   transactionRateLimit,
   idempotencyMiddleware,
   validateTransactionRequest,
   amlScreening,
   auditLogMiddleware,
-  TransactionController.deposit
+  TransactionController.deposit,
 );
 
 /**
@@ -73,7 +88,7 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/withdraw',
+  "/withdraw",
   transactionRateLimit,
   idempotencyMiddleware,
   requireKycVerified,
@@ -84,7 +99,7 @@ router.post(
   amlScreening,
   basicFraudCheck,
   auditLogMiddleware,
-  TransactionController.withdraw
+  TransactionController.withdraw,
 );
 
 /**
@@ -92,28 +107,31 @@ router.post(
  * @desc    Get user's transactions
  * @access  Private
  */
-router.get('/', TransactionController.getTransactions);
+router.get("/", TransactionController.getTransactions);
 
 /**
  * @route   GET /api/transactions/stats
  * @desc    Get user's transaction statistics
  * @access  Private
  */
-router.get('/stats', TransactionController.getTransactionStats);
+router.get("/stats", TransactionController.getTransactionStats);
 
 /**
  * @route   GET /api/transactions/reference/:reference
  * @desc    Get transaction by reference number
  * @access  Private
  */
-router.get('/reference/:reference', TransactionController.getTransactionByReference);
+router.get(
+  "/reference/:reference",
+  TransactionController.getTransactionByReference,
+);
 
 /**
  * @route   GET /api/transactions/:id
  * @desc    Get single transaction by ID
  * @access  Private
  */
-router.get('/:id', TransactionController.getTransactionById);
+router.get("/:id", TransactionController.getTransactionById);
 
 /**
  * @route   POST /api/transactions/:id/cancel
@@ -121,9 +139,9 @@ router.get('/:id', TransactionController.getTransactionById);
  * @access  Private
  */
 router.post(
-  '/:id/cancel',
+  "/:id/cancel",
   auditLogMiddleware,
-  TransactionController.cancelTransaction
+  TransactionController.cancelTransaction,
 );
 
 // ============================================================================
@@ -136,9 +154,9 @@ router.post(
  * @access  Private/Admin
  */
 router.get(
-  '/admin/all',
+  "/admin/all",
   requireAdmin,
-  TransactionController.getAllTransactions
+  TransactionController.getAllTransactions,
 );
 
 /**
@@ -147,10 +165,10 @@ router.get(
  * @access  Private/Admin
  */
 router.patch(
-  '/admin/:id/status',
+  "/admin/:id/status",
   requireAdmin,
   auditLogMiddleware,
-  TransactionController.updateTransactionStatus
+  TransactionController.updateTransactionStatus,
 );
 
 // ============================================================================

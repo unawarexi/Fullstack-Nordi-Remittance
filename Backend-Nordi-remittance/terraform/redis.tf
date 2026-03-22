@@ -1,12 +1,12 @@
 # ============================================================================
-# UrbanRide Navii — ElastiCache Redis
-# For session caching, driver location tracking, and real-time data
+# Nordi-Remittance — ElastiCache Redis
+# For session caching and real-time data
 # ============================================================================
 
 # --------------------------------------------------------------------------
 # ElastiCache Subnet Group
 # --------------------------------------------------------------------------
-resource "aws_elasticache_subnet_group" "navii" {
+resource "aws_elasticache_subnet_group" "remit" {
   name       = "${var.project_name}-redis-subnet"
   subnet_ids = module.vpc.private_subnets
 
@@ -21,14 +21,14 @@ resource "aws_elasticache_subnet_group" "navii" {
 resource "aws_security_group" "redis" {
   name_prefix = "${var.project_name}-redis-"
   vpc_id      = module.vpc.vpc_id
-  description = "Security group for UrbanRide Navii Redis"
+  description = "Security group for Nordi-Remittance Redis"
 
   # Allow inbound from EKS worker nodes
   ingress {
     from_port       = 6379
     to_port         = 6379
     protocol        = "tcp"
-    security_groups = [aws_security_group.navii_api.id]
+    security_groups = [aws_security_group.remit_api.id]
     description     = "Redis from API pods"
   }
 
@@ -48,9 +48,9 @@ resource "aws_security_group" "redis" {
 # --------------------------------------------------------------------------
 # ElastiCache Redis Replication Group
 # --------------------------------------------------------------------------
-resource "aws_elasticache_replication_group" "navii" {
+resource "aws_elasticache_replication_group" "remit" {
   replication_group_id = "${var.project_name}-redis"
-  description          = "UrbanRide Navii Redis cluster for caching and real-time data"
+  description          = "Nordi-Remittance Redis cluster for caching and real-time data"
 
   node_type            = var.redis_node_type
   num_cache_clusters   = var.redis_num_cache_nodes
@@ -59,10 +59,10 @@ resource "aws_elasticache_replication_group" "navii" {
   # Engine
   engine               = "redis"
   engine_version       = "7.1"
-  parameter_group_name = aws_elasticache_parameter_group.navii.name
+  parameter_group_name = aws_elasticache_parameter_group.remit.name
 
   # Network
-  subnet_group_name    = aws_elasticache_subnet_group.navii.name
+  subnet_group_name    = aws_elasticache_subnet_group.remit.name
   security_group_ids   = [aws_security_group.redis.id]
 
   # Security
@@ -90,9 +90,9 @@ resource "aws_elasticache_replication_group" "navii" {
 }
 
 # --------------------------------------------------------------------------
-# Redis Parameter Group (optimized for real-time ride tracking)
+# Redis Parameter Group (optimized for session management)
 # --------------------------------------------------------------------------
-resource "aws_elasticache_parameter_group" "navii" {
+resource "aws_elasticache_parameter_group" "remit" {
   family = "redis7"
   name   = "${var.project_name}-redis-params"
 

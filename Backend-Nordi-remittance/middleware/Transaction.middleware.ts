@@ -3,7 +3,8 @@
 // ============================================================================
 
 import { Response, NextFunction } from 'express';
-import type { AuthenticatedRequest, TransactionType } from '../types/index.js';
+import type { AuthenticatedRequest } from '../types/index.js';
+import { TransactionType } from '../types/index.js';
 import { Wallets, AccountBalances } from '../models/AccountsModel.js';
 import Transactions from '../models/TransactionModel.js';
 import { 
@@ -105,7 +106,16 @@ export function validateTransactionRequest(
   }
 
   // Validate type
-  const validTypes: TransactionType[] = ['deposit', 'withdrawal', 'transfer', 'payment', 'refund', 'fee', 'reversal', 'exchange'];
+  const validTypes: TransactionType[] = [
+    TransactionType.DEPOSIT,
+    TransactionType.WITHDRAWAL,
+    TransactionType.TRANSFER,
+    TransactionType.PAYMENT,
+    TransactionType.REFUND,
+    TransactionType.FEE,
+    TransactionType.REVERSAL,
+    TransactionType.EXCHANGE
+  ];
   if (!type) {
     errors.push('Transaction type is required');
   } else if (!validTypes.includes(type)) {
@@ -159,7 +169,11 @@ export async function checkSufficientBalance(
     const userId = req.user?.userId;
 
     // Only check balance for debit transactions
-    const debitTypes: TransactionType[] = ['withdrawal', 'transfer', 'payment'];
+    const debitTypes: TransactionType[] = [
+      TransactionType.WITHDRAWAL,
+      TransactionType.TRANSFER,
+      TransactionType.PAYMENT
+    ];
     if (!debitTypes.includes(type)) {
       return next();
     }
@@ -223,7 +237,11 @@ export async function checkTransactionLimits(
     const userId = req.user?.userId;
 
     // Skip for credit transactions
-    const debitTypes: TransactionType[] = ['withdrawal', 'transfer', 'payment'];
+    const debitTypes: TransactionType[] = [
+      TransactionType.WITHDRAWAL,
+      TransactionType.TRANSFER,
+      TransactionType.PAYMENT
+    ];
     if (!debitTypes.includes(type)) {
       return next();
     }

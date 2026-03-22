@@ -2,12 +2,22 @@
 // LOAN ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import LoansController from '../controllers/Loans.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { transactionRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
-import { requireKycVerified } from '../middleware/Kyc.middleware.js';
+import { Router } from "express";
+import LoansController from "../controllers/Loans.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import {
+  transactionRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
+import { requireKycVerified } from "../middleware/kyc.middleware.js";
 
 const router = Router();
 
@@ -26,21 +36,25 @@ router.use(verifyAccountStatus);
  * @desc    Get user's loans
  * @access  Private
  */
-router.get('/', LoansController.getLoans);
+router.get("/", LoansController.getLoans);
 
 /**
  * @route   GET /api/loans/:loanId
  * @desc    Get specific loan details
  * @access  Private
  */
-router.get('/:loanId', LoansController.getLoanById);
+router.get("/:loanId", LoansController.getLoanById);
 
 /**
  * @route   GET /api/loans/eligibility/check
  * @desc    Check loan eligibility
  * @access  Private
  */
-router.get('/eligibility/check', requireKycVerified, LoansController.checkEligibility);
+router.get(
+  "/eligibility/check",
+  requireKycVerified,
+  LoansController.checkEligibility,
+);
 
 /**
  * @route   POST /api/loans/apply
@@ -48,12 +62,12 @@ router.get('/eligibility/check', requireKycVerified, LoansController.checkEligib
  * @access  Private
  */
 router.post(
-  '/apply',
+  "/apply",
   transactionRateLimit,
   requireKycVerified,
   auditLogMiddleware,
   // auditLogMiddleware('loan_application'),
-  LoansController.applyForLoan
+  LoansController.applyForLoan,
 );
 
 /**
@@ -61,14 +75,14 @@ router.post(
  * @desc    Get user's loan applications
  * @access  Private
  */
-router.get('/applications', LoansController.getApplications);
+router.get("/applications", LoansController.getApplications);
 
 /**
  * @route   GET /api/loans/:loanId/schedule
  * @desc    Get loan repayment schedule
  * @access  Private
  */
-router.get('/:loanId/schedule', LoansController.getRepaymentSchedule);
+router.get("/:loanId/schedule", LoansController.getRepaymentSchedule);
 
 /**
  * @route   POST /api/loans/:loanId/pay
@@ -76,11 +90,11 @@ router.get('/:loanId/schedule', LoansController.getRepaymentSchedule);
  * @access  Private
  */
 router.post(
-  '/:loanId/pay',
+  "/:loanId/pay",
   transactionRateLimit,
   auditLogMiddleware,
   // auditLogMiddleware('loan_payment'),
-  LoansController.makePayment
+  LoansController.makePayment,
 );
 
 // ============================================================================
@@ -92,7 +106,11 @@ router.post(
  * @desc    Get all loan applications
  * @access  Admin
  */
-router.get('/admin/applications', requireAdmin, LoansController.getAllApplications);
+router.get(
+  "/admin/applications",
+  requireAdmin,
+  LoansController.getAllApplications,
+);
 
 /**
  * @route   POST /api/loans/admin/applications/:applicationId/review
@@ -100,11 +118,11 @@ router.get('/admin/applications', requireAdmin, LoansController.getAllApplicatio
  * @access  Admin
  */
 router.post(
-  '/admin/applications/:applicationId/review',
+  "/admin/applications/:applicationId/review",
   requireAdmin,
   // auditLogMiddleware('loan_review'),
   auditLogMiddleware,
-  LoansController.reviewApplication
+  LoansController.reviewApplication,
 );
 
 /**
@@ -113,11 +131,11 @@ router.post(
  * @access  Admin
  */
 router.post(
-  '/admin/:loanId/disburse',
+  "/admin/:loanId/disburse",
   requireAdmin,
   // auditLogMiddleware('loan_disbursement'),
   auditLogMiddleware,
-  LoansController.disburseLoan
+  LoansController.disburseLoan,
 );
 
 export default router;

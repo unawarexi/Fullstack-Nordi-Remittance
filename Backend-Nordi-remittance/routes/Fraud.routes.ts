@@ -2,11 +2,18 @@
 // FRAUD ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import FraudController from '../controllers/Fraud.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import FraudController from "../controllers/Fraud.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import { sanitizeInput } from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -24,7 +31,11 @@ router.use(authenticate);
  * @desc    Get user's behavior profile
  * @access  Private
  */
-router.get('/behavior-profile', verifyAccountStatus, FraudController.getBehaviorProfile);
+router.get(
+  "/behavior-profile",
+  verifyAccountStatus,
+  FraudController.getBehaviorProfile,
+);
 
 // ============================================================================
 // ADMIN ROUTES
@@ -41,14 +52,14 @@ router.use(requireAdmin);
  * @desc    Get fraud signals
  * @access  Admin
  */
-router.get('/signals', FraudController.getFraudSignals);
+router.get("/signals", FraudController.getFraudSignals);
 
 /**
  * @route   GET /api/fraud/signals/:signalId
  * @desc    Get specific fraud signal
  * @access  Admin
  */
-router.get('/signals/:signalId', FraudController.getFraudSignalById);
+router.get("/signals/:signalId", FraudController.getFraudSignalById);
 
 /**
  * @route   PUT /api/fraud/signals/:signalId
@@ -56,9 +67,9 @@ router.get('/signals/:signalId', FraudController.getFraudSignalById);
  * @access  Admin
  */
 router.put(
-  '/signals/:signalId',
+  "/signals/:signalId",
   auditLogMiddleware,
-  FraudController.updateFraudSignal
+  FraudController.updateFraudSignal,
 );
 
 // ============================================================================
@@ -70,25 +81,21 @@ router.put(
  * @desc    Get all fraud cases
  * @access  Admin
  */
-router.get('/cases', FraudController.getFraudCases);
+router.get("/cases", FraudController.getFraudCases);
 
 /**
  * @route   POST /api/fraud/cases
  * @desc    Create new fraud case
  * @access  Admin
  */
-router.post(
-  '/cases',
-  auditLogMiddleware,
-  FraudController.createFraudCase
-);
+router.post("/cases", auditLogMiddleware, FraudController.createFraudCase);
 
 /**
  * @route   GET /api/fraud/cases/:caseId
  * @desc    Get fraud case details
  * @access  Admin
  */
-router.get('/cases/:caseId', FraudController.getFraudCaseById);
+router.get("/cases/:caseId", FraudController.getFraudCaseById);
 
 /**
  * @route   PUT /api/fraud/cases/:caseId
@@ -96,9 +103,9 @@ router.get('/cases/:caseId', FraudController.getFraudCaseById);
  * @access  Admin
  */
 router.put(
-  '/cases/:caseId',
+  "/cases/:caseId",
   auditLogMiddleware,
-  FraudController.updateFraudCase
+  FraudController.updateFraudCase,
 );
 
 /**
@@ -106,10 +113,7 @@ router.put(
  * @desc    Add comment to fraud case
  * @access  Admin
  */
-router.post(
-  '/cases/:caseId/comments',
-  FraudController.addCaseComment
-);
+router.post("/cases/:caseId/comments", FraudController.addCaseComment);
 
 // ============================================================================
 // VELOCITY RULES
@@ -120,7 +124,7 @@ router.post(
  * @desc    Get all velocity rules
  * @access  Admin
  */
-router.get('/velocity-rules', FraudController.getVelocityRules);
+router.get("/velocity-rules", FraudController.getVelocityRules);
 
 /**
  * @route   POST /api/fraud/velocity-rules
@@ -128,9 +132,9 @@ router.get('/velocity-rules', FraudController.getVelocityRules);
  * @access  Admin
  */
 router.post(
-  '/velocity-rules',
+  "/velocity-rules",
   auditLogMiddleware,
-  FraudController.createVelocityRule
+  FraudController.createVelocityRule,
 );
 
 /**
@@ -139,9 +143,9 @@ router.post(
  * @access  Admin
  */
 router.put(
-  '/velocity-rules/:ruleId',
+  "/velocity-rules/:ruleId",
   auditLogMiddleware,
-  FraudController.updateVelocityRule
+  FraudController.updateVelocityRule,
 );
 
 /**
@@ -150,9 +154,9 @@ router.put(
  * @access  Admin
  */
 router.delete(
-  '/velocity-rules/:ruleId',
+  "/velocity-rules/:ruleId",
   auditLogMiddleware,
-  FraudController.deleteVelocityRule
+  FraudController.deleteVelocityRule,
 );
 
 // ============================================================================
@@ -164,7 +168,10 @@ router.delete(
  * @desc    Get user's behavior profile (admin view)
  * @access  Admin
  */
-router.get('/users/:userId/behavior-profile', FraudController.getBehaviorProfile);
+router.get(
+  "/users/:userId/behavior-profile",
+  FraudController.getBehaviorProfile,
+);
 
 /**
  * @route   PUT /api/fraud/users/:userId/behavior-profile
@@ -172,9 +179,9 @@ router.get('/users/:userId/behavior-profile', FraudController.getBehaviorProfile
  * @access  Admin
  */
 router.put(
-  '/users/:userId/behavior-profile',
+  "/users/:userId/behavior-profile",
   auditLogMiddleware,
-  FraudController.updateBehaviorProfile
+  FraudController.updateBehaviorProfile,
 );
 
 // ============================================================================
@@ -186,14 +193,14 @@ router.put(
  * @desc    Get security events
  * @access  Admin
  */
-router.get('/security-events', FraudController.getSecurityEvents);
+router.get("/security-events", FraudController.getSecurityEvents);
 
 /**
  * @route   POST /api/fraud/security-events
  * @desc    Log security event
  * @access  Admin
  */
-router.post('/security-events', FraudController.logSecurityEvent);
+router.post("/security-events", FraudController.logSecurityEvent);
 
 // ============================================================================
 // ANALYTICS
@@ -204,6 +211,6 @@ router.post('/security-events', FraudController.logSecurityEvent);
  * @desc    Get fraud analytics
  * @access  Admin
  */
-router.get('/analytics', FraudController.getFraudAnalytics);
+router.get("/analytics", FraudController.getFraudAnalytics);
 
 export default router;

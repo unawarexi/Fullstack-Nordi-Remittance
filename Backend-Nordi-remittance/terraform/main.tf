@@ -1,5 +1,5 @@
 # ============================================================================
-# UrbanRide Navii — Main Infrastructure (VPC + EKS)
+# Nordi-Remittance — Main Infrastructure (VPC + EKS)
 # ============================================================================
 
 # --------------------------------------------------------------------------
@@ -79,8 +79,8 @@ module "eks" {
 
   # Managed node groups
   eks_managed_node_groups = {
-    navii_workers = {
-      name           = "navii-workers"
+    remit_workers = {
+      name           = "nordi-remit-workers"
       instance_types = var.node_instance_types
       
       min_size     = var.node_min_size
@@ -129,10 +129,10 @@ module "ebs_csi_irsa" {
 # --------------------------------------------------------------------------
 # Security Group for Backend API pods
 # --------------------------------------------------------------------------
-resource "aws_security_group" "navii_api" {
+resource "aws_security_group" "remit_api" {
   name_prefix = "${var.project_name}-api-"
   vpc_id      = module.vpc.vpc_id
-  description = "Security group for UrbanRide Navii API pods"
+  description = "Security group for Nordi-Remittance API pods"
 
   # Allow inbound from ALB
   ingress {

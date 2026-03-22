@@ -1,5 +1,5 @@
 # ============================================================================
-# UrbanRide Navii — Terraform Providers
+# Nordi-Remittance — Terraform Providers
 # ============================================================================
 
 terraform {
@@ -30,10 +30,10 @@ terraform {
 
   # Remote state — uncomment and configure for team use
   # backend "s3" {
-  #   bucket         = "urbanride-navii-terraform-state"
+  #   bucket         = "nordi-remittance-terraform-state"
   #   key            = "production/terraform.tfstate"
   #   region         = "us-east-1"
-  #   dynamodb_table = "urbanride-navii-terraform-locks"
+  #   dynamodb_table = "nordi-remittance-terraform-locks"
   #   encrypt        = true
   # }
 }
@@ -43,7 +43,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "urbanride-navii"
+      Project     = "nordi-remittance"
       Environment = var.environment
       ManagedBy   = "terraform"
     }

@@ -2,19 +2,27 @@
 // SECURITY CONTROLLER
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { SecurityEvents, BehaviorProfiles } from '../models/FraudSecurityModel.js';
-import Users from '../models/UserModel.js';
-import { sendSuccess, sendPaginated } from '../core/helpers/response.helper.js';
-import { UnauthorizedError, ValidationError, NotFoundError, ForbiddenError } from '../core/errors/AppError.js';
-import { sendTemplatedMail } from '../services/Mailer.service.js';
-import EmailContentGenerator from '../core/mail/Mail-content.js';
-import { emitToUser } from '../services/Websocket.service.js';
-import { WS } from '../core/constants/ws-events.js';
-import { encrypt, decrypt } from '../core/helpers/crypto.helper.js';
-import speakeasy from 'speakeasy';
-import QRCode from 'qrcode';
+import { Response, NextFunction } from "express";
+import type { AuthenticatedRequest } from "../types/index.js";
+import {
+  SecurityEvents,
+  BehaviorProfiles,
+} from "../models/FraudSecurityModel.js";
+import Users from "../models/UserModel.js";
+import { sendSuccess, sendPaginated } from "../core/helpers/response.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+  ForbiddenError,
+} from "../core/errors/AppError.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { emitToUser } from "../services/websocket.service.js";
+import { WS } from "../core/constants/ws-events.js";
+import { encrypt, decrypt } from "../core/helpers/crypto.helper.js";
+import speakeasy from "speakeasy";
+import QRCode from "qrcode";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -23,9 +31,13 @@ const emailGenerator = new EmailContentGenerator();
 // LOGIN HISTORY
 // ============================================================================
 
-export async function getLoginHistory(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getLoginHistory(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
@@ -34,16 +46,18 @@ export async function getLoginHistory(req: AuthenticatedRequest, res: Response, 
     const [events, total] = await Promise.all([
       SecurityEvents.find({
         user: req.user.userId,
-        eventType: { $in: ['login', 'login_failed', 'logout'] },
+        eventType: { $in: ["login", "login_failed", "logout"] },
       })
-        .select('eventType severity ipAddress location userAgent timestamp createdAt')
+        .select(
+          "eventType severity ipAddress location userAgent timestamp createdAt",
+        )
         .sort({ timestamp: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
       SecurityEvents.countDocuments({
         user: req.user.userId,
-        eventType: { $in: ['login', 'login_failed', 'logout'] },
+        eventType: { $in: ["login", "login_failed", "logout"] },
       }),
     ]);
 
@@ -57,19 +71,23 @@ export async function getLoginHistory(req: AuthenticatedRequest, res: Response, 
 // ACTIVE SESSIONS
 // ============================================================================
 
-export async function getActiveSessions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getActiveSessions(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const sessions = (user.activeSessions as any[]) || [];
 
     // Mark current session
-    const currentSessionId = req.headers['x-session-id'] as string;
+    const currentSessionId = req.headers["x-session-id"] as string;
     const sessionsWithCurrent = sessions.map((session: any) => ({
-      ...session.toObject ? session.toObject() : session,
+      ...(session.toObject ? session.toObject() : session),
       isCurrent: session.sessionId === currentSessionId,
     }));
 
@@ -79,26 +97,30 @@ export async function getActiveSessions(req: AuthenticatedRequest, res: Response
   }
 }
 
-export async function revokeSession(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function revokeSession(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { sessionId } = req.params;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const activeSessions = (user.activeSessions as any[]) || [];
     if (!activeSessions.length) {
-      throw new NotFoundError('Session not found');
+      throw new NotFoundError("Session not found");
     }
 
     const sessionIndex = activeSessions.findIndex(
-      (s: any) => s.sessionId === sessionId
+      (s: any) => s.sessionId === sessionId,
     );
 
     if (sessionIndex === -1) {
-      throw new NotFoundError('Session not found');
+      throw new NotFoundError("Session not found");
     }
 
     activeSessions.splice(sessionIndex, 1);
@@ -108,10 +130,10 @@ export async function revokeSession(req: AuthenticatedRequest, res: Response, ne
     // Log security event
     await SecurityEvents.create({
       user: req.user.userId,
-      eventType: 'session_revoked',
-      severity: 'info',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      eventType: "session_revoked",
+      severity: "info",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
       metadata: { revokedSessionId: sessionId },
     });
 
@@ -120,27 +142,31 @@ export async function revokeSession(req: AuthenticatedRequest, res: Response, ne
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Session revoked successfully');
+    sendSuccess(res, null, "Session revoked successfully");
   } catch (error) {
     next(error);
   }
 }
 
-export async function revokeAllSessions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function revokeAllSessions(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { exceptCurrent } = req.body;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
-    const currentSessionId = req.headers['x-session-id'] as string;
+    const currentSessionId = req.headers["x-session-id"] as string;
     const activeSessions = (user.activeSessions as any[]) || [];
 
     if (exceptCurrent && currentSessionId) {
       user.activeSessions = activeSessions.filter(
-        (s: any) => s.sessionId === currentSessionId
+        (s: any) => s.sessionId === currentSessionId,
       ) as any;
     } else {
       user.activeSessions = [] as any;
@@ -150,10 +176,10 @@ export async function revokeAllSessions(req: AuthenticatedRequest, res: Response
 
     await SecurityEvents.create({
       user: req.user.userId,
-      eventType: 'all_sessions_revoked',
-      severity: 'warning',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      eventType: "all_sessions_revoked",
+      severity: "warning",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     emitToUser(req.user!.userId, WS.SECURITY.ALL_SESSIONS_REVOKED, {
@@ -161,7 +187,7 @@ export async function revokeAllSessions(req: AuthenticatedRequest, res: Response
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'All sessions revoked');
+    sendSuccess(res, null, "All sessions revoked");
   } catch (error) {
     next(error);
   }
@@ -171,21 +197,25 @@ export async function revokeAllSessions(req: AuthenticatedRequest, res: Response
 // TWO-FACTOR AUTHENTICATION
 // ============================================================================
 
-export async function setup2FA(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function setup2FA(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     if (user.twoFactorEnabled) {
-      throw new ValidationError('2FA is already enabled');
+      throw new ValidationError("2FA is already enabled");
     }
 
     // Generate secret
     const secret = speakeasy.generateSecret({
       name: `Remit (${user.email})`,
-      issuer: 'Remit',
+      issuer: "Remit",
     });
 
     // Store temporarily (encrypted)
@@ -197,62 +227,67 @@ export async function setup2FA(req: AuthenticatedRequest, res: Response, next: N
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url!);
 
     emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_ENABLED, {
-      step: 'setup_initiated',
+      step: "setup_initiated",
       timestamp: new Date().toISOString(),
     });
 
     sendSuccess(res, {
       secret: secret.base32,
       qrCode: qrCodeUrl,
-      message: 'Scan the QR code with your authenticator app, then verify with a code.',
+      message:
+        "Scan the QR code with your authenticator app, then verify with a code.",
     });
   } catch (error) {
     next(error);
   }
 }
 
-export async function verify2FASetup(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function verify2FASetup(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { code } = req.body;
 
     const user: any = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     if (!user.twoFactorSecret || !(user as any).twoFactorPending) {
-      throw new ValidationError('2FA setup not initiated');
+      throw new ValidationError("2FA setup not initiated");
     }
 
     const secret = decrypt(String(user.twoFactorSecret));
     const verified = speakeasy.totp.verify({
       secret,
-      encoding: 'base32',
+      encoding: "base32",
       token: code,
     });
 
     if (!verified) {
-      throw new ValidationError('Invalid verification code');
+      throw new ValidationError("Invalid verification code");
     }
 
     // Generate backup codes
     const backupCodes = Array.from({ length: 10 }, () =>
-      Math.random().toString(36).substring(2, 10).toUpperCase()
+      Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
 
     user.twoFactorEnabled = true;
     (user as any).twoFactorPending = false;
-    user.backupCodes = backupCodes.map(code => encrypt(code)) as any;
+    user.backupCodes = backupCodes.map((code) => encrypt(code)) as any;
     (user as any).twoFactorEnabledAt = new Date();
     await user.save();
 
     // Log security event
     await SecurityEvents.create({
       user: req.user.userId,
-      eventType: '2fa_enabled',
-      severity: 'info',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      eventType: "2fa_enabled",
+      severity: "info",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     // Send confirmation email using template
@@ -260,7 +295,7 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
       firstName: String(user.firstName),
       email: String(user.email),
       enabledAt: new Date().toISOString(),
-      method: 'authenticator',
+      method: "authenticator",
       backupCodes,
       userId: String(user._id),
     });
@@ -268,51 +303,62 @@ export async function verify2FASetup(req: AuthenticatedRequest, res: Response, n
     sendTemplatedMail(String(user.email), emailContent).catch(console.error);
 
     emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_ENABLED, {
-      step: 'confirmed',
+      step: "confirmed",
       enabled: true,
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, {
-      enabled: true,
-      backupCodes,
-      message: 'Save your backup codes in a secure location.',
-    }, '2FA enabled successfully');
+    sendSuccess(
+      res,
+      {
+        enabled: true,
+        backupCodes,
+        message: "Save your backup codes in a secure location.",
+      },
+      "2FA enabled successfully",
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function disable2FA(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function disable2FA(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { code, password } = req.body;
 
-    const user: any = await Users.findById(req.user.userId).select('+password');
-    if (!user) throw new NotFoundError('User not found');
+    const user: any = await Users.findById(req.user.userId).select("+password");
+    if (!user) throw new NotFoundError("User not found");
 
     if (!user.twoFactorEnabled) {
-      throw new ValidationError('2FA is not enabled');
+      throw new ValidationError("2FA is not enabled");
     }
 
     // Verify password
-    const bcrypt = await import('bcryptjs');
-    const isPasswordValid = await bcrypt.compare(password, String(user.password));
+    const bcrypt = await import("bcryptjs");
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      String(user.password),
+    );
     if (!isPasswordValid) {
-      throw new ValidationError('Invalid password');
+      throw new ValidationError("Invalid password");
     }
 
     // Verify 2FA code
     const secret = decrypt(String(user.twoFactorSecret));
     const verified = speakeasy.totp.verify({
       secret,
-      encoding: 'base32',
+      encoding: "base32",
       token: code,
     });
 
     if (!verified) {
-      throw new ValidationError('Invalid 2FA code');
+      throw new ValidationError("Invalid 2FA code");
     }
 
     user.twoFactorEnabled = false;
@@ -323,10 +369,10 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
 
     await SecurityEvents.create({
       user: req.user.userId,
-      eventType: '2fa_disabled',
-      severity: 'warning',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      eventType: "2fa_disabled",
+      severity: "warning",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
     // Send notification email using template
@@ -334,7 +380,7 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
       firstName: String(user.firstName),
       email: String(user.email),
       disabledAt: new Date().toISOString(),
-      ipAddress: req.ip || 'Unknown',
+      ipAddress: req.ip || "Unknown",
       userId: String(user._id),
     });
 
@@ -344,54 +390,58 @@ export async function disable2FA(req: AuthenticatedRequest, res: Response, next:
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, '2FA disabled successfully');
+    sendSuccess(res, null, "2FA disabled successfully");
   } catch (error) {
     next(error);
   }
 }
 
-export async function regenerateBackupCodes(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function regenerateBackupCodes(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { code } = req.body;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     if (!user.twoFactorEnabled) {
-      throw new ValidationError('2FA is not enabled');
+      throw new ValidationError("2FA is not enabled");
     }
 
     // Verify 2FA code
     const secret = decrypt(String(user.twoFactorSecret));
     const verified = speakeasy.totp.verify({
       secret,
-      encoding: 'base32',
+      encoding: "base32",
       token: code,
     });
 
     if (!verified) {
-      throw new ValidationError('Invalid 2FA code');
+      throw new ValidationError("Invalid 2FA code");
     }
 
     // Generate new backup codes
     const backupCodes = Array.from({ length: 10 }, () =>
-      Math.random().toString(36).substring(2, 10).toUpperCase()
+      Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
 
-    user.backupCodes = backupCodes.map(code => encrypt(code)) as any;
+    user.backupCodes = backupCodes.map((code) => encrypt(code)) as any;
     await user.save();
 
     await SecurityEvents.create({
       user: req.user.userId,
-      eventType: 'backup_codes_regenerated',
-      severity: 'info',
-      ipAddress: req.ip || '',
-      userAgent: req.headers['user-agent'] || '',
+      eventType: "backup_codes_regenerated",
+      severity: "info",
+      ipAddress: req.ip || "",
+      userAgent: req.headers["user-agent"] || "",
     });
 
-    sendSuccess(res, { backupCodes }, 'Backup codes regenerated');
+    sendSuccess(res, { backupCodes }, "Backup codes regenerated");
   } catch (error) {
     next(error);
   }
@@ -401,15 +451,21 @@ export async function regenerateBackupCodes(req: AuthenticatedRequest, res: Resp
 // SECURITY ALERTS
 // ============================================================================
 
-export async function getSecurityAlerts(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getSecurityAlerts(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const alerts = await SecurityEvents.find({
       user: req.user.userId,
-      severity: { $in: ['warning', 'critical'] },
+      severity: { $in: ["warning", "critical"] },
     })
-      .select('eventType severity status description ipAddress location timestamp createdAt')
+      .select(
+        "eventType severity status description ipAddress location timestamp createdAt",
+      )
       .sort({ timestamp: -1 })
       .limit(50)
       .lean();
@@ -424,12 +480,16 @@ export async function getSecurityAlerts(req: AuthenticatedRequest, res: Response
 // TRUSTED DEVICES
 // ============================================================================
 
-export async function getTrustedDevices(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getTrustedDevices(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     sendSuccess(res, { devices: (user.trustedDevices as any[]) || [] });
   } catch (error) {
@@ -437,28 +497,32 @@ export async function getTrustedDevices(req: AuthenticatedRequest, res: Response
   }
 }
 
-export async function addTrustedDevice(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function addTrustedDevice(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { deviceName } = req.body;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const trustedDevices = (user.trustedDevices as any[]) || [];
 
     // Check limit
     if (trustedDevices.length >= 10) {
-      throw new ForbiddenError('Maximum 10 trusted devices allowed');
+      throw new ForbiddenError("Maximum 10 trusted devices allowed");
     }
 
-    const deviceId = require('crypto').randomBytes(16).toString('hex');
+    const deviceId = require("crypto").randomBytes(16).toString("hex");
 
     trustedDevices.push({
       deviceId,
-      deviceName: deviceName || 'Unknown Device',
-      userAgent: req.headers['user-agent'],
+      deviceName: deviceName || "Unknown Device",
+      userAgent: req.headers["user-agent"],
       ipAddress: req.ip,
       addedAt: new Date(),
       lastUsed: new Date(),
@@ -469,36 +533,40 @@ export async function addTrustedDevice(req: AuthenticatedRequest, res: Response,
 
     emitToUser(req.user!.userId, WS.SECURITY.TRUSTED_DEVICE_ADDED, {
       deviceId,
-      deviceName: deviceName || 'Unknown Device',
+      deviceName: deviceName || "Unknown Device",
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { deviceId }, 'Device added to trusted devices');
+    sendSuccess(res, { deviceId }, "Device added to trusted devices");
   } catch (error) {
     next(error);
   }
 }
 
-export async function removeTrustedDevice(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function removeTrustedDevice(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { deviceId } = req.params;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const trustedDevices = (user.trustedDevices as any[]) || [];
     if (!trustedDevices.length) {
-      throw new NotFoundError('Device not found');
+      throw new NotFoundError("Device not found");
     }
 
     const deviceIndex = trustedDevices.findIndex(
-      (d: any) => d.deviceId === deviceId
+      (d: any) => d.deviceId === deviceId,
     );
 
     if (deviceIndex === -1) {
-      throw new NotFoundError('Device not found');
+      throw new NotFoundError("Device not found");
     }
 
     trustedDevices.splice(deviceIndex, 1);
@@ -510,7 +578,7 @@ export async function removeTrustedDevice(req: AuthenticatedRequest, res: Respon
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, null, 'Device removed from trusted devices');
+    sendSuccess(res, null, "Device removed from trusted devices");
   } catch (error) {
     next(error);
   }
@@ -520,15 +588,21 @@ export async function removeTrustedDevice(req: AuthenticatedRequest, res: Respon
 // SECURITY SETTINGS
 // ============================================================================
 
-export async function getSecuritySettings(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getSecuritySettings(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId)
-      .select('twoFactorEnabled securitySettings lastPasswordChange email emailVerified phone phoneVerified')
+      .select(
+        "twoFactorEnabled securitySettings lastPasswordChange email emailVerified phone phoneVerified",
+      )
       .lean();
 
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const securitySettings = (user.securitySettings as any) || {};
 
@@ -539,7 +613,8 @@ export async function getSecuritySettings(req: AuthenticatedRequest, res: Respon
         phoneVerified: (user as any).phoneVerified || false,
         lastPasswordChange: (user as any).lastPasswordChange,
         loginNotifications: securitySettings.loginNotifications ?? true,
-        transactionNotifications: securitySettings.transactionNotifications ?? true,
+        transactionNotifications:
+          securitySettings.transactionNotifications ?? true,
         marketingEmails: securitySettings.marketingEmails ?? false,
       },
     });
@@ -548,14 +623,19 @@ export async function getSecuritySettings(req: AuthenticatedRequest, res: Respon
   }
 }
 
-export async function updateSecuritySettings(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateSecuritySettings(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { loginNotifications, transactionNotifications, marketingEmails } = req.body;
+    const { loginNotifications, transactionNotifications, marketingEmails } =
+      req.body;
 
     const user = await Users.findById(req.user.userId);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     const securitySettings = (user.securitySettings as any) || {};
 
@@ -572,7 +652,11 @@ export async function updateSecuritySettings(req: AuthenticatedRequest, res: Res
     user.securitySettings = securitySettings;
     await user.save();
 
-    sendSuccess(res, { settings: securitySettings }, 'Security settings updated');
+    sendSuccess(
+      res,
+      { settings: securitySettings },
+      "Security settings updated",
+    );
   } catch (error) {
     next(error);
   }
@@ -582,12 +666,16 @@ export async function updateSecuritySettings(req: AuthenticatedRequest, res: Res
 // ACCOUNT SECURITY SCORE
 // ============================================================================
 
-export async function getSecurityScore(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getSecurityScore(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const user = await Users.findById(req.user.userId).lean();
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) throw new NotFoundError("User not found");
 
     let score = 0;
     const recommendations: string[] = [];
@@ -596,28 +684,28 @@ export async function getSecurityScore(req: AuthenticatedRequest, res: Response,
     if (user.emailVerified) {
       score += 20;
     } else {
-      recommendations.push('Verify your email address');
+      recommendations.push("Verify your email address");
     }
 
     // Phone verified: +20
     if (user.phoneVerified) {
       score += 20;
     } else {
-      recommendations.push('Verify your phone number');
+      recommendations.push("Verify your phone number");
     }
 
     // 2FA enabled: +30
     if (user.twoFactorEnabled) {
       score += 30;
     } else {
-      recommendations.push('Enable two-factor authentication');
+      recommendations.push("Enable two-factor authentication");
     }
 
     // KYC approved: +20
-    if (user.kycStatus === 'approved') {
+    if (user.kycStatus === "approved") {
       score += 20;
     } else {
-      recommendations.push('Complete KYC verification');
+      recommendations.push("Complete KYC verification");
     }
 
     // Strong password (changed in last 90 days): +10
@@ -625,13 +713,20 @@ export async function getSecurityScore(req: AuthenticatedRequest, res: Response,
     if (user.lastPasswordChange && user.lastPasswordChange > ninetyDaysAgo) {
       score += 10;
     } else {
-      recommendations.push('Update your password regularly');
+      recommendations.push("Update your password regularly");
     }
 
     sendSuccess(res, {
       score,
       maxScore: 100,
-      level: score >= 80 ? 'excellent' : score >= 60 ? 'good' : score >= 40 ? 'fair' : 'needs_improvement',
+      level:
+        score >= 80
+          ? "excellent"
+          : score >= 60
+            ? "good"
+            : score >= 40
+              ? "fair"
+              : "needs_improvement",
       recommendations,
     });
   } catch (error) {

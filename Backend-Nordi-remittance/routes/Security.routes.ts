@@ -2,11 +2,20 @@
 // SECURITY ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import SecurityController from '../controllers/Security.controller.js';
-import { authenticate, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { authRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+import { Router } from "express";
+import SecurityController from "../controllers/Security.controller.js";
+import {
+  authenticate,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import {
+  authRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
 
 const router = Router();
 
@@ -25,14 +34,14 @@ router.use(verifyAccountStatus);
  * @desc    Get account security score
  * @access  Private
  */
-router.get('/score', SecurityController.getSecurityScore);
+router.get("/score", SecurityController.getSecurityScore);
 
 /**
  * @route   GET /api/security/settings
  * @desc    Get security settings
  * @access  Private
  */
-router.get('/settings', SecurityController.getSecuritySettings);
+router.get("/settings", SecurityController.getSecuritySettings);
 
 /**
  * @route   PUT /api/security/settings
@@ -40,9 +49,9 @@ router.get('/settings', SecurityController.getSecuritySettings);
  * @access  Private
  */
 router.put(
-  '/settings',
+  "/settings",
   auditLogMiddleware,
-  SecurityController.updateSecuritySettings
+  SecurityController.updateSecuritySettings,
 );
 
 /**
@@ -50,7 +59,7 @@ router.put(
  * @desc    Get security alerts
  * @access  Private
  */
-router.get('/alerts', SecurityController.getSecurityAlerts);
+router.get("/alerts", SecurityController.getSecurityAlerts);
 
 // ============================================================================
 // LOGIN HISTORY & SESSIONS
@@ -61,14 +70,14 @@ router.get('/alerts', SecurityController.getSecurityAlerts);
  * @desc    Get login history
  * @access  Private
  */
-router.get('/login-history', SecurityController.getLoginHistory);
+router.get("/login-history", SecurityController.getLoginHistory);
 
 /**
  * @route   GET /api/security/sessions
  * @desc    Get active sessions
  * @access  Private
  */
-router.get('/sessions', SecurityController.getActiveSessions);
+router.get("/sessions", SecurityController.getActiveSessions);
 
 /**
  * @route   DELETE /api/security/sessions/:sessionId
@@ -76,9 +85,9 @@ router.get('/sessions', SecurityController.getActiveSessions);
  * @access  Private
  */
 router.delete(
-  '/sessions/:sessionId',
+  "/sessions/:sessionId",
   auditLogMiddleware,
-  SecurityController.revokeSession
+  SecurityController.revokeSession,
 );
 
 /**
@@ -87,9 +96,9 @@ router.delete(
  * @access  Private
  */
 router.delete(
-  '/sessions',
+  "/sessions",
   auditLogMiddleware,
-  SecurityController.revokeAllSessions
+  SecurityController.revokeAllSessions,
 );
 
 // ============================================================================
@@ -102,10 +111,10 @@ router.delete(
  * @access  Private
  */
 router.post(
-  '/2fa/setup',
+  "/2fa/setup",
   authRateLimit,
   auditLogMiddleware,
-  SecurityController.setup2FA
+  SecurityController.setup2FA,
 );
 
 /**
@@ -114,10 +123,10 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/2fa/verify',
+  "/2fa/verify",
   authRateLimit,
   auditLogMiddleware,
-  SecurityController.verify2FASetup
+  SecurityController.verify2FASetup,
 );
 
 /**
@@ -126,10 +135,10 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/2fa/disable',
+  "/2fa/disable",
   authRateLimit,
   auditLogMiddleware,
-  SecurityController.disable2FA
+  SecurityController.disable2FA,
 );
 
 /**
@@ -138,10 +147,10 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/2fa/backup-codes',
+  "/2fa/backup-codes",
   authRateLimit,
   auditLogMiddleware,
-  SecurityController.regenerateBackupCodes
+  SecurityController.regenerateBackupCodes,
 );
 
 // ============================================================================
@@ -153,7 +162,7 @@ router.post(
  * @desc    Get trusted devices
  * @access  Private
  */
-router.get('/trusted-devices', SecurityController.getTrustedDevices);
+router.get("/trusted-devices", SecurityController.getTrustedDevices);
 
 /**
  * @route   POST /api/security/trusted-devices
@@ -161,9 +170,9 @@ router.get('/trusted-devices', SecurityController.getTrustedDevices);
  * @access  Private
  */
 router.post(
-  '/trusted-devices',
+  "/trusted-devices",
   auditLogMiddleware,
-  SecurityController.addTrustedDevice
+  SecurityController.addTrustedDevice,
 );
 
 /**
@@ -172,9 +181,9 @@ router.post(
  * @access  Private
  */
 router.delete(
-  '/trusted-devices/:deviceId',
+  "/trusted-devices/:deviceId",
   auditLogMiddleware,
-  SecurityController.removeTrustedDevice
+  SecurityController.removeTrustedDevice,
 );
 
 export default router;

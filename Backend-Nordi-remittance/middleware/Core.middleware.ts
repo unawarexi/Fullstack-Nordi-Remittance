@@ -5,7 +5,7 @@
 import { Request, Response, NextFunction } from "express";
 import { v4 as uuidv4 } from "uuid";
 import type { AuthenticatedRequest, DeviceInfo } from "../types/index.js";
-import { constants } from "../config/env.config.js";
+import { constants, env } from "../config/env.config.js";
 import {
   AppError,
   isAppError,
@@ -16,8 +16,8 @@ import {
   sendInternalError,
 } from "../core/helpers/response.helper.js";
 import { AuditLogs } from "../models/AuditModels.js";
-import { env } from "../config/env.config.js";
 import onHeaders from "on-headers";
+import Logger from "../logs/logger.js";
 
 // ============================================================================
 // REQUEST ID INJECTION
@@ -39,31 +39,54 @@ export function requestIdMiddleware(
 }
 
 // ============================================================================
-// REQUEST TIMING
+// REQUEST TIMING & LOGGING
 // ============================================================================
 
 /**
- * Track request timing for performance monitoring
+ * Track request timing and log HTTP details
  */
-export function requestTimingMiddleware(
+export function requestLoggingMiddleware(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ): void {
-  req.startTime = Date.now();
-
+  const startTime = process.hrtime();
+  
   onHeaders(res, () => {
-    const duration = Date.now() - (req.startTime || Date.now());
-    res.setHeader("X-Response-Time", `${duration}ms`);
+    const [seconds, nanoseconds] = process.hrtime(startTime);
+    const durationMs = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
+    res.setHeader("X-Response-Time", `${durationMs}ms`);
   });
 
   res.on("finish", () => {
-    const duration = Date.now() - (req.startTime || Date.now());
-    // Log slow requests
-    if (duration > 3000) {
-      console.warn(
-        `Slow request: ${req.method} ${req.originalUrl} - ${duration}ms`,
-      );
+    const [seconds, nanoseconds] = process.hrtime(startTime);
+    const durationMs = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
+
+    // Skip health check and metrics noise in info/http logs
+    const isNoise = req.originalUrl === "/health" || req.originalUrl === "/metrics";
+
+    const logData = {
+      requestId: req.requestId,
+      method: req.method,
+      url: req.originalUrl,
+      status: res.statusCode,
+      duration: `${durationMs}ms`,
+      ip: req.clientIp,
+      userAgent: req.headers["user-agent"],
+      userId: req.user?.userId,
+    };
+
+    if (res.statusCode >= 500) {
+      Logger.error(`HTTP ${res.statusCode} - ${req.method} ${req.originalUrl}`, logData);
+    } else if (res.statusCode >= 400) {
+      Logger.warn(`HTTP ${res.statusCode} - ${req.method} ${req.originalUrl}`, logData);
+    } else if (!isNoise) {
+      Logger.http(`HTTP ${res.statusCode} - ${req.method} ${req.originalUrl}`, logData);
+    }
+
+    // Proactive warning for slow requests
+    if (parseFloat(durationMs) > 3000) {
+      Logger.warn(`Slow request detected: ${req.method} ${req.originalUrl} (${durationMs}ms)`);
     }
   });
 
@@ -130,10 +153,8 @@ function detectDeviceType(userAgent: string): string {
 }
 
 function detectOS(userAgent: string): string {
-  // Check mobile OS first (more specific patterns)
   if (/iphone|ipad|ipod/i.test(userAgent)) return "iOS";
   if (/android/i.test(userAgent)) return "Android";
-  // Then check desktop OS
   if (/windows/i.test(userAgent)) return "Windows";
   if (/macintosh|mac os x/i.test(userAgent)) return "MacOS";
   if (/linux/i.test(userAgent)) return "Linux";
@@ -150,43 +171,6 @@ function detectBrowser(userAgent: string): string {
 }
 
 // ============================================================================
-// REQUEST LOGGING
-// ============================================================================
-
-/**
- * Log all incoming requests
- */
-export function requestLoggingMiddleware(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction,
-): void {
-  const startTime = Date.now();
-
-  res.on("finish", () => {
-    const duration = Date.now() - startTime;
-    const logData = {
-      requestId: req.requestId,
-      method: req.method,
-      url: req.originalUrl,
-      status: res.statusCode,
-      duration: `${duration}ms`,
-      ip: req.clientIp,
-      userAgent: req.headers["user-agent"],
-      userId: req.user?.userId,
-    };
-
-    if (res.statusCode >= 400) {
-      console.error("Request Error:", JSON.stringify(logData));
-    } else if (env.NODE_ENV === "development") {
-      console.log("Request:", JSON.stringify(logData));
-    }
-  });
-
-  next();
-}
-
-// ============================================================================
 // GLOBAL ERROR HANDLER
 // ============================================================================
 
@@ -199,17 +183,16 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ): void {
-  // Log the error
-  console.error("Error:", {
+  const logData = {
     requestId: req.requestId,
-    message: error.message,
-    stack: env.NODE_ENV === "development" ? error.stack : undefined,
     url: req.originalUrl,
     method: req.method,
     userId: req.user?.userId,
-  });
+    stack: env.NODE_ENV === "development" ? error.stack : undefined,
+  };
 
-  // Handle operational errors
+  Logger.error(`Unhandled Error: ${error.message}`, logData);
+
   if (isAppError(error)) {
     const response = createErrorResponse(error);
     res.status(error.statusCode).json({
@@ -222,7 +205,7 @@ export function errorHandler(
     return;
   }
 
-  // Handle Mongoose validation errors
+  // Mongoose validation errors
   if (error.name === "ValidationError") {
     sendError(res, "Validation failed", "VALIDATION_ERROR", 400, {
       details: (error as any).errors,
@@ -230,22 +213,14 @@ export function errorHandler(
     return;
   }
 
-  // Handle Mongoose cast errors (invalid ObjectId, etc.)
-  if (error.name === "CastError") {
-    sendError(res, "Invalid resource identifier", "INVALID_ID", 400);
-    return;
-  }
-
-  // Handle Mongoose duplicate key errors
+  // Mongoose duplicate key errors
   if ((error as any).code === 11000) {
     const field = Object.keys((error as any).keyValue || {})[0] || "field";
-    sendError(res, `Duplicate value for ${field}`, "DUPLICATE_ENTRY", 409, {
-      field,
-    });
+    sendError(res, `Duplicate value for ${field}`, "DUPLICATE_ENTRY", 409, { field });
     return;
   }
 
-  // Handle JWT errors
+  // JWT errors
   if (error.name === "JsonWebTokenError") {
     sendError(res, "Invalid token", "TOKEN_INVALID", 401);
     return;
@@ -259,9 +234,7 @@ export function errorHandler(
   // Generic server error
   sendInternalError(
     res,
-    env.NODE_ENV === "production"
-      ? "An unexpected error occurred"
-      : error.message,
+    env.NODE_ENV === "production" ? "An unexpected error occurred" : error.message,
   );
 }
 
@@ -269,9 +242,6 @@ export function errorHandler(
 // 404 NOT FOUND HANDLER
 // ============================================================================
 
-/**
- * Handle 404 - Route not found
- */
 export function notFoundHandler(
   req: Request,
   res: Response,
@@ -289,38 +259,23 @@ export function notFoundHandler(
 // AUDIT LOGGING
 // ============================================================================
 
-/**
- * Log important actions to audit trail
- */
 export async function auditLogMiddleware(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  // Only audit mutating requests
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
     return next();
   }
 
-  // Skip certain paths
   const skipPaths = ["/health", "/api/v1/auth/refresh"];
   if (skipPaths.some((path) => req.originalUrl.includes(path))) {
     return next();
   }
 
-  const originalJson = res.json.bind(res);
-  let responseBody: any;
-
-  res.json = function (body: any) {
-    responseBody = body;
-    return originalJson(body);
-  };
-
   res.on("finish", async () => {
     try {
-      // Determine action from URL and method
       const action = determineAction(req.method, req.originalUrl);
-
       await AuditLogs.create({
         eventType: "user_action",
         action,
@@ -339,7 +294,7 @@ export async function auditLogMiddleware(
         },
       });
     } catch (error) {
-      console.error("Failed to create audit log:", error);
+      Logger.error("Failed to create audit log", { error });
     }
   });
 
@@ -351,28 +306,23 @@ function determineAction(method: string, url: string): string {
   const resource = parts[2] || "resource";
 
   switch (method) {
-    case "POST":
-      return `create_${resource}`;
+    case "POST": return `create_${resource}`;
     case "PUT":
-    case "PATCH":
-      return `update_${resource}`;
-    case "DELETE":
-      return `delete_${resource}`;
-    default:
-      return `${method.toLowerCase()}_${resource}`;
+    case "PATCH": return `update_${resource}`;
+    case "DELETE": return `delete_${resource}`;
+    default: return `${method.toLowerCase()}_${resource}`;
   }
 }
 
 // ============================================================================
-// EXPORT DEFAULT
+// EXPORTS
 // ============================================================================
 
 export default {
   requestIdMiddleware,
-  requestTimingMiddleware,
+  requestLoggingMiddleware,
   clientIpMiddleware,
   deviceInfoMiddleware,
-  requestLoggingMiddleware,
   errorHandler,
   notFoundHandler,
   auditLogMiddleware,

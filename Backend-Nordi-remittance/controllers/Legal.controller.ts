@@ -2,25 +2,33 @@
 // LEGAL CONTROLLER
 // ============================================================================
 
-import { Response, NextFunction } from 'express';
-import type { AuthenticatedRequest } from '../types/index.js';
-import { 
-  LegalDocuments, 
-  UserConsents, 
-  Disputes, 
+import { Response, NextFunction } from "express";
+import type { AuthenticatedRequest } from "../types/index.js";
+import {
+  LegalDocuments,
+  UserConsents,
+  Disputes,
   RegulatoryReports,
   PolicyVersions,
   DisputeClaims,
-  RegulatoryFilings
-} from '../models/LegalReportsModel.js';
-import Users from '../models/UserModel.js';
-import Transactions from '../models/TransactionModel.js';
-import { sendSuccess, sendCreated, sendPaginated } from '../core/helpers/response.helper.js';
-import { UnauthorizedError, ValidationError, NotFoundError } from '../core/errors/AppError.js';
-import { sendTemplatedMail } from '../services/Mailer.service.js';
-import EmailContentGenerator  from '../core/mail/Mail-content.js';
-import { emitToUser } from '../services/Websocket.service.js';
-import { WS } from '../core/constants/ws-events.js';
+  RegulatoryFilings,
+} from "../models/LegalReportsModel.js";
+import Users from "../models/UserModel.js";
+import Transactions from "../models/TransactionModel.js";
+import {
+  sendSuccess,
+  sendCreated,
+  sendPaginated,
+} from "../core/helpers/response.helper.js";
+import {
+  UnauthorizedError,
+  ValidationError,
+  NotFoundError,
+} from "../core/errors/AppError.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { emitToUser } from "../services/websocket.service.js";
+import { WS } from "../core/constants/ws-events.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -29,13 +37,17 @@ const emailGenerator = new EmailContentGenerator();
 // LEGAL DOCUMENTS
 // ============================================================================
 
-export async function getLegalDocuments(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getLegalDocuments(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    const filter: any = { status: 'active' };
+    const filter: any = { status: "active" };
     if (req.query.type) filter.documentType = req.query.type;
 
     const documents = await LegalDocuments.find(filter)
-      .select('title documentType version effectiveDate summary')
+      .select("title documentType version effectiveDate summary")
       .sort({ documentType: 1, effectiveDate: -1 })
       .lean();
 
@@ -45,12 +57,16 @@ export async function getLegalDocuments(req: AuthenticatedRequest, res: Response
   }
 }
 
-export async function getLegalDocumentById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getLegalDocumentById(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const { id } = req.params;
 
     const document = await LegalDocuments.findById(id).lean();
-    if (!document) throw new NotFoundError('Document not found');
+    if (!document) throw new NotFoundError("Document not found");
 
     sendSuccess(res, { document });
   } catch (error) {
@@ -58,18 +74,22 @@ export async function getLegalDocumentById(req: AuthenticatedRequest, res: Respo
   }
 }
 
-export async function getLegalDocumentByType(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getLegalDocumentByType(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const { type } = req.params; // 'terms' | 'privacy' | 'cookie' | 'aml' | etc.
 
     const document = await LegalDocuments.findOne({
       documentType: type,
-      status: 'active',
+      status: "active",
     })
       .sort({ effectiveDate: -1 })
       .lean();
 
-    if (!document) throw new NotFoundError('Document not found');
+    if (!document) throw new NotFoundError("Document not found");
 
     sendSuccess(res, { document });
   } catch (error) {
@@ -77,24 +97,28 @@ export async function getLegalDocumentByType(req: AuthenticatedRequest, res: Res
   }
 }
 
-export async function createLegalDocument(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createLegalDocument(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { 
-      title, 
-      documentType, 
-      content, 
-      summary, 
-      version, 
+    const {
+      title,
+      documentType,
+      content,
+      summary,
+      version,
       effectiveDate,
       requiresConsent,
     } = req.body;
 
     // Deactivate previous versions
     await LegalDocuments.updateMany(
-      { documentType, status: 'active' },
-      { status: 'archived' }
+      { documentType, status: "active" },
+      { status: "archived" },
     );
 
     const document = new LegalDocuments({
@@ -105,7 +129,7 @@ export async function createLegalDocument(req: AuthenticatedRequest, res: Respon
       version,
       effectiveDate: effectiveDate ? new Date(effectiveDate) : new Date(),
       requiresConsent: requiresConsent !== false,
-      status: 'active',
+      status: "active",
       createdBy: req.user.userId,
     });
 
@@ -116,26 +140,30 @@ export async function createLegalDocument(req: AuthenticatedRequest, res: Respon
       documentType,
       version,
       documentId: document._id,
-      changes: req.body.changes || 'New version published',
+      changes: req.body.changes || "New version published",
       effectiveDate: document.effectiveDate,
       createdBy: req.user.userId,
     });
 
-    sendCreated(res, { document }, 'Legal document created');
+    sendCreated(res, { document }, "Legal document created");
   } catch (error) {
     next(error);
   }
 }
 
-export async function updateLegalDocument(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateLegalDocument(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { title, content, summary, status } = req.body;
 
     const document = await LegalDocuments.findById(id);
-    if (!document) throw new NotFoundError('Document not found');
+    if (!document) throw new NotFoundError("Document not found");
 
     if (title) document.title = title;
     if (content) document.content = content;
@@ -145,7 +173,7 @@ export async function updateLegalDocument(req: AuthenticatedRequest, res: Respon
     document.updatedBy = req.user.userId;
     await document.save();
 
-    sendSuccess(res, { document }, 'Document updated');
+    sendSuccess(res, { document }, "Document updated");
   } catch (error) {
     next(error);
   }
@@ -155,12 +183,16 @@ export async function updateLegalDocument(req: AuthenticatedRequest, res: Respon
 // USER CONSENTS
 // ============================================================================
 
-export async function getUserConsents(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getUserConsents(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const consents = await UserConsents.find({ user: req.user.userId })
-      .populate('document', 'title documentType version')
+      .populate("document", "title documentType version")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -170,14 +202,18 @@ export async function getUserConsents(req: AuthenticatedRequest, res: Response, 
   }
 }
 
-export async function recordConsent(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function recordConsent(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { documentId, consentType, accepted } = req.body;
 
     const document = await LegalDocuments.findById(documentId);
-    if (!document) throw new NotFoundError('Document not found');
+    if (!document) throw new NotFoundError("Document not found");
 
     // Check if consent already exists
     const existingConsent = await UserConsents.findOne({
@@ -188,11 +224,11 @@ export async function recordConsent(req: AuthenticatedRequest, res: Response, ne
     if (existingConsent) {
       existingConsent.accepted = accepted;
       existingConsent.consentDate = new Date();
-      existingConsent.ipAddress = req.ip || '';
-      existingConsent.userAgent = req.headers['user-agent'] || '';
+      existingConsent.ipAddress = req.ip || "";
+      existingConsent.userAgent = req.headers["user-agent"] || "";
       await existingConsent.save();
 
-      sendSuccess(res, { consent: existingConsent }, 'Consent updated');
+      sendSuccess(res, { consent: existingConsent }, "Consent updated");
       return;
     }
 
@@ -201,24 +237,28 @@ export async function recordConsent(req: AuthenticatedRequest, res: Response, ne
       document: documentId,
       documentType: document.documentType,
       documentVersion: document.version,
-      consentType: consentType || 'explicit',
+      consentType: consentType || "explicit",
       accepted,
       consentDate: new Date(),
       ipAddress: req.ip,
-      userAgent: req.headers['user-agent'],
+      userAgent: req.headers["user-agent"],
     });
 
     await consent.save();
 
-    sendCreated(res, { consent }, 'Consent recorded');
+    sendCreated(res, { consent }, "Consent recorded");
   } catch (error) {
     next(error);
   }
 }
 
-export async function withdrawConsent(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function withdrawConsent(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { documentId } = req.params;
 
@@ -227,25 +267,29 @@ export async function withdrawConsent(req: AuthenticatedRequest, res: Response, 
       document: documentId,
     });
 
-    if (!consent) throw new NotFoundError('Consent not found');
+    if (!consent) throw new NotFoundError("Consent not found");
 
     consent.accepted = false;
     consent.withdrawnAt = new Date();
     await consent.save();
 
-    sendSuccess(res, { consent }, 'Consent withdrawn');
+    sendSuccess(res, { consent }, "Consent withdrawn");
   } catch (error) {
     next(error);
   }
 }
 
-export async function checkRequiredConsents(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function checkRequiredConsents(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     // Get all active documents requiring consent
     const requiredDocuments = await LegalDocuments.find({
-      status: 'active',
+      status: "active",
       requiresConsent: true,
     }).lean();
 
@@ -256,16 +300,16 @@ export async function checkRequiredConsents(req: AuthenticatedRequest, res: Resp
     }).lean();
 
     const consentedDocIds = new Set(
-      userConsents.map(c => c.document.toString())
+      userConsents.map((c) => c.document.toString()),
     );
 
     const pendingConsents = requiredDocuments.filter(
-      doc => !consentedDocIds.has(doc._id.toString())
+      (doc) => !consentedDocIds.has(doc._id.toString()),
     );
 
     sendSuccess(res, {
       allConsented: pendingConsents.length === 0,
-      pendingConsents: pendingConsents.map(doc => ({
+      pendingConsents: pendingConsents.map((doc) => ({
         id: doc._id,
         title: doc.title,
         type: doc.documentType,
@@ -281,12 +325,16 @@ export async function checkRequiredConsents(req: AuthenticatedRequest, res: Resp
 // DISPUTE CLAIMS
 // ============================================================================
 
-export async function getDisputeClaims(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getDisputeClaims(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const claims = await DisputeClaims.find({ user: req.user.userId })
-      .populate('transaction', 'reference amount type')
+      .populate("transaction", "reference amount type")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -296,11 +344,21 @@ export async function getDisputeClaims(req: AuthenticatedRequest, res: Response,
   }
 }
 
-export async function createDisputeClaim(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createDisputeClaim(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { transactionId, reason, description, expectedResolution, attachments } = req.body;
+    const {
+      transactionId,
+      reason,
+      description,
+      expectedResolution,
+      attachments,
+    } = req.body;
 
     // Verify transaction belongs to user
     const transaction = await Transactions.findOne({
@@ -308,16 +366,18 @@ export async function createDisputeClaim(req: AuthenticatedRequest, res: Respons
       $or: [{ sender: req.user.userId }, { recipient: req.user.userId }],
     });
 
-    if (!transaction) throw new NotFoundError('Transaction not found');
+    if (!transaction) throw new NotFoundError("Transaction not found");
 
     // Check if dispute already exists
     const existingDispute = await DisputeClaims.findOne({
       transaction: transactionId,
-      status: { $nin: ['closed', 'resolved', 'rejected'] },
+      status: { $nin: ["closed", "resolved", "rejected"] },
     });
 
     if (existingDispute) {
-      throw new ValidationError('A dispute already exists for this transaction');
+      throw new ValidationError(
+        "A dispute already exists for this transaction",
+      );
     }
 
     const claim = new DisputeClaims({
@@ -328,13 +388,15 @@ export async function createDisputeClaim(req: AuthenticatedRequest, res: Respons
       description,
       expectedResolution,
       attachments: attachments || [],
-      status: 'submitted',
-      priority: 'medium',
-      timeline: [{
-        action: 'submitted',
-        timestamp: new Date(),
-        notes: 'Dispute claim submitted',
-      }],
+      status: "submitted",
+      priority: "medium",
+      timeline: [
+        {
+          action: "submitted",
+          timestamp: new Date(),
+          notes: "Dispute claim submitted",
+        },
+      ],
     });
 
     await claim.save();
@@ -345,11 +407,12 @@ export async function createDisputeClaim(req: AuthenticatedRequest, res: Respons
       const emailContent = emailGenerator.disputeClaimEmail({
         userName: `${user.firstName} ${user.lastName}`,
         claimId: claim.claimId || claim._id.toString(),
-        transactionId: transaction.referenceNumber || (transaction._id as any).toString(),
+        transactionId:
+          transaction.referenceNumber || (transaction._id as any).toString(),
         amount: String(transaction.amount),
-        currency: transaction.currency || 'USD',
+        currency: transaction.currency || "USD",
         claimType: claim.claimType,
-        status: 'submitted',
+        status: "submitted",
         submittedAt: new Date().toISOString(),
       });
 
@@ -362,22 +425,30 @@ export async function createDisputeClaim(req: AuthenticatedRequest, res: Respons
       timestamp: new Date().toISOString(),
     });
 
-    sendCreated(res, {
-      claim: {
-        id: claim._id,
-        claimId: claim.claimId,
-        status: claim.status,
-        createdAt: claim.createdAt,
+    sendCreated(
+      res,
+      {
+        claim: {
+          id: claim._id,
+          claimId: claim.claimId,
+          status: claim.status,
+          createdAt: claim.createdAt,
+        },
       },
-    }, 'Dispute claim submitted successfully');
+      "Dispute claim submitted successfully",
+    );
   } catch (error) {
     next(error);
   }
 }
 
-export async function getDisputeClaimById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getDisputeClaimById(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
 
@@ -385,10 +456,10 @@ export async function getDisputeClaimById(req: AuthenticatedRequest, res: Respon
       $or: [{ _id: id }, { claimId: id }],
       user: req.user.userId,
     })
-      .populate('transaction')
+      .populate("transaction")
       .lean();
 
-    if (!claim) throw new NotFoundError('Dispute claim not found');
+    if (!claim) throw new NotFoundError("Dispute claim not found");
 
     sendSuccess(res, { claim });
   } catch (error) {
@@ -396,9 +467,13 @@ export async function getDisputeClaimById(req: AuthenticatedRequest, res: Respon
   }
 }
 
-export async function addDisputeComment(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function addDisputeComment(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
     const { comment, attachments } = req.body;
@@ -408,14 +483,14 @@ export async function addDisputeComment(req: AuthenticatedRequest, res: Response
       user: req.user.userId,
     });
 
-    if (!claim) throw new NotFoundError('Dispute claim not found');
+    if (!claim) throw new NotFoundError("Dispute claim not found");
 
-    if (claim.status === 'closed' || claim.status === 'resolved') {
-      throw new ValidationError('Cannot add comments to closed disputes');
+    if (claim.status === "closed" || claim.status === "resolved") {
+      throw new ValidationError("Cannot add comments to closed disputes");
     }
 
     claim.timeline.push({
-      action: 'comment_added',
+      action: "comment_added",
       timestamp: new Date(),
       notes: comment,
       performedBy: req.user.userId,
@@ -424,7 +499,7 @@ export async function addDisputeComment(req: AuthenticatedRequest, res: Response
 
     await claim.save();
 
-    sendSuccess(res, { claim }, 'Comment added');
+    sendSuccess(res, { claim }, "Comment added");
   } catch (error) {
     next(error);
   }
@@ -434,9 +509,13 @@ export async function addDisputeComment(req: AuthenticatedRequest, res: Response
 // ADMIN: DISPUTE MANAGEMENT
 // ============================================================================
 
-export async function getAllDisputeClaims(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getAllDisputeClaims(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
@@ -448,9 +527,9 @@ export async function getAllDisputeClaims(req: AuthenticatedRequest, res: Respon
 
     const [claims, total] = await Promise.all([
       DisputeClaims.find(filter)
-        .populate('user', 'firstName lastName email')
-        .populate('transaction', 'reference amount type')
-        .populate('assignedTo', 'firstName lastName')
+        .populate("user", "firstName lastName email")
+        .populate("transaction", "reference amount type")
+        .populate("assignedTo", "firstName lastName")
         .sort({ priority: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -464,18 +543,23 @@ export async function getAllDisputeClaims(req: AuthenticatedRequest, res: Respon
   }
 }
 
-export async function updateDisputeClaim(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function updateDisputeClaim(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
-    const { status, priority, assignedTo, resolution, refundAmount, notes } = req.body;
+    const { status, priority, assignedTo, resolution, refundAmount, notes } =
+      req.body;
 
     const claim = await DisputeClaims.findById(id);
-    if (!claim) throw new NotFoundError('Dispute claim not found');
+    if (!claim) throw new NotFoundError("Dispute claim not found");
 
     const timelineEntry: any = {
-      action: 'status_updated',
+      action: "status_updated",
       timestamp: new Date(),
       performedBy: req.user.userId,
       notes: notes || `Status changed to ${status}`,
@@ -484,7 +568,7 @@ export async function updateDisputeClaim(req: AuthenticatedRequest, res: Respons
     if (status) {
       claim.status = status;
 
-      if (status === 'resolved' || status === 'closed') {
+      if (status === "resolved" || status === "closed") {
         claim.resolution = resolution;
         claim.closedAt = new Date();
 
@@ -507,11 +591,15 @@ export async function updateDisputeClaim(req: AuthenticatedRequest, res: Respons
       const emailContent = emailGenerator.disputeClaimEmail({
         userName: `${user.firstName} ${user.lastName}`,
         claimId: claim.claimId || claim._id.toString(),
-        transactionId: claim.transaction?.toString() || 'N/A',
+        transactionId: claim.transaction?.toString() || "N/A",
         amount: String(claim.amount || 0),
-        currency: claim.currency || 'USD',
+        currency: claim.currency || "USD",
         claimType: claim.claimType,
-        status: status as 'submitted' | 'under_review' | 'resolved' | 'rejected',
+        status: status as
+          | "submitted"
+          | "under_review"
+          | "resolved"
+          | "rejected",
         resolution: resolution || undefined,
         updatedAt: new Date().toISOString(),
       });
@@ -526,7 +614,7 @@ export async function updateDisputeClaim(req: AuthenticatedRequest, res: Respons
       timestamp: new Date().toISOString(),
     });
 
-    sendSuccess(res, { claim }, 'Dispute claim updated');
+    sendSuccess(res, { claim }, "Dispute claim updated");
   } catch (error) {
     next(error);
   }
@@ -536,9 +624,13 @@ export async function updateDisputeClaim(req: AuthenticatedRequest, res: Respons
 // REGULATORY FILINGS
 // ============================================================================
 
-export async function getRegulatoryFilings(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getRegulatoryFilings(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
@@ -550,7 +642,7 @@ export async function getRegulatoryFilings(req: AuthenticatedRequest, res: Respo
 
     const [filings, total] = await Promise.all([
       RegulatoryFilings.find(filter)
-        .populate('createdBy', 'firstName lastName')
+        .populate("createdBy", "firstName lastName")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -564,18 +656,22 @@ export async function getRegulatoryFilings(req: AuthenticatedRequest, res: Respo
   }
 }
 
-export async function createRegulatoryFiling(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createRegulatoryFiling(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { 
-      filingType, 
-      title, 
-      description, 
-      periodStart, 
-      periodEnd, 
-      data, 
-      attachments 
+    const {
+      filingType,
+      title,
+      description,
+      periodStart,
+      periodEnd,
+      data,
+      attachments,
     } = req.body;
 
     const filing = new RegulatoryFilings({
@@ -586,37 +682,41 @@ export async function createRegulatoryFiling(req: AuthenticatedRequest, res: Res
       periodEnd: new Date(periodEnd),
       data: data || {},
       attachments: attachments || [],
-      status: 'draft',
+      status: "draft",
       createdBy: req.user.userId,
     });
 
     await filing.save();
 
-    sendCreated(res, { filing }, 'Regulatory filing created');
+    sendCreated(res, { filing }, "Regulatory filing created");
   } catch (error) {
     next(error);
   }
 }
 
-export async function submitRegulatoryFiling(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function submitRegulatoryFiling(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { id } = req.params;
 
     const filing = await RegulatoryFilings.findById(id);
-    if (!filing) throw new NotFoundError('Filing not found');
+    if (!filing) throw new NotFoundError("Filing not found");
 
-    if (filing.status !== 'pending' && filing.status !== 'in_progress') {
-      throw new ValidationError('Filing has already been submitted');
+    if (filing.status !== "pending" && filing.status !== "in_progress") {
+      throw new ValidationError("Filing has already been submitted");
     }
 
-    filing.status = 'submitted';
+    filing.status = "submitted";
     filing.submittedAt = new Date();
     filing.submittedBy = req.user.userId;
     await filing.save();
 
-    sendSuccess(res, { filing }, 'Filing submitted');
+    sendSuccess(res, { filing }, "Filing submitted");
   } catch (error) {
     next(error);
   }
@@ -626,9 +726,13 @@ export async function submitRegulatoryFiling(req: AuthenticatedRequest, res: Res
 // POLICY VERSIONS
 // ============================================================================
 
-export async function getPolicyVersions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export async function getPolicyVersions(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    if (!req.user) throw new UnauthorizedError('Authentication required');
+    if (!req.user) throw new UnauthorizedError("Authentication required");
 
     const { type } = req.query;
 

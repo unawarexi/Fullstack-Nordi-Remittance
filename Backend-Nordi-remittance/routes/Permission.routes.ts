@@ -6,7 +6,7 @@
 // import PermissionController from '../controllers/Permission.controller.js';
 // import { authenticate, requireAdmin, requireSuperAdmin } from '../middleware/Auth.middleware.js';
 // import { sanitizeInput } from '../middleware/Security.middleware.js';
-// import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
+// import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/core.middleware.js';
 
 // const router = Router();
 

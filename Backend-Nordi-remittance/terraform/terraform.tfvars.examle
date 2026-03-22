@@ -1,12 +1,12 @@
 # ============================================================================
-# UrbanRide Navii — Example Terraform Variables
+# Nordi-Remittance — Example Terraform Variables
 # Copy this to terraform.tfvars and fill in your actual values
 # DO NOT commit terraform.tfvars to version control!
 # ============================================================================
 
 # General
 environment  = "production"
-project_name = "urbanride-navii"
+project_name = "nordi-remittance"
 
 # AWS
 aws_region         = "us-east-1"
@@ -14,7 +14,7 @@ vpc_cidr           = "10.0.0.0/16"
 availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
 
 # EKS
-cluster_name        = "navii-cluster"
+cluster_name        = "nordi-remittance-cluster"
 cluster_version     = "1.29"
 node_instance_types = ["t3.medium", "t3.large"]
 node_min_size       = 3
@@ -25,8 +25,8 @@ node_desired_size   = 3
 db_instance_class        = "db.t3.medium"
 db_allocated_storage     = 50
 db_max_allocated_storage = 200
-db_name                  = "urbanride_navii"
-db_username              = "navii_admin"
+db_name                  = "urbanride_nordi-remittance"
+db_username              = "nordi-remittance_admin"
 db_password              = "CHANGE_ME_USE_STRONG_PASSWORD"
 
 # ElastiCache Redis
@@ -36,4 +36,4 @@ redis_num_cache_nodes = 2
 # Cloudflare
 cloudflare_api_token = "your-cloudflare-api-token"
 cloudflare_zone_id   = "your-cloudflare-zone-id"
-domain_name          = "urbanride-navii.com"
+domain_name          = "nordi-remittance.com"

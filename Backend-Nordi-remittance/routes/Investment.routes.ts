@@ -2,12 +2,25 @@
 // INVESTMENT ROUTES
 // ============================================================================
 
-import { Router } from 'express';
-import InvestmentController from '../controllers/Investment.controller.js';
-import { authenticate, requireAdmin, verifyAccountStatus } from '../middleware/Auth.middleware.js';
-import { transactionRateLimit, sanitizeInput } from '../middleware/Security.middleware.js';
-import { requestLoggingMiddleware, auditLogMiddleware } from '../middleware/Core.middleware.js';
-import { requireKycVerified, enforceKycLimits } from '../middleware/Kyc.middleware.js';
+import { Router } from "express";
+import InvestmentController from "../controllers/Investment.controller.js";
+import {
+  authenticate,
+  requireAdmin,
+  verifyAccountStatus,
+} from "../middleware/auth.middleware.js";
+import {
+  transactionRateLimit,
+  sanitizeInput,
+} from "../middleware/security.middleware.js";
+import {
+  requestLoggingMiddleware,
+  auditLogMiddleware,
+} from "../middleware/core.middleware.js";
+import {
+  requireKycVerified,
+  enforceKycLimits,
+} from "../middleware/kyc.middleware.js";
 
 const router = Router();
 
@@ -26,7 +39,7 @@ router.use(verifyAccountStatus);
  * @desc    Get user's savings goals
  * @access  Private
  */
-router.get('/savings', InvestmentController.getSavingsGoals);
+router.get("/savings", InvestmentController.getSavingsGoals);
 
 /**
  * @route   POST /api/investments/savings
@@ -34,9 +47,9 @@ router.get('/savings', InvestmentController.getSavingsGoals);
  * @access  Private
  */
 router.post(
-  '/savings',
+  "/savings",
   auditLogMiddleware,
-  InvestmentController.createSavingsGoal
+  InvestmentController.createSavingsGoal,
 );
 
 /**
@@ -45,11 +58,11 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/savings/:goalId/deposit',
+  "/savings/:goalId/deposit",
   transactionRateLimit,
   enforceKycLimits,
   auditLogMiddleware,
-  InvestmentController.depositToGoal
+  InvestmentController.depositToGoal,
 );
 
 /**
@@ -58,10 +71,10 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/savings/:goalId/withdraw',
+  "/savings/:goalId/withdraw",
   transactionRateLimit,
   auditLogMiddleware,
-  InvestmentController.withdrawFromGoal
+  InvestmentController.withdrawFromGoal,
 );
 
 /**
@@ -70,9 +83,9 @@ router.post(
  * @access  Private
  */
 router.delete(
-  '/savings/:goalId',
+  "/savings/:goalId",
   auditLogMiddleware,
-  InvestmentController.deleteSavingsGoal
+  InvestmentController.deleteSavingsGoal,
 );
 
 // ============================================================================
@@ -84,7 +97,7 @@ router.delete(
  * @desc    Get user's investment account
  * @access  Private
  */
-router.get('/account', InvestmentController.getInvestmentAccount);
+router.get("/account", InvestmentController.getInvestmentAccount);
 
 /**
  * @route   POST /api/investments/account
@@ -92,10 +105,10 @@ router.get('/account', InvestmentController.getInvestmentAccount);
  * @access  Private
  */
 router.post(
-  '/account',
+  "/account",
   requireKycVerified,
   auditLogMiddleware,
-  InvestmentController.createInvestmentAccount
+  InvestmentController.createInvestmentAccount,
 );
 
 /**
@@ -103,21 +116,24 @@ router.post(
  * @desc    Get user's investment portfolio
  * @access  Private
  */
-router.get('/portfolio', InvestmentController.getPortfolio);
+router.get("/portfolio", InvestmentController.getPortfolio);
 
 /**
  * @route   GET /api/investments/portfolio/transactions
  * @desc    Get portfolio transaction history
  * @access  Private
  */
-router.get('/portfolio/transactions', InvestmentController.getPortfolioTransactions);
+router.get(
+  "/portfolio/transactions",
+  InvestmentController.getPortfolioTransactions,
+);
 
 /**
  * @route   GET /api/investments/summary
  * @desc    Get investment summary and performance
  * @access  Private
  */
-router.get('/summary', InvestmentController.getInvestmentSummary);
+router.get("/summary", InvestmentController.getInvestmentSummary);
 
 // ============================================================================
 // ASSETS & TRADING
@@ -128,14 +144,14 @@ router.get('/summary', InvestmentController.getInvestmentSummary);
  * @desc    Get available investment assets
  * @access  Private
  */
-router.get('/assets', InvestmentController.getAssets);
+router.get("/assets", InvestmentController.getAssets);
 
 /**
  * @route   GET /api/investments/assets/:assetId
  * @desc    Get specific asset details
  * @access  Private
  */
-router.get('/assets/:assetId', InvestmentController.getAssetById);
+router.get("/assets/:assetId", InvestmentController.getAssetById);
 
 /**
  * @route   POST /api/investments/buy
@@ -143,12 +159,12 @@ router.get('/assets/:assetId', InvestmentController.getAssetById);
  * @access  Private
  */
 router.post(
-  '/buy',
+  "/buy",
   transactionRateLimit,
   requireKycVerified,
   enforceKycLimits,
   auditLogMiddleware,
-  InvestmentController.buyAsset
+  InvestmentController.buyAsset,
 );
 
 /**
@@ -157,11 +173,11 @@ router.post(
  * @access  Private
  */
 router.post(
-  '/sell',
+  "/sell",
   transactionRateLimit,
   requireKycVerified,
   auditLogMiddleware,
-  InvestmentController.sellAsset
+  InvestmentController.sellAsset,
 );
 
 // ============================================================================
@@ -173,6 +189,6 @@ router.post(
  * @desc    Get available interest/investment plans
  * @access  Private
  */
-router.get('/plans', InvestmentController.getInterestPlans);
+router.get("/plans", InvestmentController.getInterestPlans);
 
 export default router;

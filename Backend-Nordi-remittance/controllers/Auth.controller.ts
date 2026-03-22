@@ -4,7 +4,7 @@ import type {
   UserRegistrationData,
 } from "../types/index.js";
 import Users from "../models/UserModel.js";
-import { uploadToCloudinary } from "../services/Cloudinary.service.js";
+import { uploadToCloudinary } from "../services/cloudinary.service";
 import { Wallets } from "../models/AccountsModel.js";
 import {
   ConfirmationToken,
@@ -50,10 +50,10 @@ import {
   UserAlreadyExistsError,
 } from "../core/errors/AppError.js";
 import { constants, HttpStatus, env } from "../config/env.config.js";
-import { sendTemplatedMail } from "../services/Mailer.service.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import mongoose from "mongoose";
-import { emitToUser, broadcast } from "../services/Websocket.service.js";
+import { emitToUser, broadcast } from "../services/websocket.service.js";
 import {
   createSession,
   deleteSession,
@@ -71,7 +71,8 @@ import {
   cacheUserWallets,
   CACHE_KEYS,
   CACHE_TTL,
-} from "../services/Redis.service.js";
+} from "../services/redis.service.js";
+import { getKafkaService, KafkaTopics } from "../services/kafka.service.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -255,6 +256,17 @@ export async function register(
       },
       "Registration successful. Please verify your email.",
     );
+
+    // Kafka Event - User Registered
+    const kafkaService = await getKafkaService();
+    await kafkaService.publish(KafkaTopics.USER_REGISTERED, {
+      userId: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      accountNumber: user.accountNumber,
+      timestamp: new Date().toISOString(),
+    });
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -545,6 +557,25 @@ export async function registerFullKyc(
       },
       "Registration successful",
     );
+
+    // Kafka Events - User Registered & KYC Submitted
+    const kafkaService = await getKafkaService();
+    await Promise.all([
+      kafkaService.publish(KafkaTopics.USER_REGISTERED, {
+        userId: user._id.toString(),
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        accountNumber: generatedAccountNumber,
+        isFullKyc: true,
+        timestamp: new Date().toISOString(),
+      }),
+      kafkaService.publish(KafkaTopics.KYC_SUBMITTED, {
+        userId: user._id.toString(),
+        idType,
+        timestamp: new Date().toISOString(),
+      }),
+    ]);
   } catch (error) {
     await session.abortTransaction();
     next(error);
@@ -587,9 +618,9 @@ export async function login(
     }
 
     // Find user
-    const user: any = await Users.findOne({ email: email.toLowerCase() }).select(
-      "+password +loginAttempts +lockUntil +twoFactorSecret",
-    );
+    const user: any = await Users.findOne({
+      email: email.toLowerCase(),
+    }).select("+password +loginAttempts +lockUntil +twoFactorSecret");
 
     if (!user) {
       // Track failed attempt in Redis
@@ -843,6 +874,16 @@ export async function login(
       },
       "Login successful",
     );
+
+    // Kafka Event - User Logged In
+    const kafkaService = await getKafkaService();
+    await kafkaService.publish(KafkaTopics.USER_LOGGED_IN, {
+      userId: user._id.toString(),
+      email: user.email,
+      ip: clientIp,
+      userAgent: req.headers["user-agent"],
+      timestamp: new Date().toISOString(),
+    });
   } catch (error) {
     next(error);
   }

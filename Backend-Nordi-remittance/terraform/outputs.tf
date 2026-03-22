@@ -1,5 +1,5 @@
 # ============================================================================
-# UrbanRide Navii — Terraform Outputs
+# Nordi-Remittance — Terraform Outputs
 # ============================================================================
 
 # --------------------------------------------------------------------------
@@ -49,18 +49,18 @@ output "kubeconfig_command" {
 # --------------------------------------------------------------------------
 output "db_endpoint" {
   description = "RDS PostgreSQL endpoint"
-  value       = aws_db_instance.navii.endpoint
+  value       = aws_db_instance.nordi-remittance.endpoint
 }
 
 output "db_connection_string" {
   description = "PostgreSQL connection string for Prisma"
-  value       = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.navii.endpoint}/${var.db_name}?schema=public"
+  value       = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.nordi-remittance.endpoint}/${var.db_name}?schema=public"
   sensitive   = true
 }
 
 output "db_instance_id" {
   description = "RDS instance identifier"
-  value       = aws_db_instance.navii.id
+  value       = aws_db_instance.nordi-remittance.id
 }
 
 # --------------------------------------------------------------------------
@@ -68,12 +68,12 @@ output "db_instance_id" {
 # --------------------------------------------------------------------------
 output "redis_endpoint" {
   description = "ElastiCache Redis primary endpoint"
-  value       = aws_elasticache_replication_group.navii.primary_endpoint_address
+  value       = aws_elasticache_replication_group.nordi-remittance.primary_endpoint_address
 }
 
 output "redis_connection_string" {
   description = "Redis connection string"
-  value       = "rediss://:${random_password.redis_auth.result}@${aws_elasticache_replication_group.navii.primary_endpoint_address}:6379"
+  value       = "rediss://:${random_password.redis_auth.result}@${aws_elasticache_replication_group.nordi-remittance.primary_endpoint_address}:6379"
   sensitive   = true
 }
 
@@ -100,7 +100,7 @@ output "ws_url" {
 # --------------------------------------------------------------------------
 output "api_security_group_id" {
   description = "Security group ID for API pods"
-  value       = aws_security_group.navii_api.id
+  value       = aws_security_group.nordi-remittance_api.id
 }
 
 output "rds_security_group_id" {

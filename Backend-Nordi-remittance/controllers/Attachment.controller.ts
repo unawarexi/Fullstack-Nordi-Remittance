@@ -5,7 +5,7 @@ import Users from "../models/UserModel.js";
 import {
   uploadToCloudinary,
   deleteFromCloudinary,
-} from "../services/Cloudinary.service.js";
+} from "../services/cloudinary.service.js";
 import {
   sendSuccess,
   sendCreated,
@@ -22,7 +22,7 @@ import {
   extensionToMimeType,
 } from "../core/utils/extentions.js";
 import * as path from "path";
-import { emitToUser } from "../services/Websocket.service.js";
+import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -165,7 +165,9 @@ export async function getAttachments(
 
     const [attachments, total] = await Promise.all([
       Attachments.find(filter)
-        .select('fileName fileType fileSize category status relatedEntityType relatedEntityId createdAt')
+        .select(
+          "fileName fileType fileSize category status relatedEntityType relatedEntityId createdAt",
+        )
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -467,7 +469,9 @@ export async function getAllAttachments(
 
     const [attachments, total] = await Promise.all([
       Attachments.find(filter)
-        .select('fileName fileType fileSize category status user relatedEntityType relatedEntityId createdAt')
+        .select(
+          "fileName fileType fileSize category status user relatedEntityType relatedEntityId createdAt",
+        )
         .populate("user", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -500,7 +504,7 @@ export async function getUserKycDocuments(
       user: userId,
       category: "kyc",
     })
-      .select('fileName fileType fileSize category status metadata createdAt')
+      .select("fileName fileType fileSize category status metadata createdAt")
       .sort({ createdAt: -1 })
       .lean();
 
