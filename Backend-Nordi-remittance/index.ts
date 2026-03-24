@@ -48,6 +48,7 @@ import IntegrationRoutes from "./routes/Integrations.routes.js";
 import SecurityRoutes from "./routes/Security.routes.js";
 import TransferVerificationRoutes from "./routes/TransferVerification.routes.js";
 import KycRoutes from "./routes/Kyc.routes.js";
+import AiAgentRoutes from "./routes/AiAgent.routes.js";
 
 // Services
 import { initializeWebSocket } from "./services/websocket.service.js";
@@ -224,6 +225,9 @@ app.use(
   `${API_PREFIX}/transactions/secure-transfer`,
   TransferVerificationRoutes,
 );
+
+// AI Agent routes
+app.use(`${API_PREFIX}/ai`, AiAgentRoutes);
 
 // ============================================================================
 // API DOCUMENTATION ENDPOINT

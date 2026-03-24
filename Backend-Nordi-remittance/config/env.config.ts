@@ -73,6 +73,14 @@ interface EnvConfig {
 
   // Monitoring
   SENTRY_DSN?: string;
+
+  // AI Agent
+  OPENAI_API_KEY?: string;
+  ANTHROPIC_API_KEY?: string;
+  GOOGLE_AI_KEY?: string;
+  HUGGINGFACE_API_KEY?: string;
+  ML_SERVICE_URL: string;
+  ENABLE_AI_AGENT: boolean;
 }
 
 function getEnvString(key: string, defaultValue?: string): string {
@@ -180,6 +188,14 @@ export const env: EnvConfig = {
 
   // Monitoring
   SENTRY_DSN: process.env.SENTRY_DSN,
+
+  // AI Agent
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+  GOOGLE_AI_KEY: process.env.GOOGLE_AI_KEY,
+  HUGGINGFACE_API_KEY: process.env.HUGGINGFACE_API_KEY,
+  ML_SERVICE_URL: getEnvString("ML_SERVICE_URL", "http://localhost:8000"),
+  ENABLE_AI_AGENT: getEnvBoolean("ENABLE_AI_AGENT", true),
 };
 
 // ============================================================================
