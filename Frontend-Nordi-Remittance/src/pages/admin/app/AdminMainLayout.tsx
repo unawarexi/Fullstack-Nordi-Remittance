@@ -15,13 +15,13 @@ const AdminMainLayout = () => {
 
   return (
     <>
-      <div className="flex w-full h-screen">
+      <div className="flex w-full h-screen bg-white dark:bg-gray-950 transition-colors duration-200">
         {/* Left Container - fixed, full height */}
         <div className="h-screen">
           <AdminLeftContainer />
         </div>
         {/* Right Container - flex-1, scrollable */}
-        <div className="flex-1 h-screen overflow-y-auto bg-white">
+        <div className="flex-1 h-screen overflow-y-auto bg-white dark:bg-gray-950">
           <AdminRightContainer>
             <AdminRoutes />
           </AdminRightContainer>

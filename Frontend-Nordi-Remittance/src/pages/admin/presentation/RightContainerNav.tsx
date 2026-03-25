@@ -1,232 +1,276 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Bell, 
-  MessageSquare, 
-  Settings, 
-  ChevronDown, 
-  CreditCard, 
-  Briefcase, 
-  PiggyBank, 
-  Wallet,
-  ChevronRight,
+import { useNavigate } from 'react-router-dom';
+import {
+  Search,
+  Bell,
+  Settings,
   Sun,
-  Moon
+  Moon,
+  Monitor,
+  LogOut,
+  User,
+  Shield,
 } from 'lucide-react';
+import { useAuth } from '@store/auth.store';
+import useThemeStore from '@store/theme.store';
+import { useUnreadNotificationsCount } from '@hooks/queries';
 
-// Sample user accounts for the dropdown
-const userAccounts = [
-  { id: 1, type: "Checking Account", number: "****6789", balance: "$4,256.78", icon: <CreditCard size={16} /> },
-  { id: 2, type: "Savings Account", number: "****1234", balance: "$12,845.50", icon: <PiggyBank size={16} /> },
-  { id: 3, type: "Investment Portfolio", number: "****8901", balance: "$36,720.42", icon: <Briefcase size={16} /> },
-  { id: 4, type: "Business Account", number: "****4567", balance: "$85,412.19", icon: <Wallet size={16} /> }
-];
+const RightContainerNav: React.FC = () => {
+  const navigate = useNavigate();
 
-// Placeholder user data
-const userData = {
-  name: "Alexander Thompson",
-  image: "/api/placeholder/40/40", // You can replace with actual image path
-  notifications: 3,
-  messages: 2
-};
+  // ── Auth ──
+  const { user, userName, logout } = useAuth();
 
-const RightContainerNav = () => {
-  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-  const [greeting, setGreeting] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
-  // Calculate greeting based on time of day
+  // ── Theme ──
+  const { mode, isDarkMode, setMode, toggleDarkMode } = useThemeStore();
+
+  // ── Notifications (real count) ──
+  const { data: countRes } = useUnreadNotificationsCount();
+  const unreadCount =
+    typeof countRes === 'number'
+      ? countRes
+      : typeof (countRes as Record<string, unknown>)?.count === 'number'
+        ? (countRes as Record<string, number>).count
+        : 0;
+
+  // ── Local UI state ──
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [greeting, setGreeting] = useState('');
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
+
+  // Greeting based on time-of-day
   useEffect(() => {
-    const hours = new Date().getHours();
-    if (hours < 12) setGreeting("Good Morning");
-    else if (hours < 18) setGreeting("Good Afternoon");
-    else setGreeting("Good Evening");
+    const h = new Date().getHours();
+    setGreeting(h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening');
   }, []);
-  
-  // Toggle account dropdown
-  const toggleAccountDropdown = () => {
-    setIsAccountDropdownOpen(!isAccountDropdownOpen);
-  };
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node))
+        setIsProfileOpen(false);
+      if (themeRef.current && !themeRef.current.contains(e.target as Node))
+        setIsThemeOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // Animation variants
-  const dropdownVariants = {
-    hidden: { opacity: 0, y: -5, height: 0 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      height: "auto",
-      transition: { duration: 0.2, ease: "easeOut" }
+  const dropdown = {
+    hidden: { opacity: 0, y: -5, scale: 0.97 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.15, ease: 'easeOut' },
     },
-    exit: {
-      opacity: 0,
-      y: -5,
-      height: 0,
-      transition: { duration: 0.2, ease: "easeIn" }
-    }
+    exit: { opacity: 0, y: -5, scale: 0.97, transition: { duration: 0.1 } },
   };
 
-  const iconButtonVariants = {
-    hover: { scale: 1.1 },
-    tap: { scale: 0.95 }
-  };
+  const initials = user
+    ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
+    : 'A';
 
   return (
-    <nav className="w-full bg-slate-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <div className="flex justify-between h-16">
-          {/* Left section: Logo and greeting */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <div className="h-8 w-8 bg-blue-600 rounded-md flex items-center justify-center text-white font-bold mr-2">
-                SB
-              </div>
-              <span className="text-blue-600 font-bold text-lg hidden md:block">SecureBank</span>
+    <nav className="w-full bg-white dark:bg-gray-900 border-b border-blue-100 dark:border-gray-800 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
+        <div className="flex items-center justify-between h-14">
+          {/* ── Left: Logo + Greeting ── */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-8 w-8 bg-gradient-to-tr from-blue-600 via-blue-500 to-cyan-400 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
+              NA
             </div>
-            
-            <div className="ml-6 hidden md:flex items-center text-gray-700">
-              <span className="mr-1 text-sm text-gray-500">{greeting},</span>
-              <span className="font-medium text-blue-600">{userData.name}</span>
-            </div>
-          </div>
-          
-          {/* Center: Search */}
-          <div className="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-end">
-            <div className="max-w-lg w-full lg:max-w-xs relative">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search size={18} className="text-gray-400" />
-                </div>
-                <input
-                  id="search"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-full leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm"
-                  placeholder="Search transactions, accounts..."
-                  type="search"
-                />
-              </div>
+            <span className="text-blue-700 dark:text-blue-300 font-bold text-base hidden md:block">
+              Nordi Admin
+            </span>
+            <div className="hidden lg:flex items-center text-sm ml-2">
+              <span className="text-blue-400 dark:text-blue-500 mr-1">
+                {greeting},
+              </span>
+              <span className="font-medium text-blue-700 dark:text-blue-300 truncate max-w-[180px]">
+                {userName || 'Admin'}
+              </span>
             </div>
           </div>
-          
-          {/* Right section: Account selector and icons */}
-          <div className="flex items-center space-x-4">
-            {/* Account selector dropdown */}
+
+          {/* ── Center: Search ── */}
+          <div className="flex-1 max-w-xs mx-4 hidden sm:block">
             <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-500"
+              />
+              <input
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-full border border-blue-100 dark:border-gray-700 bg-blue-50/60 dark:bg-gray-800 placeholder-blue-300 dark:placeholder-gray-500 text-blue-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-600 focus:bg-white dark:focus:bg-gray-800 transition"
+                placeholder="Search users, transactions..."
+                type="search"
+              />
+            </div>
+          </div>
+
+          {/* ── Right: Controls ── */}
+          <div className="flex items-center gap-2">
+            {/* Admin Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg text-sm border border-blue-100 dark:border-gray-700">
+              <Shield size={14} />
+              <span className="hidden md:inline font-medium">Admin Panel</span>
+            </div>
+
+            {/* Theme Toggle */}
+            <div ref={themeRef} className="relative">
               <motion.button
-                onClick={toggleAccountDropdown}
-                className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg transition-colors duration-150 text-sm border border-blue-100"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className="p-2 rounded-full bg-blue-50 dark:bg-gray-800 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 transition"
+                whileTap={{ scale: 0.9 }}
+                onClick={() => {
+                  setIsThemeOpen(!isThemeOpen);
+                  setIsProfileOpen(false);
+                }}
+                title={`Theme: ${mode}`}
               >
-                <span className="hidden sm:inline">Choose Account</span>
-                <ChevronDown size={16} className={`transform transition-transform duration-200 ${isAccountDropdownOpen ? 'rotate-180' : ''}`} />
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
               </motion.button>
-              
+
               <AnimatePresence>
-                {isAccountDropdownOpen && (
+                {isThemeOpen && (
                   <motion.div
-                    className="absolute right-0 mt-2 w-72 bg-slate-50 rounded-lg shadow-lg border border-gray-100 z-50"
-                    variants={dropdownVariants}
+                    className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-blue-100 dark:border-gray-700 z-50 overflow-hidden"
+                    variants={dropdown}
                     initial="hidden"
                     animate="visible"
                     exit="exit"
                   >
-                    <div className="p-3 border-b border-gray-100">
-                      <h3 className="text-sm font-medium text-gray-700">Your Accounts</h3>
-                    </div>
-                    <div className="py-1">
-                      {userAccounts.map((account) => (
-                        <motion.a
-                          key={account.id}
-                          href="#"
-                          className="block px-4 py-3 hover:bg-blue-50 transition-colors duration-150"
-                          whileHover={{ backgroundColor: "rgba(239, 246, 255, 0.6)" }}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center">
-                              <div className="mr-3 text-blue-500">
-                                {account.icon}
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-gray-800">{account.type}</div>
-                                <div className="text-xs text-gray-500">{account.number}</div>
-                              </div>
-                            </div>
-                            <div className="text-sm font-semibold text-blue-700">{account.balance}</div>
-                          </div>
-                        </motion.a>
-                      ))}
-                    </div>
-                    <div className="p-3 border-t border-gray-100">
-                      <a href="/accounts" className="text-xs flex items-center justify-center text-blue-600 hover:text-blue-800 font-medium">
-                        View All Accounts
-                        <ChevronRight size={14} className="ml-1" />
-                      </a>
-                    </div>
+                    {([
+                      { key: 'light' as const, icon: <Sun size={15} />, label: 'Light' },
+                      { key: 'dark' as const, icon: <Moon size={15} />, label: 'Dark' },
+                      { key: 'system' as const, icon: <Monitor size={15} />, label: 'System' },
+                    ]).map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={() => {
+                          setMode(opt.key);
+                          setIsThemeOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition ${
+                          mode === opt.key
+                            ? 'bg-blue-50 dark:bg-gray-800 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                        }`}
+                      >
+                        {opt.icon} {opt.label}
+                      </button>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-            
-            {/* Icon buttons */}
-            <div className="flex items-center space-x-2">
-              {/* Toggle dark/light mode */}
+
+            {/* Notifications */}
+            <motion.button
+              className="relative p-2 rounded-full bg-blue-50 dark:bg-gray-800 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 transition"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigate('/admin/communications')}
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-600 text-white text-[10px] min-w-[16px] h-4 flex items-center justify-center rounded-full px-1">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </motion.button>
+
+            {/* Settings */}
+            <motion.button
+              className="p-2 rounded-full bg-blue-50 dark:bg-gray-800 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-700 transition hidden md:flex"
+              whileTap={{ scale: 0.9 }}
+              onClick={() => navigate('/admin/settings')}
+            >
+              <Settings size={18} />
+            </motion.button>
+
+            {/* Profile Avatar + Dropdown */}
+            <div ref={profileRef} className="relative ml-1">
               <motion.button
-                className="p-2 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                variants={iconButtonVariants}
-                whileHover="hover"
-                whileTap="tap"
-                onClick={() => setIsDarkMode(!isDarkMode)}
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsThemeOpen(false);
+                }}
+                className="h-9 w-9 rounded-full bg-gradient-to-tr from-blue-200 via-blue-300 to-cyan-100 dark:from-blue-700 dark:via-blue-800 dark:to-cyan-900 overflow-hidden border-2 border-blue-200 dark:border-gray-700 flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}
               >
-                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+                <span className="text-xs font-bold text-blue-700 dark:text-blue-200">
+                  {initials}
+                </span>
               </motion.button>
-            
-              {/* Messages */}
-              <motion.div className="relative" variants={iconButtonVariants} whileHover="hover" whileTap="tap">
-                <button className="p-2 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <MessageSquare size={18} />
-                </button>
-                {userData.messages > 0 && (
-                  <span className="absolute top-0 right-0 bg-amber-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    {userData.messages}
-                  </span>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-blue-100 dark:border-gray-700 z-50 overflow-hidden"
+                    variants={dropdown}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    {/* User info header */}
+                    <div className="px-4 py-3 border-b border-blue-50 dark:border-gray-800">
+                      <p className="text-sm font-semibold text-blue-900 dark:text-gray-100 truncate">
+                        {userName || 'Admin'}
+                      </p>
+                      <p className="text-xs text-blue-400 dark:text-blue-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+
+                    {/* Menu items */}
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigate('/admin/management/users');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <User size={15} /> My Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigate('/admin/settings');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+                    >
+                      <Settings size={15} /> Settings
+                    </button>
+
+                    {/* Dark mode quick toggle */}
+                    <button
+                      onClick={toggleDarkMode}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+                    >
+                      {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+                      {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                    </button>
+
+                    {/* Logout */}
+                    <div className="border-t border-blue-50 dark:border-gray-800">
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          logout();
+                          navigate('/admin');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <LogOut size={15} /> Sign Out
+                      </button>
+                    </div>
+                  </motion.div>
                 )}
-              </motion.div>
-              
-              {/* Notifications */}
-              <motion.div className="relative" variants={iconButtonVariants} whileHover="hover" whileTap="tap">
-                <button className="p-2 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <Bell size={18} />
-                </button>
-                {userData.notifications > 0 && (
-                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    {userData.notifications}
-                  </span>
-                )}
-              </motion.div>
-              
-              {/* Settings */}
-              <motion.button
-                className="p-2 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                variants={iconButtonVariants}
-                whileHover="hover"
-                whileTap="tap"
-              >
-                <Settings size={18} />
-              </motion.button>
-            </div>
-            
-            {/* User profile */}
-            <div className="ml-2 flex items-center">
-              <motion.div 
-                className="h-10 w-10 rounded-full bg-blue-100 overflow-hidden border-2 border-blue-200"
-                whileHover={{ scale: 1.05 }}
-              >
-                <img
-                  src={userData.image}
-                  alt={userData.name}
-                  className="h-full w-full object-cover"
-                />
-              </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useLogout } from "@hooks/queries/useAuth";
+import { useAuth } from "@store/auth.store";
 import {
   LayoutDashboard,
   Users,
@@ -18,13 +20,22 @@ import {
   ChevronDown,
   Landmark,
   Lock,
-  Globe
-} from 'lucide-react';
+  Globe,
+  Bell,
+  AlertTriangle,
+  Activity,
+  Shield,
+  User,
+} from "lucide-react";
 
-// Menu structure with additional banking-specific items
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+// ============================================================================
+// MENU STRUCTURE
+// ============================================================================
 const menu = [
   {
-    title: "Admin Dashboard",
+    title: "Dashboard",
     icon: <LayoutDashboard size={20} />,
     route: "/admin/dashboard",
   },
@@ -36,7 +47,7 @@ const menu = [
       { title: "All Users", route: "/admin/users/all" },
       { title: "KYC Pending", route: "/admin/users/kyc-pending" },
       { title: "Blocked Users", route: "/admin/users/blocked" },
-      { title: "VIP Clients", route: "/admin/users/vip" },
+      { title: "Admin Team", route: "/admin/users/vip" },
     ],
   },
   {
@@ -52,7 +63,7 @@ const menu = [
     ],
   },
   {
-    title: "KYC / Identity Verification",
+    title: "KYC / Identity",
     icon: <BadgeCheck size={20} />,
     route: "/admin/kyc",
     children: [
@@ -170,80 +181,76 @@ const menu = [
   {
     title: "Logout",
     icon: <LogOut size={20} />,
-    route: "/logout",
+    route: "/admin/logout",
   },
 ];
 
-// Animation variants
+// ============================================================================
+// ANIMATION VARIANTS
+// ============================================================================
 const sidebarVariants = {
-  expanded: {
-    width: "280px",
-    transition: { duration: 0.3, ease: "easeInOut" }
-  },
-  collapsed: {
-    width: "80px",
-    transition: { duration: 0.3, ease: "easeInOut" }
-  }
+  expanded: { width: "280px", transition: { duration: 0.3, ease: "easeInOut" } },
+  collapsed: { width: "80px", transition: { duration: 0.3, ease: "easeInOut" } },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, x: -10 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: { duration: 0.2 }
-  }
+  visible: { opacity: 1, x: 0, transition: { duration: 0.2 } },
 };
 
 const dropdownVariants = {
   hidden: { height: 0, opacity: 0 },
-  visible: { 
-    height: "auto", 
-    opacity: 1,
-    transition: { duration: 0.3, ease: "easeOut" }
-  }
+  visible: { height: "auto", opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
-const AdminLeftContainer = () => {
+// ============================================================================
+// COMPONENT
+// ============================================================================
+const AdminLeftContainer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout: clearAuthState, user, userName } = useAuth();
+  const logoutMutation = useLogout();
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState(false);
-  // const [notificationCount, setNotificationCount] = useState(5);
-  // const [alertCount, setAlertCount] = useState(3);
-  
-  // Automatically open dropdown for active route on mount
-  useEffect(() => {
-    const currentParentRoute = menu.find(item => 
-      item.children && item.children.some(child => location.pathname === child.route)
-    );
-    
-    if (currentParentRoute && currentParentRoute.route) {
-      setOpenDropdowns([currentParentRoute.route]);
-    }
-  }, []);
 
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
+  const displayName = userName || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Admin";
+  const initials = user
+    ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
+    : displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "A";
+  const roleBadge = user?.role === "admin" ? "System Administrator" : "Admin";
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSettled: () => {
+        clearAuthState();
+        navigate("/admin", { replace: true });
+      },
+    });
   };
+
+  // Auto-expand dropdown for active route
+  useEffect(() => {
+    const parent = menu.find(
+      (item) => item.children?.some((child) => location.pathname === child.route)
+    );
+    if (parent) setOpenDropdowns([parent.route]);
+  }, [location.pathname]);
+
+  const toggleSidebar = () => setCollapsed(!collapsed);
 
   const handleDropdown = (route: string) => {
     setOpenDropdowns((prev) =>
-      prev.includes(route)
-        ? prev.filter((r) => r !== route)
-        : [...prev, route]
+      prev.includes(route) ? prev.filter((r) => r !== route) : [...prev, route]
     );
   };
 
   const isActive = (route: string) =>
-    location.pathname === route ||
-    (route !== '/' && location.pathname.startsWith(route));
-    
+    location.pathname === route || (route !== "/" && location.pathname.startsWith(route));
+
   const handleNavigation = (route: string) => {
     navigate(route);
-    if (collapsed) {
-      setCollapsed(false);
-    }
+    if (collapsed) setCollapsed(false);
   };
 
   return (
@@ -251,202 +258,241 @@ const AdminLeftContainer = () => {
       variants={sidebarVariants}
       initial="expanded"
       animate={collapsed ? "collapsed" : "expanded"}
-      className="h-screen bg-white shadow-lg flex flex-col py-6 relative"
+      className="h-screen bg-gradient-to-b from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-900 shadow-lg dark:shadow-gray-950/50 flex flex-col py-6 relative transition-colors duration-200"
     >
       {/* Toggle button */}
-      <button 
+      <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-12 bg-blue-600 text-white p-1 rounded-full shadow-md z-10"
+        className="absolute -right-3 top-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-1 rounded-full shadow-lg z-10"
       >
-        <motion.div
-          animate={{ rotate: collapsed ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div animate={{ rotate: collapsed ? 180 : 0 }} transition={{ duration: 0.3 }}>
           <ChevronDown size={16} />
         </motion.div>
       </button>
 
-      {/* Logo */}
-      <motion.div 
-        className="font-bold text-xl text-blue-600 mb-8 px-4 flex items-center"
+      {/* Logo + Admin Profile */}
+      <motion.div
+        className="font-bold text-xl mb-6 px-4 flex items-center"
         animate={{ justifyContent: collapsed ? "center" : "flex-start" }}
       >
-        <Landmark size={28} className="text-blue-600 mr-2" />
+        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+          {initials}
+        </div>
         {!collapsed && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            Secure Bank
-          </motion.span>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ml-3">
+            <div className="font-semibold text-blue-900 dark:text-blue-200 text-sm truncate max-w-[180px]">
+              {displayName}
+            </div>
+            <div className="text-xs text-indigo-500 dark:text-indigo-400 font-medium">{roleBadge}</div>
+          </motion.div>
         )}
       </motion.div>
 
-      {/* Status indicators */}
+      {/* Quick Actions */}
       {!collapsed && (
-        <motion.div 
-          className="px-4 mb-6 flex border-b border-gray-100  justify-between"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="bg-blue-50 rounded-lg p-3 flex items-center gap-2 w-1/2">
-            <div className="bg-green-500 rounded-full h-2 w-2"></div>
-            <span className="text-xs font-medium text-blue-800">SYSTEM ONLINE</span>
+        <motion.div className="px-4 mb-6" variants={itemVariants} initial="hidden" animate="visible">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-semibold text-blue-900 dark:text-blue-200">Quick Actions</span>
+              <Activity size={14} className="text-indigo-500 dark:text-indigo-400" />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { icon: <Users size={16} />, label: "Users", route: "/admin/users/all", c: "bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 text-blue-600 dark:text-blue-400" },
+                { icon: <ShieldAlert size={16} />, label: "Fraud", route: "/admin/fraud", c: "bg-red-50 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400" },
+                { icon: <BarChart2 size={16} />, label: "Reports", route: "/admin/reports", c: "bg-emerald-50 dark:bg-gray-700 hover:bg-emerald-100 dark:hover:bg-gray-600 text-emerald-600 dark:text-emerald-400" },
+                { icon: <Settings size={16} />, label: "Settings", route: "/admin/settings", c: "bg-amber-50 dark:bg-gray-700 hover:bg-amber-100 dark:hover:bg-gray-600 text-amber-600 dark:text-amber-400" },
+              ].map(({ icon, label, route, c }) => (
+                <motion.div
+                  key={label}
+                  className={`flex flex-col items-center justify-center p-2 rounded-lg cursor-pointer ${c}`}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate(route)}
+                >
+                  <div className="mb-1">{icon}</div>
+                  <span className="text-xs">{label}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
-         
         </motion.div>
       )}
 
-  
+      {/* Status Indicators */}
+      {!collapsed && (
+        <motion.div className="px-4 mb-6 flex flex-col gap-2" variants={itemVariants} initial="hidden" animate="visible">
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+            whileHover={{ x: 3 }}
+          >
+            <div className="flex items-center gap-2">
+              <div className="bg-green-500 rounded-full h-2 w-2" />
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">System Online</span>
+            </div>
+            <Shield size={14} className="text-green-500" />
+          </motion.div>
+
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+            whileHover={{ x: 3 }}
+            onClick={() => navigate("/admin/fraud/alerts")}
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={14} className="text-amber-500 dark:text-amber-400" />
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Security Alerts</span>
+            </div>
+            <Bell size={14} className="text-amber-500 dark:text-amber-400" />
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2">
-        <ul className="list-none p-0 m-0 space-y-1">
-          {menu.map((item) => {
-            const active = isActive(item.route);
-            const hasChildren = !!item.children;
-            const open = openDropdowns.includes(item.route);
-            
-            return (
-              <li key={item.title}>
-                <motion.div
-                  onClick={() => {
-                    if (hasChildren) {
-                      if (!collapsed) handleDropdown(item.route);
-                      else handleNavigation(item.route);
-                    } else {
-                      handleNavigation(item.route);
-                    }
-                  }}
-                  className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
-                    ${active ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 font-medium'}
-                    ${!active ? 'hover:bg-blue-50/50 hover:text-blue-600' : ''}
-                  `}
-                  whileHover={{ x: collapsed ? 0 : 5 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+      <nav className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+        <AnimatePresence>
+          <ul className="list-none p-0 m-0 space-y-1">
+            {menu.map((item) => {
+              const active = isActive(item.route);
+              const hasChildren = !!item.children;
+              const open = openDropdowns.includes(item.route);
+
+              return (
+                <motion.li key={item.title} variants={itemVariants} initial="hidden" animate="visible" exit="hidden">
                   <motion.div
-                    className={active ? "text-blue-600" : "text-amber-500"}
-                    animate={{ 
-                      scale: active ? 1.1 : 1 
+                    onClick={() => {
+                      if (item.title === "Logout") {
+                        handleLogout();
+                        return;
+                      }
+                      if (hasChildren) {
+                        if (!collapsed) handleDropdown(item.route);
+                        else handleNavigation(item.route);
+                      } else {
+                        handleNavigation(item.route);
+                      }
                     }}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
+                      ${item.title === "Logout"
+                        ? "text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium"
+                        : active
+                          ? "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 text-blue-800 dark:text-blue-200 font-semibold"
+                          : "text-gray-700 dark:text-gray-300 font-medium hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-700 dark:hover:text-blue-300"
+                      }
+                    `}
+                    whileHover={{ x: collapsed ? 0 : 3 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {item.icon}
-                  </motion.div>
-                  
-                  {!collapsed && (
-                    <motion.span
-                      variants={itemVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="flex-1"
-                    >
-                      {item.title}
-                    </motion.span>
-                  )}
-                  
-                  {hasChildren && !collapsed && (
                     <motion.div
-                      initial={{ rotate: 0 }}
-                      animate={{ rotate: open ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
+                      className={
+                        item.title === "Logout"
+                          ? "text-rose-500 dark:text-rose-400"
+                          : active
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-indigo-500 dark:text-indigo-400"
+                      }
+                      animate={{ scale: active ? 1.1 : 1 }}
                     >
-                      <ChevronDown size={16} className="text-blue-400" />
+                      {item.icon}
                     </motion.div>
-                  )}
-                </motion.div>
-                
-                {/* Dropdown menu */}
-                {hasChildren && !collapsed && (
-                  <AnimatePresence>
-                    {open && (
-                      <motion.ul
-                        className="list-none pl-8 mt-1 mb-1 overflow-hidden"
-                        variants={dropdownVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
+
+                    {!collapsed && <motion.span className="flex-1">{item.title}</motion.span>}
+
+                    {hasChildren && !collapsed && (
+                      <motion.div
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: open ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        {item.children!.map((child) => {
-                          const childActive = isActive(child.route);
-                          return (
-                            <motion.li 
-                              key={child.title}
-                              variants={itemVariants}
-                              className="mb-1"
-                            >
-                              <motion.div
-                                onClick={() => navigate(child.route)}
-                                className={`
-                                  px-3 py-2 rounded-lg cursor-pointer text-sm transition
-                                  ${childActive ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-700 font-normal'}
-                                  ${!childActive ? 'hover:bg-blue-50 hover:text-blue-600' : ''}
-                                `}
-                                whileHover={{ x: 3 }}
-                                whileTap={{ scale: 0.98 }}
-                              >
-                                {child.title}
-                                {childActive && (
-                                  <motion.div
-                                    className="w-1 h-full absolute right-0 top-0 bg-blue-600 rounded-l"
-                                    layoutId="activeIndicator"
-                                  />
-                                )}
-                              </motion.div>
-                            </motion.li>
-                          );
-                        })}
-                      </motion.ul>
+                        <ChevronDown size={16} className="text-blue-400" />
+                      </motion.div>
                     )}
-                  </AnimatePresence>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  </motion.div>
+
+                  {/* Dropdown */}
+                  {hasChildren && !collapsed && (
+                    <AnimatePresence>
+                      {open && (
+                        <motion.ul
+                          className="list-none pl-8 mt-1 mb-1 overflow-hidden"
+                          variants={dropdownVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                        >
+                          {item.children!.map((child) => {
+                            const childActive = isActive(child.route);
+                            return (
+                              <motion.li key={child.title} variants={itemVariants} className="mb-1">
+                                <motion.div
+                                  onClick={() => navigate(child.route)}
+                                  className={`
+                                    px-3 py-2 rounded-lg cursor-pointer text-sm transition
+                                    ${childActive
+                                      ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold"
+                                      : "text-gray-700 dark:text-gray-400 font-normal hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-300"
+                                    }
+                                  `}
+                                  whileHover={{ x: 3 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  {child.title}
+                                  {childActive && (
+                                    <motion.div
+                                      className="w-1 h-full absolute right-0 top-0 bg-blue-600 rounded-l"
+                                      layoutId="activeIndicator"
+                                    />
+                                  )}
+                                </motion.div>
+                              </motion.li>
+                            );
+                          })}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  )}
+                </motion.li>
+              );
+            })}
+          </ul>
+        </AnimatePresence>
       </nav>
 
       {/* Admin Info */}
       {!collapsed && (
-        <motion.div 
-          className="mt-auto border-t border-gray-100 pt-4 px-4"
+        <motion.div
+          className="mt-auto border-t border-blue-100 dark:border-gray-700 pt-4 px-4"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-              A
+          <motion.div
+            className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-xl p-3 flex items-center gap-3 cursor-pointer"
+            whileHover={{ y: -2, boxShadow: "0 4px 6px rgba(59, 130, 246, 0.1)" }}
+            onClick={() => navigate("/admin/profile")}
+          >
+            <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+              <User size={16} />
             </div>
             <div>
-              <div className="text-sm font-semibold text-blue-900">Admin User</div>
-              <div className="text-xs text-gray-500">System Administrator</div>
+              <div className="text-xs font-medium text-blue-900 dark:text-blue-200">Admin Profile</div>
+              <div className="text-xs text-blue-700 dark:text-blue-400">View & manage</div>
             </div>
-          </div>
-          <div className="flex justify-between text-xs mt-2">
-            <div className="text-gray-500">Last login:</div>
-            <div className="text-blue-600 font-medium">Today, 9:45 AM</div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
 
       {/* Footer */}
-      <motion.div 
+      <motion.div
         className="mt-4 py-3 px-4 text-xs text-center"
-        animate={{ 
-          justifyContent: collapsed ? "center" : "space-between",
-          opacity: 1
-        }}
+        animate={{ justifyContent: collapsed ? "center" : "space-between", opacity: 1 }}
       >
         {!collapsed ? (
-          <div className="text-amber-500 opacity-80">
-            &copy; {new Date().getFullYear()} Secure Bank Admin
+          <div className="text-blue-400 dark:text-blue-500">
+            &copy; {new Date().getFullYear()} Nordi Admin
           </div>
         ) : (
-          <Lock size={16} className="text-amber-500 mx-auto" />
+          <Lock size={16} className="text-blue-400 mx-auto" />
         )}
       </motion.div>
     </motion.aside>
