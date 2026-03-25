@@ -1,0 +1,31 @@
+# Nordi Machine Learning Service — Python Dependencies
+# FastAPI-based ML service for fraud detection, credit scoring, anomaly detection
+
+# --- Core ---
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+pydantic==2.11.4
+python-dotenv==1.1.0
+httpx==0.28.1
+
+# --- ML / Data Science ---
+scikit-learn==1.7.0
+numpy==2.3.0
+pandas==2.3.0
+joblib==1.5.1
+
+# --- Deep Learning (optional, for advanced models) ---
+torch==2.7.1
+transformers==4.52.4
+
+# --- Database & Caching ---
+motor==3.7.0
+redis==6.2.0
+pymongo==4.13.0
+
+# --- Monitoring & Logging ---
+structlog==25.4.0
+prometheus-client==0.22.1
+
+# --- Security ---
+python-jose[cryptography]==3.4.0
