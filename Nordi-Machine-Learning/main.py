@@ -46,3 +46,14 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(fraud.router, prefix="/api/v1/ml/fraud", tags=["Fraud Detection"])
 app.include_router(risk.router, prefix="/api/v1/ml/risk", tags=["Risk Scoring"])
 app.include_router(anomaly.router, prefix="/api/v1/ml/anomaly", tags=["Anomaly Detection"])
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host=settings.ML_SERVICE_HOST,
+        port=settings.ML_SERVICE_PORT,
+        reload=True,
+    )
