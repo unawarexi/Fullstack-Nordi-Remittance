@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Shield, Globe, CreditCard } from "lucide-react";
 import Images from "@utils/constants/Image_strings";
 import GetLocation from "@utils/GetLocation";
+import useThemeStore from "@store/theme.store";
+import { lightTheme, darkTheme, gradients } from "@constants/colors";
 
 interface FormContainerProps {
   children: ReactNode;
@@ -15,6 +17,8 @@ interface FormContainerProps {
 const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalSteps = 7 }) => {
   const location = useLocation();
   const isAdminRoute = location.pathname.includes("admin");
+  const { isDarkMode } = useThemeStore();
+  const theme = useMemo(() => (isDarkMode ? darkTheme : lightTheme), [isDarkMode]);
 
   // Create step titles for better user understanding
   const getStepTitle = (index: number) => {
@@ -44,7 +48,8 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex w-full flex-col bg-slate-50 p-4 md:p-6 lg:p-8 lg:w-[65%]"
+        className="flex w-full flex-col p-4 md:p-6 lg:p-8 lg:w-[65%]"
+        style={{ backgroundColor: theme.background.secondary }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -61,16 +66,16 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
 
         {/* Title Section */}
         <div className="text-center mb-4">
-          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-neutral-900">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold" style={{ color: theme.text.primary }}>
             {isAdminRoute ? "Create and Authorize Account" : "Banking Account Registration"}
           </h1>
-          <p className="mt-2 text-sm md:text-base text-neutral-600">
+          <p className="mt-2 text-sm md:text-base" style={{ color: theme.text.secondary }}>
             Complete all required information to set up your account
           </p>
           {!isAdminRoute && (
-            <p className="mt-2 text-sm">
+            <p className="mt-2 text-sm" style={{ color: theme.text.tertiary }}>
               Already have an account?{" "}
-              <Link to="/auth/login" className="text-primary-600 hover:underline font-semibold">
+              <Link to="/auth/login" className="hover:underline font-semibold" style={{ color: theme.text.link }}>
                 Login
               </Link>
             </p>
@@ -86,26 +91,36 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
                   <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: index === step ? 1.1 : 1 }}
-                    className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition-all duration-300 ${
-                      index < step
-                        ? "bg-green-500 text-white"
-                        : index === step
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
-                        : "bg-neutral-200 text-neutral-500"
-                    }`}
+                    className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full font-semibold text-sm transition-all duration-300"
+                    style={{
+                      backgroundColor:
+                        index < step
+                          ? "#10B981"
+                          : index === step
+                          ? theme.text.link
+                          : theme.surface.tertiary,
+                      color:
+                        index <= step ? "#FFFFFF" : theme.text.muted,
+                      boxShadow: index === step ? `0 4px 12px ${theme.text.link}40` : undefined,
+                    }}
                   >
                     {index < step ? <Check className="w-4 h-4" /> : index}
                   </motion.div>
-                  <span className={`mt-1 text-[10px] md:text-xs whitespace-nowrap ${
-                    index === step ? "text-blue-600 font-semibold" : "text-neutral-500"
-                  }`}>
+                  <span
+                    className="mt-1 text-[10px] md:text-xs whitespace-nowrap"
+                    style={{
+                      color: index === step ? theme.text.link : theme.text.muted,
+                      fontWeight: index === step ? 600 : 400,
+                    }}
+                  >
                     {getStepTitle(index)}
                   </span>
                 </div>
                 {index < totalSteps && (
-                  <div className={`flex-1 h-0.5 mx-1 md:mx-2 transition-colors duration-300 ${
-                    index < step ? "bg-green-500" : "bg-neutral-200"
-                  }`} />
+                  <div
+                    className="flex-1 h-0.5 mx-1 md:mx-2 transition-colors duration-300"
+                    style={{ backgroundColor: index < step ? "#10B981" : theme.border.primary }}
+                  />
                 )}
               </div>
             ))}
@@ -121,7 +136,8 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
         <div className="mt-4 text-center">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-primary-600 transition-colors"
+            className="inline-flex items-center gap-2 text-sm transition-colors"
+            style={{ color: theme.text.secondary }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Homepage
@@ -129,7 +145,10 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-neutral-200 text-center text-xs text-neutral-500">
+        <div
+          className="mt-4 pt-4 border-t text-center text-xs"
+          style={{ borderColor: theme.border.primary, color: theme.text.muted }}
+        >
           <p>© 2024 Nordea Bank PLC. (Licensed by the International Monetary Fund)</p>
         </div>
       </motion.div>
@@ -139,7 +158,12 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="hidden lg:flex lg:w-[35%] flex-col items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-700 to-blue-800 p-8 relative overflow-hidden"
+        className="hidden lg:flex lg:w-[35%] flex-col items-center justify-center p-8 relative overflow-hidden"
+        style={{
+          background: isDarkMode
+            ? gradients.dark
+            : "linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #1E40AF 100%)",
+        }}
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
@@ -182,12 +206,13 @@ const FormContainer: React.FC<FormContainerProps> = ({ children, step, totalStep
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm"
+                className="flex items-center gap-3 p-3 rounded-xl backdrop-blur-sm"
+                style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
               >
-                <div className="p-2 rounded-lg bg-white/20 text-white">{feature.icon}</div>
+                <div className="p-2 rounded-lg text-white" style={{ backgroundColor: "rgba(255,255,255,0.2)" }}>{feature.icon}</div>
                 <div>
                   <p className="font-semibold text-white text-sm">{feature.title}</p>
-                  <p className="text-white/70 text-xs">{feature.desc}</p>
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>{feature.desc}</p>
                 </div>
               </motion.div>
             ))}

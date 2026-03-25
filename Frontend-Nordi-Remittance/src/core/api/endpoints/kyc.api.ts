@@ -367,6 +367,30 @@ export const kycApi = {
     );
     return response.data;
   },
+
+  // ==========================================================================
+  // ADMIN KYC ENDPOINTS
+  // ==========================================================================
+
+  getAdminPendingReviews: async (params?: { page?: number; limit?: number; status?: string }) => {
+    const response = await apiClient.get(`${KYC_BASE}/admin/pending`, { params });
+    return response.data;
+  },
+
+  getAdminUserKyc: async (userId: string) => {
+    const response = await apiClient.get(`${KYC_BASE}/admin/users/${userId}`);
+    return response.data;
+  },
+
+  adminReviewKyc: async (userId: string, data: { decision: 'approved' | 'rejected'; reason?: string }) => {
+    const response = await apiClient.patch(`${KYC_BASE}/admin/users/${userId}/review`, data);
+    return response.data;
+  },
+
+  getAdminKycStats: async () => {
+    const response = await apiClient.get(`${KYC_BASE}/admin/stats`);
+    return response.data;
+  },
 };
 
 export default kycApi;

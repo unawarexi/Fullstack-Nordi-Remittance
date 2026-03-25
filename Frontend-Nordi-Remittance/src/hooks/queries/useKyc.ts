@@ -459,6 +459,58 @@ export const useGetVerificationSession = () => {
   });
 };
 
+// ============================================================================
+// ADMIN KYC HOOKS
+// ============================================================================
+
+export const useAdminPendingReviews = (params?: { page?: number; limit?: number; status?: string }) => {
+  return useQuery({
+    queryKey: [...queryKeys.kyc.all, "admin", "pending", params],
+    queryFn: async () => {
+      const response = await kycApi.getAdminPendingReviews(params);
+      return response;
+    },
+  });
+};
+
+export const useAdminUserKyc = (userId: string) => {
+  return useQuery({
+    queryKey: [...queryKeys.kyc.all, "admin", "user", userId],
+    queryFn: async () => {
+      const response = await kycApi.getAdminUserKyc(userId);
+      return response;
+    },
+    enabled: !!userId,
+  });
+};
+
+export const useAdminReviewKyc = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async ({ userId, data }: { userId: string; data: { decision: 'approved' | 'rejected'; reason?: string } }) => {
+      const response = await kycApi.adminReviewKyc(userId, data);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...queryKeys.kyc.all, "admin"] });
+      showToast("KYC review submitted", "success");
+    },
+    onError: (e: Error) => showToast(e.message || "Failed to review KYC", "error"),
+  });
+};
+
+export const useAdminKycStats = () => {
+  return useQuery({
+    queryKey: [...queryKeys.kyc.all, "admin", "stats"],
+    queryFn: async () => {
+      const response = await kycApi.getAdminKycStats();
+      return response;
+    },
+  });
+};
+
 /**
  * Complete third-party verification mutation
  */
