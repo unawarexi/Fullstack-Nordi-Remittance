@@ -45,7 +45,7 @@ const getTransactionHistory: AgentToolDefinition = {
   },
   async execute(args) {
     const limit = Math.min((args.limit as number) || 20, 50);
-    const transactions = await Transactions.find({ wallet: args.walletId })
+    const transactions = await Transactions.find({ wallet: args.walletId as string })
       .sort({ createdAt: -1 })
       .limit(limit)
       .select('type amount currency status description referenceNumber createdAt completedAt recipientName')
@@ -108,7 +108,7 @@ const getUserWallets: AgentToolDefinition = {
     required: ['userId'],
   },
   async execute(args) {
-    const wallets = await Wallets.find({ user: args.userId, status: 'active' })
+    const wallets = await Wallets.find({ user: args.userId as string, status: 'active' })
       .select('walletNumber balances status walletType isPrimary createdAt')
       .lean();
     return { wallets, count: wallets.length };
@@ -188,13 +188,25 @@ const assessTransactionRisk: AgentToolDefinition = {
     required: ['userId', 'amount', 'currency', 'transactionType'],
   },
   async execute(args) {
+    // Build RiskFactors from user data + args
+    const user = await Users.findById(args.userId).lean() as any;
+    const txCount = await Transactions.countDocuments({ wallet: { $in: (user?.wallets || []) } });
+    const avgAmount = txCount > 0
+      ? (await Transactions.aggregate([{ $match: { wallet: { $in: (user?.wallets || []) } } }, { $group: { _id: null, avg: { $avg: '$amount' } } }]))[0]?.avg || 0
+      : 0;
     const assessment = await RiskScoringEngine.assess({
-      userId: args.userId as string,
-      amount: args.amount as number,
-      currency: args.currency as string,
-      recipientCountry: args.recipientCountry as string,
-      transactionType: args.transactionType as string,
-      channel: 'api',
+      accountAge: user ? Math.floor((Date.now() - new Date(user.createdAt).getTime()) / 86_400_000) : 0,
+      kycLevel: user?.kycLevel || 'none',
+      totalTransactions: txCount,
+      averageAmount: avgAmount,
+      currentAmount: args.amount as number,
+      isNewRecipient: true,
+      isInternational: !!(args.recipientCountry && args.recipientCountry !== 'US'),
+      isNewDevice: false,
+      isNewIp: false,
+      hourOfDay: new Date().getHours(),
+      failedTxLast24h: 0,
+      recipientCountry: args.recipientCountry as string | undefined,
     });
     return assessment;
   },
@@ -216,7 +228,7 @@ const getTransactionStats: AgentToolDefinition = {
     const since = new Date(Date.now() - days * 86_400_000);
 
     const stats = await Transactions.aggregate([
-      { $match: { wallet: args.walletId, status: 'completed', createdAt: { $gte: since } } },
+      { $match: { wallet: args.walletId as string, status: 'completed', createdAt: { $gte: since } } },
       {
         $group: {
           _id: '$type',

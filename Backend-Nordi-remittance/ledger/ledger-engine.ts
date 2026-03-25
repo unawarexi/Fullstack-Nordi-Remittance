@@ -77,7 +77,7 @@ export class LedgerEngine {
     const lockKey = `ledger:${pair.debitWalletId}:${pair.creditWalletId}`;
     return RedisService.withLock(lockKey, async () => {
       return LedgerEngine.executePosting(pair);
-    }, { ttl: 15, retryCount: 3, retryDelayMs: 200 });
+    }, { ttl: 15, retries: 3, retryDelayMs: 200 });
   }
 
   private static async executePosting(pair: DebitCreditPair): Promise<PostingResult> {

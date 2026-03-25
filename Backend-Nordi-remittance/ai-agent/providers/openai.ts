@@ -2,6 +2,7 @@
 // LLM PROVIDER — OpenAI (GPT-4o)
 // ============================================================================
 import OpenAI from 'openai';
+import type { ChatCompletionMessageParam, ChatCompletionTool } from 'openai/resources/chat/completions';
 import type { AgentMessage, LLMResponse, AgentToolDefinition, ToolCall } from '../types.js';
 import logger from '../../logs/logger.js';
 
@@ -20,19 +21,25 @@ export class OpenAIProvider {
     options?: { temperature?: number; maxTokens?: number; model?: string },
   ): Promise<LLMResponse> {
     const model = options?.model || 'gpt-4o';
-    const openAiMessages = messages.map((m) => ({
-      role: m.role as 'system' | 'user' | 'assistant' | 'tool',
-      content: m.content,
-      ...(m.name ? { name: m.name } : {}),
-      ...(m.toolCallId ? { tool_call_id: m.toolCallId } : {}),
-    }));
+    const openAiMessages: ChatCompletionMessageParam[] = messages.map((m) => {
+      if (m.role === 'tool') {
+        return { role: 'tool' as const, content: m.content, tool_call_id: m.toolCallId || '' };
+      }
+      if (m.role === 'assistant') {
+        return { role: 'assistant' as const, content: m.content };
+      }
+      if (m.role === 'system') {
+        return { role: 'system' as const, content: m.content };
+      }
+      return { role: 'user' as const, content: m.content };
+    });
 
-    const toolDefs = tools?.map((t) => ({
+    const toolDefs: ChatCompletionTool[] | undefined = tools?.map((t) => ({
       type: 'function' as const,
       function: {
         name: t.name,
         description: t.description,
-        parameters: t.parameters,
+        parameters: t.parameters as Record<string, unknown>,
       },
     }));
 
@@ -45,10 +52,10 @@ export class OpenAIProvider {
     });
 
     const choice = response.choices[0];
-    const toolCalls: ToolCall[] = (choice.message.tool_calls || []).map((tc) => ({
+    const toolCalls: ToolCall[] = (choice.message.tool_calls || []).filter((tc) => tc.type === 'function').map((tc) => ({
       id: tc.id,
-      name: tc.function.name,
-      arguments: JSON.parse(tc.function.arguments),
+      name: tc.function!.name,
+      arguments: JSON.parse(tc.function!.arguments),
     }));
 
     return {

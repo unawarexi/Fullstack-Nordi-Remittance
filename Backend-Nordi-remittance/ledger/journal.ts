@@ -124,10 +124,10 @@ export class Journal {
           },
         },
       },
-      { $sort: { '_id.wallet': 1, '_id.currency': 1 } },
+      { $sort: { '_id.wallet': 1, '_id.currency': 1 } as Record<string, 1 | -1> },
     ];
 
-    const results = await LedgerEntries.aggregate(pipeline);
+    const results = await LedgerEntries.aggregate(pipeline as any[]);
 
     let totalDebits = 0, totalCredits = 0;
     const accounts = results.map((row: any) => {

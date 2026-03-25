@@ -1,7 +1,7 @@
 // ============================================================================
 // LLM PROVIDER — Google Gemini (Gemini 2.5 Pro)
 // ============================================================================
-import { GoogleGenerativeAI, type FunctionDeclaration } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { AgentMessage, LLMResponse, AgentToolDefinition, ToolCall } from '../types.js';
 
 export class GeminiProvider {
@@ -31,7 +31,7 @@ export class GeminiProvider {
               name: t.name,
               description: t.description,
               parameters: t.parameters,
-            })) as FunctionDeclaration[],
+            })) as any[],
           }]
         : undefined,
     });
