@@ -10,7 +10,7 @@ _db = None
 async def connect_db():
     global _client, _db
     _client = AsyncIOMotorClient(settings.MONGODB_URI)
-    _db = _client.get_default_database()
+    _db = _client.get_default_database(default="nordi_remittance")
 
 
 async def close_db():
