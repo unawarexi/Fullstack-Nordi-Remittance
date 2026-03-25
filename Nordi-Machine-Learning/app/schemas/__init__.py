@@ -18,11 +18,11 @@ class FraudPredictionRequest(BaseModel):
     recipient_country: Optional[str] = None
     channel: str = "web"
     is_international: bool = False
-    hour_of_day: int = Field(ge=0, le=23)
-    day_of_week: int = Field(ge=0, le=6)
-    user_account_age_days: int = Field(ge=0)
-    user_transaction_count_30d: int = Field(ge=0)
-    user_avg_transaction_amount: float = Field(ge=0)
+    hour_of_day: int = Field(ge=0, le=23, default=12)
+    day_of_week: int = Field(ge=0, le=6, default=3)
+    user_account_age_days: int = Field(ge=0, default=0)
+    user_transaction_count_30d: int = Field(ge=0, default=0)
+    user_avg_transaction_amount: float = Field(ge=0, default=0.0)
     device_fingerprint: Optional[str] = None
     ip_country: Optional[str] = None
 
@@ -47,9 +47,9 @@ class RiskScoreRequest(BaseModel):
     recipient_country: Optional[str] = None
     transaction_type: str
     kyc_level: str = "pending"
-    account_age_days: int = Field(ge=0)
+    account_age_days: int = Field(ge=0, default=0)
     historical_fraud_signals: int = Field(ge=0, default=0)
-    velocity_score: float = Field(ge=0, le=1, default=0)
+    velocity_score: float = Field(ge=0, le=1, default=0.0)
 
 
 class RiskTier(str, Enum):

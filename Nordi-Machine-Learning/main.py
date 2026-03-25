@@ -29,10 +29,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS
+# CORS — allow backend and development origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.BACKEND_API_URL],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        settings.BACKEND_API_URL.rstrip("/").rsplit("/api", 1)[0],  # extract origin from full URL
+    ],
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
