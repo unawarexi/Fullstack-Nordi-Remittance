@@ -7,10 +7,10 @@ from functools import lru_cache
 class Settings(BaseSettings):
     ML_SERVICE_PORT: int = 8000
     ML_SERVICE_HOST: str = "0.0.0.0"
-    MONGODB_URI: str = "mongodb://localhost:27017/nordi_remittance"
-    REDIS_URL: str = "redis://localhost:6379/1"
+    MONGODB_URI: str  # Required — must be set in .env
+    REDIS_URL: str  # Required — must be set in .env
     BACKEND_API_URL: str = "http://localhost:3000/api/v1"
-    JWT_SECRET: str = "your-super-secret-jwt-key-change-in-production"
+    JWT_SECRET: str  # Required — must be set in .env
     MODEL_DIR: str = "./models/saved"
     LOG_LEVEL: str = "INFO"
 
