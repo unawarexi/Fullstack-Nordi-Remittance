@@ -50,6 +50,17 @@ export const useAdminUserDetails = (userId: UUID) => {
   });
 };
 
+export const useAdminUserFinancialData = (userId: string) => {
+  return useQuery({
+    queryKey: [...queryKeys.admin.userDetail(userId as UUID), "financial"],
+    queryFn: async () => {
+      const response = await adminApi.getUserDetails(userId as UUID);
+      return response.data;
+    },
+    enabled: !!userId,
+  });
+};
+
 export const useAdminUsersList = (params?: any) => {
   return useQuery({
     queryKey: queryKeys.admin.admins(params),
@@ -273,6 +284,43 @@ export const useUpdateSystemSettings = () => {
   });
 };
 
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async (userId: UUID) => {
+      const response = await adminApi.deleteUser(userId);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() });
+      showToast("User deleted successfully", "success");
+    },
+    onError: (e: Error) =>
+      showToast(e.message || "Failed to delete user", "error"),
+  });
+};
+
+export const useAdminUpdateUser = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async ({ userId, data }: { userId: UUID; data: any }) => {
+      const response = await adminApi.updateUser(userId, data);
+      return response.data;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.userDetail(userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() });
+      showToast("User updated successfully", "success");
+    },
+    onError: (e: Error) =>
+      showToast(e.message || "Failed to update user", "error"),
+  });
+};
+
 export const useAdminOperations = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToastStore();
@@ -282,7 +330,9 @@ export const useAdminOperations = () => {
       (await adminApi.creditUserWallet(data)).data,
     onSuccess: () => {
       queryClient.invalidateQueries();
-      showToast("Wallet credited", "success");
+    },
+    onError: () => {
+      showToast("Failed to credit wallet", "error");
     },
   });
 
@@ -291,7 +341,9 @@ export const useAdminOperations = () => {
       (await adminApi.debitUserWallet(data)).data,
     onSuccess: () => {
       queryClient.invalidateQueries();
-      showToast("Wallet debited", "success");
+    },
+    onError: () => {
+      showToast("Failed to debit wallet", "error");
     },
   });
 

@@ -78,6 +78,24 @@ export const adminApi = {
     );
     return response.data;
   },
+  deleteUser: async (
+    userId: UUID,
+  ): Promise<ApiResponse<{ message: string }>> => {
+    const response = await apiClient.delete<ApiResponse<{ message: string }>>(
+      `${ADMIN_BASE}/users/${userId}`,
+    );
+    return response.data;
+  },
+  updateUser: async (
+    userId: UUID,
+    data: any,
+  ): Promise<ApiResponse<any>> => {
+    const response = await apiClient.put<ApiResponse<any>>(
+      `${ADMIN_BASE}/users/${userId}`,
+      data,
+    );
+    return response.data;
+  },
 
   // ==========================================================================
   // ADMIN USER MANAGEMENT

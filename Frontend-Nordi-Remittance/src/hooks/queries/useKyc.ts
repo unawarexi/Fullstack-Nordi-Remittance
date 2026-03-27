@@ -489,7 +489,7 @@ export const useAdminReviewKyc = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async ({ userId, data }: { userId: string; data: { decision: 'approved' | 'rejected'; reason?: string } }) => {
+    mutationFn: async ({ userId, data }: { userId: string; data: { status: 'approved' | 'rejected' | 'pending'; notes?: string } }) => {
       const response = await kycApi.adminReviewKyc(userId, data);
       return response;
     },

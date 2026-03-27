@@ -382,7 +382,7 @@ export const kycApi = {
     return response.data;
   },
 
-  adminReviewKyc: async (userId: string, data: { decision: 'approved' | 'rejected'; reason?: string }) => {
+  adminReviewKyc: async (userId: string, data: { status: 'approved' | 'rejected' | 'pending'; notes?: string }) => {
     const response = await apiClient.patch(`${KYC_BASE}/admin/users/${userId}/review`, data);
     return response.data;
   },

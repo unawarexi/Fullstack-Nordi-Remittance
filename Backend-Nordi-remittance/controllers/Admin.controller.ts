@@ -19,6 +19,7 @@ import { Wallets, AccountLimits } from "../models/AccountsModel.js";
 import Transactions from "../models/TransactionModel.js";
 import { Loans } from "../models/LoansModel.js";
 import { Cards } from "../models/CardsModel.js";
+import { InvestmentAccounts, SavingsGoals } from "../models/InvestmentsModel.js";
 import { FraudCases } from "../models/FraudSecurityModel.js";
 import {
   sendSuccess,
@@ -654,7 +655,7 @@ export async function getUserDetails(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { id } = req.params;
+    const id = req.params.userId || req.params.id;
 
     const user = await Users.findById(id)
       .select("-password -twoFactorSecret")
@@ -662,22 +663,28 @@ export async function getUserDetails(
     if (!user) throw new NotFoundError("User not found");
 
     // Get related data — use .select() projections to avoid returning full documents
-    const [wallets, recentTransactions, loans, cards] = await Promise.all([
+    const [wallets, recentTransactions, loans, cards, investments, savingsGoals] = await Promise.all([
       Wallets.find({ user: id })
         .select("walletNumber status balances isPrimary walletType createdAt")
         .lean(),
       Transactions.find({ initiatedBy: id })
         .select(
-          "type amount currency status referenceNumber createdAt completedAt",
+          "type category amount currency status description referenceNumber createdAt completedAt",
         )
         .sort({ createdAt: -1 })
         .limit(10)
         .lean(),
       Loans.find({ user: id })
-        .select("loanType status principalAmount interestRate createdAt")
+        .select("loanId loanType status principalAmount outstandingBalance interestRate term startDate maturityDate monthlyPayment currency collateral createdAt")
         .lean(),
       Cards.find({ user: id })
-        .select("cardType brand status last4 expiryDate createdAt")
+        .select("cardId cardType cardBrand cardholderName status balance creditLimit availableCredit expiryMonth expiryYear issueDate currency createdAt")
+        .lean(),
+      InvestmentAccounts.find({ user: id })
+        .select("accountId accountType status totalInvested currentValue totalReturns returnPercentage currency riskProfile createdAt")
+        .lean(),
+      SavingsGoals.find({ user: id })
+        .select("goalId name description targetAmount currentAmount currency targetDate status category createdAt")
         .lean(),
     ]);
 
@@ -692,6 +699,8 @@ export async function getUserDetails(
         cvv: "***",
         pin: undefined,
       })),
+      investments,
+      savingsGoals,
     });
   } catch (error) {
     next(error);
@@ -706,20 +715,35 @@ export async function updateUserStatus(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { id } = req.params;
+    const id = req.params.userId || req.params.id;
     const { status, reason } = req.body;
 
-    const user = await Users.findById(id);
+    const user = await Users.findById(id)
+      .select("firstName lastName email accountStatus isActive isLocked")
+      .lean();
     if (!user) throw new NotFoundError("User not found");
 
-    const oldStatus = user.accountStatus;
-    user.accountStatus = status;
+    const oldStatus = (user as any).accountStatus;
 
-    if (status === "suspended" || status === "banned") {
-      user.suspensionReason = reason;
+    // Build atomic update — avoids triggering pre-save hooks
+    const updateFields: Record<string, any> = { accountStatus: status };
+
+    if (status === "active") {
+      updateFields.isActive = true;
+      updateFields.isLocked = false;
+    } else if (status === "suspended") {
+      updateFields.isActive = false;
+      updateFields.isLocked = true;
+      updateFields.suspensionReason = reason;
+    } else if (status === "banned") {
+      updateFields.isActive = false;
+      updateFields.isLocked = true;
+      updateFields.suspensionReason = reason;
+    } else if (status === "restricted") {
+      updateFields.isActive = false;
     }
 
-    await user.save();
+    await Users.findByIdAndUpdate(id, updateFields);
 
     await AdminActionLogs.create({
       admin: req.user.userId,
@@ -734,8 +758,8 @@ export async function updateUserStatus(
 
     // Notify user using template
     const emailContent = emailGenerator.accountStatusUpdateEmail({
-      firstName: String(user.firstName),
-      email: String(user.email),
+      firstName: String((user as any).firstName),
+      email: String((user as any).email),
       status: status as "active" | "suspended" | "banned" | "restricted",
       reason: reason || undefined,
       effectiveDate: new Date().toISOString(),
@@ -743,18 +767,18 @@ export async function updateUserStatus(
       userId: (user._id as any).toString(),
     });
 
-    sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+    sendTemplatedMail(String((user as any).email), emailContent).catch(console.error);
 
     emitToUser((user._id as any).toString(), WS.ADMIN.USER_STATUS_CHANGED, {
       userId: (user._id as any).toString(),
-      status: user.accountStatus,
+      status,
       reason: reason || undefined,
       timestamp: new Date().toISOString(),
     });
 
     sendSuccess(
       res,
-      { user: { id: user._id, status: user.accountStatus } },
+      { user: { id: user._id, status } },
       "User status updated",
     );
   } catch (error) {
@@ -770,7 +794,7 @@ export async function resetUserPassword(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { id } = req.params;
+    const id = req.params.userId || req.params.id;
 
     const user = await Users.findById(id);
     if (!user) throw new NotFoundError("User not found");
