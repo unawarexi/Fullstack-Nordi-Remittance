@@ -10,13 +10,13 @@ import { cn } from "@utils/cn";
 // BASE SKELETON BLOCK
 // ========================
 const shimmer =
-  "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent";
+  "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 dark:before:via-white/10 before:to-transparent";
 
 export const SkeletonBlock: React.FC<{
   className?: string;
   rounded?: string;
 }> = ({ className, rounded = "rounded-lg" }) => (
-  <div className={cn("bg-neutral-200", shimmer, rounded, className)} />
+  <div className={cn("bg-neutral-200 dark:bg-neutral-700", shimmer, rounded, className)} />
 );
 
 // ========================
@@ -34,7 +34,7 @@ export const PageHeaderSkeleton: React.FC = () => (
 // ========================
 export const StatsCardSkeleton: React.FC = () => (
   <motion.div
-    className="bg-white rounded-xl shadow-sm p-5"
+    className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none dark:border dark:border-neutral-700/50 p-5"
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
   >
@@ -62,7 +62,7 @@ export const StatsGridSkeleton: React.FC<{ count?: number }> = ({
 // ========================
 export const AccountCardSkeleton: React.FC = () => (
   <motion.div
-    className="bg-white rounded-xl shadow-sm p-5 border border-neutral-100"
+    className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none p-5 border border-neutral-100 dark:border-neutral-700/50"
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
   >
@@ -97,7 +97,7 @@ export const AccountListSkeleton: React.FC<{ count?: number }> = ({
 // TRANSACTION ROW SKELETON
 // ========================
 export const TransactionRowSkeleton: React.FC = () => (
-  <div className="flex items-center gap-4 py-3 border-b border-neutral-100">
+  <div className="flex items-center gap-4 py-3 border-b border-neutral-100 dark:border-neutral-700/50">
     <SkeletonBlock className="h-10 w-10 flex-shrink-0" rounded="rounded-full" />
     <div className="flex-1 min-w-0">
       <SkeletonBlock className="h-4 w-40 mb-1" />
@@ -113,7 +113,7 @@ export const TransactionRowSkeleton: React.FC = () => (
 export const TransactionListSkeleton: React.FC<{ count?: number }> = ({
   count = 6,
 }) => (
-  <div className="bg-white rounded-xl shadow-sm p-5">
+  <div className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none dark:border dark:border-neutral-700/50 p-5">
     <div className="flex items-center justify-between mb-4">
       <SkeletonBlock className="h-6 w-44" />
       <SkeletonBlock className="h-8 w-28" rounded="rounded-lg" />
@@ -129,18 +129,18 @@ export const TransactionListSkeleton: React.FC<{ count?: number }> = ({
 // ========================
 export const CreditCardSkeleton: React.FC = () => (
   <motion.div
-    className="bg-gradient-to-br from-neutral-300 to-neutral-200 rounded-2xl p-6 h-48 w-full max-w-sm"
+    className="bg-gradient-to-br from-neutral-300 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 rounded-2xl p-6 h-48 w-full max-w-sm"
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
   >
     <div className="flex justify-between mb-8">
-      <SkeletonBlock className="h-8 w-12 bg-neutral-300" rounded="rounded-md" />
-      <SkeletonBlock className="h-6 w-16 bg-neutral-300" />
+      <SkeletonBlock className="h-8 w-12 bg-neutral-300 dark:bg-neutral-600" rounded="rounded-md" />
+      <SkeletonBlock className="h-6 w-16 bg-neutral-300 dark:bg-neutral-600" />
     </div>
-    <SkeletonBlock className="h-6 w-56 bg-neutral-300 mb-4" />
+    <SkeletonBlock className="h-6 w-56 bg-neutral-300 dark:bg-neutral-600 mb-4" />
     <div className="flex justify-between">
-      <SkeletonBlock className="h-4 w-24 bg-neutral-300" />
-      <SkeletonBlock className="h-4 w-16 bg-neutral-300" />
+      <SkeletonBlock className="h-4 w-24 bg-neutral-300 dark:bg-neutral-600" />
+      <SkeletonBlock className="h-4 w-16 bg-neutral-300 dark:bg-neutral-600" />
     </div>
   </motion.div>
 );
@@ -152,9 +152,9 @@ export const TableSkeleton: React.FC<{
   rows?: number;
   cols?: number;
 }> = ({ rows = 5, cols = 5 }) => (
-  <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none dark:border dark:border-neutral-700/50 overflow-hidden">
     {/* Header */}
-    <div className="flex gap-4 p-4 border-b border-neutral-200 bg-neutral-50">
+    <div className="flex gap-4 p-4 border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/80">
       {Array.from({ length: cols }).map((_, i) => (
         <SkeletonBlock key={i} className="h-4 flex-1" />
       ))}
@@ -163,7 +163,7 @@ export const TableSkeleton: React.FC<{
     {Array.from({ length: rows }).map((_, i) => (
       <div
         key={i}
-        className="flex gap-4 p-4 border-b border-neutral-100 last:border-0"
+        className="flex gap-4 p-4 border-b border-neutral-100 dark:border-neutral-700/50 last:border-0"
       >
         {Array.from({ length: cols }).map((_, j) => (
           <SkeletonBlock
@@ -189,7 +189,7 @@ export const FormFieldSkeleton: React.FC = () => (
 export const FormSkeleton: React.FC<{ fields?: number }> = ({
   fields = 4,
 }) => (
-  <div className="bg-white rounded-xl shadow-sm p-6">
+  <div className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none dark:border dark:border-neutral-700/50 p-6">
     <SkeletonBlock className="h-6 w-48 mb-6" />
     {Array.from({ length: fields }).map((_, i) => (
       <FormFieldSkeleton key={i} />
@@ -204,7 +204,7 @@ export const FormSkeleton: React.FC<{ fields?: number }> = ({
 export const ChartSkeleton: React.FC<{ height?: string }> = ({
   height = "h-64",
 }) => (
-  <div className="bg-white rounded-xl shadow-sm p-5">
+  <div className="bg-white dark:bg-neutral-800/60 rounded-xl shadow-sm dark:shadow-none dark:border dark:border-neutral-700/50 p-5">
     <div className="flex items-center justify-between mb-4">
       <SkeletonBlock className="h-6 w-40" />
       <div className="flex gap-2">
@@ -238,7 +238,7 @@ export const DetailPageSkeleton: React.FC = () => (
 // FULL PAGE SKELETON
 // ========================
 export const FullPageSkeleton: React.FC = () => (
-  <div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 min-h-full">
+  <div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-neutral-900 dark:to-neutral-950 min-h-full">
     <PageHeaderSkeleton />
     <StatsGridSkeleton />
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
