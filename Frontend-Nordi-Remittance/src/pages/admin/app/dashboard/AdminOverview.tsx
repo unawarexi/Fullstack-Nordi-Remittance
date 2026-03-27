@@ -3,10 +3,15 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@components/shared/DashboardPrimitives";
 import { dashboardContainerVariants, dashboardItemVariants } from "@core/animation/Animation";
 import { FullPageSkeleton } from "@components/skeletons/Skeletons";
-import { useAdminDashboard } from "./use-case/useAdminDashboard";
+import { useAdminDashboard } from "../../domain/useAdminDashboard";
 import DashboardStats from "./DashboardStats";
 import DashboardMain from "./DashboardMain";
 import DashboardSidebar from "./DashboardSidebar";
+import DashboardLoans from "./DashboardLoans";
+import DashboardInvestments from "./DashboardInvestments";
+import DashboardCards from "./DashboardCards";
+import DashboardFraud from "./DashboardFraud";
+import TransferSection from "./TransferSection";
 
 const NordeaBankingAdmin: React.FC = () => {
   useEffect(() => {
@@ -21,9 +26,18 @@ const NordeaBankingAdmin: React.FC = () => {
     weeklyTransactions,
     alerts,
     pendingApprovals,
+    loansData,
+    investmentsData,
+    cardsData,
+    fraudData,
+    transferStats,
     isLoading,
     isChartsLoading,
     isAlertsLoading,
+    isLoansLoading,
+    isInvestmentsLoading,
+    isCardsLoading,
+    isFraudLoading,
   } = useAdminDashboard();
 
   if (isLoading && isChartsLoading && isAlertsLoading) {
@@ -51,7 +65,7 @@ const NordeaBankingAdmin: React.FC = () => {
           <DashboardStats stats={stats} isLoading={isLoading} />
         </motion.div>
 
-        {/* Main + Sidebar */}
+        {/* Main Charts + Sidebar */}
         <motion.div variants={dashboardItemVariants} className="flex flex-col lg:flex-row gap-6">
           <DashboardMain
             revenueData={revenueData}
@@ -67,6 +81,21 @@ const NordeaBankingAdmin: React.FC = () => {
             isAlertsLoading={isAlertsLoading}
           />
         </motion.div>
+
+        {/* Loans & Investments Row */}
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DashboardLoans loansData={loansData} isLoading={isLoansLoading} />
+          <DashboardInvestments investmentsData={investmentsData} isLoading={isInvestmentsLoading} />
+        </motion.div>
+
+        {/* Cards & Fraud Row */}
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DashboardCards cardsData={cardsData} isLoading={isCardsLoading} />
+          <DashboardFraud fraudData={fraudData} isLoading={isFraudLoading} />
+        </motion.div>
+
+        {/* Transfer History — Full-width section: table ~80% + sidebar ~20% */}
+        <TransferSection transferStats={transferStats} />
       </motion.div>
     </PageContainer>
   );

@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -6,14 +6,12 @@ import {
   Pie, Cell, Legend,
 } from "recharts";
 import { DashCard, SectionHeader } from "@components/shared/DashboardPrimitives";
-import { ChartSkeleton, SkeletonBlock } from "@components/skeletons/Skeletons";
+import { ChartSkeleton } from "@components/skeletons/Skeletons";
 import { useInView } from "@hooks/useInView";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const CHART_COLORS = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
-
-const LazyTransferHistory = lazy(() => import("./TransferHistory"));
 
 interface DashboardMainProps {
   revenueData: { name: string; value: number }[];
@@ -170,29 +168,17 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
       {/* Revenue Chart (always visible) */}
       {isChartsLoading ? <ChartSkeleton /> : <RevenueChart data={revenueData} />}
 
-      {/* Weekly Transactions + Distribution + Transfer History — lazy */}
+      {/* Weekly Transactions + Account Distribution — lazy */}
       <div ref={chartsRef}>
         {chartsInView ? (
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex flex-col flex-1 gap-4">
-              <WeeklyTransactionsChart data={weeklyTransactions} />
-              <AccountDistributionChart data={accountDistribution} />
-            </div>
-            <div className="flex-1">
-              <Suspense fallback={<ChartSkeleton />}>
-                <LazyTransferHistory />
-              </Suspense>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <WeeklyTransactionsChart data={weeklyTransactions} />
+            <AccountDistributionChart data={accountDistribution} />
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 space-y-4">
-              <ChartSkeleton />
-              <ChartSkeleton />
-            </div>
-            <div className="flex-1">
-              <ChartSkeleton />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ChartSkeleton />
+            <ChartSkeleton />
           </div>
         )}
       </div>
