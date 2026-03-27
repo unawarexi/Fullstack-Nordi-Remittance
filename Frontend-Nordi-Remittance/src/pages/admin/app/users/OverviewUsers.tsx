@@ -12,6 +12,9 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
+  Ban,
+  ShieldOff,
+  Trash2,
 } from "lucide-react";
 import {
   PageContainer,
@@ -27,8 +30,9 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAllUsers } from "./use-case/useAllUsers";
-import type { UserStatusFilter, KycStatusFilter } from "./use-case/useAllUsers";
+import { useAllUsers } from "../../domain/useAllUsers";
+import type { UserStatusFilter, KycStatusFilter } from "../../domain/useAllUsers";
+import { useDeleteUser } from "@hooks/queries";
 
 const statusFilterOptions = [
   { value: "all", label: "All Statuses" },
@@ -59,7 +63,34 @@ const OverviewUsers: React.FC = () => {
     setPage,
     resetFilters,
     refetch,
+    updateStatus,
   } = useAllUsers();
+  const deleteUser = useDeleteUser();
+  const [confirmModal, setConfirmModal] = React.useState<{
+    userId: string;
+    userName: string;
+    action: "block" | "restrict" | "delete";
+  } | null>(null);
+
+  const handleConfirmAction = () => {
+    if (!confirmModal) return;
+    const { userId, action } = confirmModal;
+    if (action === "block") {
+      updateStatus.mutate(
+        { userId: userId as any, data: { status: "banned" as any, reason: "Blocked by admin" } },
+        { onSuccess: () => { setConfirmModal(null); refetch(); } },
+      );
+    } else if (action === "restrict") {
+      updateStatus.mutate(
+        { userId: userId as any, data: { status: "suspended" as any, reason: "Restricted by admin" } },
+        { onSuccess: () => { setConfirmModal(null); refetch(); } },
+      );
+    } else if (action === "delete") {
+      deleteUser.mutate(userId as any, {
+        onSuccess: () => { setConfirmModal(null); refetch(); },
+      });
+    }
+  };
 
   return (
     <PageContainer className="[&>div]:max-w-full">
@@ -219,6 +250,33 @@ const OverviewUsers: React.FC = () => {
                               >
                                 <Edit size={15} />
                               </motion.button>
+                              <motion.button
+                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "restrict" })}
+                                title="Restrict User"
+                              >
+                                <ShieldOff size={15} />
+                              </motion.button>
+                              <motion.button
+                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "block" })}
+                                title="Block User"
+                              >
+                                <Ban size={15} />
+                              </motion.button>
+                              <motion.button
+                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "delete" })}
+                                title="Delete User"
+                              >
+                                <Trash2 size={15} />
+                              </motion.button>
                             </div>
                           </td>
                         </motion.tr>
@@ -296,6 +354,53 @@ const OverviewUsers: React.FC = () => {
           )}
         </DashCard>
       </motion.div>
+      {/* Confirmation Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <motion.div
+            className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              {confirmModal.action === "block" && "Block User"}
+              {confirmModal.action === "restrict" && "Restrict User"}
+              {confirmModal.action === "delete" && "Delete User"}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {confirmModal.action === "block" &&
+                `Are you sure you want to block ${confirmModal.userName}? They will be banned from the platform.`}
+              {confirmModal.action === "restrict" &&
+                `Are you sure you want to restrict ${confirmModal.userName}? Their account will be suspended.`}
+              {confirmModal.action === "delete" &&
+                `Are you sure you want to permanently delete ${confirmModal.userName}'s account? This action cannot be undone.`}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => setConfirmModal(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 text-sm font-medium rounded-lg text-white ${
+                  confirmModal.action === "delete"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : confirmModal.action === "block"
+                      ? "bg-rose-600 hover:bg-rose-700"
+                      : "bg-orange-600 hover:bg-orange-700"
+                }`}
+                onClick={handleConfirmAction}
+              >
+                {confirmModal.action === "block" && "Block"}
+                {confirmModal.action === "restrict" && "Restrict"}
+                {confirmModal.action === "delete" && "Delete"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </PageContainer>
   );
 };

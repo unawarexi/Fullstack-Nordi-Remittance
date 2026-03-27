@@ -23,7 +23,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useKycPendingUsers } from "./use-case/useKycPendingUsers";
+import { useKycPendingUsers } from "../../domain/useKycPendingUsers";
 
 const KycPending: React.FC = () => {
   const navigate = useNavigate();

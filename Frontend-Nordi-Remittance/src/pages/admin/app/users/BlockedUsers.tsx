@@ -20,7 +20,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useBlockedUsers } from "./use-case/useBlockedUsers";
+import { useBlockedUsers } from "../../domain/useBlockedUsers";
 
 const BlockedUsers: React.FC = () => {
   const navigate = useNavigate();

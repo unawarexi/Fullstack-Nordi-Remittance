@@ -65,7 +65,7 @@ export function useKycPendingUsers() {
   const approveUser = useCallback(
     (userId: string) => {
       reviewMutation.mutate(
-        { userId, data: { decision: "approved" } },
+        { userId, data: { status: "approved" } },
         { onSuccess: () => refetch() },
       );
     },
@@ -75,7 +75,7 @@ export function useKycPendingUsers() {
   const rejectUser = useCallback(
     (userId: string, reason: string) => {
       reviewMutation.mutate(
-        { userId, data: { decision: "rejected", reason } },
+        { userId, data: { status: "rejected", notes: reason } },
         { onSuccess: () => refetch() },
       );
     },

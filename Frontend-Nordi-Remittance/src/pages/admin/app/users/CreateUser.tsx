@@ -26,7 +26,7 @@ import {
 } from "@core/data/FormData";
 import useThemeStore from "@store/theme.store";
 import { lightTheme, darkTheme } from "@constants/colors";
-import { useCreateUser, type Country } from "./use-case/useCreateUser";
+import { useCreateUser, type Country } from "../../domain/useCreateUser";
 import {
   signupSchema,
   signupInitialValues,

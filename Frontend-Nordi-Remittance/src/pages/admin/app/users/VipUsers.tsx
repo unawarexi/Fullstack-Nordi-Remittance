@@ -18,7 +18,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAdminTeam } from "./use-case/useAdminTeam";
+import { useAdminTeam } from "../../domain/useAdminTeam";
 
 const AdminUsers: React.FC = () => {
   const {
