@@ -44,6 +44,7 @@ import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
+import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -252,6 +253,9 @@ export async function creditUserWallet(
       metadata,
     } = req.body;
 
+    // Validate target user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(userId, "credit wallet");
+
     // Validate amount
     if (!amount || amount <= 0) {
       throw new ValidationError("Amount must be greater than zero");
@@ -293,6 +297,11 @@ export async function creditUserWallet(
 
     // Create transaction record
     const referenceNumber = reference || generateReferenceNumber();
+
+    // Extract sender/recipient details from metadata for top-level model fields
+    const isInternational = metadata?.isInternational === true;
+    const senderDetails = metadata?.sender || {};
+
     const transaction = new Transactions({
       wallet: wallet._id,
       referenceNumber,
@@ -304,6 +313,11 @@ export async function creditUserWallet(
       description: description || `Admin credit: ${transactionType}`,
       initiatedBy: userId,
       fee: taxAmount, // Store tax as fee
+      isInternational,
+      recipientName: senderDetails.name || undefined,
+      recipientBankName: senderDetails.bankName || undefined,
+      recipientAccountNumber: senderDetails.accountNumber || undefined,
+      exchangeRate: metadata?.exchangeRate || undefined,
       meta: {
         adminInitiated: true,
         adminId: req.user.userId,
@@ -314,6 +328,7 @@ export async function creditUserWallet(
         taxAmount,
         taxRate: isTaxExempt ? 0 : TAX_RATE,
         isTaxExempt,
+        transferType: isInternational ? "international" : "domestic",
         ...metadata,
       },
       completedAt: new Date(),
@@ -484,6 +499,9 @@ export async function debitUserWallet(
       metadata,
     } = req.body;
 
+    // Validate target user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(userId, "debit wallet");
+
     // Validate amount
     if (!amount || amount <= 0) {
       throw new ValidationError("Amount must be greater than zero");
@@ -524,6 +542,11 @@ export async function debitUserWallet(
 
     // Create transaction record
     const referenceNumber = reference || generateReferenceNumber();
+
+    // Extract recipient details from metadata for top-level model fields
+    const isInternational = metadata?.isInternational === true;
+    const recipientDetails = metadata?.recipient || {};
+
     const transaction = new Transactions({
       wallet: wallet._id,
       referenceNumber,
@@ -534,6 +557,11 @@ export async function debitUserWallet(
       status: "completed",
       description: description || `Admin debit: ${transactionType}`,
       initiatedBy: userId,
+      isInternational,
+      recipientName: recipientDetails.name || undefined,
+      recipientBankName: recipientDetails.bankName || undefined,
+      recipientAccountNumber: recipientDetails.accountNumber || undefined,
+      exchangeRate: metadata?.exchangeRate || undefined,
       meta: {
         adminInitiated: true,
         adminId: req.user.userId,
@@ -541,6 +569,7 @@ export async function debitUserWallet(
         previousBalance,
         newBalance,
         forceDebit,
+        transferType: isInternational ? "international" : "domestic",
         ...metadata,
       },
       completedAt: new Date(),
@@ -680,6 +709,12 @@ export async function adminTransfer(
       description,
       metadata,
     } = req.body;
+
+    // Validate both users' eligibility (KYC approved, account active & unlocked)
+    await Promise.all([
+      validateUserEligibility(fromUserId, "admin transfer (sender)"),
+      validateUserEligibility(toUserId, "admin transfer (recipient)"),
+    ]);
 
     if (fromUserId === toUserId) {
       throw new ValidationError("Cannot transfer to the same account");
@@ -890,6 +925,9 @@ export async function approveLoan(
     const application =
       await LoanApplications.findById(loanId).session(session);
     if (!application) throw new NotFoundError("Loan application not found");
+
+    // Validate applicant eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(application.user), "loan approval");
 
     // LoanApplication status can be: draft, submitted, under_review, approved, rejected, cancelled
     if (
@@ -1175,6 +1213,9 @@ export async function disburseLoan(
     const loan = await Loans.findById(loanId).session(session);
     if (!loan) throw new NotFoundError("Loan not found");
 
+    // Validate borrower eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(loan.user), "loan disbursement");
+
     // Loan status: pending, active, paid, defaulted, written_off, paused
     // 'pending' is the status after approval but before disbursement
     if (loan.status !== "pending") {
@@ -1314,6 +1355,9 @@ export async function approveCard(
     // Get card application
     const application = await CardApplications.findById(cardId);
     if (!application) throw new NotFoundError("Card application not found");
+
+    // Validate applicant eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(application.user), "card approval");
 
     // CardApplication status: pending, under_review, approved, rejected, cancelled
     if (
@@ -1561,6 +1605,9 @@ export async function approveInvestment(
     const investment = await InvestmentAccounts.findById(investmentId);
     if (!investment) throw new NotFoundError("Investment not found");
 
+    // Validate investor eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(investment.user), "investment approval");
+
     // InvestmentAccount status: active, suspended, closed
     investment.status = "active";
     await investment.save();
@@ -1645,6 +1692,9 @@ export async function addInvestmentReturns(
     const investment =
       await InvestmentAccounts.findById(investmentId).session(session);
     if (!investment) throw new NotFoundError("Investment not found");
+
+    // Validate investor eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(investment.user), "investment returns");
 
     // Update investment value and returns (full amount - tax only on wallet credit)
     // InvestmentAccount has: totalInvested, currentValue, totalReturns, returnPercentage
@@ -1891,6 +1941,9 @@ export async function approveTransaction(
       await Transactions.findById(transactionId).session(session);
     if (!transaction) throw new NotFoundError("Transaction not found");
 
+    // Validate transaction initiator's eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(transaction.initiatedBy), "transaction approval");
+
     if (transaction.status !== "pending") {
       throw new ValidationError(
         `Cannot approve transaction with status: ${transaction.status}`,
@@ -2099,6 +2152,9 @@ export async function reverseTransaction(
       await Transactions.findById(transactionId).session(session);
     if (!transaction) throw new NotFoundError("Transaction not found");
 
+    // Validate transaction initiator's eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(transaction.initiatedBy), "transaction reversal");
+
     if (transaction.status !== "completed") {
       throw new ValidationError("Only completed transactions can be reversed");
     }
@@ -2254,6 +2310,9 @@ export async function bulkCredit(
 
     for (const op of operations) {
       try {
+        // Validate each user's eligibility before crediting
+        await validateUserEligibility(op.userId, "bulk credit");
+
         const session = await mongoose.startSession();
         session.startTransaction();
 

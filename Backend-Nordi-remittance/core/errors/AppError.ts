@@ -74,14 +74,14 @@ export class ForbiddenError extends AppError {
 }
 
 export class AccountLockedError extends AppError {
-  constructor(message: string = 'Account is locked') {
-    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.ACCOUNT_LOCKED);
+  constructor(message: string = 'Account is locked', details?: Record<string, unknown>) {
+    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.ACCOUNT_LOCKED, true, details);
   }
 }
 
 export class AccountSuspendedError extends AppError {
-  constructor(message: string = 'Account is suspended') {
-    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.ACCOUNT_SUSPENDED);
+  constructor(message: string = 'Account is suspended', details?: Record<string, unknown>) {
+    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.ACCOUNT_SUSPENDED, true, details);
   }
 }
 
@@ -260,8 +260,8 @@ export class WalletFrozenError extends AppError {
 // ============================================================================
 
 export class KycNotVerifiedError extends AppError {
-  constructor(message: string = 'KYC verification is required for this action') {
-    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.KYC_NOT_VERIFIED);
+  constructor(message: string = 'KYC verification is required for this action', details?: Record<string, unknown>) {
+    super(message, HttpStatus.FORBIDDEN, constants.ERROR_CODES.KYC_NOT_VERIFIED, true, details);
   }
 }
 

@@ -30,6 +30,7 @@ import {
   TransactionFailedError,
 } from "../core/errors/AppError.js";
 import { constants, HttpStatus } from "../config/env.config.js";
+import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser, broadcast } from "../services/websocket.service.js";
@@ -104,6 +105,9 @@ export async function internalTransfer(
       throw new UnauthorizedError("Authentication required");
     }
 
+    // Validate sender eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "transfer");
+
     const {
       recipientAccountNumber,
       recipientEmail,
@@ -157,6 +161,9 @@ export async function internalTransfer(
     if (!recipient) {
       throw new NotFoundError("Recipient not found");
     }
+
+    // Validate recipient eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(String(recipient._id), "receive transfer");
 
     // Prevent self-transfer
     if (recipient._id.toString() === sender._id.toString()) {
@@ -479,6 +486,9 @@ export async function deposit(
       throw new UnauthorizedError("Authentication required");
     }
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "deposit");
+
     const { amount, currency, paymentMethod, paymentReference } = req.body;
 
     if (!amount || amount <= 0) {
@@ -682,6 +692,9 @@ export async function withdraw(
       throw new UnauthorizedError("Authentication required");
     }
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "withdrawal");
+
     const {
       amount,
       currency,
@@ -699,11 +712,6 @@ export async function withdraw(
     const user: any = await Users.findById(req.user.userId).session(session);
     if (!user) {
       throw new NotFoundError("User not found");
-    }
-
-    // KYC check for withdrawals
-    if (user.kycStatus !== "approved") {
-      throw new ValidationError("KYC verification required for withdrawals");
     }
 
     const withdrawCurrency = currency || "USD";

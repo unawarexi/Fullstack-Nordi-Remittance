@@ -38,6 +38,7 @@ import {
 } from "../core/errors/AppError.js";
 import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
+import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
 
@@ -173,17 +174,15 @@ export async function createVirtualCard(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "virtual card creation");
+
     const { walletId, cardType, cardBrand, cardholderName, currency } =
       req.body;
 
     // Verify user
     const user = await Users.findById(req.user.userId).session(session);
     if (!user) throw new NotFoundError("User not found");
-
-    // KYC check
-    if (user.kycStatus !== "approved") {
-      throw new ForbiddenError("KYC verification required to create cards");
-    }
 
     // Verify wallet
     const wallet = await Wallets.findOne({
@@ -333,14 +332,13 @@ export async function requestPhysicalCard(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "physical card request");
+
     const { walletId, cardBrand, shippingAddress } = req.body;
 
     const user = await Users.findById(req.user.userId).session(session);
     if (!user) throw new NotFoundError("User not found");
-
-    if (user.kycStatus !== "approved") {
-      throw new ForbiddenError("KYC verification required");
-    }
 
     // Validate shipping address
     if (

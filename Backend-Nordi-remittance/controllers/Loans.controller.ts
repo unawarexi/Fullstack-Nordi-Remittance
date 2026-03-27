@@ -31,6 +31,7 @@ import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
+import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -265,14 +266,13 @@ export async function applyForLoan(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "loan application");
+
     const { amount, purpose, termMonths, disbursementWalletId } = req.body;
 
     const user = await Users.findById(req.user.userId).session(session);
     if (!user) throw new NotFoundError("User not found");
-
-    if (user.kycStatus !== "approved") {
-      throw new ForbiddenError("KYC verification required");
-    }
 
     // Validate amount
     if (amount < 100) throw new ValidationError("Minimum loan amount is $100");
@@ -435,6 +435,9 @@ export async function makePayment(
 
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
+
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "loan payment");
 
     const { id } = req.params;
     const { amount, walletId, paymentType } = req.body; // paymentType: 'scheduled' | 'extra' | 'full'

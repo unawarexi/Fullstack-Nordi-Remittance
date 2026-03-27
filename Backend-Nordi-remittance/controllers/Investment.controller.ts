@@ -32,6 +32,7 @@ import { sendTemplatedMail } from "../services/mailer.service.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
+import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 
 // Initialize email content generator
 const emailGenerator = new EmailContentGenerator();
@@ -92,6 +93,9 @@ export async function createSavingsGoal(
 
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
+
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "savings goal creation");
 
     const {
       name,
@@ -206,6 +210,9 @@ export async function depositToGoal(
 
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
+
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "savings deposit");
 
     const { id } = req.params;
     const { amount, walletId } = req.body;
@@ -327,6 +334,9 @@ export async function withdrawFromGoal(
 
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
+
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "savings withdrawal");
 
     const { id } = req.params;
     const { amount, walletId } = req.body;
@@ -570,14 +580,13 @@ export async function createInvestmentAccount(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "investment account creation");
+
     const { walletId, riskTolerance, investmentGoal } = req.body;
 
     const user = await Users.findById(req.user.userId).session(session);
     if (!user) throw new NotFoundError("User not found");
-
-    if (user.kycStatus !== "approved") {
-      throw new ForbiddenError("KYC verification required for investments");
-    }
 
     // Check for existing account
     const existing = await InvestmentAccounts.findOne({
@@ -787,6 +796,9 @@ export async function buyAsset(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "asset purchase");
+
     const { assetId, amount, walletId } = req.body;
     const currency = "USD";
 
@@ -969,6 +981,9 @@ export async function sellAsset(
 
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
+
+    // Validate user eligibility (KYC approved, account active & unlocked)
+    await validateUserEligibility(req.user.userId, "asset sale");
 
     const { assetId, quantity, walletId } = req.body;
     const currency = "USD";
