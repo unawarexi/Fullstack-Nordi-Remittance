@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@utils/cn';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@components/ui/Button';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 
 // ========================
 // SLIDE DATA

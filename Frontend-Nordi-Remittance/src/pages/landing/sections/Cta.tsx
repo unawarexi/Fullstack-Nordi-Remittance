@@ -9,7 +9,7 @@ import { cn } from '@utils/cn';
 import { useBreakpoint, useIsMobile } from '@hooks/index';
 import { Section } from '@components/layout/Section';
 import { Container } from '@components/layout/Container';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 import Section_divider from '@components/custom_shapes/Section_divider';
 
 // ========================

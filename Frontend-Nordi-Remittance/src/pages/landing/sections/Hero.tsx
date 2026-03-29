@@ -8,7 +8,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@utils/cn";
 import { useBreakpoint, useIsMobile } from "@hooks/index";
 import { Button } from "@components/ui/Button";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 import Contents from "./Contents";
 
 const slides = [

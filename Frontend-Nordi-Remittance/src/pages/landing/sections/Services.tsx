@@ -2,7 +2,7 @@
 // BANKING SERVICES - Responsive slider section
 // ============================================================================
 
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";

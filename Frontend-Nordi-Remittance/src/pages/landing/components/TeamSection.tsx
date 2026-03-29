@@ -8,7 +8,7 @@ import { Section, Container, Grid } from '@components/layout';
 import { Card } from '@components/ui/Card';
 import { Avatar } from '@components/ui/Avatar';
 import { Linkedin, Twitter, Mail } from 'lucide-react';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 
 // ========================
 // TYPES

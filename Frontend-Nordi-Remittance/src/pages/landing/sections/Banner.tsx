@@ -10,7 +10,7 @@ import { useBreakpoint, useIsMobile } from "@hooks/index";
 import { Section } from "@components/layout/Section";
 import { Container } from "@components/layout/Container";
 import { Grid } from "@components/layout/Grid";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 
 // ========================
 // SERVICES DATA

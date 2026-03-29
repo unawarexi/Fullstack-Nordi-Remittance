@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import id1 from "@assets/id1.jpg";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { saveConfirmData } from "@core/api/BankingConfirm"; // API function
-import { ConfirmSpinner } from "@components/shared/Spinner";
+import { ConfirmSpinner } from "@components/ui/Spinner";
 import { ConfirmError, ConfirmSuccess } from "@components/shared/ConfirmPop";
 
 interface ConfirmIDValues {

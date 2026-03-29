@@ -1,4 +1,4 @@
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 import React from 'react';
 
 const teamMembers = [

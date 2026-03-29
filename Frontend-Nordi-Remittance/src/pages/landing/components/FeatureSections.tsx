@@ -9,7 +9,7 @@ import { Shield, Coins, ArrowRight } from 'lucide-react';
 import { Section, Container, Grid, Flex } from '@components/layout';
 import { Card, CardContent } from '@components/ui/Card';
 import StoreLinks, { BtnTypes } from '@components/common/StoreLinks';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 
 // Import assets
 import AppFrame from '@assets/app_frame.png';

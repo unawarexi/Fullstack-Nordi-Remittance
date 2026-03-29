@@ -6,7 +6,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@utils/cn';
 import { useBreakpoint, useIsMobile } from '@hooks/index';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 
 // ========================
 // CONTENT DATA

@@ -6,7 +6,7 @@ import HeroImage from "@assets/hero.png";
 import Phone from "@assets/phone.png";
 import StoreLinks, { BtnTypes } from "@components/common/StoreLinks";
 import Section_divider from "@components/custom_shapes/Section_divider";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 
 function Features() {
   return (
