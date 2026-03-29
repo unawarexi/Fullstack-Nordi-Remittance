@@ -10,14 +10,14 @@ import { cn } from "@utils/cn";
 // VARIANT STYLES
 // ========================
 const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-neutral-100 text-neutral-700 border-neutral-200",
+  default: "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700",
   primary: "bg-primary-100 text-primary-700 border-primary-200",
   secondary: "bg-secondary-100 text-secondary-700 border-secondary-200",
   success: "bg-success-100 text-success-700 border-success-200",
   warning: "bg-warning-100 text-warning-700 border-warning-200",
   error: "bg-error-100 text-error-700 border-error-200",
   info: "bg-info-100 text-info-700 border-info-200",
-  outline: "bg-transparent text-neutral-700 border-neutral-300",
+  outline: "bg-transparent text-neutral-700 dark:text-neutral-200 border-neutral-300",
 };
 
 // ========================

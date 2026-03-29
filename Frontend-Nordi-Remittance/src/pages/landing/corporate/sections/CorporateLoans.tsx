@@ -83,7 +83,7 @@ const loanProducts: LoanProduct[] = [
       "Vendor partnerships",
       "Residual value options",
     ],
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
   },
   {
     id: "commercial-mortgage",
@@ -119,7 +119,7 @@ const processSteps = [
 // ========================
 const CorporateLoans: React.FC = () => {
   return (
-    <Section id="corporate-loans" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="corporate-loans" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -132,10 +132,10 @@ const CorporateLoans: React.FC = () => {
             <Landmark className="w-4 h-4" />
             Corporate Loans
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Financing Your Growth Ambitions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive lending solutions tailored for large corporations, 
             from working capital to long-term project financing.
           </p>
@@ -151,30 +151,30 @@ const CorporateLoans: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
               <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", product.color)}>
                 {product.icon}
               </div>
 
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{product.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{product.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{product.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{product.description}</p>
 
               {/* Key Metrics */}
-              <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 mb-4">
+              <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 mb-4">
                 <div className="text-center">
                   <p className="text-xs text-neutral-400 mb-1">Amount</p>
-                  <p className="text-sm font-semibold text-neutral-900">{product.amount}</p>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.amount}</p>
                 </div>
                 <div className="text-center border-x border-slate-200">
                   <p className="text-xs text-neutral-400 mb-1">Tenor</p>
-                  <p className="text-sm font-semibold text-neutral-900">{product.tenor}</p>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.tenor}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-neutral-400 mb-1">Rate</p>
-                  <p className="text-sm font-semibold text-neutral-900">{product.rate}</p>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.rate}</p>
                 </div>
               </div>
 
@@ -183,7 +183,7 @@ const CorporateLoans: React.FC = () => {
                 {product.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm text-neutral-600">{feature}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                   </li>
                 ))}
               </ul>

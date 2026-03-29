@@ -91,7 +91,7 @@ const loanCategories: LoanCategory[] = [
     rate: "5.5%",
     tenure: "20 years",
     icon: <Building className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     eligibleFor: [
       "Medical Office Buildings",
       "Senior Care Facilities",
@@ -137,8 +137,8 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Icon */}
@@ -147,14 +147,14 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 mb-2">{loan.name}</h3>
-    <p className="text-sm text-neutral-500 mb-4">{loan.description}</p>
+    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{loan.name}</h3>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{loan.description}</p>
 
     {/* Loan Details */}
-    <div className="grid grid-cols-3 gap-3 py-4 border-y border-neutral-100 mb-4">
+    <div className="grid grid-cols-3 gap-3 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
       <div>
         <p className="text-xs text-neutral-400">Max Amount</p>
-        <p className="text-lg font-bold text-neutral-900">{loan.maxAmount}</p>
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">{loan.maxAmount}</p>
       </div>
       <div>
         <p className="text-xs text-neutral-400">Rate</p>
@@ -162,7 +162,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
       </div>
       <div>
         <p className="text-xs text-neutral-400">Tenure</p>
-        <p className="text-lg font-bold text-neutral-900">{loan.tenure}</p>
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">{loan.tenure}</p>
       </div>
     </div>
 
@@ -173,7 +173,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
         {loan.eligibleFor.map((item) => (
           <span
             key={item}
-            className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded"
+            className="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded"
           >
             {item}
           </span>
@@ -207,10 +207,10 @@ const CBNHealthcare: React.FC = () => {
             <Heart className="w-4 h-4" />
             Healthcare Sector Intervention
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             CBN Healthcare Sector Loan
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access concessionary financing through the Central Bank's Healthcare 
             Sector Intervention Fund to grow your healthcare business.
           </p>
@@ -226,13 +226,13 @@ const CBNHealthcare: React.FC = () => {
           {programBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white border border-neutral-200"
+              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-10 h-10 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -270,7 +270,7 @@ const CBNHealthcare: React.FC = () => {
             <div className="text-center">
               <p className="text-4xl font-bold text-amber-400 mb-2">$50M+</p>
               <p className="text-blue-200 mb-6">Total funds disbursed to healthcare sector</p>
-              <Button variant="primary" size="lg" className="bg-amber-500 hover:bg-amber-600">
+              <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
                 Check Your Eligibility
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

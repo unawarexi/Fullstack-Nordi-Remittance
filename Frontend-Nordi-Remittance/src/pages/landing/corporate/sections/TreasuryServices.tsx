@@ -109,14 +109,14 @@ const TreasuryServices: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
             <TrendingUp className="w-4 h-4" />
             Treasury Services
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Risk Management & Treasury Solutions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Expert treasury services to help you manage financial risks, optimize 
             investments, and implement sophisticated hedging strategies.
           </p>
@@ -134,12 +134,12 @@ const TreasuryServices: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className={cn(
-                  "relative p-5 rounded-xl bg-white border border-neutral-200",
+                  "relative p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                   "hover:shadow-md hover:border-amber-300 transition-all duration-300"
                 )}
               >
                 {product.badge && (
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
+                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-xs font-medium">
                     {product.badge}
                   </span>
                 )}
@@ -148,14 +148,14 @@ const TreasuryServices: React.FC = () => {
                   {product.icon}
                 </div>
                 
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">{product.name}</h3>
-                <p className="text-sm text-neutral-500 mb-4">{product.description}</p>
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-2">{product.name}</h3>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{product.description}</p>
                 
                 <ul className="space-y-1.5">
                   {product.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-center gap-2">
                       <Check className="w-3.5 h-3.5 text-amber-500" />
-                      <span className="text-xs text-neutral-600">{benefit}</span>
+                      <span className="text-xs text-neutral-600 dark:text-neutral-300">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -206,17 +206,17 @@ const TreasuryServices: React.FC = () => {
             </div>
 
             {/* Risk Assessment */}
-            <div className="p-5 rounded-xl bg-amber-50 border border-amber-100">
+            <div className="p-5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
                   <Calculator className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-neutral-900">Risk Assessment</h4>
-                  <p className="text-xs text-neutral-500">Free consultation</p>
+                  <h4 className="font-semibold text-neutral-900 dark:text-white">Risk Assessment</h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Free consultation</p>
                 </div>
               </div>
-              <p className="text-sm text-neutral-600 mb-4">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">
                 Get a comprehensive analysis of your currency and interest rate exposures 
                 with recommended hedging strategies.
               </p>
@@ -227,8 +227,8 @@ const TreasuryServices: React.FC = () => {
             </div>
 
             {/* Research */}
-            <div className="p-5 rounded-xl bg-white border border-neutral-200">
-              <h4 className="font-semibold text-neutral-900 mb-3">Market Research</h4>
+            <div className="p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+              <h4 className="font-semibold text-neutral-900 dark:text-white mb-3">Market Research</h4>
               <ul className="space-y-3">
                 {[
                   "Q4 FX Outlook Report",
@@ -238,7 +238,7 @@ const TreasuryServices: React.FC = () => {
                   <li key={item}>
                     <a
                       href="#"
-                      className="flex items-center gap-2 text-sm text-neutral-600 hover:text-amber-600"
+                      className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300 hover:text-amber-600"
                     >
                       <BarChart3 className="w-4 h-4" />
                       {item}

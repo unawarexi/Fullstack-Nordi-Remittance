@@ -207,12 +207,12 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col p-6 rounded-2xl bg-white border",
+      "relative flex flex-col p-6 rounded-2xl bg-white dark:bg-neutral-800 border",
       card.popular
         ? "border-indigo-200 shadow-xl ring-2 ring-indigo-500"
         : card.premium
         ? "border-amber-200 shadow-xl ring-2 ring-amber-500"
-        : "border-neutral-200 hover:shadow-lg",
+        : "border-neutral-200 dark:border-neutral-700 hover:shadow-lg dark:hover:shadow-neutral-900/50",
       "transition-all duration-300"
     )}
   >
@@ -221,7 +221,7 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
         <span className={cn(
           "inline-flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded-full",
-          card.popular ? "bg-indigo-500" : "bg-amber-500"
+          card.popular ? "bg-indigo-50 dark:bg-indigo-900/300" : "bg-amber-50 dark:bg-amber-900/200"
         )}>
           {card.popular ? <Star className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}
           {card.popular ? "Most Popular" : "Premium"}
@@ -236,15 +236,15 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
 
     {/* Card Info */}
     <div className="mb-4">
-      <h3 className="text-xl font-semibold text-neutral-900">{card.name}</h3>
-      <p className="text-sm text-neutral-500">{card.tagline}</p>
+      <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">{card.name}</h3>
+      <p className="text-sm text-neutral-500 dark:text-neutral-400">{card.tagline}</p>
     </div>
 
     {/* Key Stats */}
-    <div className="grid grid-cols-2 gap-3 py-4 border-y border-neutral-100 mb-4">
+    <div className="grid grid-cols-2 gap-3 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
       <div>
         <p className="text-xs text-neutral-400">Annual Fee</p>
-        <p className="text-lg font-bold text-neutral-900">{card.annualFee}</p>
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">{card.annualFee}</p>
       </div>
       <div>
         <p className="text-xs text-neutral-400">Sign-up Bonus</p>
@@ -254,11 +254,11 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
 
     {/* Rewards */}
     <div className="mb-4">
-      <p className="text-xs font-medium text-neutral-500 uppercase mb-2">Rewards</p>
+      <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase mb-2">Rewards</p>
       <div className="space-y-1.5">
         {card.rewards.slice(0, 3).map((reward) => (
           <div key={reward.category} className="flex items-center justify-between text-sm">
-            <span className="text-neutral-600">{reward.category}</span>
+            <span className="text-neutral-600 dark:text-neutral-300">{reward.category}</span>
             <span className="font-semibold text-indigo-600">{reward.rate}</span>
           </div>
         ))}
@@ -268,7 +268,7 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     {/* Features */}
     <ul className="space-y-2 flex-1 mb-6">
       {card.features.slice(0, 4).map((feature) => (
-        <li key={feature} className="flex items-start gap-2 text-sm text-neutral-600">
+        <li key={feature} className="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-300">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
           {feature}
         </li>
@@ -281,7 +281,7 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
       className={cn(
         "w-full",
         card.popular && "bg-indigo-600 hover:bg-indigo-700",
-        card.premium && "bg-amber-500 hover:bg-amber-600"
+        card.premium && "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600"
       )}
     >
       Apply Now
@@ -308,10 +308,10 @@ const CreditCards: React.FC = () => {
             <CreditCard className="w-4 h-4" />
             Credit Cards
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Find The Perfect Card For Your Lifestyle
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             From everyday essentials to premium rewards, our credit cards offer 
             exceptional benefits and industry-leading cashback rates.
           </p>
@@ -327,13 +327,13 @@ const CreditCards: React.FC = () => {
           {cardBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50"
+              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
               <div className="w-10 h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -352,7 +352,7 @@ const CreditCards: React.FC = () => {
           viewport={{ once: true }}
           className="mt-12 text-center"
         >
-          <p className="text-neutral-600 mb-4">
+          <p className="text-neutral-600 dark:text-neutral-300 mb-4">
             Need help choosing? Compare all cards side by side.
           </p>
           <Button variant="outline" size="lg">

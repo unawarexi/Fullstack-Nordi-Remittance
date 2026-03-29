@@ -197,10 +197,10 @@ const Signup: React.FC = () => {
           validateForm,
           setTouched,
         }) => (
-          <div className="mx-auto flex h-auto w-full flex-col items-center bg-slate-50 justify-center lg:w-[50%]">
+          <div className="mx-auto flex h-auto w-full flex-col items-center bg-slate-50 dark:bg-neutral-900 justify-center lg:w-[50%]">
             <Form
               // onSubmit={handleSubmit}
-              className="h-full w-full rounded-md bg-white p-6 md:w-[80%] lg:w-full"
+              className="h-full w-full rounded-md bg-white dark:bg-neutral-800 p-6 md:w-[80%] lg:w-full"
             >
               <div
                 style={{ display: "flex", justifyContent: "space-between" }}
@@ -593,7 +593,7 @@ const Signup: React.FC = () => {
                 {/* ------------ PREVIOUS BUTTON ----------- */}
                 <button
                   type="button"
-                  className="w-full rounded-md bg-white px-4 py-1 text-sm font-normal md:py-2 md:text-base"
+                  className="w-full rounded-md bg-white dark:bg-neutral-800 px-4 py-1 text-sm font-normal md:py-2 md:text-base"
                   onClick={() => setStep(step > 1 ? step - 1 : 1)}
                 >
                   Previous

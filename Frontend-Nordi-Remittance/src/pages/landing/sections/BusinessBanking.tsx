@@ -83,7 +83,7 @@ const BusinessBanking: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-500/10 rounded-full mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-50 dark:bg-indigo-900/300/10 rounded-full mb-4">
               <Briefcase className="w-3.5 h-3.5" />
               Business Banking
             </span>
@@ -148,7 +148,7 @@ const BusinessBanking: React.FC = () => {
                   "hover:bg-slate-750 hover:border-slate-600 transition-all"
                 )}
               >
-                <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 w-fit mb-3">
+                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/300/20 text-indigo-400 w-fit mb-3">
                   {solution.icon}
                 </div>
                 <h4 className="font-medium text-white text-sm">{solution.title}</h4>

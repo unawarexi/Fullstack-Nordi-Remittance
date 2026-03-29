@@ -94,7 +94,7 @@ const loanTypes: LoanType[] = [
     maxAmount: "$100,000",
     maxTerm: "7 years",
     icon: <Briefcase className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "No collateral required",
       "Fixed monthly payments",
@@ -150,8 +150,8 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "relative group p-6 rounded-2xl bg-white border border-neutral-200",
-        "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+        "relative group p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+        "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
       )}
     >
       {/* Icon */}
@@ -163,29 +163,29 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => {
       </div>
 
       {/* Content */}
-      <h3 className="text-xl font-semibold text-neutral-900 mb-2">{loan.name}</h3>
-      <p className="text-sm text-neutral-500 mb-4">{loan.description}</p>
+      <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{loan.name}</h3>
+      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{loan.description}</p>
 
       {/* Rate & Details */}
-      <div className="grid grid-cols-3 gap-3 py-4 border-y border-neutral-100 mb-4">
+      <div className="grid grid-cols-3 gap-3 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
         <div>
           <p className="text-xs text-neutral-400">Rate from</p>
-          <p className="text-lg font-bold text-neutral-900">{loan.rateFrom}</p>
+          <p className="text-lg font-bold text-neutral-900 dark:text-white">{loan.rateFrom}</p>
         </div>
         <div>
           <p className="text-xs text-neutral-400">Max Amount</p>
-          <p className="text-sm font-semibold text-neutral-700">{loan.maxAmount}</p>
+          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxAmount}</p>
         </div>
         <div>
           <p className="text-xs text-neutral-400">Max Term</p>
-          <p className="text-sm font-semibold text-neutral-700">{loan.maxTerm}</p>
+          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxTerm}</p>
         </div>
       </div>
 
       {/* Features */}
       <ul className="space-y-2 mb-6">
         {loan.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600">
+          <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
             <Check className="w-4 h-4 text-emerald-500" />
             {feature}
           </li>
@@ -276,7 +276,7 @@ const LoanCalculatorPreview: React.FC = () => {
         </p>
       </div>
 
-      <Button variant="primary" className="w-full bg-amber-500 hover:bg-amber-600">
+      <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
         Get Pre-Approved
         <ArrowRight className="w-5 h-5 ml-2" />
       </Button>
@@ -302,10 +302,10 @@ const Loans: React.FC = () => {
             <FileText className="w-4 h-4" />
             Personal Loans
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Flexible Loan Solutions For Every Need
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Whether you're buying a home, car, or funding your education, we offer 
             competitive rates and flexible terms to help you achieve your goals.
           </p>
@@ -321,13 +321,13 @@ const Loans: React.FC = () => {
           {loanBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50"
+              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

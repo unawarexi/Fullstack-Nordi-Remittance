@@ -100,7 +100,7 @@ export const CtaSection: React.FC = () => {
             >
               <Button
                 size="lg"
-                className="bg-white text-primary-700 hover:bg-neutral-100 px-8"
+                className="bg-white dark:bg-neutral-800 text-primary-700 hover:bg-neutral-100 dark:bg-neutral-700 px-8"
               >
                 Open Free Account
                 <ArrowRight className="ml-2 w-5 h-5" />

@@ -68,21 +68,21 @@ const RateRow: React.FC<RateRowProps> = ({ rate, index }) => (
     transition={{ duration: 0.3, delay: index * 0.05 }}
     className={cn(
       "flex items-center justify-between py-3 px-4",
-      "border-b border-neutral-100 last:border-0",
-      "hover:bg-neutral-50 transition-colors"
+      "border-b border-neutral-100 dark:border-neutral-700 last:border-0",
+      "hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50 transition-colors"
     )}
   >
     <div className="flex-1 min-w-0">
-      <div className="font-medium text-neutral-900 text-sm">{rate.name}</div>
+      <div className="font-medium text-neutral-900 dark:text-white text-sm">{rate.name}</div>
       {rate.term && (
-        <div className="text-xs text-neutral-500">{rate.term}</div>
+        <div className="text-xs text-neutral-500 dark:text-neutral-400">{rate.term}</div>
       )}
     </div>
     <div className="flex items-center gap-4">
       <div className="text-right">
-        <div className="font-semibold text-neutral-900">{rate.rate}</div>
+        <div className="font-semibold text-neutral-900 dark:text-white">{rate.rate}</div>
         {rate.apy && (
-          <div className="text-xs text-neutral-500">{rate.apy} APY</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">{rate.apy} APY</div>
         )}
       </div>
       <TrendIcon change={rate.change} />
@@ -100,11 +100,11 @@ interface RateTableProps {
 }
 
 const RateTable: React.FC<RateTableProps> = ({ title, rates, color }) => (
-  <div className="bg-white rounded-xl border border-neutral-100 overflow-hidden">
-    <div className={cn("px-4 py-3 border-b border-neutral-100", color)}>
+  <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-100 dark:border-neutral-700 overflow-hidden">
+    <div className={cn("px-4 py-3 border-b border-neutral-100 dark:border-neutral-700", color)}>
       <h3 className="font-semibold text-white text-sm">{title}</h3>
     </div>
-    <div className="divide-y divide-neutral-100">
+    <div className="divide-y divide-neutral-100 dark:divide-neutral-700">
       {rates.map((rate, index) => (
         <RateRow key={rate.name} rate={rate} index={index} />
       ))}
@@ -134,13 +134,13 @@ const InterestRates: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
               Current Rates
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Competitive Interest Rates
             </h2>
-            <p className="mt-2 text-neutral-600">
+            <p className="mt-2 text-neutral-600 dark:text-neutral-300">
               Updated daily to give you the best possible rates.
             </p>
           </motion.div>
@@ -149,7 +149,7 @@ const InterestRates: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center gap-2 text-xs text-neutral-500"
+            className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400"
           >
             <Info className="w-4 h-4" />
             Last updated: {lastUpdated}
@@ -177,14 +177,14 @@ const InterestRates: React.FC = () => {
           viewport={{ once: true }}
           className={cn(
             "mt-6 p-4 rounded-lg",
-            "bg-amber-50 border border-amber-100"
+            "bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30"
           )}
         >
           <div className="flex gap-3">
             <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-800">
+            <div className="text-sm text-amber-800 dark:text-amber-200">
               <p className="font-medium">Rate Information</p>
-              <p className="mt-1 text-amber-700">
+              <p className="mt-1 text-amber-700 dark:text-amber-300">
                 Annual Percentage Yields (APY) and rates are accurate as of the date shown and are
                 subject to change without notice. Fees may reduce earnings. Additional terms and
                 conditions may apply.{" "}

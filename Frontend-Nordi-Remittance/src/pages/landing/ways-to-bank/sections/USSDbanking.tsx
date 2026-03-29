@@ -55,7 +55,7 @@ const benefits = [
 // ========================
 const USSDbanking: React.FC = () => {
   return (
-    <Section id="ussd-banking" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="ussd-banking" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -68,10 +68,10 @@ const USSDbanking: React.FC = () => {
             <Phone className="w-4 h-4" />
             *901# USSD Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Bank Without Internet
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access your account from any phone, anywhere. Simply dial *901# to 
             transfer money, check balance, pay bills, and more - no data required.
           </p>
@@ -87,14 +87,14 @@ const USSDbanking: React.FC = () => {
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-neutral-200"
+              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500">{benefit.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -107,15 +107,15 @@ const USSDbanking: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
-            <h4 className="font-semibold text-neutral-900 mb-6">Quick USSD Codes</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-6">Quick USSD Codes</h4>
             <div className="space-y-3">
               {ussdServices.map((service) => (
                 <div
                   key={service.code}
                   className={cn(
-                    "flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100",
+                    "flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100",
                     "hover:bg-orange-50 hover:border-orange-200 transition-all"
                   )}
                 >
@@ -123,8 +123,8 @@ const USSDbanking: React.FC = () => {
                     {service.code}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-neutral-900 text-sm">{service.name}</p>
-                    <p className="text-xs text-neutral-500">{service.description}</p>
+                    <p className="font-medium text-neutral-900 dark:text-white text-sm">{service.name}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.description}</p>
                   </div>
                 </div>
               ))}
@@ -141,20 +141,20 @@ const USSDbanking: React.FC = () => {
             {/* Phone Mockup */}
             <div className="relative mx-auto w-64 h-80 bg-neutral-900 rounded-3xl p-3 shadow-xl">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-1 bg-neutral-800 rounded-full" />
-              <div className="h-full bg-neutral-100 rounded-2xl overflow-hidden">
+              <div className="h-full bg-neutral-100 dark:bg-neutral-700 rounded-2xl overflow-hidden">
                 <div className="h-8 bg-orange-500 flex items-center justify-center text-white text-xs font-medium">
                   USSD Menu
                 </div>
                 <div className="p-4 space-y-2 text-xs font-mono">
-                  <p className="text-neutral-900 font-semibold">Welcome to *901#</p>
-                  <p className="text-neutral-600">1. Transfer Money</p>
-                  <p className="text-neutral-600">2. Buy Airtime</p>
-                  <p className="text-neutral-600">3. Pay Bills</p>
-                  <p className="text-neutral-600">4. Check Balance</p>
-                  <p className="text-neutral-600">5. Account Services</p>
-                  <p className="text-neutral-600">6. Cardless Withdrawal</p>
-                  <div className="mt-4 pt-2 border-t border-neutral-200">
-                    <p className="text-neutral-500">Reply with option number</p>
+                  <p className="text-neutral-900 dark:text-white font-semibold">Welcome to *901#</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">1. Transfer Money</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">2. Buy Airtime</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">3. Pay Bills</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">4. Check Balance</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">5. Account Services</p>
+                  <p className="text-neutral-600 dark:text-neutral-300">6. Cardless Withdrawal</p>
+                  <div className="mt-4 pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                    <p className="text-neutral-500 dark:text-neutral-400">Reply with option number</p>
                   </div>
                 </div>
               </div>
@@ -178,7 +178,7 @@ const USSDbanking: React.FC = () => {
                   </li>
                 ))}
               </ol>
-              <Button variant="primary" className="w-full mt-4 bg-white text-orange-600 hover:bg-orange-50">
+              <Button variant="primary" className="w-full mt-4 bg-white dark:bg-neutral-800 text-orange-600 hover:bg-orange-50">
                 Reset USSD PIN
               </Button>
             </div>

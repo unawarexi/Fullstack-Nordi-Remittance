@@ -125,24 +125,24 @@ const QuickLinkCard: React.FC<QuickLinkCardProps> = ({ link, index }) => (
     transition={{ duration: 0.3, delay: index * 0.04 }}
     className={cn(
       "group flex items-center gap-3 p-4 rounded-xl",
-      "bg-white border border-neutral-100",
-      "hover:shadow-md hover:border-indigo-100 transition-all duration-300"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all duration-300"
     )}
   >
     <div
       className={cn(
         "flex-shrink-0 p-2.5 rounded-lg",
-        "bg-neutral-50 text-neutral-600",
-        "group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"
+        "bg-neutral-50 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-300",
+        "group-hover:bg-indigo-50 dark:bg-indigo-900/30 group-hover:text-indigo-600 transition-colors"
       )}
     >
       {link.icon}
     </div>
     <div className="flex-1 min-w-0">
-      <h4 className="font-medium text-neutral-900 text-sm group-hover:text-indigo-600 transition-colors">
+      <h4 className="font-medium text-neutral-900 dark:text-white text-sm group-hover:text-indigo-600 transition-colors">
         {link.title}
       </h4>
-      <p className="text-xs text-neutral-500 truncate">{link.description}</p>
+      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{link.description}</p>
     </div>
     <ArrowRight
       className={cn(
@@ -167,13 +167,13 @@ const QuickLinks: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
             Quick Access
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
             Popular Services
           </h2>
-          <p className="mt-2 text-neutral-600">
+          <p className="mt-2 text-neutral-600 dark:text-neutral-300">
             Quick shortcuts to the things you do most
           </p>
         </motion.div>
@@ -209,9 +209,9 @@ const QuickLinks: React.FC = () => {
               href="/services"
               className={cn(
                 "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg",
-                "bg-white text-indigo-600",
+                "bg-white dark:bg-neutral-800 text-indigo-600",
                 "text-sm font-medium",
-                "hover:bg-indigo-50 transition-colors"
+                "hover:bg-indigo-50 dark:bg-indigo-900/30 transition-colors"
               )}
             >
               All Services
@@ -221,7 +221,7 @@ const QuickLinks: React.FC = () => {
               href="/contact"
               className={cn(
                 "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg",
-                "bg-indigo-500 text-white",
+                "bg-indigo-50 dark:bg-indigo-900/300 text-white",
                 "text-sm font-medium",
                 "hover:bg-indigo-400 transition-colors"
               )}

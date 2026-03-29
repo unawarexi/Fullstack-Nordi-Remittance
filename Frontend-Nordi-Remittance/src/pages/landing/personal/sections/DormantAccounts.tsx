@@ -97,14 +97,14 @@ const DormantAccounts: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
             <AlertCircle className="w-4 h-4" />
             Dormant Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Reactivate Your Dormant Account
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Haven't used your account in a while? Don't worry – reactivating your 
             dormant account is simple. Follow these steps to regain full access to your funds.
           </p>
@@ -115,19 +115,19 @@ const DormantAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col md:flex-row items-start md:items-center gap-4"
+          className="mb-12 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 flex flex-col md:flex-row items-start md:items-center gap-4"
         >
           <div className="p-2 rounded-lg bg-amber-100">
             <Clock className="w-6 h-6 text-amber-600" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-neutral-900">Account Inactive?</h3>
-            <p className="text-sm text-neutral-600">
+            <h3 className="font-semibold text-neutral-900 dark:text-white">Account Inactive?</h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
               If your account has had no activity for 12+ months, it may be classified as dormant. 
               Your funds are safe, but transactions are temporarily restricted.
             </p>
           </div>
-          <Button variant="primary" className="bg-amber-500 hover:bg-amber-600 whitespace-nowrap">
+          <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap">
             Check Account Status
           </Button>
         </motion.div>
@@ -136,7 +136,7 @@ const DormantAccounts: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Reactivation Steps */}
           <div className="lg:col-span-2">
-            <h3 className="text-xl font-semibold text-neutral-900 mb-6">
+            <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-6">
               How to Reactivate Your Account
             </h3>
             <div className="space-y-4">
@@ -147,19 +147,19 @@ const DormantAccounts: React.FC = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex gap-4 p-4 rounded-xl bg-white border border-neutral-200"
+                  className="flex gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
                 >
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center font-bold">
                       {step.step}
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-neutral-900 flex items-center gap-2">
+                    <h4 className="font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
                       {step.title}
                       <step.icon className="w-4 h-4 text-neutral-400" />
                     </h4>
-                    <p className="text-sm text-neutral-600 mt-1">{step.description}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -170,15 +170,15 @@ const DormantAccounts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 p-6 rounded-xl bg-neutral-50"
+              className="mt-8 p-6 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-500" />
                 Documents Required
               </h3>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {requiredDocuments.map((doc) => (
-                  <li key={doc} className="flex items-center gap-2 text-sm text-neutral-600">
+                  <li key={doc} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                     <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                     {doc}
                   </li>
@@ -194,19 +194,19 @@ const DormantAccounts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-xl bg-white border border-neutral-200"
+              className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-indigo-500" />
                 Frequently Asked Questions
               </h3>
               <div className="space-y-4">
                 {faqs.map((faq, index) => (
-                  <div key={index} className="pb-4 border-b border-neutral-100 last:border-0 last:pb-0">
-                    <h4 className="font-medium text-neutral-900 text-sm mb-1">
+                  <div key={index} className="pb-4 border-b border-neutral-100 dark:border-neutral-700 last:border-0 last:pb-0">
+                    <h4 className="font-medium text-neutral-900 dark:text-white text-sm mb-1">
                       {faq.question}
                     </h4>
-                    <p className="text-xs text-neutral-500">{faq.answer}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{faq.answer}</p>
                   </div>
                 ))}
               </div>
@@ -241,7 +241,7 @@ const DormantAccounts: React.FC = () => {
                 </div>
               </div>
 
-              <Button variant="primary" className="w-full bg-amber-500 hover:bg-amber-600">
+              <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
                 Find Nearest Branch
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

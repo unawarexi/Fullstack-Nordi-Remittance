@@ -95,8 +95,8 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
       "p-4 rounded-xl",
-      "bg-white border border-neutral-100",
-      "hover:shadow-md hover:border-neutral-200 transition-all"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-md hover:border-neutral-200 dark:border-neutral-700 transition-all"
     )}
   >
     <div className="flex items-start gap-3">
@@ -105,7 +105,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
         className={cn(
           "flex-shrink-0 p-2.5 rounded-lg",
           location.type === "branch"
-            ? "bg-indigo-50 text-indigo-600"
+            ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600"
             : "bg-emerald-50 text-emerald-600"
         )}
       >
@@ -120,26 +120,26 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h4 className="font-semibold text-neutral-900 text-sm">
+            <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">
               {location.name}
             </h4>
             <span
               className={cn(
                 "inline-block mt-0.5 px-2 py-0.5 text-xs font-medium rounded",
                 location.type === "branch"
-                  ? "bg-indigo-50 text-indigo-600"
+                  ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600"
                   : "bg-emerald-50 text-emerald-600"
               )}
             >
               {location.type === "branch" ? "Branch" : "ATM"}
             </span>
           </div>
-          <span className="text-xs font-medium text-neutral-500">
+          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
             {location.distance}
           </span>
         </div>
 
-        <div className="mt-3 space-y-1.5 text-xs text-neutral-600">
+        <div className="mt-3 space-y-1.5 text-xs text-neutral-600 dark:text-neutral-300">
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-neutral-400" />
             <span>
@@ -165,7 +165,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
           {location.services.map((service) => (
             <span
               key={service}
-              className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-600 rounded"
+              className="px-2 py-0.5 text-xs bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 rounded"
             >
               {service}
             </span>
@@ -192,7 +192,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
               className={cn(
                 "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
                 "text-xs font-medium",
-                "bg-neutral-100 text-neutral-700",
+                "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200",
                 "hover:bg-neutral-200 transition-colors"
               )}
             >
@@ -233,7 +233,7 @@ const Locations: React.FC = () => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="w-12 h-12 text-neutral-400 mx-auto mb-2" />
-                  <p className="text-sm text-neutral-500">Interactive map</p>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">Interactive map</p>
                   <p className="text-xs text-neutral-400">
                     150+ locations nationwide
                   </p>
@@ -243,16 +243,16 @@ const Locations: React.FC = () => {
               {/* Stats overlay */}
               <div className="absolute bottom-4 left-4 right-4 flex gap-3">
                 <div className="flex-1 p-3 rounded-lg bg-white/90 backdrop-blur-sm">
-                  <div className="text-lg font-bold text-neutral-900">150+</div>
-                  <div className="text-xs text-neutral-500">Branches</div>
+                  <div className="text-lg font-bold text-neutral-900 dark:text-white">150+</div>
+                  <div className="text-xs text-neutral-500 dark:text-neutral-400">Branches</div>
                 </div>
                 <div className="flex-1 p-3 rounded-lg bg-white/90 backdrop-blur-sm">
-                  <div className="text-lg font-bold text-neutral-900">2,500+</div>
-                  <div className="text-xs text-neutral-500">ATMs</div>
+                  <div className="text-lg font-bold text-neutral-900 dark:text-white">2,500+</div>
+                  <div className="text-xs text-neutral-500 dark:text-neutral-400">ATMs</div>
                 </div>
                 <div className="flex-1 p-3 rounded-lg bg-white/90 backdrop-blur-sm">
-                  <div className="text-lg font-bold text-neutral-900">50+</div>
-                  <div className="text-xs text-neutral-500">States</div>
+                  <div className="text-lg font-bold text-neutral-900 dark:text-white">50+</div>
+                  <div className="text-xs text-neutral-500 dark:text-neutral-400">States</div>
                 </div>
               </div>
             </div>
@@ -265,13 +265,13 @@ const Locations: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
                 Find Us
               </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
                 Branches & ATMs Near You
               </h2>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-neutral-600 dark:text-neutral-300">
                 Find a branch or fee-free ATM in your neighborhood.
               </p>
             </motion.div>
@@ -292,7 +292,7 @@ const Locations: React.FC = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={cn(
                     "w-full pl-10 pr-4 py-3 rounded-lg",
-                    "bg-white border border-neutral-200",
+                    "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                     "text-sm placeholder:text-neutral-400",
                     "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   )}

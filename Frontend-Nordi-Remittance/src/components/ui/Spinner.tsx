@@ -23,7 +23,7 @@ const sizeStyles: Record<SpinnerSize, { spinner: number; text: string }> = {
 // VARIANT STYLES
 // ========================
 const variantStyles: Record<SpinnerVariant, string> = {
-  default: "text-neutral-500",
+  default: "text-neutral-500 dark:text-neutral-400",
   primary: "text-primary-500",
   white: "text-white",
 };
@@ -198,7 +198,7 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
             dotSizes[size],
             variant === "default" && "bg-neutral-500",
             variant === "primary" && "bg-primary-500",
-            variant === "white" && "bg-white",
+            variant === "white" && "bg-white dark:bg-neutral-800",
           )}
         />
       ))}
@@ -246,7 +246,7 @@ export const PulseLoader: React.FC<PulseLoaderProps> = ({
           "absolute inset-[25%] rounded-full",
           variant === "default" && "bg-neutral-500",
           variant === "primary" && "bg-primary-500",
-          variant === "white" && "bg-white",
+          variant === "white" && "bg-white dark:bg-neutral-800",
         )}
       />
     </div>
@@ -304,7 +304,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-white"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-neutral-800"
     >
       <div className="flex flex-col items-center text-center">
         {showLogo && (
@@ -322,7 +322,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-2 text-neutral-600"
+            className="mt-2 text-neutral-600 dark:text-neutral-300"
           >
             {message}
           </motion.p>
@@ -348,10 +348,10 @@ export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
-      <div className="rounded-2xl bg-white p-8 text-center shadow-2xl">
+      <div className="rounded-2xl bg-white dark:bg-neutral-800 p-8 text-center shadow-2xl">
         <LogoSpinner size="lg" />
         {message && (
-          <p className="mt-4 font-medium text-neutral-600">{message}</p>
+          <p className="mt-4 font-medium text-neutral-600 dark:text-neutral-300">{message}</p>
         )}
       </div>
     </motion.div>

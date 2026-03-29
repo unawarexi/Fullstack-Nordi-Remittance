@@ -65,7 +65,7 @@ const agentStats = [
 // ========================
 const AgencyBanking: React.FC = () => {
   return (
-    <Section id="agency-banking" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="agency-banking" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -78,10 +78,10 @@ const AgencyBanking: React.FC = () => {
             <Store className="w-4 h-4" />
             Agency Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Banking at Your Doorstep
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access banking services through our network of 50,000+ agents 
             located in markets, shops, and neighborhoods across Nigeria.
           </p>
@@ -95,9 +95,9 @@ const AgencyBanking: React.FC = () => {
           className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-12"
         >
           {agentStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white border border-neutral-200">
+            <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
               <p className="text-2xl font-bold text-orange-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600">{stat.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -109,23 +109,23 @@ const AgencyBanking: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
-            <h3 className="text-xl font-bold text-neutral-900 mb-4">Services Available</h3>
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">Services Available</h3>
             <div className="grid grid-cols-2 gap-3">
               {agentServices.map((service) => (
                 <div
                   key={service.name}
                   className={cn(
-                    "p-4 rounded-xl bg-neutral-50",
+                    "p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50",
                     "hover:bg-orange-50 transition-colors"
                   )}
                 >
                   <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center mb-3">
                     {service.icon}
                   </div>
-                  <h4 className="font-semibold text-neutral-900 text-sm mb-1">{service.name}</h4>
-                  <p className="text-xs text-neutral-500">{service.description}</p>
+                  <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{service.name}</h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.description}</p>
                 </div>
               ))}
             </div>
@@ -135,8 +135,8 @@ const AgencyBanking: React.FC = () => {
               <div className="flex items-center gap-3">
                 <MapPin className="w-8 h-8 text-orange-600" />
                 <div>
-                  <p className="font-semibold text-neutral-900">Find Nearest Agent</p>
-                  <p className="text-sm text-neutral-600">Locate agents close to you</p>
+                  <p className="font-semibold text-neutral-900 dark:text-white">Find Nearest Agent</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300">Locate agents close to you</p>
                 </div>
               </div>
               <Button variant="primary" size="sm" className="bg-orange-600 hover:bg-orange-700">
@@ -181,7 +181,7 @@ const AgencyBanking: React.FC = () => {
               </ul>
             </div>
 
-            <Button variant="secondary" className="w-full bg-white text-orange-600 hover:bg-orange-50">
+            <Button variant="secondary" className="w-full bg-white dark:bg-neutral-800 text-orange-600 hover:bg-orange-50">
               <Users className="w-4 h-4 mr-2" />
               Apply to Become an Agent
             </Button>
@@ -193,7 +193,7 @@ const AgencyBanking: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-600"
+          className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-600 dark:text-neutral-300"
         >
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-emerald-600" />

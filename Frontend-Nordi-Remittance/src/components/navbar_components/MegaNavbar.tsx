@@ -232,15 +232,15 @@ const MegaNavbar: React.FC = () => {
       animate="visible"
       exit="exit"
       className={cn(
-        "w-full rounded-2xl bg-slate-50  border-t border-neutral-100",
+        "w-full rounded-2xl bg-slate-50 dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800",
         "overflow-hidden"
       )}
     >
       {/* Fixed Container - Centered */}
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-100 to-slate-200 px-6 py-4">
-          <h3 className="text-lg lg:text-xl font-bold text-neutral-800">
+        <div className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-neutral-800 dark:to-neutral-800 px-6 py-4">
+          <h3 className="text-lg lg:text-xl font-bold text-neutral-800 dark:text-neutral-100">
             {activeContent.leftHeader}
           </h3>
         </div>
@@ -258,7 +258,7 @@ const MegaNavbar: React.FC = () => {
             <div className="grid grid-cols-12 gap-6">
               {/* Left Section - Links */}
               <div className="col-span-12 lg:col-span-4">
-                <div className="bg-neutral-50 rounded-xl p-4 lg:p-6 h-full">
+                <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-4 lg:p-6 h-full">
                   <ul className="space-y-1">
                     {activeContent.leftLinks?.map((link, idx) => (
                       <li key={idx}>
@@ -266,13 +266,13 @@ const MegaNavbar: React.FC = () => {
                           href={link.url}
                           className={cn(
                             "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm",
-                            "text-neutral-600 hover:text-amber-600 hover:bg-amber-50",
+                            "text-neutral-600 dark:text-neutral-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30",
                             "transition-all duration-200 group"
                           )}
                         >
                           <ChevronRight 
                             size={14} 
-                            className="text-neutral-400 group-hover:text-amber-500 transition-colors" 
+                            className="text-neutral-400 dark:text-neutral-500 group-hover:text-amber-500 transition-colors" 
                           />
                           {link.label}
                         </a>
@@ -290,7 +290,7 @@ const MegaNavbar: React.FC = () => {
                     <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-amber-600 mb-3">
                       {activeContent.rightHeader}
                     </h2>
-                    <p className="text-neutral-600 text-sm lg:text-base leading-relaxed mb-4">
+                    <p className="text-neutral-600 dark:text-neutral-400 text-sm lg:text-base leading-relaxed mb-4">
                       {activeContent.rightDescription}
                     </p>
                     <Button
@@ -313,7 +313,7 @@ const MegaNavbar: React.FC = () => {
                       alt={activeContent.imageAlt}
                       className="w-full max-w-[180px] lg:max-w-[220px] xl:max-w-[250px] "
                     />
-                    <p className="text-center text-neutral-500 text-sm mt-3">
+                    <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm mt-3">
                       {activeContent.imageCaption}
                     </p>
                   </div>

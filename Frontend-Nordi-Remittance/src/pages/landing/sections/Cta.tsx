@@ -156,7 +156,7 @@ const CtaSection: React.FC = () => {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
               <span className="text-amber-500">Nordea more</span> ways to bank.
             </h2>
-            <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base text-neutral-600 px-4">
+            <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base text-neutral-600 dark:text-neutral-400 px-4">
               The less time you spend in a bank, the more time you have for yourself. 
               Choose from a variety of easy and secure ways to manage your money.
             </p>
@@ -170,7 +170,7 @@ const CtaSection: React.FC = () => {
               className={cn(
                 "absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-20",
                 "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-                "bg-amber-500 hover:bg-amber-600",
+                "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600",
                 "flex items-center justify-center",
                 "text-white shadow-lg",
                 "transition-all duration-300 hover:scale-110"
@@ -185,7 +185,7 @@ const CtaSection: React.FC = () => {
               className={cn(
                 "absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-20",
                 "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-                "bg-amber-500 hover:bg-amber-600",
+                "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600",
                 "flex items-center justify-center",
                 "text-white shadow-lg",
                 "transition-all duration-300 hover:scale-110"
@@ -228,8 +228,8 @@ const CtaSection: React.FC = () => {
                   className={cn(
                     "h-2 rounded-full transition-all duration-300",
                     currentIndex === index
-                      ? "w-6 sm:w-8 bg-amber-500"
-                      : "w-2 bg-neutral-300 hover:bg-neutral-400"
+                      ? "w-6 sm:w-8 bg-amber-50 dark:bg-amber-900/200"
+                      : "w-2 bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/500"
                   )}
                   aria-label={`Go to slide ${index + 1}`}
                 />

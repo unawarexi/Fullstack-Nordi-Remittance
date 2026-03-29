@@ -166,7 +166,7 @@ const WiFiBranches: React.FC = () => {
               <p className="font-semibold text-white">More Locations Coming Soon</p>
               <p className="text-sm text-cyan-200">We're expanding our WiFi branch network</p>
             </div>
-            <Button variant="secondary" className="ml-4 bg-white text-cyan-900 hover:bg-cyan-50">
+            <Button variant="secondary" className="ml-4 bg-white dark:bg-neutral-800 text-cyan-900 hover:bg-cyan-50">
               <MapPin className="w-4 h-4 mr-2" />
               View All
             </Button>

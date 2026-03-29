@@ -99,10 +99,10 @@ const SponsoredMedicair: React.FC = () => {
             <Heart className="w-4 h-4" />
             Sponsored Medicair
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Premium Healthcare Coverage
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Exclusive medical coverage program providing access to the world's 
             best healthcare facilities, available to our private banking members.
           </p>
@@ -118,15 +118,15 @@ const SponsoredMedicair: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "p-5 rounded-xl bg-white border border-neutral-200",
+                "p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                 "hover:shadow-md hover:border-rose-300 transition-all"
               )}
             >
               <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
                 {feature.icon}
               </div>
-              <h3 className="font-semibold text-neutral-900 mb-2">{feature.title}</h3>
-              <p className="text-sm text-neutral-500">{feature.description}</p>
+              <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{feature.title}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -138,18 +138,18 @@ const SponsoredMedicair: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
             <div className="flex items-center gap-3 mb-6">
               <Shield className="w-5 h-5 text-rose-600" />
-              <h4 className="font-semibold text-neutral-900">Comprehensive Coverage</h4>
+              <h4 className="font-semibold text-neutral-900 dark:text-white">Comprehensive Coverage</h4>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {coverageBenefits.map((benefit) => (
                 <div key={benefit} className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-rose-500" />
-                  <span className="text-sm text-neutral-600">{benefit}</span>
+                  <span className="text-sm text-neutral-600 dark:text-neutral-300">{benefit}</span>
                 </div>
               ))}
             </div>
@@ -157,11 +157,11 @@ const SponsoredMedicair: React.FC = () => {
             {/* Coverage Limit */}
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-neutral-600">Annual Coverage Limit</span>
+                <span className="text-sm text-neutral-600 dark:text-neutral-300">Annual Coverage Limit</span>
                 <Award className="w-5 h-5 text-rose-600" />
               </div>
               <p className="text-3xl font-bold text-rose-600">$5,000,000</p>
-              <p className="text-xs text-neutral-500 mt-1">Per member, per annum</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Per member, per annum</p>
             </div>
           </motion.div>
 
@@ -206,15 +206,15 @@ const SponsoredMedicair: React.FC = () => {
                 Our medical concierge team is available around the clock for 
                 any health emergency or assistance you may need.
               </p>
-              <Button variant="primary" className="w-full bg-white text-rose-600 hover:bg-rose-50">
+              <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-rose-600 hover:bg-rose-50">
                 Download Insurance Card
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
 
             {/* Eligibility Note */}
-            <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-              <p className="text-sm text-neutral-600">
+            <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-700">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">
                 <span className="font-semibold">Note:</span> Medicair coverage is 
                 complimentary for Private Banking members with AUM exceeding $1M. 
                 Additional family members can be added at preferential rates.

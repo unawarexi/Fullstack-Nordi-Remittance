@@ -76,8 +76,8 @@ const StatCard: React.FC<StatCardProps> = ({ stat, index }) => {
       transition={{ duration: 0.4, delay: index * 0.08 }}
       className={cn(
         "relative p-6 rounded-xl",
-        "bg-white border border-neutral-100",
-        "hover:shadow-lg hover:border-indigo-100 transition-all duration-300",
+        "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+        "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-indigo-100 dark:hover:border-indigo-700 transition-all duration-300",
         "group cursor-default"
       )}
     >
@@ -85,20 +85,20 @@ const StatCard: React.FC<StatCardProps> = ({ stat, index }) => {
         <div
           className={cn(
             "flex-shrink-0 p-3 rounded-lg",
-            "bg-indigo-50 text-indigo-600",
-            "group-hover:bg-indigo-100 transition-colors"
+            "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600",
+            "group-hover:bg-indigo-100 dark:bg-indigo-800/30 transition-colors"
           )}
         >
           {stat.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-3xl font-bold text-neutral-900 tracking-tight">
+          <div className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
             {stat.value}
           </div>
-          <div className="text-sm font-semibold text-neutral-700 mt-1">
+          <div className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mt-1">
             {stat.label}
           </div>
-          <div className="text-xs text-neutral-500 mt-0.5">
+          <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
             {stat.description}
           </div>
         </div>
@@ -121,13 +121,13 @@ const Statistics: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
             Our Impact
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
             Trusted by Millions Worldwide
           </h2>
-          <p className="mt-2 text-neutral-600 max-w-2xl mx-auto">
+          <p className="mt-2 text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
             For over three decades, we've been helping individuals and businesses achieve their financial goals.
           </p>
         </motion.div>

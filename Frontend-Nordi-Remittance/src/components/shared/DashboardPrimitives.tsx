@@ -153,7 +153,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
       {value}
     </p>
-    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">
+    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500 mt-0.5 sm:mt-1">
       {label}
     </p>
   </motion.div>
@@ -216,14 +216,14 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   <div className={cn("flex items-center justify-between mb-3 sm:mb-4", className)}>
     <div className="flex items-center gap-2">
       {icon && (
-        <span className="text-gray-400 dark:text-gray-500">{icon}</span>
+        <span className="text-gray-400 dark:text-gray-500 dark:text-neutral-400">{icon}</span>
       )}
       <div>
         <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
           {title}
         </h2>
         {subtitle && (
-          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500">
             {subtitle}
           </p>
         )}
@@ -278,7 +278,7 @@ export const QuickLinkCard: React.FC<QuickLinkCardProps> = ({
         <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
           {label}
         </p>
-        <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+        <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 dark:text-neutral-400 flex items-center gap-0.5">
           View <ChevronRight size={10} />
         </p>
       </div>
@@ -336,7 +336,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     <div className="relative flex-1 min-w-[160px] sm:min-w-[200px]">
       <Search
         size={14}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-neutral-400"
       />
       <input
         type="text"
@@ -348,7 +348,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           "rounded-lg border border-gray-200 dark:border-gray-700",
           "bg-gray-50 dark:bg-gray-800",
           "text-xs sm:text-sm text-gray-900 dark:text-white",
-          "placeholder:text-gray-400 dark:placeholder:text-gray-500",
+          "placeholder:text-gray-400 dark:text-neutral-500 dark:placeholder:text-gray-500 dark:text-neutral-400",
           "focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:focus:ring-indigo-400/40 focus:border-indigo-500 dark:focus:border-indigo-400",
           "transition-colors duration-200"
         )}
@@ -415,8 +415,8 @@ export const FilterPill: React.FC<FilterPillProps> = ({
       "px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-medium whitespace-nowrap",
       "transition-all duration-200",
       active
-        ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+        ? "bg-indigo-600 dark:bg-indigo-50 dark:bg-indigo-900/300 text-white"
+        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-neutral-500 hover:bg-gray-200 dark:hover:bg-gray-700"
     )}
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
@@ -449,7 +449,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium",
       "transition-colors duration-200",
       variant === "primary"
-        ? "bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+        ? "bg-indigo-600 dark:bg-indigo-50 dark:bg-indigo-900/300 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
         : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800",
       className
     )}
@@ -488,9 +488,9 @@ const statusStyles: Record<string, string> = {
   rejected:
     "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400",
   cancelled:
-    "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400",
+    "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 dark:text-neutral-500",
   closed:
-    "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400",
+    "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 dark:text-neutral-500",
   disbursed:
     "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400",
 };
@@ -623,14 +623,14 @@ export const ListActionRow: React.FC<ListActionRowProps> = ({
         {label}
       </p>
       {description && (
-        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500">
           {description}
         </p>
       )}
     </div>
     <ChevronRight
       size={16}
-      className="text-gray-400 dark:text-gray-500 flex-shrink-0"
+      className="text-gray-400 dark:text-gray-500 dark:text-neutral-400 flex-shrink-0"
     />
   </motion.button>
 );

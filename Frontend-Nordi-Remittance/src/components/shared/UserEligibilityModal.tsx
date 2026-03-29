@@ -140,7 +140,7 @@ const BLOCK_CONFIG: Record<
   },
   ACCOUNT_INACTIVE: {
     icon: <UserX size={24} />,
-    color: "text-gray-600 dark:text-gray-400",
+    color: "text-gray-600 dark:text-gray-400 dark:text-neutral-500",
     bgColor: "bg-gray-50 dark:bg-gray-900",
     title: "Account Inactive",
     description: (name) =>
@@ -216,11 +216,11 @@ export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">
             {config.title}
           </h3>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 dark:text-neutral-500 leading-relaxed">
             {config.description(error.userName, error.reason)}
           </p>
           {error.email && (
-            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 dark:text-neutral-400">
               {error.email}
             </p>
           )}
@@ -243,7 +243,7 @@ export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={handleResolve}
             disabled={isPending}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 dark:bg-indigo-50 dark:bg-indigo-900/300 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
           >
             {isPending ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

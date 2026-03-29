@@ -119,22 +119,22 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
       </motion.div>
 
       {/* Title */}
-      <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-2">
+      <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-2">
         {title}
       </h2>
 
       {/* Description */}
-      <p className="text-neutral-600 mb-2 max-w-md">
+      <p className="text-neutral-600 dark:text-neutral-300 mb-2 max-w-md">
         {description || 'An unexpected error occurred. Please try again or contact support if the problem persists.'}
       </p>
 
       {/* Error details (dev mode) */}
       {error && process.env.NODE_ENV === 'development' && (
         <details className="mb-6 w-full max-w-lg">
-          <summary className="text-sm text-neutral-500 cursor-pointer hover:text-neutral-700">
+          <summary className="text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer hover:text-neutral-700 dark:text-neutral-200">
             View error details
           </summary>
-          <pre className="mt-2 p-4 bg-neutral-100 rounded-lg text-left text-xs overflow-auto text-error-600">
+          <pre className="mt-2 p-4 bg-neutral-100 dark:bg-neutral-700 rounded-lg text-left text-xs overflow-auto text-error-600">
             {error.message}
             {error.stack && `\n\n${error.stack}`}
           </pre>
@@ -204,8 +204,8 @@ export const NotFound: React.FC<NotFoundProps> = ({
         404
       </motion.div>
 
-      <h1 className="text-2xl font-bold text-neutral-900 mb-2">{title}</h1>
-      <p className="text-neutral-600 mb-8 max-w-md">{description}</p>
+      <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">{title}</h1>
+      <p className="text-neutral-600 dark:text-neutral-300 mb-8 max-w-md">{description}</p>
 
       <div className="flex items-center gap-3">
         {showHomeLink && (

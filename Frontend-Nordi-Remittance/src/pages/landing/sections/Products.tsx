@@ -62,7 +62,7 @@ const products: Product[] = [
     description: "Make your dream home a reality",
     icon: <Home className="w-6 h-6" />,
     features: ["Competitive rates", "Quick approval", "Flexible terms"],
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     href: "/loans/home",
   },
   {
@@ -78,7 +78,7 @@ const products: Product[] = [
     description: "Build wealth for your future",
     icon: <TrendingUp className="w-6 h-6" />,
     features: ["Managed portfolios", "Retirement accounts", "Expert advice"],
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     href: "/investments",
   },
   {
@@ -116,8 +116,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     transition={{ duration: 0.4, delay: index * 0.06 }}
     className={cn(
       "group relative p-5 rounded-xl",
-      "bg-white border border-neutral-100",
-      "hover:shadow-lg hover:border-neutral-200 transition-all duration-300"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-200 dark:border-neutral-700 transition-all duration-300"
     )}
   >
     {/* Icon */}
@@ -131,17 +131,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="font-semibold text-neutral-900 group-hover:text-indigo-600 transition-colors">
+    <h3 className="font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
       {product.title}
     </h3>
-    <p className="mt-1 text-sm text-neutral-500">{product.description}</p>
+    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{product.description}</p>
 
     {/* Features */}
     <ul className="mt-4 space-y-1.5">
       {product.features.map((feature) => (
         <li
           key={feature}
-          className="flex items-center gap-2 text-xs text-neutral-600"
+          className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-300"
         >
           <div className="w-1 h-1 rounded-full bg-neutral-300" />
           {feature}
@@ -174,13 +174,13 @@ const Products: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
             Products & Services
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
             Everything You Need in One Place
           </h2>
-          <p className="mt-2 text-neutral-600 max-w-2xl mx-auto">
+          <p className="mt-2 text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
             From everyday banking to long-term investments, we have the right solutions for every stage of life.
           </p>
         </motion.div>

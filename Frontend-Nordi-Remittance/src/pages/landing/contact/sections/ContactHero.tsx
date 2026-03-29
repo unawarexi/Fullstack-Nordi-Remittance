@@ -99,7 +99,7 @@ const ContactHero: React.FC = () => {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <Button variant="secondary" className="bg-white text-teal-900 hover:bg-teal-50">
+              <Button variant="secondary" className="bg-white dark:bg-neutral-800 text-teal-900 hover:bg-teal-50">
                 <Phone className="w-4 h-4 mr-2" />
                 Call Us Now
               </Button>

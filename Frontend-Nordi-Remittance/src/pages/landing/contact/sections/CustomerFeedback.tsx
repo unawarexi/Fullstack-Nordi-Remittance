@@ -68,7 +68,7 @@ const CustomerFeedback: React.FC = () => {
   };
 
   return (
-    <Section id="customer-feedback" className="py-16 lg:py-24 bg-white">
+    <Section id="customer-feedback" className="py-16 lg:py-24 bg-white dark:bg-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -77,14 +77,14 @@ const CustomerFeedback: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
             <MessageSquare className="w-4 h-4" />
             Feedback
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Your Voice Matters
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             We continuously improve based on your feedback. Share your thoughts, 
             suggestions, or concerns and help us serve you better.
           </p>
@@ -98,9 +98,9 @@ const CustomerFeedback: React.FC = () => {
           className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-12"
         >
           {feedbackStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-indigo-50">
+            <div key={stat.label} className="text-center p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
               <p className="text-2xl font-bold text-indigo-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600">{stat.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -112,10 +112,10 @@ const CustomerFeedback: React.FC = () => {
           viewport={{ once: true }}
           className="max-w-2xl mx-auto"
         >
-          <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-slate-50 border border-neutral-200">
+          <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             {/* Category Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
                 What's your feedback about?
               </label>
               <div className="flex flex-wrap gap-2">
@@ -128,7 +128,7 @@ const CustomerFeedback: React.FC = () => {
                       "px-4 py-2 rounded-full text-sm font-medium transition-all",
                       selectedCategory === category
                         ? "bg-indigo-600 text-white"
-                        : "bg-white border border-neutral-300 text-neutral-700 hover:border-indigo-300"
+                        : "bg-white dark:bg-neutral-800 border border-neutral-300 text-neutral-700 dark:text-neutral-200 hover:border-indigo-300"
                     )}
                   >
                     {category}
@@ -139,7 +139,7 @@ const CustomerFeedback: React.FC = () => {
 
             {/* Satisfaction Rating */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
                 How satisfied are you with our services?
               </label>
               <div className="flex justify-between gap-2">
@@ -151,12 +151,12 @@ const CustomerFeedback: React.FC = () => {
                     className={cn(
                       "flex-1 p-3 rounded-xl flex flex-col items-center gap-1 transition-all",
                       selectedSatisfaction === option.value
-                        ? "bg-indigo-100 border-2 border-indigo-500"
-                        : "bg-white border border-neutral-200 hover:border-indigo-300"
+                        ? "bg-indigo-100 dark:bg-indigo-800/30 border-2 border-indigo-500"
+                        : "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-indigo-300"
                     )}
                   >
                     <option.icon className={cn("w-8 h-8", option.color)} />
-                    <span className="text-xs text-neutral-600">{option.label}</span>
+                    <span className="text-xs text-neutral-600 dark:text-neutral-300">{option.label}</span>
                   </button>
                 ))}
               </div>
@@ -164,7 +164,7 @@ const CustomerFeedback: React.FC = () => {
 
             {/* Feedback Text */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
                 Share your thoughts
               </label>
               <textarea
@@ -179,7 +179,7 @@ const CustomerFeedback: React.FC = () => {
             {/* Contact Info (Optional) */}
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
                   Name (Optional)
                 </label>
                 <input
@@ -189,7 +189,7 @@ const CustomerFeedback: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
                   Email (Optional)
                 </label>
                 <input
@@ -211,7 +211,7 @@ const CustomerFeedback: React.FC = () => {
             </Button>
 
             {/* Privacy Note */}
-            <p className="text-xs text-neutral-500 text-center mt-4">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center mt-4">
               Your feedback is confidential. We only use it to improve our services.
             </p>
           </form>
@@ -224,7 +224,7 @@ const CustomerFeedback: React.FC = () => {
           viewport={{ once: true }}
           className="mt-12 max-w-2xl mx-auto"
         >
-          <h3 className="text-lg font-bold text-neutral-900 mb-4 text-center">
+          <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 text-center">
             Recent Improvements Based on Your Feedback
           </h3>
           <div className="space-y-3">
@@ -239,7 +239,7 @@ const CustomerFeedback: React.FC = () => {
                 className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200"
               >
                 <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-neutral-700">{improvement}</span>
+                <span className="text-neutral-700 dark:text-neutral-200">{improvement}</span>
               </div>
             ))}
           </div>

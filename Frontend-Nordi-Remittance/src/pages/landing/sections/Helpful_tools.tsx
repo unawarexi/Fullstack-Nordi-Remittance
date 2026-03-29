@@ -81,9 +81,9 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => {
         "flex flex-col items-center justify-center",
         "h-28 sm:h-32 md:h-36 lg:h-40 p-3 sm:p-4",
         "bg-gradient-to-br from-neutral-50 to-neutral-100",
-        "rounded-xl sm:rounded-2xl shadow-md",
-        "border border-neutral-200/60",
-        "hover:shadow-xl hover:border-amber-300/50",
+        "rounded-xl sm:rounded-2xl shadow-md dark:shadow-neutral-900/30",
+        "border border-neutral-200 dark:border-neutral-700/60",
+        "hover:shadow-xl dark:hover:shadow-neutral-900/50 hover:border-amber-300/50",
         "transition-all duration-300 cursor-pointer",
         "group"
       )}
@@ -97,11 +97,11 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => {
       )}>
         {tool.icon}
       </div>
-      <p className="text-xs sm:text-sm font-medium text-neutral-700 text-center leading-tight">
+      <p className="text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200 text-center leading-tight">
         {tool.title}
       </p>
       {tool.description && (
-        <p className="text-[10px] sm:text-xs text-neutral-500 text-center mt-1 hidden sm:block">
+        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 text-center mt-1 hidden sm:block">
           {tool.description}
         </p>
       )}
@@ -133,7 +133,7 @@ const Helpful_tools: React.FC = () => {
   const showSlider = !isLgUp;
 
   return (
-    <Section className="py-8 sm:py-12 md:py-16 bg-white">
+    <Section className="py-8 sm:py-12 md:py-16 bg-white dark:bg-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -142,10 +142,10 @@ const Helpful_tools: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-6 sm:mb-8"
         >
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-800">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
             Helpful <span className="text-amber-500">Tools</span>
           </h3>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             Quick access to our most popular services
           </p>
         </motion.div>
@@ -160,9 +160,9 @@ const Helpful_tools: React.FC = () => {
                 className={cn(
                   "absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10",
                   "w-8 h-8 sm:w-10 sm:h-10 rounded-full",
-                  "bg-white shadow-md hover:shadow-lg",
+                  "bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 hover:shadow-lg dark:hover:shadow-neutral-900/50",
                   "flex items-center justify-center",
-                  "text-neutral-600 hover:text-amber-600",
+                  "text-neutral-600 dark:text-neutral-300 hover:text-amber-600",
                   "transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-amber-400"
                 )}
@@ -176,9 +176,9 @@ const Helpful_tools: React.FC = () => {
                 className={cn(
                   "absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10",
                   "w-8 h-8 sm:w-10 sm:h-10 rounded-full",
-                  "bg-white shadow-md hover:shadow-lg",
+                  "bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 hover:shadow-lg dark:hover:shadow-neutral-900/50",
                   "flex items-center justify-center",
-                  "text-neutral-600 hover:text-amber-600",
+                  "text-neutral-600 dark:text-neutral-300 hover:text-amber-600",
                   "transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-amber-400"
                 )}
@@ -232,7 +232,7 @@ const Helpful_tools: React.FC = () => {
                   className={cn(
                     "h-1.5 sm:h-2 rounded-full transition-all duration-300",
                     currentIndex === index
-                      ? "w-4 sm:w-6 bg-amber-500"
+                      ? "w-4 sm:w-6 bg-amber-50 dark:bg-amber-900/200"
                       : "w-1.5 sm:w-2 bg-neutral-300 hover:bg-neutral-400"
                   )}
                   aria-label={`Go to slide ${index + 1}`}

@@ -103,10 +103,10 @@ const AmexCard: React.FC = () => {
             <CreditCard className="w-4 h-4" />
             American Express
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Premium Cards, Premium Benefits
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Experience the prestige and rewards of American Express cards, 
             now available through our partnership with enhanced local benefits.
           </p>
@@ -122,14 +122,14 @@ const AmexCard: React.FC = () => {
           {globalBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-neutral-200"
+              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500">{benefit.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -145,8 +145,8 @@ const AmexCard: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative flex flex-col rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-xl hover:border-neutral-300 transition-all duration-300"
+                "group relative flex flex-col rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-xl dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
               )}
             >
               {/* Card Visual */}
@@ -176,7 +176,7 @@ const AmexCard: React.FC = () => {
               {/* Card Details */}
               <div className="p-6 flex-1 flex flex-col">
                 <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 mb-4 text-center">
-                  <p className="text-xs text-neutral-500">Welcome Bonus</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">Welcome Bonus</p>
                   <p className="text-lg font-bold text-blue-600">{card.rewards}</p>
                 </div>
 
@@ -184,7 +184,7 @@ const AmexCard: React.FC = () => {
                   {card.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm text-neutral-600">{benefit}</span>
+                      <span className="text-sm text-neutral-600 dark:text-neutral-300">{benefit}</span>
                     </li>
                   ))}
                 </ul>

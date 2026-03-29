@@ -48,16 +48,16 @@ const MobileApp: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-4">
               <Smartphone className="w-3.5 h-3.5" />
               Mobile Banking
             </span>
 
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Banking at Your Fingertips
             </h2>
 
-            <p className="mt-3 text-neutral-600 leading-relaxed">
+            <p className="mt-3 text-neutral-600 dark:text-neutral-300 leading-relaxed">
               Download our award-winning mobile app and manage your finances anytime,
               anywhere. Available for iOS and Android devices.
             </p>
@@ -67,10 +67,10 @@ const MobileApp: React.FC = () => {
               {appFeatures.map((feature) => (
                 <div
                   key={feature.text}
-                  className="flex items-center gap-2.5 p-3 rounded-lg bg-neutral-50"
+                  className="flex items-center gap-2.5 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
                 >
                   <div className="text-indigo-500">{feature.icon}</div>
-                  <span className="text-sm text-neutral-700">{feature.text}</span>
+                  <span className="text-sm text-neutral-700 dark:text-neutral-200">{feature.text}</span>
                 </div>
               ))}
             </div>
@@ -131,10 +131,10 @@ const MobileApp: React.FC = () => {
                       </svg>
                     ))}
                   </div>
-                  <span className="text-sm font-semibold text-neutral-900">
+                  <span className="text-sm font-semibold text-neutral-900 dark:text-white">
                     {item.rating}
                   </span>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
                     ({item.reviews} reviews)
                   </span>
                 </div>
@@ -153,14 +153,14 @@ const MobileApp: React.FC = () => {
             {/* Phone Frame */}
             <div className="relative">
               {/* Background decoration */}
-              <div className="absolute inset-0 bg-indigo-100 rounded-[3rem] blur-3xl opacity-40 scale-110" />
+              <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-800/30 rounded-[3rem] blur-3xl opacity-40 scale-110" />
               
               {/* Phone */}
               <div className="relative w-64 sm:w-72 bg-neutral-900 rounded-[2.5rem] p-3 shadow-2xl">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-6 bg-neutral-900 rounded-b-xl" />
                 
                 {/* Screen */}
-                <div className="bg-white rounded-[2rem] overflow-hidden">
+                <div className="bg-white dark:bg-neutral-800 rounded-[2rem] overflow-hidden">
                   {/* Status Bar */}
                   <div className="flex justify-between items-center px-6 py-2 bg-indigo-600 text-white text-xs">
                     <span>9:41</span>
@@ -173,23 +173,23 @@ const MobileApp: React.FC = () => {
                   {/* App Content */}
                   <div className="p-5 space-y-4">
                     <div className="text-center">
-                      <div className="text-xs text-neutral-500">Total Balance</div>
-                      <div className="text-2xl font-bold text-neutral-900">$24,580.50</div>
+                      <div className="text-xs text-neutral-500 dark:text-neutral-400">Total Balance</div>
+                      <div className="text-2xl font-bold text-neutral-900 dark:text-white">$24,580.50</div>
                     </div>
                     
                     <div className="flex justify-between">
                       {["Send", "Receive", "Pay", "More"].map((action) => (
                         <div key={action} className="text-center">
-                          <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mx-auto">
-                            <div className="w-3 h-3 rounded-full bg-indigo-500" />
+                          <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center mx-auto">
+                            <div className="w-3 h-3 rounded-full bg-indigo-50 dark:bg-indigo-900/300" />
                           </div>
-                          <div className="mt-1 text-[10px] text-neutral-600">{action}</div>
+                          <div className="mt-1 text-[10px] text-neutral-600 dark:text-neutral-300">{action}</div>
                         </div>
                       ))}
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="text-xs font-medium text-neutral-700">Recent</div>
+                      <div className="text-xs font-medium text-neutral-700 dark:text-neutral-200">Recent</div>
                       {[
                         { name: "Coffee Shop", amount: "-$4.50" },
                         { name: "Salary", amount: "+$3,500" },
@@ -197,18 +197,18 @@ const MobileApp: React.FC = () => {
                       ].map((tx) => (
                         <div
                           key={tx.name}
-                          className="flex justify-between items-center py-2 border-b border-neutral-100"
+                          className="flex justify-between items-center py-2 border-b border-neutral-100 dark:border-neutral-700"
                         >
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-neutral-100" />
-                            <span className="text-xs text-neutral-700">{tx.name}</span>
+                            <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700" />
+                            <span className="text-xs text-neutral-700 dark:text-neutral-200">{tx.name}</span>
                           </div>
                           <span
                             className={cn(
                               "text-xs font-medium",
                               tx.amount.startsWith("+")
                                 ? "text-emerald-600"
-                                : "text-neutral-900"
+                                : "text-neutral-900 dark:text-white"
                             )}
                           >
                             {tx.amount}

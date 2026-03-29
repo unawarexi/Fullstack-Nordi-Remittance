@@ -130,12 +130,12 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
           )}
           <div className="min-w-0 flex-1">
             {title && (
-              <h3 className="truncate text-base font-semibold text-neutral-900 sm:text-lg">
+              <h3 className="truncate text-base font-semibold text-neutral-900 dark:text-white sm:text-lg">
                 {title}
               </h3>
             )}
             {subtitle && (
-              <p className="mt-0.5 truncate text-xs text-neutral-500 sm:text-sm">
+              <p className="mt-0.5 truncate text-xs text-neutral-500 dark:text-neutral-400 sm:text-sm">
                 {subtitle}
               </p>
             )}
@@ -183,7 +183,7 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
       <div
         ref={ref}
         className={cn(
-          "mt-4 flex items-center gap-3 border-t border-neutral-100 pt-4",
+          "mt-4 flex items-center gap-3 border-t border-neutral-100 dark:border-neutral-700 pt-4",
           alignStyles[align],
           className,
         )}
@@ -217,7 +217,7 @@ export const StatsCard = forwardRef<HTMLDivElement, StatsCardProps>(
     const changeColors = {
       increase: "text-success-600 bg-success-50",
       decrease: "text-error-600 bg-error-50",
-      neutral: "text-neutral-600 bg-neutral-50",
+      neutral: "text-neutral-600 dark:text-neutral-300 bg-neutral-50",
     };
 
     return (
@@ -230,10 +230,10 @@ export const StatsCard = forwardRef<HTMLDivElement, StatsCardProps>(
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium text-neutral-500 sm:text-sm">
+            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 sm:text-sm">
               {label}
             </p>
-            <p className="mt-1 text-xl font-bold tabular-nums text-neutral-900 sm:text-2xl lg:text-3xl">
+            <p className="mt-1 text-xl font-bold tabular-nums text-neutral-900 dark:text-white sm:text-2xl lg:text-3xl">
               {value}
             </p>
             {change && (

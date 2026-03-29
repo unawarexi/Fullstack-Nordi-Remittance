@@ -106,14 +106,14 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
       "relative flex flex-col rounded-2xl overflow-hidden",
-      "bg-white border border-neutral-100",
-      card.popular ? "ring-2 ring-indigo-500 shadow-lg" : "hover:shadow-lg",
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      card.popular ? "ring-2 ring-indigo-500 shadow-lg" : "hover:shadow-lg dark:hover:shadow-neutral-900/50",
       "transition-shadow"
     )}
   >
     {/* Popular Badge */}
     {card.popular && (
-      <div className="absolute top-0 right-0 px-3 py-1 bg-indigo-500 text-white text-xs font-medium rounded-bl-xl">
+      <div className="absolute top-0 right-0 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/300 text-white text-xs font-medium rounded-bl-xl">
         Most Popular
       </div>
     )}
@@ -140,26 +140,26 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
     <div className="flex-1 p-5">
       {/* Key Stats */}
       <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="p-3 rounded-lg bg-neutral-50">
-          <div className="text-xs text-neutral-500">Annual Fee</div>
-          <div className="text-lg font-bold text-neutral-900">{card.annualFee}</div>
+        <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">Annual Fee</div>
+          <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{card.annualFee}</div>
         </div>
-        <div className="p-3 rounded-lg bg-neutral-50">
-          <div className="text-xs text-neutral-500">Rewards</div>
-          <div className="text-lg font-bold text-indigo-600">{card.rewards}</div>
+        <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+          <div className="text-xs text-neutral-500 dark:text-neutral-400">Rewards</div>
+          <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{card.rewards}</div>
         </div>
       </div>
 
       {/* Intro Offer */}
-      <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 mb-4">
+      <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 mb-4">
         <Gift className="w-4 h-4 text-emerald-600" />
-        <span className="text-sm font-medium text-emerald-700">{card.intro}</span>
+        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">{card.intro}</span>
       </div>
 
       {/* Benefits */}
       <ul className="space-y-2 mb-5">
         {card.benefits.map((benefit) => (
-          <li key={benefit} className="flex items-center gap-2 text-sm text-neutral-600">
+          <li key={benefit} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
             <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
             {benefit}
           </li>
@@ -167,7 +167,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
       </ul>
 
       {/* APR Info */}
-      <p className="text-xs text-neutral-400">APR: {card.apr} variable</p>
+      <p className="text-xs text-neutral-400 dark:text-neutral-500 dark:text-neutral-400">APR: {card.apr} variable</p>
     </div>
 
     {/* CTA */}
@@ -179,7 +179,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
           "font-medium text-sm transition-colors",
           card.popular
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600"
         )}
       >
         Apply Now
@@ -203,14 +203,14 @@ const CompareCards: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+          <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/50 rounded-full mb-3">
             <CreditCard className="w-3.5 h-3.5" />
             Credit Cards
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
             Find Your Perfect Card
           </h2>
-          <p className="mt-2 text-neutral-600 max-w-2xl mx-auto">
+          <p className="mt-2 text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
             Whether you want cashback, travel rewards, or low APR, we have a card for you.
           </p>
         </motion.div>
@@ -232,14 +232,14 @@ const CompareCards: React.FC = () => {
           <a
             href="/cards"
             className={cn(
-              "inline-flex items-center gap-2 text-sm font-medium text-indigo-600",
-              "hover:text-indigo-700 transition-colors"
+              "inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400",
+              "hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             )}
           >
             Compare All Credit Cards
             <ArrowRight className="w-4 h-4" />
           </a>
-          <p className="mt-3 text-xs text-neutral-500 max-w-lg mx-auto">
+          <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400 max-w-lg mx-auto">
             Credit card offers are subject to credit approval. Terms and conditions apply.
             See card agreements for complete details.
           </p>

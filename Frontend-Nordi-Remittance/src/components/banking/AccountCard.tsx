@@ -137,14 +137,14 @@ export const AccountCard: React.FC<AccountCardProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-neutral-900 text-sm sm:text-base">
+              <h3 className="font-semibold text-neutral-900 dark:text-white text-sm sm:text-base">
                 {name}
               </h3>
               {isPrimary && (
                 <Badge variant="primary" size="xs">Primary</Badge>
               )}
             </div>
-            <p className="text-xs text-neutral-500">{typeConfig.label} Account</p>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">{typeConfig.label} Account</p>
           </div>
         </div>
 
@@ -165,10 +165,10 @@ export const AccountCard: React.FC<AccountCardProps> = ({
       </div>
 
       {/* Account Number */}
-      <div className="flex items-center justify-between py-3 border-t border-neutral-100">
+      <div className="flex items-center justify-between py-3 border-t border-neutral-100 dark:border-neutral-700">
         <div>
-          <p className="text-xs text-neutral-500">Account Number</p>
-          <p className="text-sm font-mono text-neutral-700">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">Account Number</p>
+          <p className="text-sm font-mono text-neutral-700 dark:text-neutral-200">
             {maskAccountNumber(accountNumber)}
           </p>
         </div>
@@ -181,7 +181,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({
                 e.stopPropagation();
                 onCopyAccountNumber();
               }}
-              className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:text-neutral-200 transition-colors"
               aria-label="Copy account number"
             >
               <Copy size={16} />
@@ -194,7 +194,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({
                 e.stopPropagation();
                 onViewDetails();
               }}
-              className="p-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:text-neutral-200 transition-colors"
               aria-label="View details"
             >
               <ExternalLink size={16} />
@@ -205,10 +205,10 @@ export const AccountCard: React.FC<AccountCardProps> = ({
 
       {/* Last Transaction */}
       {lastTransaction && (
-        <div className="pt-3 border-t border-neutral-100">
-          <p className="text-xs text-neutral-500 mb-1">Last Transaction</p>
+        <div className="pt-3 border-t border-neutral-100 dark:border-neutral-700">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">Last Transaction</p>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-600">{lastTransaction.date}</span>
+            <span className="text-xs text-neutral-600 dark:text-neutral-300">{lastTransaction.date}</span>
             <span className={cn(
               'text-sm font-semibold',
               lastTransaction.type === 'credit' ? 'text-success-600' : 'text-error-600'
@@ -258,7 +258,7 @@ export const CompactAccountCard: React.FC<CompactAccountCardProps> = ({
         'border-2',
         selected
           ? 'border-primary-500 bg-primary-50'
-          : 'border-transparent bg-neutral-50 hover:bg-neutral-100',
+          : 'border-transparent bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:bg-neutral-700',
         className
       )}
     >
@@ -269,14 +269,14 @@ export const CompactAccountCard: React.FC<CompactAccountCardProps> = ({
         {typeConfig.icon}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-neutral-900 text-sm truncate">{name}</p>
-        <p className="text-xs text-neutral-500">****{accountNumber.slice(-4)}</p>
+        <p className="font-medium text-neutral-900 dark:text-white text-sm truncate">{name}</p>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">****{accountNumber.slice(-4)}</p>
       </div>
       <div className="text-right">
-        <p className="font-semibold text-neutral-900 text-sm tabular-nums">
+        <p className="font-semibold text-neutral-900 dark:text-white text-sm tabular-nums">
           ${balance.toFixed(2)}
         </p>
-        <p className="text-xs text-neutral-500">{currency}</p>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">{currency}</p>
       </div>
     </motion.div>
   );

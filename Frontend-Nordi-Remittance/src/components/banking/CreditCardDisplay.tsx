@@ -132,8 +132,8 @@ export const CreditCardDisplay: React.FC<CreditCardDisplayProps> = ({
     >
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white transform translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white transform -translate-x-1/2 translate-y-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white dark:bg-neutral-800 transform translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white dark:bg-neutral-800 transform -translate-x-1/2 translate-y-1/2" />
       </div>
 
       {/* Status overlay */}
@@ -273,7 +273,7 @@ export const MiniCard: React.FC<MiniCardProps> = ({
         'border-2',
         selected
           ? 'border-primary-500 bg-primary-50'
-          : 'border-transparent bg-neutral-50 hover:bg-neutral-100',
+          : 'border-transparent bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:bg-neutral-700',
         className
       )}
     >
@@ -281,10 +281,10 @@ export const MiniCard: React.FC<MiniCardProps> = ({
         <div className="w-6 h-4">{BrandLogos[brand]}</div>
       </div>
       <div className="flex-1">
-        <p className="font-medium text-neutral-900 text-sm">
+        <p className="font-medium text-neutral-900 dark:text-white text-sm">
           •••• {last4}
         </p>
-        <p className="text-xs text-neutral-500 capitalize">{type} Card</p>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 capitalize">{type} Card</p>
       </div>
     </motion.div>
   );

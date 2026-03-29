@@ -122,14 +122,14 @@ const EconomicResearch: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
             <BarChart3 className="w-4 h-4" />
             Economic Research
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Insights That Drive Decisions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Expert economic analysis and market research to help you navigate 
             complex business environments and make informed strategic decisions.
           </p>
@@ -146,16 +146,16 @@ const EconomicResearch: React.FC = () => {
             <div
               key={theme.name}
               className={cn(
-                "flex items-center gap-3 p-4 rounded-xl bg-white border border-neutral-200",
+                "flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                 "hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer"
               )}
             >
-              <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center">
                 <theme.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{theme.name}</p>
-                <p className="text-xs text-neutral-500">{theme.count} reports</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{theme.name}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{theme.count} reports</p>
               </div>
             </div>
           ))}
@@ -166,7 +166,7 @@ const EconomicResearch: React.FC = () => {
           {/* Reports List */}
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-neutral-900">Latest Reports</h3>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">Latest Reports</h3>
               <Button variant="ghost" className="text-sm text-indigo-600">
                 View All
                 <ArrowRight className="w-4 h-4 ml-1" />
@@ -182,14 +182,14 @@ const EconomicResearch: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className={cn(
-                    "group flex items-start gap-4 p-4 rounded-xl bg-white border",
-                    report.featured ? "border-indigo-300 bg-indigo-50/50" : "border-neutral-200",
+                    "group flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border",
+                    report.featured ? "border-indigo-300 bg-indigo-50 dark:bg-indigo-900/30/50" : "border-neutral-200 dark:border-neutral-700",
                     "hover:shadow-md transition-all cursor-pointer"
                   )}
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0",
-                    report.featured ? "bg-indigo-100 text-indigo-600" : "bg-neutral-100 text-neutral-500"
+                    report.featured ? "bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600" : "bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400"
                   )}>
                     <FileText className="w-6 h-6" />
                   </div>
@@ -201,10 +201,10 @@ const EconomicResearch: React.FC = () => {
                       </span>
                       <span className="text-xs text-neutral-400">{report.category}</span>
                     </div>
-                    <h4 className="font-semibold text-neutral-900 group-hover:text-indigo-600 transition-colors">
+                    <h4 className="font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
                       {report.title}
                     </h4>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-neutral-500">
+                    <div className="flex items-center gap-2 mt-2 text-xs text-neutral-500 dark:text-neutral-400">
                       <Calendar className="w-3.5 h-3.5" />
                       {report.date}
                     </div>
@@ -239,7 +239,7 @@ const EconomicResearch: React.FC = () => {
                 placeholder="Enter your email"
                 className="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/20 text-white placeholder:text-indigo-200 text-sm mb-3"
               />
-              <Button variant="primary" className="w-full bg-white text-indigo-600 hover:bg-indigo-50">
+              <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-indigo-600 hover:bg-indigo-50 dark:bg-indigo-900/30">
                 Subscribe
               </Button>
             </motion.div>
@@ -250,18 +250,18 @@ const EconomicResearch: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="p-6 rounded-xl bg-white border border-neutral-200"
+              className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <h4 className="font-semibold text-neutral-900 mb-4">Our Economists</h4>
+              <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Our Economists</h4>
               <div className="space-y-4">
                 {economists.map((economist) => (
                   <div key={economist.name} className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center font-semibold text-sm">
                       {economist.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <p className="font-medium text-neutral-900 text-sm">{economist.name}</p>
-                      <p className="text-xs text-neutral-500">{economist.role}</p>
+                      <p className="font-medium text-neutral-900 dark:text-white text-sm">{economist.name}</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">{economist.role}</p>
                       <p className="text-xs text-indigo-600">{economist.specialty}</p>
                     </div>
                   </div>

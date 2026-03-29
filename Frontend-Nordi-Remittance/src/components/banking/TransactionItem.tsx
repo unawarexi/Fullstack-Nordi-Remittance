@@ -70,12 +70,12 @@ const categoryConfig: Record<TransactionCategory, { icon: React.ReactNode; color
   travel: { icon: <Plane size={18} />, color: 'bg-cyan-100 text-cyan-600' },
   housing: { icon: <Home size={18} />, color: 'bg-purple-100 text-purple-600' },
   health: { icon: <Heart size={18} />, color: 'bg-red-100 text-red-600' },
-  entertainment: { icon: <Smartphone size={18} />, color: 'bg-indigo-100 text-indigo-600' },
+  entertainment: { icon: <Smartphone size={18} />, color: 'bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600' },
   gift: { icon: <Gift size={18} />, color: 'bg-yellow-100 text-yellow-600' },
   transfer: { icon: <Repeat size={18} />, color: 'bg-emerald-100 text-emerald-600' },
   salary: { icon: <ArrowDownLeft size={18} />, color: 'bg-green-100 text-green-600' },
-  utilities: { icon: <Home size={18} />, color: 'bg-slate-100 text-slate-600' },
-  other: { icon: <MoreHorizontal size={18} />, color: 'bg-neutral-100 text-neutral-600' },
+  utilities: { icon: <Home size={18} />, color: 'bg-slate-100 dark:bg-neutral-700 text-slate-600 dark:text-neutral-300' },
+  other: { icon: <MoreHorizontal size={18} />, color: 'bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300' },
 };
 
 // ========================
@@ -168,11 +168,11 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="font-medium text-neutral-900 text-sm sm:text-base truncate">
+            <p className="font-medium text-neutral-900 dark:text-white text-sm sm:text-base truncate">
               {title}
             </p>
             {description && (
-              <p className="text-xs sm:text-sm text-neutral-500 truncate">
+              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 truncate">
                 {description}
               </p>
             )}
@@ -182,7 +182,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           <div className="text-right flex-shrink-0">
             <p className={cn(
               'font-semibold text-sm sm:text-base tabular-nums',
-              isIncome ? 'text-success-600' : 'text-neutral-900'
+              isIncome ? 'text-success-600' : 'text-neutral-900 dark:text-white'
             )}>
               {isIncome ? '+' : '-'}{formatCurrency(amount, currency)}
             </p>
@@ -234,14 +234,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   if (transactions.length === 0) {
     return (
       <div className={cn('py-12 text-center', className)}>
-        <p className="text-neutral-500">{emptyMessage}</p>
+        <p className="text-neutral-500 dark:text-neutral-400">{emptyMessage}</p>
       </div>
     );
   }
 
   if (!groupByDate) {
     return (
-      <div className={cn('divide-y divide-neutral-100', className)}>
+      <div className={cn('divide-y divide-neutral-100 dark:divide-neutral-700', className)}>
         {transactions.map((transaction, index) => (
           <motion.div
             key={transaction.id}
@@ -273,10 +273,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     <div className={cn('space-y-6', className)}>
       {Object.entries(grouped).map(([date, items]) => (
         <div key={date}>
-          <h4 className="text-sm font-medium text-neutral-500 mb-2 px-4">
+          <h4 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4">
             {date}
           </h4>
-          <div className="bg-white rounded-xl divide-y divide-neutral-100">
+          <div className="bg-white dark:bg-neutral-800 rounded-xl divide-y divide-neutral-100 dark:divide-neutral-700">
             {items.map((transaction) => (
               <TransactionItem
                 key={transaction.id}

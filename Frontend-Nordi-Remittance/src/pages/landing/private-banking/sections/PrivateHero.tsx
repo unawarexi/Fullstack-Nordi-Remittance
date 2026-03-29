@@ -53,7 +53,7 @@ const PrivateHero: React.FC = () => {
       </div>
 
       {/* Gradient Accents */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-50 dark:bg-amber-900/200/20 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl" />
 
       <Container className="relative z-10">
@@ -64,7 +64,7 @@ const PrivateHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 text-amber-300 text-sm font-medium mb-6 border border-amber-500/30">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-900/200/20 text-amber-300 text-sm font-medium mb-6 border border-amber-500/30">
               <Crown className="w-4 h-4" />
               Private Banking
             </span>
@@ -81,7 +81,7 @@ const PrivateHero: React.FC = () => {
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-12">
-              <Button variant="primary" className="bg-amber-500 hover:bg-amber-600 text-neutral-900">
+              <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
                 <Sparkles className="w-5 h-5 mr-2" />
                 Become a Member
               </Button>
@@ -103,11 +103,11 @@ const PrivateHero: React.FC = () => {
                     "hover:bg-white/10 hover:border-amber-500/50 transition-all"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/200/20 text-amber-400 flex items-center justify-center">
                     <link.icon className="w-5 h-5" />
                   </div>
                   <span className="text-white font-medium text-sm">{link.label}</span>
-                  <ChevronRight className="w-4 h-4 text-neutral-500 ml-auto" />
+                  <ChevronRight className="w-4 h-4 text-neutral-500 dark:text-neutral-400 ml-auto" />
                 </a>
               ))}
             </div>
@@ -140,17 +140,17 @@ const PrivateHero: React.FC = () => {
                     transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
                     className="p-4 rounded-xl bg-white/5 border border-white/10 text-center"
                   >
-                    <div className="w-10 h-10 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 mx-auto rounded-full bg-amber-50 dark:bg-amber-900/200/20 text-amber-400 flex items-center justify-center mb-3">
                       <stat.icon className="w-5 h-5" />
                     </div>
                     <p className="text-xl font-bold text-white">{stat.value}</p>
-                    <p className="text-xs text-neutral-500 mt-1">{stat.label}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{stat.label}</p>
                   </motion.div>
                 ))}
               </div>
 
               {/* Eligibility Note */}
-              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/200/10 border border-amber-500/20">
                 <p className="text-sm text-amber-200">
                   <span className="font-semibold">Eligibility:</span> Minimum investable assets of $500,000 
                   or annual income exceeding $200,000

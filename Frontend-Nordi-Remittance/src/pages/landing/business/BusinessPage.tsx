@@ -33,7 +33,7 @@ const BusinessPage: React.FC = () => {
   }, [location]);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-neutral-900">
       <BusinessHero />
       <BusinessAccounts />
       <BusinessLoans />

@@ -109,7 +109,7 @@ const Xtravaganza: React.FC = () => {
               repeat: Infinity,
               delay: Math.random() * 2,
             }}
-            className="absolute w-2 h-2 rounded-full bg-white"
+            className="absolute w-2 h-2 rounded-full bg-white dark:bg-neutral-800"
             style={{ 
               left: `${Math.random() * 100}%`,
               bottom: 0,
@@ -284,7 +284,7 @@ const Xtravaganza: React.FC = () => {
               <p className="text-white font-medium">Join 2M+ members earning rewards</p>
               <p className="text-sm text-purple-200">Your first 1,000 points are on us!</p>
             </div>
-            <Button variant="secondary" className="ml-4 bg-white text-purple-900 hover:bg-purple-50">
+            <Button variant="secondary" className="ml-4 bg-white dark:bg-neutral-800 text-purple-900 hover:bg-purple-50">
               <Users className="w-4 h-4 mr-2" />
               Join Now
             </Button>

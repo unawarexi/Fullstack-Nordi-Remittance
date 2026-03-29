@@ -21,7 +21,7 @@ export const ConfirmSuccess: React.FC<{ onClose: () => void }> = ({
         {...fadeInUp}
         className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800  bg-opacity-75 backdrop-blur-lg"
       >
-        <div className="w-[80%] items-center justify-center rounded-lg bg-white p-8 text-center lg:w-[30%] ">
+        <div className="w-[80%] items-center justify-center rounded-lg bg-white dark:bg-neutral-800 p-8 text-center lg:w-[30%] ">
           <p className="text-md mb-4 mt-2 font-bold text-blue-700 lg:text-lg">
             NORDEA
           </p>
@@ -52,7 +52,7 @@ export const ConfirmError: React.FC<{ onClose: () => void }> = ({
         {...fadeInUp}
         className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 backdrop-blur-lg"
       >
-        <div className="w-[80%] items-center justify-center rounded-lg bg-white p-8 text-center lg:w-[30%] ">
+        <div className="w-[80%] items-center justify-center rounded-lg bg-white dark:bg-neutral-800 p-8 text-center lg:w-[30%] ">
           <p className="text-md mb-4 mt-2 font-bold text-blue-700 lg:text-lg">
             NORDEA
           </p>

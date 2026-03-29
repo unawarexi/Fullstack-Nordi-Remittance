@@ -65,7 +65,7 @@ const atmTypes = [
 // ========================
 const ATMServices: React.FC = () => {
   return (
-    <Section id="atm-services" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="atm-services" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -78,10 +78,10 @@ const ATMServices: React.FC = () => {
             <MapPin className="w-4 h-4" />
             ATM Services
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Largest ATM Network in the Region
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access cash and banking services from over 3,500 ATMs across all 
             36 states, available 24/7 for your convenience.
           </p>
@@ -97,10 +97,10 @@ const ATMServices: React.FC = () => {
           {networkStats.map((stat) => (
             <div
               key={stat.label}
-              className="text-center p-4 rounded-xl bg-white border border-neutral-200"
+              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <p className="text-2xl lg:text-3xl font-bold text-purple-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 mt-1">{stat.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -112,9 +112,9 @@ const ATMServices: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
-            <h4 className="font-semibold text-neutral-900 mb-6">Available Services</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-6">Available Services</h4>
             <div className="grid grid-cols-2 gap-4">
               {atmServices.map((service) => (
                 <div
@@ -127,8 +127,8 @@ const ATMServices: React.FC = () => {
                   <div className="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-3">
                     {service.icon}
                   </div>
-                  <h5 className="font-semibold text-neutral-900 text-sm mb-1">{service.name}</h5>
-                  <p className="text-xs text-neutral-500">{service.description}</p>
+                  <h5 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{service.name}</h5>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.description}</p>
                 </div>
               ))}
             </div>
@@ -141,17 +141,17 @@ const ATMServices: React.FC = () => {
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <h4 className="font-semibold text-neutral-900 mb-4">ATM Types</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">ATM Types</h4>
             {atmTypes.map((type) => (
               <div
                 key={type.name}
                 className={cn(
-                  "p-4 rounded-xl bg-white border border-neutral-200",
+                  "p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                   "hover:shadow-md hover:border-purple-300 transition-all"
                 )}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <h5 className="font-semibold text-neutral-900">{type.name}</h5>
+                  <h5 className="font-semibold text-neutral-900 dark:text-white">{type.name}</h5>
                   <span className="text-sm font-semibold text-purple-600">{type.count}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -178,7 +178,7 @@ const ATMServices: React.FC = () => {
                   <p className="text-xs text-purple-200">Use our locator to find ATMs near you</p>
                 </div>
               </div>
-              <Button variant="primary" className="w-full bg-white text-purple-600 hover:bg-purple-50">
+              <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-purple-600 hover:bg-purple-50">
                 ATM Locator
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

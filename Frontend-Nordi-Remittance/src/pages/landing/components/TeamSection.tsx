@@ -105,7 +105,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
         </div>
 
         {/* Info */}
-        <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 mb-1">
+        <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1">
           {member.name}
         </h3>
         <p className="text-primary-600 text-sm font-medium mb-3">
@@ -113,7 +113,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
         </p>
         
         {member.bio && (
-          <p className="text-neutral-500 text-sm mb-4 line-clamp-2">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4 line-clamp-2">
             {member.bio}
           </p>
         )}
@@ -126,7 +126,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={member.social.linkedin}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
               >
                 <Linkedin size={16} />
               </motion.a>
@@ -136,7 +136,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={member.social.twitter}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
               >
                 <Twitter size={16} />
               </motion.a>
@@ -146,7 +146,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={`mailto:${member.social.email}`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-500 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
               >
                 <Mail size={16} />
               </motion.a>
@@ -176,10 +176,10 @@ export const TeamSection: React.FC = () => {
           <span className="text-primary-600 text-sm font-semibold uppercase tracking-wider mb-2 block">
             Our Team
           </span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Meet the experts behind Nordea Remit
           </h2>
-          <p className="text-neutral-500 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm sm:text-base max-w-xl mx-auto">
             Our dedicated team of professionals works tirelessly to provide you
             with the best money transfer experience.
           </p>

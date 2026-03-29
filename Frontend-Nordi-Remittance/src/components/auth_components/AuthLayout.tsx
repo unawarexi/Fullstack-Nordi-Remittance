@@ -195,9 +195,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3" />
-          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute top-0 left-0 w-64 h-64 bg-white dark:bg-neutral-800 rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white dark:bg-neutral-800 rounded-full translate-x-1/3 translate-y-1/3" />
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-white dark:bg-neutral-800 rounded-full -translate-x-1/2 -translate-y-1/2" />
         </div>
 
         {/* Content */}

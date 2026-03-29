@@ -77,29 +77,29 @@ const InternetBankingSideBar: React.FC = () => {
             className={cn(
               "fixed right-0 top-0 z-[100] h-screen",
               "w-[85%] sm:w-[350px] md:w-[380px] lg:w-[400px]",
-              "bg-slate-50 shadow-2xl",
+              "bg-slate-50 dark:bg-neutral-900 shadow-2xl",
               "flex flex-col",
             )}
           >
             {/* Header */}
-            <div className="border-b border-neutral-100 p-4 sm:p-6">
+            <div className="border-b border-neutral-100 dark:border-neutral-800 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-blue-100 p-2">
+                  <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2">
                     <Globe className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
                   </div>
                   <div>
-                    <p className="text-base font-semibold text-neutral-800 sm:text-lg">
+                    <p className="text-base font-semibold text-neutral-800 dark:text-neutral-100 sm:text-lg">
                       Internet Banking
                     </p>
-                    <p className="text-xs text-neutral-500">Quick Access</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Quick Access</p>
                   </div>
                 </div>
                 <button
                   onClick={closeSidebar}
-                  className="rounded-lg p-2 transition-colors hover:bg-neutral-100"
+                  className="rounded-lg p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
-                  <X className="h-5 w-5 text-neutral-500" />
+                  <X className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
                 </button>
               </div>
             </div>
@@ -114,7 +114,7 @@ const InternetBankingSideBar: React.FC = () => {
                   "bg-gradient-to-r from-lime-500 to-lime-600",
                   "hover:from-lime-600 hover:to-lime-700",
                   "transform transition-all duration-300 hover:scale-[1.02]",
-                  "shadow-lg hover:shadow-xl",
+                  "shadow-lg hover:shadow-xl dark:hover:shadow-neutral-900/50",
                 )}
               >
                 <div className="flex items-center gap-4">
@@ -141,7 +141,7 @@ const InternetBankingSideBar: React.FC = () => {
                   "bg-gradient-to-r from-indigo-500 to-indigo-600",
                   "hover:from-indigo-600 hover:to-indigo-700",
                   "transform transition-all duration-300 hover:scale-[1.02]",
-                  "shadow-lg hover:shadow-xl",
+                  "shadow-lg hover:shadow-xl dark:hover:shadow-neutral-900/50",
                 )}
               >
                 <div className="flex items-center gap-4">
@@ -161,7 +161,7 @@ const InternetBankingSideBar: React.FC = () => {
               </button>
 
               {/* Divider */}
-              <div className="my-4 h-px bg-neutral-200" />
+              <div className="my-4 h-px bg-neutral-200 dark:bg-neutral-700" />
 
               {/* Promo Images */}
               <div className="space-y-4">
@@ -169,13 +169,13 @@ const InternetBankingSideBar: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   src={Images.sideBar2}
                   alt="Banking promotion"
-                  className="w-full rounded-xl object-cover shadow-md"
+                  className="w-full rounded-xl object-cover shadow-md dark:shadow-neutral-900/30"
                 />
                 <motion.img
                   whileHover={{ scale: 1.02 }}
                   src={Images.sideBar3}
                   alt="Banking services"
-                  className="w-full rounded-xl object-cover shadow-md"
+                  className="w-full rounded-xl object-cover shadow-md dark:shadow-neutral-900/30"
                 />
               </div>
             </div>

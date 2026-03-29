@@ -104,8 +104,8 @@ const DesktopNavItems: React.FC = () => {
             to={item.href}
             className={cn(
               "rounded-md px-3 py-2 text-sm font-medium transition-all",
-              "hover:bg-neutral-100 hover:text-primary-600",
-              activeMegaMenuItem === item.label && "bg-amber-50 text-amber-500",
+              "hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-primary-600 dark:text-neutral-200 dark:hover:text-primary-400",
+              activeMegaMenuItem === item.label && "bg-amber-50 dark:bg-amber-950/30 text-amber-500",
             )}
           >
             {item.label}
@@ -147,15 +147,15 @@ const SearchBar: React.FC<{ className?: string }> = ({ className }) => {
               ref={inputRef}
               type="text"
               placeholder="Search..."
-              className="w-full rounded-full border border-neutral-200 bg-neutral-100 py-2 pl-10 pr-8 text-sm outline-none focus:border-transparent focus:ring-2 focus:ring-primary-500"
+              className="w-full rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 py-2 pl-10 pr-8 text-sm dark:text-neutral-200 outline-none focus:border-transparent focus:ring-2 focus:ring-primary-500 dark:placeholder-neutral-500"
               onBlur={() => setIsExpanded(false)}
             />
-            <Search size={16} className="absolute left-3 text-neutral-400" />
+            <Search size={16} className="absolute left-3 text-neutral-400 dark:text-neutral-500" />
             <button
               onClick={() => setIsExpanded(false)}
-              className="absolute right-2 rounded-full p-1 hover:bg-neutral-200"
+              className="absolute right-2 rounded-full p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700"
             >
-              <X size={14} className="text-neutral-500" />
+              <X size={14} className="text-neutral-500 dark:text-neutral-400" />
             </button>
           </motion.div>
         ) : (
@@ -163,9 +163,9 @@ const SearchBar: React.FC<{ className?: string }> = ({ className }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={() => setIsExpanded(true)}
-            className="rounded-full bg-neutral-100 p-2.5 transition-colors hover:bg-neutral-200"
+            className="rounded-full bg-neutral-100 dark:bg-neutral-800 p-2.5 transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-700"
           >
-            <Search size={18} className="text-neutral-600" />
+            <Search size={18} className="text-neutral-600 dark:text-neutral-300" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -267,10 +267,10 @@ export const ResponsiveNavbar: React.FC = () => {
                 {/* Mobile Menu Button */}
                 <button
                   onClick={openMobileMenu}
-                  className="rounded-lg p-2 transition-colors hover:bg-neutral-100 lg:hidden"
+                  className="rounded-lg p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 lg:hidden"
                   aria-label="Open menu"
                 >
-                  <Menu size={24} className="text-neutral-700" />
+                  <Menu size={24} className="text-neutral-700 dark:text-neutral-200" />
                 </button>
               </div>
             </div>
@@ -285,7 +285,7 @@ export const ResponsiveNavbar: React.FC = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="w-full border-t border-neutral-100 bg-white shadow-lg"
+              className="w-full border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg"
               onMouseEnter={handleMegaMenuContentEnter}
               onMouseLeave={handleMegaMenuContentLeave}
             >

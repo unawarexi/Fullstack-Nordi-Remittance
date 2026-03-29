@@ -100,7 +100,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={index}>
               {index > 0 && (
-                <ChevronRight size={14} className="text-neutral-400 dark:text-gray-500" />
+                <ChevronRight size={14} className="text-neutral-400 dark:text-gray-500 dark:text-neutral-400" />
               )}
               {crumb.href || crumb.onClick ? (
                 <a
@@ -111,7 +111,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                       crumb.onClick();
                     }
                   }}
-                  className="text-neutral-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-indigo-400 transition-colors"
+                  className="text-neutral-500 dark:text-gray-400 dark:text-neutral-500 hover:text-primary-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   {crumb.label}
                 </a>
@@ -151,7 +151,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {subtitle && (
-                <span className={cn('text-neutral-500 dark:text-gray-400', styles.subtitle)}>
+                <span className={cn('text-neutral-500 dark:text-gray-400 dark:text-neutral-500', styles.subtitle)}>
                   {subtitle}
                 </span>
               )}
@@ -165,7 +165,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             </div>
 
             {description && (
-              <p className={cn('text-neutral-500 dark:text-gray-400 mt-1', styles.description)}>
+              <p className={cn('text-neutral-500 dark:text-gray-400 dark:text-neutral-500 mt-1', styles.description)}>
                 {description}
               </p>
             )}
@@ -206,7 +206,7 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
           {title}
         </h2>
         {subtitle && (
-          <p className="text-sm text-neutral-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
+          <p className="text-sm text-neutral-500 dark:text-gray-400 dark:text-neutral-500 mt-0.5">{subtitle}</p>
         )}
       </div>
       {action}

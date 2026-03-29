@@ -88,7 +88,7 @@ const schoolOffers: SchoolOffer[] = [
     savings: "$100 Bonus",
     validUntil: "Dec 31",
     icon: <CreditCard className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "Low credit limit to start",
       "No annual fee ever",
@@ -124,8 +124,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Savings Badge */}
@@ -141,8 +141,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 mb-2">{offer.title}</h3>
-    <p className="text-sm text-neutral-500 mb-4">{offer.description}</p>
+    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{offer.title}</h3>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{offer.description}</p>
 
     {/* Valid Until */}
     <div className="flex items-center gap-2 text-xs text-neutral-400 mb-4">
@@ -155,7 +155,7 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
       {offer.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600">{feature}</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -186,10 +186,10 @@ const BackToSchool: React.FC = () => {
             <BookOpen className="w-4 h-4" />
             Back to School
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Start The School Year Right With Smart Banking
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Special offers for students and parents to make this academic year 
             financially stress-free. Limited time offers available now!
           </p>
@@ -210,8 +210,8 @@ const BackToSchool: React.FC = () => {
           className="grid grid-cols-1 lg:grid-cols-2 gap-8"
         >
           {/* Checklist */}
-          <div className="p-6 rounded-2xl bg-white border border-neutral-200">
-            <h3 className="text-xl font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+          <div className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
               <Gift className="w-5 h-5 text-indigo-500" />
               Student Financial Checklist
             </h3>
@@ -219,15 +219,15 @@ const BackToSchool: React.FC = () => {
               {schoolChecklist.map((item, index) => (
                 <li
                   key={item.item}
-                  className="flex items-center justify-between p-3 rounded-lg bg-neutral-50"
+                  className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded-full border-2 border-neutral-300 flex items-center justify-center text-xs font-bold text-neutral-400">
                       {index + 1}
                     </div>
-                    <span className="text-sm text-neutral-700">{item.item}</span>
+                    <span className="text-sm text-neutral-700 dark:text-neutral-200">{item.item}</span>
                   </div>
-                  <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded">
+                  <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-xs font-medium rounded">
                     {item.priority}
                   </span>
                 </li>
@@ -256,7 +256,7 @@ const BackToSchool: React.FC = () => {
                 <p className="text-sm text-indigo-200">App store rating</p>
               </div>
             </div>
-            <Button variant="primary" className="w-full mt-6 bg-amber-500 hover:bg-amber-600">
+            <Button variant="primary" className="w-full mt-6 bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
               Open Student Account
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

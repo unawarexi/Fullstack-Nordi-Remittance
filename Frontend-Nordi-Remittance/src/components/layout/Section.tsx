@@ -37,8 +37,8 @@ const sizeStyles: Record<SectionSize, string> = {
 // BACKGROUND STYLES
 // ========================
 const backgroundStyles: Record<SectionBackground, string> = {
-  white: 'bg-white',
-  light: 'bg-neutral-50',
+  white: 'bg-white dark:bg-neutral-900',
+  light: 'bg-neutral-50 dark:bg-neutral-800',
   dark: 'bg-neutral-900 text-white',
   primary: 'bg-primary-500 text-white',
   gradient: 'bg-gradient-to-br from-primary-500 to-accent-500 text-white',
@@ -170,14 +170,14 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         'flex gap-4',
         centered ? 'flex-col items-center' : 'items-start justify-between',
       )}>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 dark:text-white">
           {title}
         </h2>
         {action && <div className="flex-shrink-0">{action}</div>}
       </div>
       {description && (
         <p className={cn(
-          'mt-4 text-sm sm:text-base md:text-lg text-neutral-600',
+          'mt-4 text-sm sm:text-base md:text-lg text-neutral-600 dark:text-neutral-300',
           centered && 'max-w-2xl mx-auto',
         )}>
           {description}

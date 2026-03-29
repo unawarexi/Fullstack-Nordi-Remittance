@@ -56,7 +56,7 @@ const features = [
 // ========================
 const IVRBanking: React.FC = () => {
   return (
-    <Section id="ivr" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="ivr" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
@@ -69,10 +69,10 @@ const IVRBanking: React.FC = () => {
               <Phone className="w-4 h-4" />
               IVR Banking
             </span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
               Bank with Just a Phone Call
             </h2>
-            <p className="text-lg text-neutral-600 mb-6">
+            <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-6">
               No internet? No smartphone? No problem! Access all your banking 
               services by simply calling our Interactive Voice Response line.
             </p>
@@ -85,8 +85,8 @@ const IVRBanking: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-rose-600 font-medium">Call Our IVR Line</p>
-                  <p className="text-2xl font-bold text-neutral-900">0700-REMIT-00</p>
-                  <p className="text-sm text-neutral-500">Or dial 0700-736-4800</p>
+                  <p className="text-2xl font-bold text-neutral-900 dark:text-white">0700-REMIT-00</p>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">Or dial 0700-736-4800</p>
                 </div>
               </div>
             </div>
@@ -94,11 +94,11 @@ const IVRBanking: React.FC = () => {
             {/* Features */}
             <div className="grid grid-cols-2 gap-3 mb-6">
               {features.map((feature) => (
-                <div key={feature.label} className="flex items-start gap-2 p-3 rounded-lg bg-white border border-neutral-200">
+                <div key={feature.label} className="flex items-start gap-2 p-3 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
                   <feature.icon className="w-5 h-5 text-rose-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-neutral-900 text-sm">{feature.label}</p>
-                    <p className="text-xs text-neutral-500">{feature.desc}</p>
+                    <p className="font-medium text-neutral-900 dark:text-white text-sm">{feature.label}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.desc}</p>
                   </div>
                 </div>
               ))}
@@ -187,12 +187,12 @@ const IVRBanking: React.FC = () => {
           viewport={{ once: true }}
           className="mt-12 max-w-3xl mx-auto"
         >
-          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200">
             <div className="flex items-start gap-3">
               <HelpCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium text-amber-800">Quick Tips</p>
-                <ul className="text-sm text-amber-700 mt-1 space-y-1">
+                <p className="font-medium text-amber-800 dark:text-amber-200">Quick Tips</p>
+                <ul className="text-sm text-amber-700 dark:text-amber-300 mt-1 space-y-1">
                   <li>• Have your account number and PIN ready</li>
                   <li>• Speak clearly when voice prompts ask for input</li>
                   <li>• Press * to repeat any menu option</li>

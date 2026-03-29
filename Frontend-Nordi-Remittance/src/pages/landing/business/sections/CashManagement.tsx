@@ -82,7 +82,7 @@ const cashServices: CashService[] = [
     name: "Reporting & Analytics",
     description: "Comprehensive visibility into cash positions",
     icon: <BarChart3 className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "Real-time balance reporting",
       "Cash flow forecasting",
@@ -118,8 +118,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Icon */}
@@ -128,15 +128,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 mb-2">{service.name}</h3>
-    <p className="text-sm text-neutral-500 mb-4">{service.description}</p>
+    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{service.name}</h3>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{service.description}</p>
 
     {/* Features */}
     <ul className="space-y-2 flex-1 mb-6">
       {service.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600">{feature}</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -167,10 +167,10 @@ const CashManagement: React.FC = () => {
             <Wallet className="w-4 h-4" />
             Cash Management
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Optimize Your Business Cash Flow
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive cash management solutions to help you collect faster, 
             pay smarter, and gain complete visibility into your liquidity position.
           </p>
@@ -191,8 +191,8 @@ const CashManagement: React.FC = () => {
               <div className="w-10 h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

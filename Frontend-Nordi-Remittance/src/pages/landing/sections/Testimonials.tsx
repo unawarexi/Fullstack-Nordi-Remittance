@@ -119,8 +119,8 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
       "relative p-6 rounded-xl h-full",
-      "bg-white border border-neutral-100",
-      "hover:shadow-lg transition-shadow duration-300"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-shadow duration-300"
     )}
   >
     <Quote className="absolute top-4 right-4 w-8 h-8 text-indigo-100" />
@@ -129,11 +129,11 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
       <img
         src={testimonial.image}
         alt={testimonial.name}
-        className="w-12 h-12 rounded-full object-cover ring-2 ring-neutral-100"
+        className="w-12 h-12 rounded-full object-cover ring-2 ring-neutral-100 dark:ring-neutral-700"
       />
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-neutral-900 truncate">{testimonial.name}</h4>
-        <p className="text-xs text-neutral-500 truncate">
+        <h4 className="font-semibold text-neutral-900 dark:text-white truncate">{testimonial.name}</h4>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
           {testimonial.role}{testimonial.company && ` • ${testimonial.company}`}
         </p>
       </div>
@@ -141,7 +141,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
     
     <RatingStars rating={testimonial.rating} />
     
-    <p className="mt-3 text-sm text-neutral-600 leading-relaxed line-clamp-4">
+    <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed line-clamp-4">
       "{testimonial.text}"
     </p>
     
@@ -172,13 +172,13 @@ const Testimonials: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
               Testimonials
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               What Our Customers Say
             </h2>
-            <p className="mt-2 text-neutral-600 max-w-xl">
+            <p className="mt-2 text-neutral-600 dark:text-neutral-300 max-w-xl">
               Real stories from real customers who trust us with their financial journey.
             </p>
           </motion.div>
@@ -191,13 +191,13 @@ const Testimonials: React.FC = () => {
               className={cn(
                 "p-2 rounded-lg border transition-colors",
                 currentPage === 0
-                  ? "bg-neutral-50 text-neutral-300 border-neutral-100 cursor-not-allowed"
-                  : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50"
+                  ? "bg-neutral-50 dark:bg-neutral-700/50 text-neutral-300 border-neutral-100 dark:border-neutral-700 cursor-not-allowed"
+                  : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50"
               )}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <span className="text-sm text-neutral-500 min-w-[60px] text-center">
+            <span className="text-sm text-neutral-500 dark:text-neutral-400 min-w-[60px] text-center">
               {currentPage + 1} / {totalPages}
             </span>
             <button
@@ -206,8 +206,8 @@ const Testimonials: React.FC = () => {
               className={cn(
                 "p-2 rounded-lg border transition-colors",
                 currentPage === totalPages - 1
-                  ? "bg-neutral-50 text-neutral-300 border-neutral-100 cursor-not-allowed"
-                  : "bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50"
+                  ? "bg-neutral-50 dark:bg-neutral-700/50 text-neutral-300 border-neutral-100 dark:border-neutral-700 cursor-not-allowed"
+                  : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50"
               )}
             >
               <ChevronRight className="w-5 h-5" />
@@ -244,12 +244,12 @@ const Testimonials: React.FC = () => {
         >
           <div className="flex items-center gap-2">
             <RatingStars rating={5} />
-            <span className="text-sm text-neutral-600">4.9/5 Average Rating</span>
+            <span className="text-sm text-neutral-600 dark:text-neutral-300">4.9/5 Average Rating</span>
           </div>
           <div className="hidden sm:block w-px h-6 bg-neutral-200" />
-          <span className="text-sm text-neutral-600">25,000+ Reviews</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">25,000+ Reviews</span>
           <div className="hidden sm:block w-px h-6 bg-neutral-200" />
-          <span className="text-sm text-neutral-600">Trustpilot Verified</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">Trustpilot Verified</span>
         </motion.div>
       </Container>
     </Section>

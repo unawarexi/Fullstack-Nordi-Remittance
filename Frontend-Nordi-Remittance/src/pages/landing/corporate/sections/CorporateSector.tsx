@@ -133,7 +133,7 @@ const industrySectors: IndustrySector[] = [
 // ========================
 const CorporateSector: React.FC = () => {
   return (
-    <Section id="corporate-sector" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="corporate-sector" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -146,10 +146,10 @@ const CorporateSector: React.FC = () => {
             <Globe className="w-4 h-4" />
             Industry Solutions
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Sector-Specific Expertise
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Deep industry knowledge combined with tailored financial solutions 
             to address the unique challenges of your sector.
           </p>
@@ -165,8 +165,8 @@ const CorporateSector: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
               )}
             >
               {/* Icon */}
@@ -175,21 +175,21 @@ const CorporateSector: React.FC = () => {
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{sector.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{sector.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{sector.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{sector.description}</p>
 
               {/* Solutions */}
               <ul className="space-y-2 mb-6">
                 {sector.solutions.map((solution) => (
                   <li key={solution} className="flex items-center gap-2">
                     <Check className={cn("w-4 h-4", sector.color)} />
-                    <span className="text-sm text-neutral-600">{solution}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{solution}</span>
                   </li>
                 ))}
               </ul>
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700">
                 <div className="flex items-center gap-2 text-xs text-neutral-400">
                   <TrendingUp className="w-4 h-4" />
                   {sector.clients}+ clients

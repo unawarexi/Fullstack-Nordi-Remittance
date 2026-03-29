@@ -45,7 +45,7 @@ const investmentOptions: InvestmentOption[] = [
     expectedReturn: "8-12%",
     minInvestment: "$500",
     icon: <PieChart className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     features: [
       "Professional fund management",
       "Diversified portfolio",
@@ -93,7 +93,7 @@ const investmentOptions: InvestmentOption[] = [
     expectedReturn: "7-10%",
     minInvestment: "$50",
     icon: <Target className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "401(k) and IRA options",
       "Tax-deferred growth",
@@ -135,7 +135,7 @@ const investmentBenefits = [
 const RiskBadge: React.FC<{ level: "Low" | "Medium" | "High" }> = ({ level }) => {
   const colors = {
     Low: "bg-emerald-100 text-emerald-700",
-    Medium: "bg-amber-100 text-amber-700",
+    Medium: "bg-amber-100 text-amber-700 dark:text-amber-300",
     High: "bg-red-100 text-red-700",
   };
 
@@ -161,8 +161,8 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ option, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-xl hover:border-neutral-300 transition-all duration-300"
+      "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-xl dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
@@ -174,25 +174,25 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ option, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 mb-2">{option.name}</h3>
-    <p className="text-sm text-neutral-500 mb-4">{option.description}</p>
+    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{option.name}</h3>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{option.description}</p>
 
     {/* Stats */}
-    <div className="grid grid-cols-2 gap-4 py-4 border-y border-neutral-100 mb-4">
+    <div className="grid grid-cols-2 gap-4 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
       <div>
         <p className="text-xs text-neutral-400">Expected Return</p>
         <p className="text-lg font-bold text-emerald-600">{option.expectedReturn}</p>
       </div>
       <div>
         <p className="text-xs text-neutral-400">Min. Investment</p>
-        <p className="text-lg font-bold text-neutral-900">{option.minInvestment}</p>
+        <p className="text-lg font-bold text-neutral-900 dark:text-white">{option.minInvestment}</p>
       </div>
     </div>
 
     {/* Features */}
     <ul className="space-y-2 mb-6">
       {option.features.map((feature) => (
-        <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600">
+        <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
           <CheckCircle2 className="w-4 h-4 text-indigo-500" />
           {feature}
         </li>
@@ -200,7 +200,7 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ option, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="outline" className="w-full group-hover:bg-indigo-50 group-hover:border-indigo-200">
+    <Button variant="outline" className="w-full group-hover:bg-indigo-50 dark:bg-indigo-900/30 group-hover:border-indigo-200">
       Learn More
       <ArrowRight className="w-4 h-4 ml-2" />
     </Button>
@@ -221,14 +221,14 @@ const Investments: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
             <TrendingUp className="w-4 h-4" />
             Investment Solutions
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Build Wealth For Your Future
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             From stocks and bonds to retirement planning, our investment solutions 
             are designed to help you grow your wealth and achieve financial freedom.
           </p>
@@ -244,14 +244,14 @@ const Investments: React.FC = () => {
           {investmentBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-neutral-200"
+              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600">
+              <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500">{benefit.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -277,7 +277,7 @@ const Investments: React.FC = () => {
             personalized investment strategy.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" size="lg" className="bg-amber-500 hover:bg-amber-600">
+            <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
               Schedule Consultation
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

@@ -79,7 +79,7 @@ const investmentStrategies: InvestmentStrategy[] = [
 // ========================
 const riskColors = {
   Conservative: "bg-emerald-100 text-emerald-700",
-  Moderate: "bg-amber-100 text-amber-700",
+  Moderate: "bg-amber-100 text-amber-700 dark:text-amber-300",
   Aggressive: "bg-rose-100 text-rose-700",
 };
 
@@ -89,7 +89,7 @@ const riskColors = {
 const assetClasses = [
   { name: "Global Equities", allocation: "35%", color: "bg-blue-500" },
   { name: "Fixed Income", allocation: "25%", color: "bg-emerald-500" },
-  { name: "Real Estate", allocation: "15%", color: "bg-amber-500" },
+  { name: "Real Estate", allocation: "15%", color: "bg-amber-50 dark:bg-amber-900/200" },
   { name: "Private Equity", allocation: "10%", color: "bg-violet-500" },
   { name: "Alternatives", allocation: "10%", color: "bg-rose-500" },
   { name: "Cash", allocation: "5%", color: "bg-neutral-400" },
@@ -113,10 +113,10 @@ const InvestmentManagement: React.FC = () => {
             <TrendingUp className="w-4 h-4" />
             Investment Management
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Grow & Protect Your Wealth
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Sophisticated investment strategies managed by our team of experts, 
             tailored to your risk profile and financial goals.
           </p>
@@ -132,8 +132,8 @@ const InvestmentManagement: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-emerald-300 transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-emerald-300 transition-all duration-300"
               )}
             >
               <div className="flex items-start justify-between mb-4">
@@ -145,10 +145,10 @@ const InvestmentManagement: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{strategy.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{strategy.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{strategy.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{strategy.description}</p>
 
-              <div className="p-3 rounded-lg bg-neutral-50 mb-4">
+              <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 mb-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-neutral-400">Target Returns</span>
                   <span className="text-lg font-bold text-emerald-600">{strategy.returns}</span>
@@ -159,7 +159,7 @@ const InvestmentManagement: React.FC = () => {
                 {strategy.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm text-neutral-600">{feature}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -179,19 +179,19 @@ const InvestmentManagement: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
             <div className="flex items-center gap-3 mb-6">
               <PieChart className="w-5 h-5 text-emerald-600" />
-              <h4 className="font-semibold text-neutral-900">Sample Portfolio Allocation</h4>
+              <h4 className="font-semibold text-neutral-900 dark:text-white">Sample Portfolio Allocation</h4>
             </div>
 
             <div className="flex items-center justify-center mb-6">
               <div className="relative w-48 h-48">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-neutral-900">$1M+</p>
-                    <p className="text-xs text-neutral-500">Min. Investment</p>
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-white">$1M+</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Min. Investment</p>
                   </div>
                 </div>
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -226,8 +226,8 @@ const InvestmentManagement: React.FC = () => {
               {assetClasses.map((asset) => (
                 <div key={asset.name} className="flex items-center gap-2">
                   <div className={cn("w-3 h-3 rounded-full", asset.color)} />
-                  <span className="text-xs text-neutral-600">{asset.name}</span>
-                  <span className="text-xs font-semibold text-neutral-900 ml-auto">{asset.allocation}</span>
+                  <span className="text-xs text-neutral-600 dark:text-neutral-300">{asset.name}</span>
+                  <span className="text-xs font-semibold text-neutral-900 dark:text-white ml-auto">{asset.allocation}</span>
                 </div>
               ))}
             </div>
@@ -265,7 +265,7 @@ const InvestmentManagement: React.FC = () => {
               ))}
             </div>
 
-            <Button variant="primary" className="w-full bg-amber-500 hover:bg-amber-600 text-neutral-900">
+            <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
               Schedule Consultation
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

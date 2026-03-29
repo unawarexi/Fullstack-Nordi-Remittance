@@ -181,7 +181,7 @@ const BankingServices = () => {
             className={cn(
               "absolute -left-2 sm:-left-4 md:-left-6 top-1/2 z-10 -translate-y-1/2",
               "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-              "bg-white shadow-lg hover:shadow-xl",
+              "bg-white dark:bg-neutral-800 shadow-lg hover:shadow-xl dark:hover:shadow-neutral-900/50",
               "flex items-center justify-center",
               "transition-all duration-300 hover:scale-110",
               "focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -196,7 +196,7 @@ const BankingServices = () => {
             className={cn(
               "absolute -right-2 sm:-right-4 md:-right-6 top-1/2 z-10 -translate-y-1/2",
               "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-              "bg-white shadow-lg hover:shadow-xl",
+              "bg-white dark:bg-neutral-800 shadow-lg hover:shadow-xl dark:hover:shadow-neutral-900/50",
               "flex items-center justify-center",
               "transition-all duration-300 hover:scale-110",
               "focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -239,7 +239,7 @@ const BankingServices = () => {
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
                   currentSlide === index 
-                    ? "w-8 sm:w-10 bg-amber-500" 
+                    ? "w-8 sm:w-10 bg-amber-50 dark:bg-amber-900/200" 
                     : "w-2 bg-slate-300 hover:bg-slate-400"
                 )}
                 aria-label={`Go to slide ${index + 1}`}

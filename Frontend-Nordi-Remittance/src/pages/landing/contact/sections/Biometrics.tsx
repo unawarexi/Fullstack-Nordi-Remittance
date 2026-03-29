@@ -92,7 +92,7 @@ const securityFeatures = [
 // ========================
 const Biometrics: React.FC = () => {
   return (
-    <Section id="biometrics" className="py-16 lg:py-24 bg-white">
+    <Section id="biometrics" className="py-16 lg:py-24 bg-white dark:bg-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -105,10 +105,10 @@ const Biometrics: React.FC = () => {
             <Fingerprint className="w-4 h-4" />
             Biometric Authentication
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Secure Banking with Your Biometrics
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Your fingerprint, face, and iris are your most secure passwords. 
             Enjoy seamless, passwordless authentication across all our channels.
           </p>
@@ -125,20 +125,20 @@ const Biometrics: React.FC = () => {
             <div
               key={type.name}
               className={cn(
-                "p-6 rounded-2xl border border-neutral-200",
-                "hover:shadow-lg hover:border-violet-300 transition-all"
+                "p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-violet-300 transition-all"
               )}
             >
               <div className={cn("w-16 h-16 rounded-2xl text-white flex items-center justify-center mb-4", type.color)}>
                 {type.icon}
               </div>
-              <h3 className="text-xl font-bold text-neutral-900 mb-2">{type.name}</h3>
-              <p className="text-neutral-600 text-sm mb-4">{type.description}</p>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{type.name}</h3>
+              <p className="text-neutral-600 dark:text-neutral-300 text-sm mb-4">{type.description}</p>
               
               <div className="space-y-2">
-                <p className="text-xs font-medium text-neutral-500 uppercase">Use Cases:</p>
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase">Use Cases:</p>
                 {type.useCases.map((use) => (
-                  <div key={use} className="flex items-center gap-2 text-sm text-neutral-700">
+                  <div key={use} className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
                     <CheckCircle className="w-4 h-4 text-emerald-500" />
                     {use}
                   </div>
@@ -157,7 +157,7 @@ const Biometrics: React.FC = () => {
             viewport={{ once: true }}
             className="p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200"
           >
-            <h3 className="text-xl font-bold text-neutral-900 mb-6">How to Enroll</h3>
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-6">How to Enroll</h3>
             <div className="space-y-4">
               {enrollmentSteps.map((item, index) => (
                 <div key={item.step} className="flex gap-4">
@@ -165,8 +165,8 @@ const Biometrics: React.FC = () => {
                     {item.step}
                   </div>
                   <div className="flex-1 pb-4 border-b border-violet-200 last:border-0">
-                    <h4 className="font-semibold text-neutral-900">{item.title}</h4>
-                    <p className="text-sm text-neutral-600">{item.description}</p>
+                    <h4 className="font-semibold text-neutral-900 dark:text-white">{item.title}</h4>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -205,7 +205,7 @@ const Biometrics: React.FC = () => {
             </ul>
 
             {/* Privacy Notice */}
-            <div className="p-4 rounded-xl bg-amber-500/20 border border-amber-500/30">
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/200/20 border border-amber-500/30">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>

@@ -86,10 +86,10 @@ const AccessMoney: React.FC = () => {
             <Banknote className="w-4 h-4" />
             Access Money
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Cardless ATM Withdrawal
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             No card? No problem! Withdraw cash from any of our ATMs using just 
             your phone. Perfect for emergencies or when you've forgotten your card.
           </p>
@@ -110,8 +110,8 @@ const AccessMoney: React.FC = () => {
               <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -138,7 +138,7 @@ const AccessMoney: React.FC = () => {
                 {/* Connector Line */}
                 {index < withdrawalSteps.length - 1 && (
                   <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-white/20 -translate-y-1/2">
-                    <div className="absolute right-0 w-2 h-2 rounded-full bg-white -translate-y-1/2" />
+                    <div className="absolute right-0 w-2 h-2 rounded-full bg-white dark:bg-neutral-800 -translate-y-1/2" />
                   </div>
                 )}
                 
@@ -159,7 +159,7 @@ const AccessMoney: React.FC = () => {
           </div>
 
           <div className="mt-8 pt-6 border-t border-white/20 flex flex-wrap justify-center gap-4">
-            <Button variant="primary" className="bg-white text-emerald-600 hover:bg-emerald-50">
+            <Button variant="primary" className="bg-white dark:bg-neutral-800 text-emerald-600 hover:bg-emerald-50">
               Try Access Money
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -177,8 +177,8 @@ const AccessMoney: React.FC = () => {
           viewport={{ once: true }}
           className="mt-8 grid md:grid-cols-2 gap-6"
         >
-          <div className="p-6 rounded-xl bg-white border border-neutral-200">
-            <h4 className="font-semibold text-neutral-900 mb-4">Withdrawal Limits</h4>
+          <div className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Withdrawal Limits</h4>
             <ul className="space-y-3">
               {[
                 { limit: "₦20,000", period: "Per transaction" },
@@ -186,15 +186,15 @@ const AccessMoney: React.FC = () => {
                 { limit: "3 times", period: "Daily transactions" },
               ].map((item) => (
                 <li key={item.period} className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-600">{item.period}</span>
-                  <span className="font-semibold text-neutral-900">{item.limit}</span>
+                  <span className="text-neutral-600 dark:text-neutral-300">{item.period}</span>
+                  <span className="font-semibold text-neutral-900 dark:text-white">{item.limit}</span>
                 </li>
               ))}
             </ul>
           </div>
           
-          <div className="p-6 rounded-xl bg-white border border-neutral-200">
-            <h4 className="font-semibold text-neutral-900 mb-4">Security Features</h4>
+          <div className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Security Features</h4>
             <ul className="space-y-2">
               {[
                 "One-time use withdrawal codes",
@@ -202,7 +202,7 @@ const AccessMoney: React.FC = () => {
                 "Transaction PIN required at ATM",
                 "Instant SMS notification on use",
               ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600">
+                <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                   <Check className="w-4 h-4 text-emerald-500" />
                   {feature}
                 </li>

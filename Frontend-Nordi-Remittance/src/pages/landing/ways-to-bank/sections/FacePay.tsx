@@ -73,10 +73,10 @@ const FacePay: React.FC = () => {
             <Scan className="w-4 h-4" />
             FacePay
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Your Face is Your Wallet
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Experience the future of payments. Just look at the terminal and pay - 
             no cards, no phones, no PINs. Powered by advanced facial recognition technology.
           </p>
@@ -92,13 +92,13 @@ const FacePay: React.FC = () => {
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white border border-neutral-200"
+              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-12 h-12 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-6 h-6" />
               </div>
-              <h4 className="font-semibold text-neutral-900 text-sm">{benefit.title}</h4>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</h4>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -110,9 +110,9 @@ const FacePay: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
-            <h4 className="font-semibold text-neutral-900 mb-6">How FacePay Works</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-6">How FacePay Works</h4>
             <div className="space-y-6">
               {howItWorks.map((step, index) => (
                 <motion.div
@@ -127,8 +127,8 @@ const FacePay: React.FC = () => {
                     {step.step}
                   </div>
                   <div>
-                    <h5 className="font-semibold text-neutral-900">{step.title}</h5>
-                    <p className="text-sm text-neutral-500">{step.description}</p>
+                    <h5 className="font-semibold text-neutral-900 dark:text-white">{step.title}</h5>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -164,8 +164,8 @@ const FacePay: React.FC = () => {
             </div>
 
             {/* Partner Merchants */}
-            <div className="p-4 rounded-xl bg-white border border-neutral-200">
-              <p className="text-xs text-neutral-500 mb-3">Available at</p>
+            <div className="p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-3">Available at</p>
               <div className="flex flex-wrap gap-2">
                 {merchants.map((merchant) => (
                   <span
@@ -191,7 +191,7 @@ const FacePay: React.FC = () => {
                 Open your mobile app, go to Settings → FacePay, and follow the 
                 enrollment steps. Takes less than 2 minutes!
               </p>
-              <Button variant="primary" className="w-full bg-white text-violet-600 hover:bg-violet-50">
+              <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-violet-600 hover:bg-violet-50">
                 Enroll Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -204,12 +204,12 @@ const FacePay: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-8 p-4 rounded-xl bg-white border border-neutral-200 flex items-start gap-4"
+          className="mt-8 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-start gap-4"
         >
           <Shield className="w-6 h-6 text-violet-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h5 className="font-semibold text-neutral-900 mb-1">Your Privacy Matters</h5>
-            <p className="text-sm text-neutral-600">
+            <h5 className="font-semibold text-neutral-900 dark:text-white mb-1">Your Privacy Matters</h5>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
               Your facial data is encrypted and stored only on your device, never on our servers. 
               FacePay uses liveness detection to prevent spoofing and requires your explicit 
               consent for every transaction.

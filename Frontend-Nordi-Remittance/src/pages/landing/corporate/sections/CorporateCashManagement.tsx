@@ -118,10 +118,10 @@ const CorporateCashManagement: React.FC = () => {
             <Wallet className="w-4 h-4" />
             Corporate Cash Management
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Global Treasury Excellence
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive cash management solutions for multinational corporations 
             to optimize liquidity, streamline payments, and gain complete visibility.
           </p>
@@ -137,14 +137,14 @@ const CorporateCashManagement: React.FC = () => {
           {platformFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100"
+              className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100"
             >
               <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center">
                 <feature.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{feature.title}</p>
-                <p className="text-xs text-neutral-500">{feature.value}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{feature.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.value}</p>
               </div>
             </div>
           ))}
@@ -160,22 +160,22 @@ const CorporateCashManagement: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
               <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", solution.color)}>
                 {solution.icon}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{solution.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{solution.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{solution.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{solution.description}</p>
               
               <ul className="space-y-2 mb-6">
                 {solution.capabilities.map((capability) => (
                   <li key={capability} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-teal-500" />
-                    <span className="text-sm text-neutral-600">{capability}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{capability}</span>
                   </li>
                 ))}
               </ul>
@@ -205,7 +205,7 @@ const CorporateCashManagement: React.FC = () => {
                 workstations through our unified platform with seamless API integration.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Button variant="primary" className="bg-white text-teal-700 hover:bg-teal-50">
+                <Button variant="primary" className="bg-white dark:bg-neutral-800 text-teal-700 hover:bg-teal-50">
                   Request Demo
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>

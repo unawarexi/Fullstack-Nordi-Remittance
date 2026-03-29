@@ -62,7 +62,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, index }) => {
         "bg-gradient-to-br from-lime-500/90 to-lime-600/90",
         "backdrop-blur-sm rounded-xl sm:rounded-2xl",
         "border border-lime-400/30 shadow-lg",
-        "hover:shadow-xl transition-all duration-300",
+        "hover:shadow-xl dark:hover:shadow-neutral-900/50 transition-all duration-300",
         "cursor-pointer group"
       )}
     >

@@ -81,7 +81,7 @@ const fxProducts: FXProduct[] = [
     name: "Currency Swaps",
     description: "Exchange currencies and reverse at a future date",
     icon: <LineChart className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     bestFor: "Liquidity management",
     features: [
       "Short & long-term swaps",
@@ -117,8 +117,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Icon */}
@@ -127,11 +127,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 mb-2">{product.name}</h3>
-    <p className="text-sm text-neutral-500 mb-3">{product.description}</p>
+    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{product.name}</h3>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">{product.description}</p>
 
     {/* Best For Badge */}
-    <span className="inline-block px-3 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full mb-4 w-fit">
+    <span className="inline-block px-3 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded-full mb-4 w-fit">
       Best for: {product.bestFor}
     </span>
 
@@ -140,7 +140,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
       {product.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600">{feature}</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -171,10 +171,10 @@ const FXProducts: React.FC = () => {
             <Globe className="w-4 h-4" />
             FX Products
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Foreign Exchange Solutions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Manage currency risk and optimize your international transactions with 
             our comprehensive suite of FX products.
           </p>
@@ -236,7 +236,7 @@ const FXProducts: React.FC = () => {
               </div>
 
               <div className="mt-6">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/200/10 border border-amber-500/20">
                   <Shield className="w-5 h-5 text-amber-400" />
                   <div>
                     <p className="text-sm font-medium text-amber-400">Hedging Advisory</p>

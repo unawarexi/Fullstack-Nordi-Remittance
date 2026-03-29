@@ -88,7 +88,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => (
       "hover:bg-slate-750 hover:border-slate-600 transition-all duration-300"
     )}
   >
-    <div className="flex-shrink-0 p-2.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+    <div className="flex-shrink-0 p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/300/20 text-indigo-400">
       {feature.icon}
     </div>
     <div>
@@ -114,7 +114,7 @@ const Security: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-500/10 rounded-full mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-50 dark:bg-indigo-900/300/10 rounded-full mb-4">
               <Shield className="w-3.5 h-3.5" />
               Bank-Grade Security
             </span>

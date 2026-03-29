@@ -188,7 +188,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             <span
               className={cn(
                 "truncate text-neutral-900 dark:text-white",
-                !selectedOption && "text-neutral-400 dark:text-neutral-500",
+                !selectedOption && "text-neutral-400 dark:text-neutral-500 dark:text-neutral-400",
               )}
             >
               {selectedOption?.label || placeholder}
@@ -224,7 +224,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
             <ChevronDown
               size={sizeConfig.icon}
               className={cn(
-                "text-neutral-400 transition-transform duration-200 dark:text-neutral-500",
+                "text-neutral-400 transition-transform duration-200 dark:text-neutral-500 dark:text-neutral-400",
                 isOpen && "rotate-180",
               )}
             />
@@ -249,7 +249,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
               {searchable && (
                 <div className="border-b border-neutral-100 p-2 dark:border-neutral-700">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 dark:text-neutral-400" />
                     <input
                       ref={searchInputRef}
                       type="text"
@@ -320,7 +320,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
               size === "sm" && "text-[10px]",
               size === "md" && "text-xs",
               size === "lg" && "text-sm",
-              error ? "text-error-500" : "text-neutral-500",
+              error ? "text-error-500" : "text-neutral-500 dark:text-neutral-400",
             )}
           >
             {error || helperText}

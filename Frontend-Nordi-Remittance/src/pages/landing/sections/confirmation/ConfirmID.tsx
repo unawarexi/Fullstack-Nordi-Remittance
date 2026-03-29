@@ -67,18 +67,18 @@ const ConfirmID: React.FC = () => {
   };
 
   return (
-    <section className="body-font relative text-gray-600">
+    <section className="body-font relative text-gray-600 dark:text-neutral-300">
       <div className="container mx-auto flex-wrap px-5 py-24 sm:flex-nowrap md:grid md:grid-cols-1 lg:flex">
         <div className="relative flex items-end justify-start overflow-hidden rounded-lg bg-rose-200 p-4 sm:mr-10 md:w-full md:p-8 lg:w-2/3">
           <img src={id1} alt="bg image" className="w-full" />
         </div>
 
         <form onSubmit={formik.handleSubmit}>
-          <div className="mt-8 flex w-full flex-col bg-white md:mx-auto md:ml-auto md:mt-0 md:w-[80%] md:py-8 lg:w-full">
-            <h2 className="title-font mb-1 text-lg font-medium text-gray-900 md:text-2xl">
+          <div className="mt-8 flex w-full flex-col bg-white dark:bg-neutral-800 md:mx-auto md:ml-auto md:mt-0 md:w-[80%] md:py-8 lg:w-full">
+            <h2 className="title-font mb-1 text-lg font-medium text-gray-900 dark:text-white md:text-2xl">
               Confirm Account Identity
             </h2>
-            <p className="mb-5 text-sm leading-relaxed text-gray-600 md:mt-2 lg:text-base">
+            <p className="mb-5 text-sm leading-relaxed text-gray-600 dark:text-neutral-300 md:mt-2 lg:text-base">
               Secure your remittance today: verify your account identity for
               seamless processing.
             </p>
@@ -86,7 +86,7 @@ const ConfirmID: React.FC = () => {
             <div className="relative mb-6 md:mb-4">
               <label
                 htmlFor="nationalId"
-                className="text-sm leading-7 text-gray-600"
+                className="text-sm leading-7 text-gray-600 dark:text-neutral-300"
               >
                 National/SSN/Citizen ID Number
               </label>
@@ -99,7 +99,7 @@ const ConfirmID: React.FC = () => {
                   formik.touched.nationalId && formik.errors.nationalId
                     ? "border-red-500"
                     : "border-gray-300"
-                } bg-white px-3 py-1 text-sm leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
+                } bg-white dark:bg-neutral-800 px-3 py-1 text-sm leading-8 text-gray-700 dark:text-neutral-200 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.nationalId}
@@ -114,7 +114,7 @@ const ConfirmID: React.FC = () => {
             <div className="relative mb-6 md:mb-4">
               <label
                 htmlFor="accountPassword"
-                className="text-sm leading-7 text-gray-600"
+                className="text-sm leading-7 text-gray-600 dark:text-neutral-300"
               >
                 Account Password
               </label>
@@ -129,7 +129,7 @@ const ConfirmID: React.FC = () => {
                     formik.errors.accountPassword
                       ? "border-red-500"
                       : "border-gray-300"
-                  } bg-white px-3 py-1 text-sm leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
+                  } bg-white dark:bg-neutral-800 px-3 py-1 text-sm leading-8 text-gray-700 dark:text-neutral-200 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.accountPassword}
@@ -152,7 +152,7 @@ const ConfirmID: React.FC = () => {
             <div className="relative mb-6 md:mb-4">
               <label
                 htmlFor="confirmPassword"
-                className="text-sm leading-7 text-gray-600"
+                className="text-sm leading-7 text-gray-600 dark:text-neutral-300"
               >
                 Confirm Account Password
               </label>
@@ -167,7 +167,7 @@ const ConfirmID: React.FC = () => {
                     formik.errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"
-                  } bg-white px-3 py-1 text-sm leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
+                  } bg-white dark:bg-neutral-800 px-3 py-1 text-sm leading-8 text-gray-700 dark:text-neutral-200 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 md:py-2 md:text-base`}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.confirmPassword}
@@ -194,7 +194,7 @@ const ConfirmID: React.FC = () => {
             >
               Verify ID
             </button>
-            <p className="mt-3 text-[10px] text-gray-500 md:text-xs">
+            <p className="mt-3 text-[10px] text-gray-500 dark:text-neutral-400 md:text-xs">
               Nordea © 2024, Everything we do begins and ends with our
               customers.
             </p>

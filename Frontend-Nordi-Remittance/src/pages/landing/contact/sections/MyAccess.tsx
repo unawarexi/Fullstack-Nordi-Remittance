@@ -71,7 +71,7 @@ const digitalServices = [
 // ========================
 const MyAccess: React.FC = () => {
   return (
-    <Section id="my-access" className="py-16 lg:py-24 bg-white">
+    <Section id="my-access" className="py-16 lg:py-24 bg-white dark:bg-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -84,10 +84,10 @@ const MyAccess: React.FC = () => {
             <Globe className="w-4 h-4" />
             MyAccess Digital Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             One Account, Multiple Channels
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access your bank account seamlessly across all our digital platforms. 
             Whether on web, mobile, or USSD - your bank is always with you.
           </p>
@@ -104,19 +104,19 @@ const MyAccess: React.FC = () => {
             <div
               key={platform.name}
               className={cn(
-                "p-6 rounded-2xl border border-neutral-200",
-                "hover:shadow-lg hover:border-blue-300 transition-all"
+                "p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-blue-300 transition-all"
               )}
             >
               <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
                 {platform.icon}
               </div>
-              <h3 className="text-xl font-bold text-neutral-900 mb-2">{platform.name}</h3>
-              <p className="text-neutral-600 text-sm mb-4">{platform.description}</p>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{platform.name}</h3>
+              <p className="text-neutral-600 dark:text-neutral-300 text-sm mb-4">{platform.description}</p>
               
               <ul className="space-y-2">
                 {platform.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm text-neutral-700">
+                  <li key={feature} className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
                     <Check className="w-4 h-4 text-blue-500" />
                     {feature}
                   </li>
@@ -133,19 +133,19 @@ const MyAccess: React.FC = () => {
           viewport={{ once: true }}
           className="p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200"
         >
-          <h3 className="text-xl font-bold text-neutral-900 mb-6 text-center">Digital Services</h3>
+          <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-6 text-center">Digital Services</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {digitalServices.map((service) => (
               <div
                 key={service.label}
                 className={cn(
-                  "p-4 rounded-xl bg-white text-center",
+                  "p-4 rounded-xl bg-white dark:bg-neutral-800 text-center",
                   "hover:shadow-md transition-all cursor-pointer"
                 )}
               >
                 <service.icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <h4 className="font-semibold text-neutral-900 text-sm mb-1">{service.label}</h4>
-                <p className="text-xs text-neutral-500">{service.desc}</p>
+                <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{service.label}</h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.desc}</p>
               </div>
             ))}
           </div>

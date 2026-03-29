@@ -188,7 +188,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                 <Button
                   variant="primary"
                   size="lg"
-                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                  className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-white"
                 >
                   {currentSlide.ctaText}
                 </Button>
@@ -233,7 +233,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
               className={cn(
                 'w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300',
                 index === currentIndex 
-                  ? 'bg-amber-500 w-6 sm:w-8' 
+                  ? 'bg-amber-50 dark:bg-amber-900/200 w-6 sm:w-8' 
                   : 'bg-white/50 hover:bg-white/70'
               )}
               whileTap={{ scale: 0.9 }}
@@ -247,7 +247,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
         <motion.div
           key={currentIndex}
-          className="h-full bg-amber-500"
+          className="h-full bg-amber-50 dark:bg-amber-900/200"
           initial={{ width: '0%' }}
           animate={{ width: '100%' }}
           transition={{ duration: autoPlayInterval / 1000, ease: 'linear' }}

@@ -80,7 +80,7 @@ const bankerProfiles: BankerProfile[] = [
 // ========================
 const PrivateBanker: React.FC = () => {
   return (
-    <Section id="private-banker" className="py-16 lg:py-24 bg-neutral-50">
+    <Section id="private-banker" className="py-16 lg:py-24 bg-neutral-50 dark:bg-neutral-700/50">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -89,14 +89,14 @@ const PrivateBanker: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
             <Users className="w-4 h-4" />
             Exclusive Private Banker
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Your Dedicated Wealth Partner
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Experience the highest level of personalized banking with a dedicated 
             private banker who understands your unique financial aspirations.
           </p>
@@ -112,15 +112,15 @@ const PrivateBanker: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "p-5 rounded-xl bg-white border border-neutral-200",
+                "p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                 "hover:shadow-md hover:border-amber-300 transition-all"
               )}
             >
               <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
                 {service.icon}
               </div>
-              <h3 className="font-semibold text-neutral-900 mb-2">{service.name}</h3>
-              <p className="text-sm text-neutral-500">{service.description}</p>
+              <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{service.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">{service.description}</p>
             </motion.div>
           ))}
         </div>
@@ -158,7 +158,7 @@ const PrivateBanker: React.FC = () => {
             </ul>
 
             <div className="flex flex-wrap gap-3">
-              <Button variant="primary" className="bg-amber-500 hover:bg-amber-600 text-neutral-900">
+              <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
                 <Phone className="w-4 h-4 mr-2" />
                 Request a Call
               </Button>
@@ -176,13 +176,13 @@ const PrivateBanker: React.FC = () => {
             viewport={{ once: true }}
             className="space-y-4"
           >
-            <h4 className="font-semibold text-neutral-900 mb-4">Meet Our Private Bankers</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Meet Our Private Bankers</h4>
             
             {bankerProfiles.map((banker) => (
               <div
                 key={banker.name}
                 className={cn(
-                  "flex items-start gap-4 p-4 rounded-xl bg-white border border-neutral-200",
+                  "flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                   "hover:shadow-md hover:border-amber-300 transition-all"
                 )}
               >
@@ -190,9 +190,9 @@ const PrivateBanker: React.FC = () => {
                   {banker.initials}
                 </div>
                 <div className="flex-1">
-                  <h5 className="font-semibold text-neutral-900">{banker.name}</h5>
+                  <h5 className="font-semibold text-neutral-900 dark:text-white">{banker.name}</h5>
                   <p className="text-sm text-amber-600">{banker.title}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-neutral-500">
+                  <div className="flex items-center gap-4 mt-2 text-xs text-neutral-500 dark:text-neutral-400">
                     <span>{banker.specialty}</span>
                     <span>•</span>
                     <span>{banker.experience}</span>
@@ -205,12 +205,12 @@ const PrivateBanker: React.FC = () => {
             ))}
 
             {/* Contact Card */}
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-              <p className="text-sm text-neutral-700 mb-3">
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
+              <p className="text-sm text-neutral-700 dark:text-neutral-200 mb-3">
                 Ready to experience private banking at its finest? Let us match you 
                 with the perfect private banker for your needs.
               </p>
-              <Button variant="ghost" className="text-amber-700 p-0 h-auto text-sm font-medium">
+              <Button variant="ghost" className="text-amber-700 dark:text-amber-300 p-0 h-auto text-sm font-medium">
                 Get Matched
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>

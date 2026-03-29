@@ -90,7 +90,7 @@ const PersonalHero: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                className="bg-amber-500 hover:bg-amber-600"
+                className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600"
               >
                 Open an Account
                 <ArrowRight className="w-5 h-5 ml-2" />

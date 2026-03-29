@@ -80,7 +80,7 @@ const productCategories: ProductCategory[] = [
     name: "Lifestyle Services",
     description: "Concierge and lifestyle management services",
     icon: <Gem className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     products: [
       "Travel concierge",
       "Event access",
@@ -105,7 +105,7 @@ const premiumServices = [
 // ========================
 const ProductsServices: React.FC = () => {
   return (
-    <Section id="products-services" className="py-16 lg:py-24 bg-neutral-50">
+    <Section id="products-services" className="py-16 lg:py-24 bg-neutral-50 dark:bg-neutral-700/50">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -118,10 +118,10 @@ const ProductsServices: React.FC = () => {
             <Briefcase className="w-4 h-4" />
             Products & Services
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Comprehensive Private Banking Solutions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             A complete suite of financial products and lifestyle services 
             designed exclusively for private banking clients.
           </p>
@@ -137,22 +137,22 @@ const ProductsServices: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
               <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", category.color)}>
                 {category.icon}
               </div>
 
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{category.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{category.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{category.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{category.description}</p>
 
               <ul className="space-y-2 mb-6">
                 {category.products.map((product) => (
                   <li key={product} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm text-neutral-600">{product}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{product}</span>
                   </li>
                 ))}
               </ul>
@@ -187,7 +187,7 @@ const ProductsServices: React.FC = () => {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="p-4 rounded-xl bg-white/5 border border-white/10 text-center hover:bg-white/10 transition-colors"
               >
-                <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-amber-50 dark:bg-amber-900/200/20 text-amber-400 flex items-center justify-center mb-3">
                   <service.icon className="w-6 h-6" />
                 </div>
                 <h4 className="font-semibold text-sm mb-1">{service.name}</h4>
@@ -197,7 +197,7 @@ const ProductsServices: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" className="bg-amber-500 hover:bg-amber-600 text-neutral-900">
+            <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
               Request Service Catalog
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

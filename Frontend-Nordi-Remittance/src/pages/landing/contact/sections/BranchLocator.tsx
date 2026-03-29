@@ -111,7 +111,7 @@ const BranchLocator: React.FC = () => {
   };
 
   return (
-    <Section id="branch-locator" className="py-16 lg:py-24 bg-white">
+    <Section id="branch-locator" className="py-16 lg:py-24 bg-white dark:bg-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -124,10 +124,10 @@ const BranchLocator: React.FC = () => {
             <MapPin className="w-4 h-4" />
             Find Us
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Branch & ATM Locator
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Find the nearest branch, ATM, or agent location. We're closer than you think.
           </p>
         </motion.div>
@@ -142,8 +142,8 @@ const BranchLocator: React.FC = () => {
           {stats.map((stat) => (
             <div key={stat.label} className="text-center p-4 rounded-xl bg-teal-50">
               <stat.icon className="w-6 h-6 text-teal-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-neutral-900">{stat.value}</p>
-              <p className="text-sm text-neutral-600">{stat.label}</p>
+              <p className="text-xl font-bold text-neutral-900 dark:text-white">{stat.value}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -174,7 +174,7 @@ const BranchLocator: React.FC = () => {
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="pl-10 pr-8 py-3 rounded-xl border border-neutral-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none appearance-none bg-white min-w-[160px]"
+                className="pl-10 pr-8 py-3 rounded-xl border border-neutral-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none appearance-none bg-white dark:bg-neutral-800 min-w-[160px]"
               >
                 {states.map((state) => (
                   <option key={state} value={state}>
@@ -199,23 +199,23 @@ const BranchLocator: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="relative h-[400px] lg:h-full rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200"
+            className="relative h-[400px] lg:h-full rounded-2xl overflow-hidden bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-700"
           >
             {/* Map Placeholder */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <MapPin className="w-12 h-12 text-teal-300 mx-auto mb-2" />
-                <p className="text-neutral-500">Interactive Map</p>
+                <p className="text-neutral-500 dark:text-neutral-400">Interactive Map</p>
                 <p className="text-sm text-neutral-400">Click a branch to see location</p>
               </div>
             </div>
 
             {/* Map Controls */}
             <div className="absolute top-4 right-4 flex flex-col gap-2">
-              <button className="w-10 h-10 rounded-lg bg-white shadow-md flex items-center justify-center text-neutral-600 hover:bg-neutral-50">
+              <button className="w-10 h-10 rounded-lg bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 flex items-center justify-center text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50">
                 +
               </button>
-              <button className="w-10 h-10 rounded-lg bg-white shadow-md flex items-center justify-center text-neutral-600 hover:bg-neutral-50">
+              <button className="w-10 h-10 rounded-lg bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 flex items-center justify-center text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50">
                 −
               </button>
             </div>
@@ -232,7 +232,7 @@ const BranchLocator: React.FC = () => {
               <div
                 key={branch.id}
                 className={cn(
-                  "p-4 rounded-xl border border-neutral-200",
+                  "p-4 rounded-xl border border-neutral-200 dark:border-neutral-700",
                   "hover:shadow-md hover:border-teal-300 transition-all cursor-pointer"
                 )}
               >
@@ -241,16 +241,16 @@ const BranchLocator: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h4 className="font-semibold text-neutral-900">{branch.name}</h4>
-                        <p className="text-sm text-neutral-600">{branch.address}</p>
-                        <p className="text-sm text-neutral-500">
+                        <h4 className="font-semibold text-neutral-900 dark:text-white">{branch.name}</h4>
+                        <p className="text-sm text-neutral-600 dark:text-neutral-300">{branch.address}</p>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
                           {branch.city}, {branch.state}
                         </p>
                       </div>
                       <ChevronRight className="w-5 h-5 text-neutral-400" />
                     </div>
 
-                    <div className="flex items-center gap-4 mt-2 text-sm text-neutral-600">
+                    <div className="flex items-center gap-4 mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                       <span className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
                         {branch.hours}

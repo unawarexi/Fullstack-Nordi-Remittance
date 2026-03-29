@@ -18,15 +18,15 @@ const RemitNavBar = () => {
     <>
       <section className="fixed z-[90] w-full">
         {/* --------------------- FIRST NAVBAR --------------- */}
-        <div className="w-full bg-slate-200">
+        <div className="w-full bg-slate-200 dark:bg-neutral-900">
           <SubNavItem />
         </div>
 
         {/* ---------------- Main NavBar ---------------- */}
-        <header className="body-font text-gray-600 bg-slate-50">
+        <header className="body-font text-gray-600 dark:text-neutral-300 bg-slate-50 dark:bg-neutral-800">
           <div className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
             {/* ---------------- Remit Logo ---------------- */}
-            <a className="title-font text-gray-900 mb-4 flex items-center font-medium md:mb-0">
+            <a className="title-font text-gray-900 dark:text-white mb-4 flex items-center font-medium md:mb-0">
               <img
                 src={Images.headerLogo}
                 alt="Nordea"
@@ -56,14 +56,14 @@ const RemitNavBar = () => {
 
             {/* ---------------- Search Section ---------------- */}
             <div className="relative mt-4 w-full max-w-sm md:mt-0">
-              <div className="bg-gray-300 absolute left-3 top-1/2 -translate-y-1/2 transform rounded-full p-2">
-                <BsSearch className="text-gray-600" />
+              <div className="bg-gray-300 dark:bg-neutral-600 absolute left-3 top-1/2 -translate-y-1/2 transform rounded-full p-2">
+                <BsSearch className="text-gray-600 dark:text-neutral-300" />
               </div>
               <input
                 type="text"
                 name="search"
                 placeholder="Search..."
-                className="border-gray-300 focus:border-transparent w-full rounded-full border py-2 pl-12 pr-4 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="border-gray-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white dark:placeholder-neutral-400 focus:border-transparent w-full rounded-full border py-2 pl-12 pr-4 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             </div>

@@ -126,7 +126,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.1, duration: 0.3 }}
-        className="text-neutral-300 dark:text-gray-600 mb-4"
+        className="text-neutral-300 dark:text-gray-600 dark:text-neutral-300 mb-4"
       >
         {displayIcon}
       </motion.div>
@@ -140,7 +140,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
       {/* Description */}
       {displayDescription && (
-        <p className={cn('text-neutral-500 dark:text-gray-400 max-w-sm mb-6', styles.description)}>
+        <p className={cn('text-neutral-500 dark:text-gray-400 dark:text-neutral-500 max-w-sm mb-6', styles.description)}>
           {displayDescription}
         </p>
       )}
@@ -209,7 +209,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       </h3>
 
       {description && (
-        <p className={cn('text-neutral-500 dark:text-gray-400', styles.description)}>
+        <p className={cn('text-neutral-500 dark:text-gray-400 dark:text-neutral-500', styles.description)}>
           {description}
         </p>
       )}

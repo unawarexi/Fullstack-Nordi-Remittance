@@ -30,7 +30,7 @@ function StoreLinks({ type }: StoreLinksProps) {
           lowerText="Google Play"
           logo={GooglePlay}
           target="_blank"
-          className="flex gap-3 rounded-lg bg-slate-50 px-4 py-3 text-white hover:bg-slate-300 active:bg-zinc-800"
+          className="flex gap-3 rounded-lg bg-slate-50 dark:bg-neutral-900 px-4 py-3 text-white hover:bg-slate-300 active:bg-zinc-800"
         />
       </div>
     );

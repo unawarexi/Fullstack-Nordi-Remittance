@@ -138,7 +138,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               // Base styles
               "w-full outline-none transition-all duration-200",
-              "placeholder:text-neutral-400 dark:placeholder:text-neutral-500",
+              "placeholder:text-neutral-400 dark:placeholder:text-neutral-500 dark:text-neutral-400",
               // Size & Variant
               sizeConfig.input,
               variantConfig.base,
@@ -190,7 +190,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {rightIcon && !isPassword && !hasError && !hasSuccess && (
               <span
                 className={cn(
-                  "text-neutral-400 dark:text-neutral-500",
+                  "text-neutral-400 dark:text-neutral-500 dark:text-neutral-400",
                   sizeConfig.icon,
                 )}
               >
@@ -261,7 +261,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           <label
             htmlFor={inputId}
             className={cn(
-              "block font-medium text-neutral-700",
+              "block font-medium text-neutral-700 dark:text-neutral-200",
               sizeConfig.label,
               disabled && "opacity-50",
             )}
@@ -277,7 +277,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           className={cn(
             "min-h-[100px] w-full px-4 py-3",
-            "rounded-lg border border-neutral-300 bg-white",
+            "rounded-lg border border-neutral-300 bg-white dark:bg-neutral-800",
             "text-sm placeholder:text-neutral-400",
             "outline-none transition-all duration-200",
             "focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20",
@@ -296,7 +296,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               {...errorAnimation}
               className={cn(
                 sizeConfig.helper,
-                error ? "text-error-500" : "text-neutral-500",
+                error ? "text-error-500" : "text-neutral-500 dark:text-neutral-400",
               )}
             >
               {error || helperText}

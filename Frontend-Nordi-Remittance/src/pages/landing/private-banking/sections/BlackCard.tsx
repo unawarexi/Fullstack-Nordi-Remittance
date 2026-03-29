@@ -88,7 +88,7 @@ const BlackCard: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-sm font-medium mb-4 border border-amber-500/30">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/200/20 text-amber-400 text-sm font-medium mb-4 border border-amber-500/30">
             <Crown className="w-4 h-4" />
             Black Card
           </span>
@@ -140,11 +140,11 @@ const BlackCard: React.FC = () => {
 
                   <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-xs text-neutral-500 uppercase">Card Holder</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase">Card Holder</p>
                       <p className="font-semibold">PREFERRED MEMBER</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-neutral-500 uppercase">Valid Thru</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 uppercase">Valid Thru</p>
                       <p className="font-semibold">12/28</p>
                     </div>
                   </div>
@@ -153,7 +153,7 @@ const BlackCard: React.FC = () => {
             </div>
 
             {/* Glow Effect */}
-            <div className="absolute inset-0 -z-10 blur-3xl opacity-20 bg-amber-500 rounded-full scale-50" />
+            <div className="absolute inset-0 -z-10 blur-3xl opacity-20 bg-amber-50 dark:bg-amber-900/200 rounded-full scale-50" />
           </motion.div>
 
           {/* Benefits */}
@@ -172,7 +172,7 @@ const BlackCard: React.FC = () => {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/200/20 text-amber-400 flex items-center justify-center flex-shrink-0">
                     {benefit.icon}
                   </div>
                   <div>
@@ -183,7 +183,7 @@ const BlackCard: React.FC = () => {
               ))}
             </div>
 
-            <Button variant="primary" className="w-full bg-amber-500 hover:bg-amber-600 text-neutral-900">
+            <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
               <Star className="w-5 h-5 mr-2" />
               Apply for Black Card
             </Button>
@@ -214,7 +214,7 @@ const BlackCard: React.FC = () => {
                 <div className={cn("w-16 h-10 mx-auto rounded-lg mb-4", tier.color)} />
                 <h4 className="font-bold text-lg mb-2">{tier.name}</h4>
                 <p className="text-amber-400 font-semibold mb-1">{tier.fee}</p>
-                <p className="text-xs text-neutral-500">Min. annual spend: {tier.spend}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">Min. annual spend: {tier.spend}</p>
               </motion.div>
             ))}
           </div>

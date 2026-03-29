@@ -81,7 +81,7 @@ export const FileUpload = ({
 
   return (
     <div className="w-full">
-      <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+      <label className="mb-1.5 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
         {label}
         {required && <span className="ml-1 text-error-500">*</span>}
       </label>
@@ -130,11 +130,11 @@ export const FileUpload = ({
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-neutral-900">
+                <p className="truncate text-sm font-medium text-neutral-900 dark:text-white">
                   {value?.name || "File selected"}
                 </p>
                 {value && (
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
                     {(value.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 )}
@@ -147,7 +147,7 @@ export const FileUpload = ({
                 }}
                 className="rounded-full p-1.5 transition-colors hover:bg-neutral-100"
               >
-                <X className="h-5 w-5 text-neutral-500" />
+                <X className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
               </button>
             </motion.div>
           ) : (
@@ -158,14 +158,14 @@ export const FileUpload = ({
               className="flex flex-col items-center py-4"
             >
               <Upload className="mb-2 h-10 w-10 text-neutral-400" />
-              <p className="text-center text-sm text-neutral-600">
+              <p className="text-center text-sm text-neutral-600 dark:text-neutral-300">
                 <span className="font-medium text-primary-600">
                   Click to upload
                 </span>{" "}
                 or drag and drop
               </p>
               {description && (
-                <p className="mt-1 text-xs text-neutral-500">{description}</p>
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{description}</p>
               )}
             </motion.div>
           )}

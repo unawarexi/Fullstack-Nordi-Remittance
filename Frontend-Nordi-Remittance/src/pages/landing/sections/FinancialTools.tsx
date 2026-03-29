@@ -77,15 +77,15 @@ const MiniCalculator: React.FC = () => {
   const monthlyPayment = Math.round((loanAmount * 0.065) / 12 + loanAmount / 360);
 
   return (
-    <div className="p-5 rounded-xl bg-white border border-neutral-100">
+    <div className="p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700">
       <div className="flex items-center gap-2 mb-4">
         <Calculator className="w-5 h-5 text-indigo-600" />
-        <h4 className="font-semibold text-neutral-900 text-sm">Quick Estimate</h4>
+        <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">Quick Estimate</h4>
       </div>
       
       <div className="space-y-4">
         <div>
-          <label className="block text-xs text-neutral-500 mb-1.5">
+          <label className="block text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">
             Loan Amount
           </label>
           <div className="relative">
@@ -96,21 +96,21 @@ const MiniCalculator: React.FC = () => {
               onChange={(e) => setLoanAmount(Number(e.target.value))}
               className={cn(
                 "w-full pl-9 pr-4 py-2.5 rounded-lg",
-                "border border-neutral-200 text-sm",
+                "border border-neutral-200 dark:border-neutral-700 text-sm",
                 "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
               )}
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-indigo-50">
+        <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/30">
           <div>
             <div className="text-xs text-indigo-600">Est. Monthly Payment</div>
             <div className="text-xl font-bold text-indigo-700">
               ${monthlyPayment.toLocaleString()}
             </div>
           </div>
-          <div className="text-xs text-neutral-500 text-right">
+          <div className="text-xs text-neutral-500 dark:text-neutral-400 text-right">
             <div>30-year fixed</div>
             <div>6.5% APR</div>
           </div>
@@ -149,12 +149,12 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => (
     transition={{ duration: 0.4, delay: index * 0.08 }}
     className={cn(
       "group relative flex items-start gap-4 p-4 rounded-xl",
-      "bg-white border border-neutral-100",
-      "hover:shadow-md hover:border-indigo-100 transition-all"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all"
     )}
   >
     {tool.highlight && (
-      <span className="absolute -top-2 right-3 px-2 py-0.5 text-[10px] font-medium text-white bg-amber-500 rounded-full">
+      <span className="absolute -top-2 right-3 px-2 py-0.5 text-[10px] font-medium text-white bg-amber-50 dark:bg-amber-900/200 rounded-full">
         {tool.highlight}
       </span>
     )}
@@ -162,18 +162,18 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => (
     <div
       className={cn(
         "flex-shrink-0 p-2.5 rounded-lg",
-        "bg-neutral-50 text-neutral-600",
-        "group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"
+        "bg-neutral-50 dark:bg-neutral-700/50 text-neutral-600 dark:text-neutral-300",
+        "group-hover:bg-indigo-50 dark:bg-indigo-900/30 group-hover:text-indigo-600 transition-colors"
       )}
     >
       {tool.icon}
     </div>
     
     <div className="flex-1 min-w-0">
-      <h4 className="font-medium text-neutral-900 text-sm group-hover:text-indigo-600 transition-colors">
+      <h4 className="font-medium text-neutral-900 dark:text-white text-sm group-hover:text-indigo-600 transition-colors">
         {tool.title}
       </h4>
-      <p className="mt-0.5 text-xs text-neutral-500 line-clamp-2">
+      <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2">
         {tool.description}
       </p>
     </div>
@@ -202,14 +202,14 @@ const FinancialTools: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-4">
+              <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-4">
                 <Calculator className="w-3.5 h-3.5" />
                 Financial Tools
               </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
                 Plan Your Financial Future
               </h2>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-neutral-600 dark:text-neutral-300">
                 Use our free calculators and tools to make informed financial decisions.
               </p>
             </motion.div>

@@ -78,7 +78,7 @@ const businessLoans: BusinessLoan[] = [
     rateFrom: "6.5%",
     tenure: "5-25 years",
     icon: <Building2 className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     features: [
       "Competitive interest rates",
       "Up to 80% LTV",
@@ -94,7 +94,7 @@ const businessLoans: BusinessLoan[] = [
     rateFrom: "5.5%",
     tenure: "90-360 days",
     icon: <Warehouse className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "Letters of credit",
       "Documentary collections",
@@ -145,8 +145,8 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-5 rounded-xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
@@ -155,16 +155,16 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
         {loan.icon}
       </div>
       <div>
-        <h3 className="font-semibold text-neutral-900">{loan.name}</h3>
-        <p className="text-xs text-neutral-500">{loan.description}</p>
+        <h3 className="font-semibold text-neutral-900 dark:text-white">{loan.name}</h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">{loan.description}</p>
       </div>
     </div>
 
     {/* Loan Details */}
-    <div className="grid grid-cols-3 gap-2 py-3 border-y border-neutral-100 mb-3">
+    <div className="grid grid-cols-3 gap-2 py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3">
       <div>
         <p className="text-xs text-neutral-400">Amount</p>
-        <p className="text-sm font-semibold text-neutral-900">{loan.amountRange}</p>
+        <p className="text-sm font-semibold text-neutral-900 dark:text-white">{loan.amountRange}</p>
       </div>
       <div>
         <p className="text-xs text-neutral-400">Rate from</p>
@@ -172,7 +172,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
       </div>
       <div>
         <p className="text-xs text-neutral-400">Tenure</p>
-        <p className="text-sm font-semibold text-neutral-900">{loan.tenure}</p>
+        <p className="text-sm font-semibold text-neutral-900 dark:text-white">{loan.tenure}</p>
       </div>
     </div>
 
@@ -181,7 +181,7 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
       {loan.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-xs text-neutral-600">{feature}</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -212,10 +212,10 @@ const BusinessLoans: React.FC = () => {
             <Banknote className="w-4 h-4" />
             Loans for Businesses
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Financing Solutions For Every Business Need
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Access the capital you need to grow, expand, or manage cash flow with 
             our range of business financing options.
           </p>
@@ -231,13 +231,13 @@ const BusinessLoans: React.FC = () => {
           {loanBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white border border-neutral-200"
+              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -268,7 +268,7 @@ const BusinessLoans: React.FC = () => {
                 </p>
               </div>
             </div>
-            <Button variant="primary" size="lg" className="bg-amber-500 hover:bg-amber-600 whitespace-nowrap">
+            <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap">
               Calculate Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

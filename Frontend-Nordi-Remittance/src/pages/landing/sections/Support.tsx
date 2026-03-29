@@ -49,7 +49,7 @@ const supportChannels: SupportChannel[] = [
     href: "#chat",
     icon: <MessageCircle className="w-6 h-6" />,
     availability: "24/7",
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
   },
   {
     title: "Email Support",
@@ -76,7 +76,7 @@ const supportChannels: SupportChannel[] = [
     href: "/help",
     icon: <HelpCircle className="w-6 h-6" />,
     availability: "Always available",
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
   },
   {
     title: "Book Appointment",
@@ -114,8 +114,8 @@ const SupportCard: React.FC<SupportCardProps> = ({ channel, index }) => (
     transition={{ duration: 0.4, delay: index * 0.08 }}
     className={cn(
       "group block p-5 rounded-xl",
-      "bg-white border border-neutral-100",
-      "hover:shadow-lg hover:border-neutral-200 transition-all duration-300"
+      "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-200 dark:border-neutral-700 transition-all duration-300"
     )}
   >
     <div className="flex items-start gap-4">
@@ -123,10 +123,10 @@ const SupportCard: React.FC<SupportCardProps> = ({ channel, index }) => (
         {channel.icon}
       </div>
       <div className="flex-1">
-        <h4 className="font-semibold text-neutral-900 group-hover:text-indigo-600 transition-colors">
+        <h4 className="font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
           {channel.title}
         </h4>
-        <p className="mt-1 text-sm text-neutral-500">{channel.description}</p>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{channel.description}</p>
         <div className="mt-3 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-xs text-neutral-400">
             <Clock className="w-3.5 h-3.5" />
@@ -156,13 +156,13 @@ const Support: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-full mb-3">
+              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
                 Get Help
               </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900">
+              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
                 We're Here to Help
               </h2>
-              <p className="mt-2 text-neutral-600">
+              <p className="mt-2 text-neutral-600 dark:text-neutral-300">
                 Choose your preferred way to connect with our support team.
               </p>
             </motion.div>
@@ -183,11 +183,11 @@ const Support: React.FC = () => {
               viewport={{ once: true }}
               className={cn(
                 "p-6 rounded-xl",
-                "bg-neutral-50 border border-neutral-100"
+                "bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700"
               )}
             >
-              <h3 className="font-semibold text-neutral-900">Quick Help</h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <h3 className="font-semibold text-neutral-900 dark:text-white">Quick Help</h3>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                 Popular questions and resources
               </p>
 
@@ -204,8 +204,8 @@ const Support: React.FC = () => {
                       href={item.href}
                       className={cn(
                         "flex items-center gap-2 py-2 px-3 rounded-lg",
-                        "text-sm text-neutral-700",
-                        "hover:bg-white hover:text-indigo-600 transition-colors",
+                        "text-sm text-neutral-700 dark:text-neutral-200",
+                        "hover:bg-white dark:bg-neutral-800 hover:text-indigo-600 transition-colors",
                         "group"
                       )}
                     >
@@ -217,7 +217,7 @@ const Support: React.FC = () => {
                 ))}
               </ul>
 
-              <div className="mt-6 pt-5 border-t border-neutral-200">
+              <div className="mt-6 pt-5 border-t border-neutral-200 dark:border-neutral-700">
                 <a
                   href="/help"
                   className={cn(

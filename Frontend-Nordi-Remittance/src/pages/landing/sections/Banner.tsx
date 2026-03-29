@@ -61,9 +61,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
     >
       <div className={cn(
         "flex h-full flex-col rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8",
-        "bg-white/80 backdrop-blur-sm",
-        "border border-neutral-100 shadow-lg",
-        "hover:shadow-xl hover:bg-white transition-all duration-300",
+        "bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm",
+        "border border-neutral-100 dark:border-neutral-700 shadow-lg",
+        "hover:shadow-xl dark:hover:shadow-neutral-900/50 hover:bg-white dark:bg-neutral-800 dark:hover:bg-neutral-800 transition-all duration-300",
         "group cursor-pointer"
       )}>
         <div className="mb-3 sm:mb-4 flex items-center gap-3">
@@ -71,17 +71,17 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
             "flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0",
             "items-center justify-center rounded-full",
             "bg-gradient-to-br from-indigo-500 to-indigo-600",
-            "text-white shadow-md",
+            "text-white shadow-md dark:shadow-neutral-900/30",
             "group-hover:scale-110 transition-transform duration-300"
           )}>
             {service.icon}
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-neutral-800 leading-tight">
+          <h3 className="text-base sm:text-lg font-semibold text-neutral-800 dark:text-neutral-200 leading-tight">
             {service.title}
           </h3>
         </div>
         <div className="flex-grow">
-          <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
             {service.description}
           </p>
           <a 
@@ -123,10 +123,10 @@ const Banner: React.FC = () => {
           <span className="text-xs sm:text-sm font-semibold tracking-wider text-indigo-500 uppercase">
             Driving Growth & Sustainability
           </span>
-          <h2 className="mt-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900">
+          <h2 className="mt-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
             Empowering Businesses with Smart Financial Solutions
           </h2>
-          <p className="mt-3 sm:mt-4 mx-auto max-w-2xl text-sm sm:text-base text-neutral-600 leading-relaxed px-4">
+          <p className="mt-3 sm:mt-4 mx-auto max-w-2xl text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed px-4">
             Whether you're scaling your business or seeking sustainable banking
             practices, we offer tailor-made solutions to meet your unique needs.
           </p>
@@ -169,8 +169,8 @@ const Banner: React.FC = () => {
         )}>
           <div className={cn(
             "rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8",
-            "bg-amber-500/10 backdrop-blur-md",
-            "border border-amber-200/30"
+            "bg-amber-50 dark:bg-amber-900/200/10 dark:bg-amber-50 dark:bg-amber-900/200/20 backdrop-blur-md",
+            "border border-amber-200/30 dark:border-amber-700/30"
           )}>
             <Grid cols={{ base: 1, md: 3 }} gap="md">
               {services.map((service, index) => (

@@ -103,7 +103,7 @@ const advisoryServices = [
 // ========================
 const CorporateFinance: React.FC = () => {
   return (
-    <Section id="corporate-finance" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="corporate-finance" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -116,10 +116,10 @@ const CorporateFinance: React.FC = () => {
             <Landmark className="w-4 h-4" />
             Corporate Finance
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Sophisticated Financing Solutions
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             From syndicated loans to debt capital markets, we provide comprehensive 
             corporate finance solutions to support your growth ambitions and strategic initiatives.
           </p>
@@ -135,8 +135,8 @@ const CorporateFinance: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-blue-300 transition-all duration-300"
+                "relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-blue-300 transition-all duration-300"
               )}
             >
               <div className="flex items-start gap-4">
@@ -144,19 +144,19 @@ const CorporateFinance: React.FC = () => {
                   {solution.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-1">{solution.name}</h3>
-                  <p className="text-sm text-neutral-500 mb-4">{solution.description}</p>
+                  <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-1">{solution.name}</h3>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{solution.description}</p>
                   
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     {solution.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm text-neutral-600">{feature}</span>
+                        <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700">
                     <span className="text-xs text-neutral-400">Typical Range</span>
                     <span className="text-sm font-semibold text-blue-600">{solution.typical}</span>
                   </div>

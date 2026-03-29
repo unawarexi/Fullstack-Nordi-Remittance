@@ -45,7 +45,7 @@ const businessAccounts: BusinessAccount[] = [
     monthlyFee: "$15",
     transactionLimit: "100/month",
     icon: <Store className="w-6 h-6" />,
-    color: "bg-slate-500",
+    color: "bg-slate-50 dark:bg-neutral-9000",
     idealFor: "Startups & Freelancers",
     features: [
       "Free business debit card",
@@ -81,7 +81,7 @@ const businessAccounts: BusinessAccount[] = [
     monthlyFee: "$150",
     transactionLimit: "Unlimited",
     icon: <Building2 className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     idealFor: "Large Businesses",
     features: [
       "Everything in Growth",
@@ -100,7 +100,7 @@ const businessAccounts: BusinessAccount[] = [
     monthlyFee: "Custom",
     transactionLimit: "Custom",
     icon: <Factory className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     idealFor: "Healthcare, Real Estate, etc.",
     features: [
       "Industry-specific features",
@@ -138,10 +138,10 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border",
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border",
       account.popular
         ? "border-emerald-200 shadow-xl ring-2 ring-emerald-500"
-        : "border-neutral-200 hover:shadow-lg hover:border-neutral-300",
+        : "border-neutral-200 dark:border-neutral-700 hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300",
       "transition-all duration-300"
     )}
   >
@@ -161,23 +161,23 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
         {account.icon}
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-neutral-900">{account.name}</h3>
-        <p className="text-sm text-neutral-500">{account.tagline}</p>
+        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{account.name}</h3>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">{account.tagline}</p>
       </div>
     </div>
 
     {/* Ideal For */}
     <div className="mb-4">
-      <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded">
+      <span className="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded">
         Ideal for: {account.idealFor}
       </span>
     </div>
 
     {/* Pricing */}
-    <div className="py-4 border-y border-neutral-100 mb-4">
+    <div className="py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold text-neutral-900">{account.monthlyFee}</span>
-        <span className="text-sm text-neutral-500">/month</span>
+        <span className="text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
+        <span className="text-sm text-neutral-500 dark:text-neutral-400">/month</span>
       </div>
       <p className="text-xs text-neutral-400 mt-1">
         Transactions: {account.transactionLimit}
@@ -189,7 +189,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
       {account.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600">{feature}</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -226,10 +226,10 @@ const BusinessAccounts: React.FC = () => {
             <Building2 className="w-4 h-4" />
             Business Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Choose The Right Account For Your Business
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             From sole proprietors to large enterprises, we have business banking 
             solutions that scale with your company's needs.
           </p>
@@ -250,8 +250,8 @@ const BusinessAccounts: React.FC = () => {
               <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

@@ -120,10 +120,10 @@ const DistributorsForum: React.FC = () => {
             <Users className="w-4 h-4" />
             Distributors Forum
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Empowering Distribution Networks
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Exclusive financing and support programs for authorized distributors 
             of our principal partners, designed to grow your business.
           </p>
@@ -142,7 +142,7 @@ const DistributorsForum: React.FC = () => {
               className="text-center p-4 rounded-xl bg-orange-50 border border-orange-100"
             >
               <p className="text-2xl lg:text-3xl font-bold text-orange-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 mt-1">{stat.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -157,22 +157,22 @@ const DistributorsForum: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-orange-300 transition-all duration-300"
+                "relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-orange-300 transition-all duration-300"
               )}
             >
               <div className="w-14 h-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
                 {benefit.icon}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{benefit.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{benefit.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{benefit.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{benefit.description}</p>
               
               <ul className="space-y-2">
                 {benefit.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-orange-500" />
-                    <span className="text-sm text-neutral-600">{feature}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -185,17 +185,17 @@ const DistributorsForum: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="p-6 rounded-2xl bg-slate-50 border border-slate-100 mb-12"
+          className="p-6 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 mb-12"
         >
           <div className="flex items-center gap-3 mb-6">
             <Building2 className="w-5 h-5 text-slate-500" />
-            <h4 className="font-semibold text-neutral-900">Principal Partners</h4>
+            <h4 className="font-semibold text-neutral-900 dark:text-white">Principal Partners</h4>
           </div>
           <div className="flex flex-wrap gap-3">
             {principalPartners.map((partner) => (
               <span
                 key={partner}
-                className="px-4 py-2 rounded-full bg-white border border-slate-200 text-sm text-neutral-700"
+                className="px-4 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 text-sm text-neutral-700 dark:text-neutral-200"
               >
                 {partner}
               </span>
@@ -236,7 +236,7 @@ const DistributorsForum: React.FC = () => {
                 ))}
               </div>
 
-              <Button variant="primary" className="bg-white text-orange-600 hover:bg-orange-50">
+              <Button variant="primary" className="bg-white dark:bg-neutral-800 text-orange-600 hover:bg-orange-50">
                 Apply for Membership
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

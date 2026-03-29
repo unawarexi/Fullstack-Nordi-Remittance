@@ -41,7 +41,7 @@ const eSolutions: ESolution[] = [
     name: "Payment Gateway",
     description: "Accept online payments on your website or app",
     icon: <Globe className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     transactionFee: "1.5%",
     features: [
       "Multiple payment methods",
@@ -86,7 +86,7 @@ const eSolutions: ESolution[] = [
     name: "QR Payment Solutions",
     description: "Enable quick payments via QR code scanning",
     icon: <QrCode className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     transactionFee: "0.5%",
     features: [
       "Static & dynamic QR codes",
@@ -116,7 +116,7 @@ const eSolutions: ESolution[] = [
     name: "Payment APIs",
     description: "Build custom payment experiences with our APIs",
     icon: <Link2 className="w-6 h-6" />,
-    color: "bg-slate-500",
+    color: "bg-slate-50 dark:bg-neutral-9000",
     transactionFee: "Custom",
     features: [
       "RESTful APIs",
@@ -152,8 +152,8 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ solution, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.08 }}
     className={cn(
-      "relative flex flex-col h-full p-5 rounded-xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
@@ -162,15 +162,15 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ solution, index }) => (
         {solution.icon}
       </div>
       <div className="flex-1">
-        <h3 className="font-semibold text-neutral-900">{solution.name}</h3>
-        <p className="text-xs text-neutral-500">{solution.description}</p>
+        <h3 className="font-semibold text-neutral-900 dark:text-white">{solution.name}</h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">{solution.description}</p>
       </div>
     </div>
 
     {/* Transaction Fee */}
-    <div className="py-3 border-y border-neutral-100 mb-3">
+    <div className="py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3">
       <p className="text-xs text-neutral-400">Transaction Fee</p>
-      <p className="text-xl font-bold text-neutral-900">{solution.transactionFee}</p>
+      <p className="text-xl font-bold text-neutral-900 dark:text-white">{solution.transactionFee}</p>
     </div>
 
     {/* Features */}
@@ -178,7 +178,7 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ solution, index }) => (
       {solution.features.slice(0, 4).map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-xs text-neutral-600">{feature}</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -205,14 +205,14 @@ const ESolutions: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
             <Globe className="w-4 h-4" />
             E-Solutions & Services
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Digital Payment Solutions For Your Business
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Accept payments online, in-store, and on-the-go with our comprehensive 
             suite of e-payment solutions designed for modern businesses.
           </p>
@@ -228,14 +228,14 @@ const ESolutions: React.FC = () => {
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-indigo-50 border border-indigo-100"
+              className="flex items-center gap-3 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100"
             >
-              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600">
+              <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500">{benefit.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -253,12 +253,12 @@ const ESolutions: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center p-6 rounded-2xl bg-neutral-50"
+          className="mt-12 text-center p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50"
         >
-          <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">
             Ready to Start Accepting Payments?
           </h3>
-          <p className="text-neutral-600 mb-6 max-w-xl mx-auto">
+          <p className="text-neutral-600 dark:text-neutral-300 mb-6 max-w-xl mx-auto">
             Our integration team will help you set up the perfect payment solution 
             for your business in as little as 24 hours.
           </p>

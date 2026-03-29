@@ -30,9 +30,9 @@ export interface FeatureCardProps {
 // VARIANT STYLES
 // ========================
 const variantStyles: Record<FeatureCardVariant, string> = {
-  default: 'bg-white border border-neutral-200 hover:border-primary-200 hover:shadow-lg',
-  outlined: 'bg-transparent border-2 border-neutral-200 hover:border-primary-500',
-  filled: 'bg-neutral-50 hover:bg-neutral-100',
+  default: 'bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-primary-200 hover:shadow-lg dark:hover:shadow-neutral-900/50',
+  outlined: 'bg-transparent border-2 border-neutral-200 dark:border-neutral-700 hover:border-primary-500',
+  filled: 'bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:bg-neutral-700',
   glass: 'bg-white/60 backdrop-blur-lg border border-white/20 shadow-lg',
   gradient: 'bg-gradient-to-br from-primary-500 to-accent-500 text-white',
 };
@@ -147,14 +147,14 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
         {/* Content */}
         <h3 className={cn(
           sizeConfig.title,
-          isGradient ? 'text-white' : 'text-neutral-900'
+          isGradient ? 'text-white' : 'text-neutral-900 dark:text-white'
         )}>
           {title}
         </h3>
         <p className={cn(
           'mt-2 leading-relaxed',
           sizeConfig.desc,
-          isGradient ? 'text-white/80' : 'text-neutral-600'
+          isGradient ? 'text-white/80' : 'text-neutral-600 dark:text-neutral-300'
         )}>
           {description}
         </p>
@@ -278,8 +278,8 @@ export const IconFeature: React.FC<IconFeatureProps> = ({
         {icon}
       </div>
       <div>
-        <h3 className="font-semibold text-neutral-900 mb-1">{title}</h3>
-        <p className="text-sm text-neutral-600 leading-relaxed">{description}</p>
+        <h3 className="font-semibold text-neutral-900 dark:text-white mb-1">{title}</h3>
+        <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">{description}</p>
       </div>
     </motion.div>
   );

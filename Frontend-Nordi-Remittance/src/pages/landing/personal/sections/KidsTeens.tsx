@@ -146,8 +146,8 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Highlight Badge */}
@@ -167,13 +167,13 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
         {account.icon}
       </div>
       <div>
-        <h3 className="text-xl font-semibold text-neutral-900">{account.name}</h3>
+        <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">{account.name}</h3>
         <p className="text-sm text-indigo-600 font-medium">{account.ageRange}</p>
       </div>
     </div>
 
     {/* Description */}
-    <p className="text-sm text-neutral-500 mb-4">{account.description}</p>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{account.description}</p>
 
     {/* Features */}
     <div className="flex-1">
@@ -182,7 +182,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
         {account.features.map((feature) => (
           <li key={feature} className="flex items-start gap-2">
             <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-            <span className="text-sm text-neutral-600">{feature}</span>
+            <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
           </li>
         ))}
       </ul>
@@ -192,7 +192,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
         {account.benefits.map((benefit) => (
           <span
             key={benefit}
-            className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded"
+            className="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded"
           >
             {benefit}
           </span>
@@ -226,10 +226,10 @@ const KidsTeens: React.FC = () => {
             <Users className="w-4 h-4" />
             Kids & Teens Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Building Financial Skills For The Future
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Help your children develop smart money habits with age-appropriate 
             banking accounts designed to teach financial responsibility.
           </p>
@@ -250,8 +250,8 @@ const KidsTeens: React.FC = () => {
               <div className="w-10 h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
                 <feature.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{feature.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{feature.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{feature.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{feature.description}</p>
             </div>
           ))}
         </motion.div>
@@ -268,14 +268,14 @@ const KidsTeens: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-neutral-50"
+          className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50"
         >
           <div>
             <Gift className="w-8 h-8 text-violet-500 mb-3" />
-            <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+            <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">
               For Parents & Guardians
             </h3>
-            <p className="text-neutral-600 mb-4">
+            <p className="text-neutral-600 dark:text-neutral-300 mb-4">
               Stay connected to your child's financial journey with real-time alerts, 
               spending controls, and the ability to transfer funds instantly. 
               Teach them the value of money while keeping their savings secure.
@@ -287,7 +287,7 @@ const KidsTeens: React.FC = () => {
                 "Receive instant transaction notifications",
                 "Easily transfer allowance money",
               ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-neutral-600">
+                <li key={item} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
                   <Check className="w-4 h-4 text-emerald-500" />
                   {item}
                 </li>
@@ -297,7 +297,7 @@ const KidsTeens: React.FC = () => {
           <div className="flex items-center justify-center">
             <div className="text-center">
               <p className="text-5xl font-bold text-violet-600 mb-2">89%</p>
-              <p className="text-neutral-600 max-w-xs">
+              <p className="text-neutral-600 dark:text-neutral-300 max-w-xs">
                 of parents say our youth banking has improved their child's money management skills
               </p>
             </div>

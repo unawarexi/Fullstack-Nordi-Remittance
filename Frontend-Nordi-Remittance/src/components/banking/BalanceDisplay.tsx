@@ -59,10 +59,10 @@ const sizeStyles: Record<BalanceSize, { amount: string; currency: string; label:
 // VARIANT STYLES
 // ========================
 const variantStyles: Record<BalanceVariant, string> = {
-  default: 'text-neutral-900',
+  default: 'text-neutral-900 dark:text-white',
   positive: 'text-success-600',
   negative: 'text-error-600',
-  muted: 'text-neutral-500',
+  muted: 'text-neutral-500 dark:text-neutral-400',
 };
 
 // ========================
@@ -156,7 +156,7 @@ export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
   return (
     <div className={cn('flex flex-col', className)}>
       {label && (
-        <span className={cn(sizeConfig.label, 'text-neutral-500 mb-1')}>
+        <span className={cn(sizeConfig.label, 'text-neutral-500 dark:text-neutral-400 mb-1')}>
           {label}
         </span>
       )}
@@ -165,7 +165,7 @@ export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
         <BalanceContent />
         
         {showCurrency && !isHidden && (
-          <span className={cn(sizeConfig.currency, 'text-neutral-500 font-medium')}>
+          <span className={cn(sizeConfig.currency, 'text-neutral-500 dark:text-neutral-400 font-medium')}>
             {currency}
           </span>
         )}
@@ -174,7 +174,7 @@ export const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleToggle}
-            className="p-1.5 rounded-full hover:bg-neutral-100 transition-colors text-neutral-400 hover:text-neutral-600"
+            className="p-1.5 rounded-full hover:bg-neutral-100 dark:bg-neutral-700 transition-colors text-neutral-400 hover:text-neutral-600 dark:text-neutral-300"
             aria-label={isHidden ? 'Show balance' : 'Hide balance'}
           >
             {isHidden ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -211,16 +211,16 @@ export const CompactBalance: React.FC<CompactBalanceProps> = ({
   const trendColors = {
     up: 'text-success-600 bg-success-50',
     down: 'text-error-600 bg-error-50',
-    neutral: 'text-neutral-600 bg-neutral-100',
+    neutral: 'text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-700',
   };
 
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div>
         {label && (
-          <p className="text-xs text-neutral-500 mb-0.5">{label}</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-0.5">{label}</p>
         )}
-        <p className="text-base sm:text-lg font-semibold text-neutral-900 tabular-nums">
+        <p className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white tabular-nums">
           {symbol}{formattedAmount}
         </p>
       </div>

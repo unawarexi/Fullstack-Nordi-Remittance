@@ -77,7 +77,7 @@ const insuranceProducts: InsuranceProduct[] = [
     startingFrom: "$45/mo",
     coverage: "Full Replacement",
     icon: <Home className="w-6 h-6" />,
-    color: "bg-amber-500",
+    color: "bg-amber-50 dark:bg-amber-900/200",
     features: [
       "Dwelling coverage",
       "Personal property protection",
@@ -125,7 +125,7 @@ const insuranceProducts: InsuranceProduct[] = [
     startingFrom: "$20/mo",
     coverage: "$1M+",
     icon: <Umbrella className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     features: [
       "Extended liability limits",
       "Lawsuit protection",
@@ -177,8 +177,8 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.08 }}
     className={cn(
-      "relative flex flex-col h-full p-5 rounded-xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
@@ -187,14 +187,14 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
         {product.icon}
       </div>
       <div className="flex-1">
-        <h3 className="font-semibold text-neutral-900">{product.name}</h3>
-        <p className="text-xs text-neutral-500">{product.description}</p>
+        <h3 className="font-semibold text-neutral-900 dark:text-white">{product.name}</h3>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">{product.description}</p>
       </div>
     </div>
 
     {/* Pricing */}
-    <div className="flex items-baseline gap-2 py-3 border-y border-neutral-100 mb-3">
-      <span className="text-2xl font-bold text-neutral-900">{product.startingFrom}</span>
+    <div className="flex items-baseline gap-2 py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3">
+      <span className="text-2xl font-bold text-neutral-900 dark:text-white">{product.startingFrom}</span>
       <span className="text-xs text-neutral-400">Coverage: {product.coverage}</span>
     </div>
 
@@ -203,7 +203,7 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
       {product.features.slice(0, 4).map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-xs text-neutral-600">{feature}</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -234,10 +234,10 @@ const Bancassurance: React.FC = () => {
             <Shield className="w-4 h-4" />
             Bancassurance
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Protect What Matters Most
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive insurance solutions through our trusted partners. 
             Get coverage for life, health, home, and more - all managed through your banking account.
           </p>
@@ -253,13 +253,13 @@ const Bancassurance: React.FC = () => {
           {insuranceBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50"
+              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
               <div className="w-10 h-10 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
                 <benefit.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -280,10 +280,10 @@ const Bancassurance: React.FC = () => {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-xl font-semibold text-neutral-900 mb-1">
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-1">
                 Bundle & Save Up to 25%
               </h3>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">
                 Combine multiple insurance products and enjoy exclusive discounts as a Nordea customer.
               </p>
             </div>

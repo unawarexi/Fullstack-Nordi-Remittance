@@ -51,13 +51,13 @@ const teamMembers = [
 
 const Team = () => {
   return (
-    <section className="text-gray-600 body-font bg-[#f8f9fa] py-24">
+    <section className="text-gray-600 dark:text-neutral-300 body-font bg-[#f8f9fa] py-24">
       <div className="container px-5 mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <h1 className="sm:text-4xl text-3xl font-bold title-font mb-4 text-[#4B4376]">
             Meet the Visionaries Behind Our Success
           </h1>
-          <p className="lg:w-1/2 mx-auto leading-relaxed text-lg text-gray-700">
+          <p className="lg:w-1/2 mx-auto leading-relaxed text-lg text-gray-700 dark:text-neutral-200">
             Our team combines decades of experience in finance and technology to
             shape the future of banking. We're passionate about creating seamless,
             customer-focused solutions that empower businesses and individuals alike.
@@ -66,17 +66,17 @@ const Team = () => {
         <div className="flex flex-wrap -m-4">
           {teamMembers.map((member, index) => (
             <div key={index} className="p-4 lg:w-1/3 md:w-1/2 w-full">
-              <div className="h-full flex items-center bg-white shadow-lg p-6 rounded-lg transition-transform transform hover:scale-105">
+              <div className="h-full flex items-center bg-white dark:bg-neutral-800 shadow-lg p-6 rounded-lg transition-transform transform hover:scale-105">
                 <img
                   alt="team"
-                  className="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 rounded-full mr-4"
+                  className="w-16 h-16 bg-gray-100 dark:bg-neutral-700 object-cover object-center flex-shrink-0 rounded-full mr-4"
                   src={member.image}
                 />
                 <div className="flex-grow">
-                  <h2 className="text-gray-900 title-font font-medium text-lg">
+                  <h2 className="text-gray-900 dark:text-white title-font font-medium text-lg">
                     {member.name}
                   </h2>
-                  <p className="text-gray-500">{member.role}</p>
+                  <p className="text-gray-500 dark:text-neutral-400">{member.role}</p>
                 </div>
               </div>
             </div>

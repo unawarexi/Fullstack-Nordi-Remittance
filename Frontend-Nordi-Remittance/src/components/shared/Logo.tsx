@@ -40,7 +40,7 @@ const colorConfig: Record<string, { primary: string; secondary: string; text: st
   default: {
     primary: 'text-primary-600',
     secondary: 'text-primary-400',
-    text: 'text-neutral-900',
+    text: 'text-neutral-900 dark:text-white',
   },
   white: {
     primary: 'text-white',
@@ -48,9 +48,9 @@ const colorConfig: Record<string, { primary: string; secondary: string; text: st
     text: 'text-white',
   },
   dark: {
-    primary: 'text-neutral-800',
-    secondary: 'text-neutral-600',
-    text: 'text-neutral-900',
+    primary: 'text-neutral-800 dark:text-neutral-100',
+    secondary: 'text-neutral-600 dark:text-neutral-300',
+    text: 'text-neutral-900 dark:text-white',
   },
 };
 
@@ -186,7 +186,7 @@ export const LogoWithTagline: React.FC<LogoWithTaglineProps> = ({
     <div className="flex flex-col">
       <Logo {...props} />
       {tagline && (
-        <span className="text-xs text-neutral-500 mt-0.5 ml-10">
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 ml-10">
           {tagline}
         </span>
       )}

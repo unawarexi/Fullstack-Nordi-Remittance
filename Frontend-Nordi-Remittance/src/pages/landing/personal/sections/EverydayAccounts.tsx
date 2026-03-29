@@ -42,7 +42,7 @@ const everydayAccounts: EverydayAccount[] = [
     description: "Simple, no-frills banking for everyday transactions",
     monthlyFee: "$0",
     icon: <Wallet className="w-6 h-6" />,
-    color: "bg-slate-500",
+    color: "bg-slate-50 dark:bg-neutral-9000",
     features: [
       "No minimum balance requirement",
       "Free online and mobile banking",
@@ -58,7 +58,7 @@ const everydayAccounts: EverydayAccount[] = [
     description: "Enhanced features for active banking customers",
     monthlyFee: "$12",
     icon: <CreditCard className="w-6 h-6" />,
-    color: "bg-indigo-500",
+    color: "bg-indigo-50 dark:bg-indigo-900/300",
     features: [
       "Unlimited ATM fee rebates",
       "Free checks and money orders",
@@ -139,8 +139,8 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white border border-neutral-200",
-      "hover:shadow-lg hover:border-neutral-300 transition-all duration-300"
+      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
@@ -159,18 +159,18 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
             </span>
           ))}
         </div>
-        <h3 className="text-xl font-semibold text-neutral-900 mt-2">{account.name}</h3>
+        <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mt-2">{account.name}</h3>
       </div>
     </div>
 
     {/* Description */}
-    <p className="text-sm text-neutral-500 mb-4">{account.description}</p>
+    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{account.description}</p>
 
     {/* Monthly Fee */}
-    <div className="py-3 border-y border-neutral-100 mb-4">
+    <div className="py-3 border-y border-neutral-100 dark:border-neutral-700 mb-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold text-neutral-900">{account.monthlyFee}</span>
-        <span className="text-sm text-neutral-500">/month</span>
+        <span className="text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
+        <span className="text-sm text-neutral-500 dark:text-neutral-400">/month</span>
       </div>
       {account.monthlyFee !== "$0" && (
         <p className="text-xs text-neutral-400 mt-1">
@@ -184,7 +184,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
       {account.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
           <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600">{feature}</span>
+          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
         </li>
       ))}
     </ul>
@@ -211,14 +211,14 @@ const EverydayAccounts: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-neutral-700 text-slate-700 text-sm font-medium mb-4">
             <Wallet className="w-4 h-4" />
             Everyday Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Banking Made Simple For Everyday Life
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Open an account in minutes and enjoy seamless banking with no hidden fees, 
             powerful digital tools, and 24/7 access to your money.
           </p>
@@ -234,12 +234,12 @@ const EverydayAccounts: React.FC = () => {
           {accountFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="text-center p-4 rounded-xl bg-white border border-neutral-200"
+              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2">
+              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-2">
                 <feature.icon className="w-5 h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 text-xs">{feature.title}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-xs">{feature.title}</p>
             </div>
           ))}
         </motion.div>
@@ -256,18 +256,18 @@ const EverydayAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-indigo-50 border border-indigo-100"
+          className="mt-12 p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold text-neutral-900">
+              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
                 Already have a bank account elsewhere?
               </h3>
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">
                 Switch to Nordea in minutes. We'll help you transfer everything seamlessly.
               </p>
             </div>
-            <Button variant="outline" className="border-indigo-300 text-indigo-700 hover:bg-indigo-100">
+            <Button variant="outline" className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-800/30">
               Start Switch Process
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>

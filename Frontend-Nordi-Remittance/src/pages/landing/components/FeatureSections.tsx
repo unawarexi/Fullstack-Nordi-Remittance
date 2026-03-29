@@ -148,7 +148,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           </div>
         )}
         
-        <h3 className="text-xl sm:text-2xl font-semibold text-neutral-800 mb-3">
+        <h3 className="text-xl sm:text-2xl font-semibold text-neutral-800 dark:text-neutral-100 mb-3">
           {highlight ? (
             <>
               {title.split(highlight)[0]}
@@ -160,7 +160,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           )}
         </h3>
         
-        <p className="text-neutral-600 text-sm sm:text-base leading-relaxed">
+        <p className="text-neutral-600 dark:text-neutral-300 text-sm sm:text-base leading-relaxed">
           {description}
         </p>
       </div>
@@ -189,10 +189,10 @@ export const FeaturesSection: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-800 dark:text-neutral-100 mb-3">
             Make every penny count
           </h2>
-          <p className="text-neutral-500 text-sm sm:text-base max-w-xl mx-auto">
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm sm:text-base max-w-xl mx-auto">
             Spend smarter, lower your bills, get cashback on everything you buy,
             and unlock credit to grow your business.
           </p>

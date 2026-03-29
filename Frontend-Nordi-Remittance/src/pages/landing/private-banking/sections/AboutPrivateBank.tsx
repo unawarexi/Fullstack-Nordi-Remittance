@@ -72,14 +72,14 @@ const AboutPrivateBank: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 text-neutral-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-medium mb-4">
             <Building2 className="w-4 h-4" />
             About Private Bank
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             A Legacy of Trusted Stewardship
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             For over 25 years, we've been the trusted wealth partner for 
             discerning individuals and families across generations.
           </p>
@@ -96,15 +96,15 @@ const AboutPrivateBank: React.FC = () => {
             <div
               key={value.title}
               className={cn(
-                "p-5 rounded-xl bg-white border border-neutral-200 text-center",
+                "p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-center",
                 "hover:shadow-md hover:border-amber-300 transition-all"
               )}
             >
               <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
                 <value.icon className="w-6 h-6" />
               </div>
-              <h4 className="font-semibold text-neutral-900 mb-1">{value.title}</h4>
-              <p className="text-xs text-neutral-500">{value.description}</p>
+              <h4 className="font-semibold text-neutral-900 dark:text-white mb-1">{value.title}</h4>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">{value.description}</p>
             </div>
           ))}
         </motion.div>
@@ -116,11 +116,11 @@ const AboutPrivateBank: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-neutral-50 border border-neutral-100"
+            className="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700"
           >
             <div className="flex items-center gap-3 mb-6">
               <History className="w-5 h-5 text-amber-600" />
-              <h4 className="font-semibold text-neutral-900">Our Journey</h4>
+              <h4 className="font-semibold text-neutral-900 dark:text-white">Our Journey</h4>
             </div>
 
             <div className="relative pl-8">
@@ -134,13 +134,13 @@ const AboutPrivateBank: React.FC = () => {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   className="relative pb-6 last:pb-0"
                 >
-                  <div className="absolute left-0 w-6 h-6 -translate-x-1/2 rounded-full bg-amber-500 flex items-center justify-center">
-                    <span className="w-2 h-2 rounded-full bg-white" />
+                  <div className="absolute left-0 w-6 h-6 -translate-x-1/2 rounded-full bg-amber-50 dark:bg-amber-900/200 flex items-center justify-center">
+                    <span className="w-2 h-2 rounded-full bg-white dark:bg-neutral-800" />
                   </div>
                   <div className="ml-4">
                     <span className="text-xs font-semibold text-amber-600">{milestone.year}</span>
-                    <h5 className="font-semibold text-neutral-900">{milestone.title}</h5>
-                    <p className="text-sm text-neutral-500">{milestone.description}</p>
+                    <h5 className="font-semibold text-neutral-900 dark:text-white">{milestone.title}</h5>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">{milestone.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -202,7 +202,7 @@ const AboutPrivateBank: React.FC = () => {
           viewport={{ once: true }}
           className="mt-12 text-center"
         >
-          <p className="text-neutral-600 mb-4">
+          <p className="text-neutral-600 dark:text-neutral-300 mb-4">
             Join the exclusive circle of clients who trust us with their wealth.
           </p>
           <Button variant="primary" className="bg-neutral-900 hover:bg-neutral-800">

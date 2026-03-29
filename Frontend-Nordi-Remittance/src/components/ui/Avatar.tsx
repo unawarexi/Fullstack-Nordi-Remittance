@@ -243,7 +243,7 @@ export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
           <div
             className={cn(
               "flex items-center justify-center",
-              "bg-neutral-200 font-semibold text-neutral-600",
+              "bg-neutral-200 font-semibold text-neutral-600 dark:text-neutral-300",
               "rounded-full ring-2 ring-white",
               sizeConfig.container,
               sizeConfig.text,

@@ -122,10 +122,10 @@ const ExportersForum: React.FC = () => {
             <Ship className="w-4 h-4" />
             Exporters Forum
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Powering Nigerian Exports
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive trade finance and support services for exporters, 
             helping you expand into global markets with confidence.
           </p>
@@ -144,7 +144,7 @@ const ExportersForum: React.FC = () => {
               className="text-center p-4 rounded-xl bg-cyan-50 border border-cyan-100"
             >
               <p className="text-2xl lg:text-3xl font-bold text-cyan-600">{metric.value}</p>
-              <p className="text-sm text-neutral-600 mt-1">{metric.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{metric.label}</p>
             </div>
           ))}
         </motion.div>
@@ -159,22 +159,22 @@ const ExportersForum: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-cyan-300 transition-all duration-300"
+                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-cyan-300 transition-all duration-300"
               )}
             >
               <div className="w-14 h-14 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center mb-4">
                 {solution.icon}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 mb-2">{solution.name}</h3>
-              <p className="text-sm text-neutral-500 mb-4">{solution.description}</p>
+              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{solution.name}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{solution.description}</p>
               
               <ul className="space-y-2 mb-6">
                 {solution.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan-500" />
-                    <span className="text-sm text-neutral-600">{feature}</span>
+                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -194,21 +194,21 @@ const ExportersForum: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white border border-neutral-200"
+            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
           >
             <div className="flex items-center gap-3 mb-6">
               <MapPin className="w-5 h-5 text-cyan-600" />
-              <h4 className="font-semibold text-neutral-900">Export Destinations</h4>
+              <h4 className="font-semibold text-neutral-900 dark:text-white">Export Destinations</h4>
             </div>
             <div className="space-y-4">
               {exportDestinations.map((dest) => (
                 <div key={dest.region} className="flex items-center gap-4">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-neutral-700">{dest.region}</span>
+                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{dest.region}</span>
                       <span className="text-sm text-cyan-600">{dest.share}</span>
                     </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-cyan-500 rounded-full transition-all"
                         style={{ width: dest.share }}
@@ -218,7 +218,7 @@ const ExportersForum: React.FC = () => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-neutral-500 mt-4">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-4">
               Based on 2024 export finance volume
             </p>
           </motion.div>
@@ -250,7 +250,7 @@ const ExportersForum: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <Button variant="primary" className="w-full bg-white text-cyan-600 hover:bg-cyan-50">
+            <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-cyan-600 hover:bg-cyan-50">
               Join Exporters Forum
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>

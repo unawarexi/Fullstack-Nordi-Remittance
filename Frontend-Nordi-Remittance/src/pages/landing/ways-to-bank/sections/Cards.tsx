@@ -114,10 +114,10 @@ const Cards: React.FC = () => {
             <CreditCard className="w-4 h-4" />
             Cards
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             The Right Card for Every Need
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             From everyday spending to international travel, choose from our 
             range of debit, credit, and prepaid cards with world-class security.
           </p>
@@ -133,14 +133,14 @@ const Cards: React.FC = () => {
           {cardFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white border border-neutral-200"
+              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
               <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                 <feature.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 text-sm">{feature.title}</p>
-                <p className="text-xs text-neutral-500">{feature.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{feature.title}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.description}</p>
               </div>
             </div>
           ))}
@@ -156,13 +156,13 @@ const Cards: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
               className={cn(
-                "group relative flex flex-col rounded-2xl bg-white border",
-                card.popular ? "border-amber-300 shadow-lg" : "border-neutral-200",
-                "hover:shadow-xl transition-all duration-300"
+                "group relative flex flex-col rounded-2xl bg-white dark:bg-neutral-800 border",
+                card.popular ? "border-amber-300 shadow-lg" : "border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-xl dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
               {card.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-semibold">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/200 text-white text-xs font-semibold">
                   Most Popular
                 </div>
               )}
@@ -193,7 +193,7 @@ const Cards: React.FC = () => {
                   {card.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
+                      <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -219,7 +219,7 @@ const Cards: React.FC = () => {
             Get instant virtual cards for immediate online use.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" className="bg-white text-blue-600 hover:bg-blue-50">
+            <Button variant="primary" className="bg-white dark:bg-neutral-800 text-blue-600 hover:bg-blue-50">
               Open Mobile App
             </Button>
             <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">

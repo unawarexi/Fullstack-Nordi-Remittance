@@ -104,10 +104,10 @@ const WeCare: React.FC = () => {
             <Heart className="w-4 h-4" />
             We Care
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Making a Difference, One Community at a Time
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             At Remit Bank, we believe in giving back. Our Corporate Social Responsibility 
             initiatives touch lives across education, healthcare, environment, and community development.
           </p>
@@ -121,9 +121,9 @@ const WeCare: React.FC = () => {
           className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12"
         >
           {impactStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white border border-rose-200">
+            <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-rose-200">
               <p className="text-2xl font-bold text-rose-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600">{stat.label}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -139,8 +139,8 @@ const WeCare: React.FC = () => {
             <div
               key={pillar.name}
               className={cn(
-                "p-5 rounded-2xl bg-white border border-neutral-200",
-                "hover:shadow-lg hover:border-rose-300 transition-all"
+                "p-5 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-rose-300 transition-all"
               )}
             >
               <div className={cn(
@@ -149,9 +149,9 @@ const WeCare: React.FC = () => {
               )}>
                 {pillar.icon}
               </div>
-              <h3 className="font-bold text-neutral-900 mb-2">{pillar.name}</h3>
-              <p className="text-sm text-neutral-600 mb-3">{pillar.description}</p>
-              <div className="pt-3 border-t border-neutral-100">
+              <h3 className="font-bold text-neutral-900 dark:text-white mb-2">{pillar.name}</h3>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3">{pillar.description}</p>
+              <div className="pt-3 border-t border-neutral-100 dark:border-neutral-700">
                 <p className="text-xs font-semibold text-rose-600">{pillar.impact}</p>
               </div>
             </div>
@@ -179,8 +179,8 @@ const WeCare: React.FC = () => {
 
           {/* Content */}
           <div>
-            <h3 className="text-2xl font-bold text-neutral-900 mb-4">Our Ongoing Initiatives</h3>
-            <p className="text-neutral-600 mb-6">
+            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">Our Ongoing Initiatives</h3>
+            <p className="text-neutral-600 dark:text-neutral-300 mb-6">
               We're committed to sustainable development and creating lasting positive impact 
               in the communities we serve. Here are some of our key programs:
             </p>
@@ -191,7 +191,7 @@ const WeCare: React.FC = () => {
                   <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
                     <Check className="w-4 h-4 text-rose-600" />
                   </div>
-                  <span className="text-neutral-700">{initiative}</span>
+                  <span className="text-neutral-700 dark:text-neutral-200">{initiative}</span>
                 </li>
               ))}
             </ul>
@@ -214,11 +214,11 @@ const WeCare: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-white border border-rose-200 text-center"
+          className="mt-12 p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-rose-200 text-center"
         >
           <Users className="w-10 h-10 text-rose-500 mx-auto mb-3" />
-          <h3 className="text-xl font-bold text-neutral-900 mb-2">Partner With Us</h3>
-          <p className="text-neutral-600 max-w-xl mx-auto mb-4">
+          <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">Partner With Us</h3>
+          <p className="text-neutral-600 dark:text-neutral-300 max-w-xl mx-auto mb-4">
             Are you an NGO, community organization, or social enterprise? 
             Let's collaborate to create meaningful impact together.
           </p>

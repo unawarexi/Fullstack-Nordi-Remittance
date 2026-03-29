@@ -331,7 +331,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
           {type === 'warning' && '!'}
           {type === 'info' && 'i'}
         </div>
-        <p className="text-neutral-600">{message}</p>
+        <p className="text-neutral-600 dark:text-neutral-300">{message}</p>
       </div>
     </Modal>
   );

@@ -51,9 +51,9 @@ const sizeStyles = {
 // VARIANT STYLES
 // ========================
 const variantStyles = {
-  default: 'bg-white border border-neutral-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100',
-  filled: 'bg-neutral-100 border-transparent focus:bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100',
-  outlined: 'bg-transparent border-2 border-neutral-200 focus:border-primary-500',
+  default: 'bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-100',
+  filled: 'bg-neutral-100 dark:bg-neutral-700 border-transparent focus:bg-white dark:bg-neutral-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-100',
+  outlined: 'bg-transparent border-2 border-neutral-200 dark:border-neutral-700 focus:border-primary-500',
 };
 
 // ========================
@@ -170,7 +170,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
             whileTap={{ scale: 0.9 }}
             onClick={handleClear}
             className={cn(
-              'absolute top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 transition-colors',
+              'absolute top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:text-neutral-300 transition-colors',
               styles.clearIcon,
               showFilterButton && 'right-12'
             )}
@@ -187,7 +187,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           onClick={onFilterClick}
           className={cn(
             'absolute top-1/2 -translate-y-1/2 right-3 p-1.5 rounded-md',
-            'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition-colors'
+            'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:bg-neutral-700 transition-colors'
           )}
         >
           <SlidersHorizontal className="w-4 h-4" />
@@ -270,13 +270,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-neutral-200 overflow-hidden z-50"
+            className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden z-50"
           >
             {/* Recent searches */}
             {showRecent && !value && recentSearches.length > 0 && (
               <div className="p-2">
                 <div className="flex items-center justify-between px-2 mb-1">
-                  <span className="text-xs text-neutral-500 font-medium">Recent</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Recent</span>
                   {onClearRecent && (
                     <button
                       onClick={onClearRecent}
@@ -294,7 +294,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                       onSearch?.(search);
                       setShowSuggestions(false);
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-50 rounded-md transition-colors"
+                    className="w-full px-3 py-2 text-left text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50 rounded-md transition-colors"
                   >
                     {search}
                   </button>
@@ -309,15 +309,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   <button
                     key={suggestion.id}
                     onClick={() => handleSelect(suggestion)}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-neutral-50 rounded-md transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50 rounded-md transition-colors"
                   >
                     {suggestion.icon && (
                       <span className="text-neutral-400">{suggestion.icon}</span>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-neutral-900 truncate">{suggestion.label}</p>
+                      <p className="text-sm text-neutral-900 dark:text-white truncate">{suggestion.label}</p>
                       {suggestion.category && (
-                        <p className="text-xs text-neutral-500">{suggestion.category}</p>
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">{suggestion.category}</p>
                       )}
                     </div>
                   </button>
@@ -327,7 +327,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
             {/* No results */}
             {value && filteredSuggestions.length === 0 && (
-              <div className="p-4 text-center text-sm text-neutral-500">
+              <div className="p-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
                 No results found
               </div>
             )}

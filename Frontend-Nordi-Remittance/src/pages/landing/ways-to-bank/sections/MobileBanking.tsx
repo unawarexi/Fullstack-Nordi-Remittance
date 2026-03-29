@@ -67,7 +67,7 @@ const appStats = [
 // ========================
 const MobileBanking: React.FC = () => {
   return (
-    <Section id="mobile-banking" className="py-16 lg:py-24 bg-slate-50">
+    <Section id="mobile-banking" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -80,10 +80,10 @@ const MobileBanking: React.FC = () => {
             <Smartphone className="w-4 h-4" />
             Mobile Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
             Your Bank in Your Pocket
           </h2>
-          <p className="text-lg text-neutral-600">
+          <p className="text-lg text-neutral-600 dark:text-neutral-300">
             The award-winning mobile app that puts complete control of your 
             finances at your fingertips. Bank smarter, not harder.
           </p>
@@ -97,12 +97,12 @@ const MobileBanking: React.FC = () => {
           className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-12"
         >
           {appStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white border border-neutral-200">
+            <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <stat.icon className="w-4 h-4 text-cyan-600" />
-                <span className="text-xl font-bold text-neutral-900">{stat.value}</span>
+                <span className="text-xl font-bold text-neutral-900 dark:text-white">{stat.value}</span>
               </div>
-              <p className="text-xs text-neutral-500">{stat.label}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -185,15 +185,15 @@ const MobileBanking: React.FC = () => {
                 <div
                   key={feature.name}
                   className={cn(
-                    "p-4 rounded-xl bg-white border border-neutral-200",
+                    "p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                     "hover:shadow-md hover:border-cyan-300 transition-all"
                   )}
                 >
                   <div className="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center mb-3">
                     {feature.icon}
                   </div>
-                  <h4 className="font-semibold text-neutral-900 text-sm mb-1">{feature.name}</h4>
-                  <p className="text-xs text-neutral-500">{feature.description}</p>
+                  <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{feature.name}</h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.description}</p>
                 </div>
               ))}
             </div>

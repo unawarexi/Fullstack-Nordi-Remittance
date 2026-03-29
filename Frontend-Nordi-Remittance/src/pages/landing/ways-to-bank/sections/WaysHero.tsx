@@ -81,7 +81,7 @@ const WaysHero: React.FC = () => {
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-12">
-              <Button variant="primary" className="bg-white text-blue-700 hover:bg-blue-50">
+              <Button variant="primary" className="bg-white dark:bg-neutral-800 text-blue-700 hover:bg-blue-50">
                 Download App
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>

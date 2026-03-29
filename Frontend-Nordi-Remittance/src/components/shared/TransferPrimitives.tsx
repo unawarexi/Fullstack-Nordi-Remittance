@@ -63,7 +63,7 @@ export const StepIndicator: React.FC<{
               i === current &&
                 "bg-indigo-600 border-indigo-600 text-white scale-110",
               i > current &&
-                "bg-transparent border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500",
+                "bg-transparent border-gray-300 dark:border-gray-700 text-gray-400 dark:text-gray-500 dark:text-neutral-400",
             )}
           >
             {i < current ? <Check size={16} /> : i + 1}
@@ -73,7 +73,7 @@ export const StepIndicator: React.FC<{
               "mt-1.5 text-[11px] sm:text-xs font-medium text-center max-w-[80px] leading-tight",
               i <= current
                 ? "text-gray-900 dark:text-white"
-                : "text-gray-400 dark:text-gray-500",
+                : "text-gray-400 dark:text-gray-500 dark:text-neutral-400",
             )}
           >
             {step.label}
@@ -131,7 +131,7 @@ export const WizardNav: React.FC<{
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 dark:text-neutral-500 hover:text-gray-900 dark:text-white dark:hover:text-white rounded-lg hover:bg-gray-100 dark:bg-neutral-700 dark:hover:bg-gray-800 transition-colors"
       >
         <ChevronLeft size={16} /> Back
       </button>
@@ -179,7 +179,7 @@ export const TCard: React.FC<{
             </h3>
           )}
           {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500 mt-0.5">
               {subtitle}
             </p>
           )}
@@ -216,7 +216,7 @@ export const TInput: React.FC<TInputProps> = ({
     </label>
     <div className="relative">
       {icon && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-neutral-400">
           {icon}
         </div>
       )}
@@ -224,7 +224,7 @@ export const TInput: React.FC<TInputProps> = ({
         {...props}
         className={cn(
           "w-full px-3 py-2.5 text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white",
-          "placeholder:text-gray-400 dark:placeholder:text-gray-500",
+          "placeholder:text-gray-400 dark:text-neutral-500 dark:placeholder:text-gray-500 dark:text-neutral-400",
           "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors",
           icon && "pl-10",
           error && touched
@@ -234,7 +234,7 @@ export const TInput: React.FC<TInputProps> = ({
       />
     </div>
     {hint && !(error && touched) && (
-      <p className="text-xs text-gray-400 dark:text-gray-500">{hint}</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500 dark:text-neutral-400">{hint}</p>
     )}
     {error && touched && <p className="text-xs text-red-500">{error}</p>}
   </div>
@@ -298,7 +298,7 @@ export const TTextarea: React.FC<TTextareaProps> = ({
       {...props}
       className={cn(
         "w-full px-3 py-2.5 text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white",
-        "placeholder:text-gray-400 dark:placeholder:text-gray-500",
+        "placeholder:text-gray-400 dark:text-neutral-500 dark:placeholder:text-gray-500 dark:text-neutral-400",
         "focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors resize-none",
         error && touched
           ? "border-red-400 dark:border-red-500"
@@ -326,7 +326,7 @@ export const TCheckbox: React.FC<{
         onChange={onChange}
         className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-gray-800"
       />
-      <span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
+      <span className="text-sm text-gray-600 dark:text-gray-400 dark:text-neutral-500 group-hover:text-gray-900 dark:text-white dark:group-hover:text-gray-200 transition-colors">
         {label}
       </span>
     </label>
@@ -358,7 +358,7 @@ export const AccountSelector: React.FC<{
         ))}
       </div>
     ) : accounts.length === 0 ? (
-      <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+      <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-neutral-500 py-6 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
         No accounts available
       </p>
     ) : (
@@ -389,7 +389,7 @@ export const AccountSelector: React.FC<{
               <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                 {a.name || a.walletType || "Account"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500">
                 {a.accountNumber
                   ? `••••${String(a.accountNumber).slice(-4)}`
                   : `ID: ${a.id.slice(0, 8)}`}
@@ -401,7 +401,7 @@ export const AccountSelector: React.FC<{
                   ? `$${a.balance.toLocaleString()}`
                   : "—"}
               </p>
-              <p className="text-[11px] text-gray-400">{a.currency || "USD"}</p>
+              <p className="text-[11px] text-gray-400 dark:text-neutral-500">{a.currency || "USD"}</p>
             </div>
             {selected === a.id && (
               <Check
@@ -423,7 +423,7 @@ export const ReviewRow: React.FC<{
   highlight?: boolean;
 }> = ({ label, value, highlight }) => (
   <div className="flex items-center justify-between py-2.5">
-    <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+    <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-neutral-500">{label}</span>
     <span
       className={cn(
         "text-sm font-medium text-right",
@@ -449,7 +449,7 @@ export const ReviewSection: React.FC<{
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:bg-neutral-700 dark:hover:bg-gray-800 transition-colors"
       >
         <div className="flex items-center gap-2">
           {icon && <span className="text-indigo-500">{icon}</span>}
@@ -460,7 +460,7 @@ export const ReviewSection: React.FC<{
         <ChevronRight
           size={16}
           className={cn(
-            "text-gray-400 transition-transform duration-200",
+            "text-gray-400 dark:text-neutral-500 transition-transform duration-200",
             open && "rotate-90",
           )}
         />
@@ -507,7 +507,7 @@ export const FeeSummary: React.FC<{
           className={
             r.highlight
               ? "text-gray-900 dark:text-white"
-              : "text-gray-500 dark:text-gray-400"
+              : "text-gray-500 dark:text-gray-400 dark:text-neutral-500"
           }
         >
           {r.label}
@@ -586,7 +586,7 @@ export const TransferResult: React.FC<{
           {title}
         </h2>
         {subtitle && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-neutral-500 mt-1">
             {subtitle}
           </p>
         )}
@@ -595,7 +595,7 @@ export const TransferResult: React.FC<{
       {/* Reference */}
       {reference && (
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-gray-500 dark:text-gray-400 dark:text-neutral-500">
             Ref:
           </span>
           <span className="text-sm font-mono font-semibold text-gray-900 dark:text-white">
@@ -604,7 +604,7 @@ export const TransferResult: React.FC<{
           <button
             type="button"
             onClick={copyRef}
-            className="text-gray-400 hover:text-indigo-500 transition-colors"
+            className="text-gray-400 dark:text-neutral-500 hover:text-indigo-500 transition-colors"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
           </button>
@@ -616,7 +616,7 @@ export const TransferResult: React.FC<{
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 max-w-md mx-auto text-left divide-y divide-gray-100 dark:divide-gray-800">
           {details.map((d, i) => (
             <div key={i} className="flex justify-between py-2.5">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-neutral-500">
                 {d.label}
               </span>
               <span className="text-sm font-medium text-gray-900 dark:text-white">
