@@ -74,6 +74,11 @@ interface EnvConfig {
   // Monitoring
   SENTRY_DSN?: string;
 
+  // Clerk Authentication
+  CLERK_SECRET_KEY: string;
+  CLERK_PUBLISHABLE_KEY: string;
+  CLERK_WEBHOOK_SECRET: string;
+
   // AI Agent
   OPENAI_API_KEY?: string;
   ANTHROPIC_API_KEY?: string;
@@ -188,6 +193,11 @@ export const env: EnvConfig = {
 
   // Monitoring
   SENTRY_DSN: process.env.SENTRY_DSN,
+
+  // Clerk Authentication
+  CLERK_SECRET_KEY: getEnvString("CLERK_SECRET_KEY", ""),
+  CLERK_PUBLISHABLE_KEY: getEnvString("CLERK_PUBLISHABLE_KEY", ""),
+  CLERK_WEBHOOK_SECRET: getEnvString("CLERK_WEBHOOK_SECRET", ""),
 
   // AI Agent
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,

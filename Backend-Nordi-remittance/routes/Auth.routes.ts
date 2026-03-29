@@ -4,7 +4,9 @@
 
 import { Router } from "express";
 import AuthController from "../controllers/Auth.controller.js";
+import * as ClerkAuthController from "../controllers/ClerkAuth.controller.js";
 import { authenticate, optionalAuth } from "../middleware/auth.middleware.js";
+import { verifyClerkToken } from "../middleware/clerk.middleware.js";
 import {
   authRateLimit,
   sanitizeInput,
@@ -99,6 +101,45 @@ router.post("/forgot-password", authRateLimit, AuthController.forgotPassword);
  * @access  Public
  */
 router.post("/reset-password", authRateLimit, AuthController.resetPassword);
+
+// ============================================================================
+// CLERK AUTH ROUTES — Clerk sign-in sync, OTP step-up, webhook
+// ============================================================================
+
+/**
+ * @route   POST /api/auth/clerk-sync
+ * @desc    Sync Clerk user → local DB, check if OTP is required
+ * @access  Public (with Clerk session token)
+ */
+router.post("/clerk-sync", authRateLimit, verifyClerkToken, ClerkAuthController.clerkSync);
+
+/**
+ * @route   POST /api/auth/clerk-sync/admin
+ * @desc    Admin-specific Clerk sync
+ * @access  Public (with Clerk session token)
+ */
+router.post("/clerk-sync/admin", authRateLimit, verifyClerkToken, ClerkAuthController.clerkSyncAdmin);
+
+/**
+ * @route   POST /api/auth/verify-clerk-otp
+ * @desc    Verify OTP code for Clerk-authenticated users
+ * @access  Public
+ */
+router.post("/verify-clerk-otp", authRateLimit, ClerkAuthController.verifyClerkOtp);
+
+/**
+ * @route   POST /api/auth/resend-clerk-otp
+ * @desc    Resend OTP code for Clerk-authenticated users
+ * @access  Public
+ */
+router.post("/resend-clerk-otp", authRateLimit, ClerkAuthController.resendClerkOtp);
+
+/**
+ * @route   POST /api/auth/clerk-webhook
+ * @desc    Clerk webhook handler (user lifecycle events)
+ * @access  Clerk Webhook (verified by Svix signature)
+ */
+router.post("/clerk-webhook", ClerkAuthController.clerkWebhook);
 
 // ============================================================================
 // PROTECTED ROUTES (Authentication required)

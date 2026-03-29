@@ -92,6 +92,12 @@ const UserSchema: Schema = new Schema({
   emailVerified: { type: Boolean, default: false },
   phoneVerified: { type: Boolean, default: false },
   status: { type: String, enum: ["active", "inactive", "suspended", "banned"], default: "active" },
+
+  // Clerk Integration
+  clerkUserId: { type: String, unique: true, sparse: true },
+  authProvider: { type: String, enum: ["local", "clerk", "google"], default: "local" },
+  lastOtpVerifiedAt: { type: Date },
+  knownDeviceFingerprints: [{ type: String }],
   activationToken: { type: String },
   isActive: { type: Boolean, default: false },
   kycStatus: { type: String, default: "pending" },
@@ -183,6 +189,7 @@ UserSchema.pre("save", function () {
 // Exact match indexes (high selectivity)
 UserSchema.index({ mobileNumber: 1 }, { unique: true, sparse: true });
 UserSchema.index({ idNumber: 1 }, { sparse: true });
+UserSchema.index({ clerkUserId: 1 }, { unique: true, sparse: true });
 
 // Filter/sort compound indexes
 UserSchema.index({ accountStatus: 1, kycStatus: 1 });
