@@ -9,6 +9,8 @@ import { authenticate, optionalAuth } from "../middleware/auth.middleware.js";
 import { verifyClerkToken } from "../middleware/clerk.middleware.js";
 import {
   authRateLimit,
+  otpVerifyRateLimit,
+  otpResendRateLimit,
   sanitizeInput,
 } from "../middleware/security.middleware.js";
 import { requestLoggingMiddleware } from "../middleware/core.middleware.js";
@@ -61,7 +63,7 @@ router.post("/login", authRateLimit, AuthController.login);
  * @desc    Verify two-factor authentication code
  * @access  Public (with 2FA token)
  */
-router.post("/verify-2fa", authRateLimit, AuthController.verify2FA);
+router.post("/verify-2fa", otpVerifyRateLimit, AuthController.verify2FA);
 
 /**
  * @route   POST /api/auth/refresh
@@ -125,14 +127,14 @@ router.post("/clerk-sync/admin", authRateLimit, verifyClerkToken, ClerkAuthContr
  * @desc    Verify OTP code for Clerk-authenticated users
  * @access  Public
  */
-router.post("/verify-clerk-otp", authRateLimit, ClerkAuthController.verifyClerkOtp);
+router.post("/verify-clerk-otp", otpVerifyRateLimit, ClerkAuthController.verifyClerkOtp);
 
 /**
  * @route   POST /api/auth/resend-clerk-otp
  * @desc    Resend OTP code for Clerk-authenticated users
  * @access  Public
  */
-router.post("/resend-clerk-otp", authRateLimit, ClerkAuthController.resendClerkOtp);
+router.post("/resend-clerk-otp", otpResendRateLimit, ClerkAuthController.resendClerkOtp);
 
 /**
  * @route   POST /api/auth/clerk-webhook

@@ -150,6 +150,22 @@ export const authRateLimit = rateLimit({
   message: "Too many authentication attempts, please try again later",
 });
 
+/** OTP verification rate limiter — very tight to prevent brute-force on 6-digit codes */
+export const otpVerifyRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  maxRequests: 3,
+  keyGenerator: (req) => `otp-verify:${req.ip}`,
+  message: "Too many OTP verification attempts. Please wait 5 minutes before trying again.",
+});
+
+/** OTP resend rate limiter — prevents OTP flooding/spam */
+export const otpResendRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 3,
+  keyGenerator: (req) => `otp-resend:${req.ip}`,
+  message: "Too many OTP resend requests. Please wait before requesting another code.",
+});
+
 export const transactionRateLimit = rateLimit({
   windowMs: constants.TRANSACTION_RATE_LIMIT.windowMs,
   maxRequests: constants.TRANSACTION_RATE_LIMIT.maxRequests,
@@ -333,6 +349,8 @@ export default {
   helmetMiddleware,
   rateLimit,
   authRateLimit,
+  otpVerifyRateLimit,
+  otpResendRateLimit,
   transactionRateLimit,
   ipBlockingMiddleware,
   blockIP,
