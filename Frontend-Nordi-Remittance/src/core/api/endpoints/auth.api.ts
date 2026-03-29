@@ -231,6 +231,66 @@ export const authApi = {
     );
     return response.data;
   },
+
+  // ========================================================================
+  // CLERK AUTH ENDPOINTS
+  // ========================================================================
+
+  /**
+   * Sync Clerk session with backend — returns JWT tokens or OTP-required flag
+   */
+  clerkSync: async (
+    clerkToken: string,
+  ): Promise<ApiResponse<ClerkSyncResponse>> => {
+    const response = await apiClient.post<ApiResponse<ClerkSyncResponse>>(
+      `${AUTH_BASE}/clerk-sync`,
+      {},
+      { headers: { Authorization: `Bearer ${clerkToken}` } },
+    );
+    return response.data;
+  },
+
+  /**
+   * Sync Clerk admin session with backend
+   */
+  clerkSyncAdmin: async (
+    clerkToken: string,
+  ): Promise<ApiResponse<ClerkSyncResponse>> => {
+    const response = await apiClient.post<ApiResponse<ClerkSyncResponse>>(
+      `${AUTH_BASE}/clerk-sync/admin`,
+      {},
+      { headers: { Authorization: `Bearer ${clerkToken}` } },
+    );
+    return response.data;
+  },
+
+  /**
+   * Verify OTP for Clerk-authenticated users
+   */
+  verifyClerkOtp: async (data: {
+    otpSessionToken: string;
+    code: string;
+    isAdmin?: boolean;
+  }): Promise<ApiResponse<LoginResponse>> => {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      `${AUTH_BASE}/verify-clerk-otp`,
+      data,
+    );
+    return response.data;
+  },
+
+  /**
+   * Resend OTP code for Clerk-authenticated users
+   */
+  resendClerkOtp: async (
+    otpSessionToken: string,
+  ): Promise<ApiResponse<{ sent: boolean }>> => {
+    const response = await apiClient.post<ApiResponse<{ sent: boolean }>>(
+      `${AUTH_BASE}/resend-clerk-otp`,
+      { otpSessionToken },
+    );
+    return response.data;
+  },
 };
 
 export { getErrorMessage };

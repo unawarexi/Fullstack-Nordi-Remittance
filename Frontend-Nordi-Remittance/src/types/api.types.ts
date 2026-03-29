@@ -131,6 +131,22 @@ declare global {
     twoFactorMethod?: "sms" | "email" | "authenticator";
   }
 
+  interface ClerkSyncResponse {
+    requiresOtp: boolean;
+    otpSessionToken?: string;
+    email?: string;
+    user?: User;
+    tokens?: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
+    accessToken?: string;
+    refreshToken?: string;
+    expiresIn?: number;
+    wallet?: any;
+  }
+
   interface RegisterRequest {
     email: string;
     password: string;

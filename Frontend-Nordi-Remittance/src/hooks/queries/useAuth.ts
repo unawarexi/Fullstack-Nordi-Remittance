@@ -367,3 +367,117 @@ export const useLogoutAll = () => {
     },
   });
 };
+
+// ============================================================================
+// CLERK AUTH HOOKS
+// ============================================================================
+
+/**
+ * Clerk sync mutation — syncs Clerk session with backend
+ * Returns either JWT tokens (login complete) or OTP-required flag
+ */
+export const useClerkSync = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async (clerkToken: string) => {
+      const response = await authApi.clerkSync(clerkToken);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (!data.requiresOtp) {
+        const accessToken = data.tokens?.accessToken || data.accessToken;
+        const refreshToken = data.tokens?.refreshToken || data.refreshToken;
+        TokenManager.setTokens(accessToken, refreshToken);
+        if (data.user) {
+          queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
+        }
+        showToast("Login successful", "success");
+      }
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Clerk authentication failed", "error");
+    },
+  });
+};
+
+/**
+ * Clerk admin sync mutation
+ */
+export const useClerkSyncAdmin = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async (clerkToken: string) => {
+      const response = await authApi.clerkSyncAdmin(clerkToken);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (!data.requiresOtp) {
+        const accessToken = data.tokens?.accessToken || data.accessToken;
+        const refreshToken = data.tokens?.refreshToken || data.refreshToken;
+        TokenManager.setTokens(accessToken, refreshToken);
+        if (data.user) {
+          queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
+        }
+        showToast("Admin login successful", "success");
+      }
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Admin authentication failed", "error");
+    },
+  });
+};
+
+/**
+ * Verify Clerk OTP mutation
+ */
+export const useVerifyClerkOtp = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async (data: {
+      otpSessionToken: string;
+      code: string;
+      isAdmin?: boolean;
+    }) => {
+      const response = await authApi.verifyClerkOtp(data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      const accessToken = data.tokens?.accessToken || data.accessToken;
+      const refreshToken = data.tokens?.refreshToken || data.refreshToken;
+      TokenManager.setTokens(accessToken, refreshToken);
+      if (data.user) {
+        queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
+      }
+      showToast("Verification successful", "success");
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Invalid verification code", "error");
+    },
+  });
+};
+
+/**
+ * Resend Clerk OTP mutation
+ */
+export const useResendClerkOtp = () => {
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async (otpSessionToken: string) => {
+      const response = await authApi.resendClerkOtp(otpSessionToken);
+      return response.data;
+    },
+    onSuccess: () => {
+      showToast("Verification code resent", "success");
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Failed to resend code", "error");
+    },
+  });
+};
