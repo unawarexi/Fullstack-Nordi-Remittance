@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import RoutingCountries from "@core/data/Routing";
 import { TiArrowBackOutline } from "react-icons/ti";
 import Banks from "@core/data/Banks";
-import { SubmitSpinner } from "@components/shared/Spinner";
+import { SubmitSpinner } from "@components/ui/Spinner";
 import { Error, Success } from "@components/shared/InfoBankingPop";
 
 // Types

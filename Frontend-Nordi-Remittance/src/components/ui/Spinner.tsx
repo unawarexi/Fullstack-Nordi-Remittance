@@ -1,11 +1,12 @@
 // ============================================================================
-// SPINNER / LOADER COMPONENTS - Loading state indicators
+// SPINNER / LOADER COMPONENTS - Unified loading state indicators
 // ============================================================================
 
 import React from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@utils/cn";
 import { Loader2 } from "lucide-react";
+import FooterImg from "@assets/images/footer/confirmed.png";
 
 // ========================
 // SIZE STYLES
@@ -25,6 +26,101 @@ const variantStyles: Record<SpinnerVariant, string> = {
   default: "text-neutral-500",
   primary: "text-primary-500",
   white: "text-white",
+};
+
+// ========================
+// BRANDED LOGO SPINNER — logo with orbital ring
+// ========================
+const logoSizes = {
+  sm: { ring: 48, img: 24, stroke: 2.5 },
+  md: { ring: 64, img: 32, stroke: 3 },
+  lg: { ring: 96, img: 48, stroke: 3.5 },
+  xl: { ring: 128, img: 64, stroke: 4 },
+} as const;
+
+type LogoSpinnerSize = keyof typeof logoSizes;
+
+const LogoSpinner: React.FC<{ size?: LogoSpinnerSize; className?: string }> = ({
+  size = "lg",
+  className,
+}) => {
+  const { ring, img, stroke } = logoSizes[size];
+  const radius = (ring - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <div
+      className={cn("relative inline-flex items-center justify-center", className)}
+      style={{ width: ring, height: ring }}
+    >
+      {/* Outer pulse ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full border border-primary-300/40"
+        animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0, 0.6] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Rotating orbital arc */}
+      <motion.svg
+        className="absolute inset-0"
+        width={ring}
+        height={ring}
+        viewBox={`0 0 ${ring} ${ring}`}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+      >
+        <circle
+          cx={ring / 2}
+          cy={ring / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#orbital-gradient)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${circumference * 0.3} ${circumference * 0.7}`}
+        />
+        <defs>
+          <linearGradient id="orbital-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6366F1" />
+            <stop offset="50%" stopColor="#818CF8" />
+            <stop offset="100%" stopColor="#6366F1" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+      </motion.svg>
+
+      {/* Counter-rotating secondary arc (thinner, opposite) */}
+      <motion.svg
+        className="absolute inset-0"
+        width={ring}
+        height={ring}
+        viewBox={`0 0 ${ring} ${ring}`}
+        animate={{ rotate: -360 }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
+      >
+        <circle
+          cx={ring / 2}
+          cy={ring / 2}
+          r={radius - stroke * 1.5}
+          fill="none"
+          stroke="#818CF8"
+          strokeOpacity={0.3}
+          strokeWidth={stroke * 0.6}
+          strokeLinecap="round"
+          strokeDasharray={`${circumference * 0.15} ${circumference * 0.85}`}
+        />
+      </motion.svg>
+
+      {/* Center logo with gentle breathe */}
+      <motion.img
+        src={FooterImg}
+        alt="Nordi"
+        className="relative z-10 rounded-full object-contain"
+        style={{ width: img, height: img }}
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  );
 };
 
 // ========================
@@ -56,7 +152,6 @@ export const Spinner: React.FC<SpinnerProps> = ({
 // ========================
 // DOTS LOADER
 // ========================
-
 export const DotsLoader: React.FC<DotsLoaderProps> = ({
   size = "md",
   variant = "primary",
@@ -114,7 +209,6 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
 // ========================
 // PULSE LOADER
 // ========================
-
 export const PulseLoader: React.FC<PulseLoaderProps> = ({
   size = "md",
   variant = "primary",
@@ -162,7 +256,6 @@ export const PulseLoader: React.FC<PulseLoaderProps> = ({
 // ========================
 // SKELETON LOADER
 // ========================
-
 export const Skeleton: React.FC<SkeletonProps> = ({
   className,
   variant = "text",
@@ -170,7 +263,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   height,
   animation = "pulse",
 }) => {
-  const variantStyles = {
+  const skeletonVariantStyles = {
     text: "h-4 rounded",
     circular: "rounded-full",
     rectangular: "rounded-none",
@@ -187,7 +280,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     <div
       className={cn(
         "bg-neutral-200",
-        variantStyles[variant],
+        skeletonVariantStyles[variant],
         animationStyles[animation],
         className,
       )}
@@ -200,9 +293,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 };
 
 // ========================
-// FULL PAGE LOADER
+// FULL PAGE LOADER (branded)
 // ========================
-
 export const PageLoader: React.FC<PageLoaderProps> = ({
   message = "Loading...",
   showLogo = true,
@@ -214,7 +306,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-white"
     >
-      <div className="text-center">
+      <div className="flex flex-col items-center text-center">
         {showLogo && (
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -222,18 +314,15 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500">
-              <span className="text-2xl font-bold text-white">N</span>
-            </div>
+            <LogoSpinner size="xl" />
           </motion.div>
         )}
-        <Spinner size="lg" variant="primary" />
         {message && (
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-neutral-600"
+            className="mt-2 text-neutral-600"
           >
             {message}
           </motion.p>
@@ -244,9 +333,8 @@ export const PageLoader: React.FC<PageLoaderProps> = ({
 };
 
 // ========================
-// OVERLAY LOADER
+// OVERLAY LOADER (branded)
 // ========================
-
 export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
   isVisible,
   message,
@@ -261,12 +349,70 @@ export const OverlayLoader: React.FC<OverlayLoaderProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
       <div className="rounded-2xl bg-white p-8 text-center shadow-2xl">
-        <Spinner size="lg" variant="primary" />
+        <LogoSpinner size="lg" />
         {message && (
           <p className="mt-4 font-medium text-neutral-600">{message}</p>
         )}
       </div>
     </motion.div>
+  );
+};
+
+// ========================
+// CONFIRM SPINNER (full-screen branded overlay)
+// ========================
+export const ConfirmSpinner: React.FC<{ visible: boolean }> = ({ visible }) => {
+  if (!visible) return null;
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75 backdrop-blur-lg"
+      >
+        <div className="flex flex-col items-center">
+          <LogoSpinner size="xl" />
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-6 text-lg font-medium text-white lg:text-2xl"
+          >
+            Verifying ID...
+          </motion.p>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// ========================
+// SUBMIT SPINNER (full-screen branded overlay)
+// ========================
+export const SubmitSpinner: React.FC<{ visible: boolean }> = ({ visible }) => {
+  if (!visible) return null;
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75 backdrop-blur-lg"
+      >
+        <div className="flex flex-col items-center">
+          <LogoSpinner size="xl" />
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-6 text-lg font-medium text-white lg:text-2xl"
+          >
+            Submitting Remittance! Loading...
+          </motion.p>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

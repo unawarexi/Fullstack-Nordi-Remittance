@@ -135,7 +135,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
   className,
 }) => {
   const isIncome = type === 'credit' || type === 'refund';
-  const catConfig = category ? categoryConfig[category] : typeConfig[type];
+  const catConfig = (category && categoryConfig[category as TransactionCategory]) || typeConfig[type] || typeConfig.debit;
   
   return (
     <motion.div

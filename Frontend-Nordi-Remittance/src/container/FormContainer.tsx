@@ -3,7 +3,7 @@ import React, { ReactNode, useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Shield, Globe, CreditCard } from "lucide-react";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 import GetLocation from "@utils/GetLocation";
 import useThemeStore from "@store/theme.store";
 import { lightTheme, darkTheme, gradients } from "@constants/colors";
