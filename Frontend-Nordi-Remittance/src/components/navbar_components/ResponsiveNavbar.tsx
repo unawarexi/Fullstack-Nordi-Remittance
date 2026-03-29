@@ -15,7 +15,7 @@ import MegaNavbar from "./MegaNavbar";
 import InternetBankingSideBar from "./InternetBankingSideBar";
 import { ThemeToggle } from "@components/shared/ThemeToggle";
 import Countries from "@core/data/Countries";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 
 // ========================
 // NAV ITEMS DATA

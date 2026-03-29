@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Globe, User, Building, ArrowRight, X } from "lucide-react";
 import { cn } from "@utils/cn";
 import { useNavbar } from "@contexts/navbar-context";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 
 // ========================
 // ANIMATION VARIANTS

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, Shield, ShieldCheck, Globe, Fingerprint } from "lucide-react";
 
 import { Button, Input, Spinner } from "@components/ui";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 import GetLocation from "@utils/GetLocation";
 import { useAdminLogin } from "@hooks/queries/useAdmin";
 import { useAuthStore } from "@store/auth.store";

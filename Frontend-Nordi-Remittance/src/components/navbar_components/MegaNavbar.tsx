@@ -8,7 +8,7 @@ import { ChevronRight, ArrowRight } from "lucide-react";
 import { cn } from "@utils/cn";
 import { Button } from "@components/ui/Button";
 import { useNavbar } from "@contexts/navbar-context";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 
 // ========================
 // MEGA MENU CONTENT DATA

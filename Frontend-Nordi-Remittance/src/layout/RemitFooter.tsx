@@ -9,7 +9,7 @@ import { cn } from '@utils/cn';
 import { useBreakpoint, useIsMobile } from '@hooks/index';
 import { Button } from '@components/ui/Button';
 import { Container } from '@components/layout/Container';
-import Images from '../utils/constants/Image_strings';
+import Images from '@constants/images';
 
 // ========================
 // FOOTER DATA

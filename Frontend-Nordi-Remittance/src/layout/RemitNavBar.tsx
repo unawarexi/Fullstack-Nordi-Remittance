@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SubNavItem from "@components/navbar_components/SubNavBar";
 import NavbarItems from "@components/navbar_components/NavbarItems";
-import Images from "@utils/constants/Image_strings";
+import Images from '@constants/images';
 import InternetBankingSideBar from "@components/navbar_components/InternetBankingSideBar";
 import { BsSearch } from "react-icons/bs";
 import { CiLock } from "react-icons/ci";

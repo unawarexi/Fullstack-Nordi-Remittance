@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Shield, Globe, Lock, CreditCard } from 'lucide-react';
 import { cn } from '@utils/cn';
-import Images from '@utils/constants/Image_strings';
+import Images from '@constants/images';
 import GetLocation from '@utils/GetLocation';
 
 // ========================
