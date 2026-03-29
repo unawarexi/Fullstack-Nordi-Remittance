@@ -13,9 +13,19 @@ import { PERIOD_MAP, CHART_COLORS } from "./constants/dashboard.constants";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// ─── Tiny safe-array helper ──────────────────────────────────────────────────
-const toArray = (d: unknown): any[] =>
-  Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
+// ─── Safe-array extractor ────────────────────────────────────────────────────
+const extractArray = (d: unknown, ...keys: string[]): any[] => {
+  if (Array.isArray(d)) return d;
+  if (!d || typeof d !== "object") return [];
+  const obj = d as Record<string, any>;
+  for (const k of keys) { if (Array.isArray(obj[k])) return obj[k]; }
+  if (Array.isArray(obj.data)) return obj.data;
+  if (obj.data && typeof obj.data === "object") {
+    for (const k of keys) { if (Array.isArray(obj.data[k])) return obj.data[k]; }
+    if (Array.isArray(obj.data.data)) return obj.data.data;
+  }
+  return [];
+};
 
 export function useClientSpending(): ClientSpendingData {
   const [activeFilter, setActiveFilter] = useState("Month");
@@ -39,7 +49,7 @@ export function useClientSpending(): ClientSpendingData {
   }, [catRes]);
 
   const trends = useMemo<SpendingTrendPoint[]>(() => {
-    const mapped = toArray(trendRes).map((t: any) => ({
+    const mapped = extractArray(trendRes, "trends").map((t: any) => ({
       month: t.month || t.period || t.label || "",
       spent: t.amount || t.total || t.spent || 0,
     }));

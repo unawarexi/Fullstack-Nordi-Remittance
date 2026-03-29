@@ -16,6 +16,7 @@ import {
   useRecentTransactions,
   useBudgetProgress,
   useInvestmentPortfolio,
+  useInvestments,
   useLoans,
   useCards,
   useSavingsGoals,
@@ -29,9 +30,21 @@ import { multiKeySort, topK } from "@core/algo";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// ─── Tiny safe-array helper ──────────────────────────────────────────────────
-const toArray = (d: unknown): any[] =>
-  Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
+// ─── Safe-array extractor — handles nested backend response shapes ───────────
+// Tries: direct array → named keys at top → obj.data as array →
+// named keys under obj.data → obj.data.data (double-nested paginated)
+const extractArray = (d: unknown, ...keys: string[]): any[] => {
+  if (Array.isArray(d)) return d;
+  if (!d || typeof d !== "object") return [];
+  const obj = d as Record<string, any>;
+  for (const k of keys) { if (Array.isArray(obj[k])) return obj[k]; }
+  if (Array.isArray(obj.data)) return obj.data;
+  if (obj.data && typeof obj.data === "object") {
+    for (const k of keys) { if (Array.isArray(obj.data[k])) return obj.data[k]; }
+    if (Array.isArray(obj.data.data)) return obj.data.data;
+  }
+  return [];
+};
 
 // ─── Hook ────────────────────────────────────────────────────────────────────
 export function useClientDashboard(): ClientDashboardData {
@@ -41,6 +54,7 @@ export function useClientDashboard(): ClientDashboardData {
   const { data: txRaw, isLoading: txLoading }                 = useRecentTransactions(5);
   const { data: budgetRaw, isLoading: budgetLoading }         = useBudgetProgress();
   const { data: portfolioRaw, isLoading: portfolioLoading }   = useInvestmentPortfolio();
+  const { data: investmentsListRaw, isLoading: investmentsListLoading } = useInvestments();
   const { data: loansRaw, isLoading: loansLoading }           = useLoans();
   const { data: cardsRaw, isLoading: cardsLoading }           = useCards();
   const { data: goalsRaw, isLoading: goalsLoading }           = useSavingsGoals();
@@ -52,8 +66,12 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Account Summary ──────────────────────────────────────────────────────
   const account = useMemo<AccountSummaryData>(() => {
-    const stats: any = overviewRaw || {};
-    const wallets = toArray(walletsRaw);
+    const raw: any = overviewRaw || {};
+    // Backend shape: { statistics: { wallets: { totalBalance, count }, transactions: {...}, products: {...} } }
+    const stats = raw.statistics || raw;
+    const walletStats = stats.wallets || stats;
+
+    const wallets = extractArray(walletsRaw, "wallets");
 
     const mapped: WalletItem[] = wallets.map((w: any) => ({
       id: w._id || w.id || "",
@@ -66,16 +84,16 @@ export function useClientDashboard(): ClientDashboardData {
 
     return {
       totalBalance:
-        stats.totalBalance ?? mapped.reduce((s, w) => s + w.balance, 0),
-      monthlyIncome: stats.monthlyIncome ?? 0,
-      monthlyExpenses: stats.monthlyExpenses ?? 0,
+        walletStats.totalBalance ?? stats.totalBalance ?? raw.totalBalance ?? mapped.reduce((s, w) => s + w.balance, 0),
+      monthlyIncome: stats.monthlyIncome ?? raw.monthlyIncome ?? 0,
+      monthlyExpenses: stats.monthlyExpenses ?? raw.monthlyExpenses ?? 0,
       wallets: mapped,
     };
   }, [overviewRaw, walletsRaw]);
 
   // ── Recent Transactions (sorted by date DESC via multiKeySort) ──────────
   const recentTransactions = useMemo<TransactionItem[]>(() => {
-    const mapped: TransactionItem[] = toArray(txRaw).map((tx: any) => ({
+    const mapped: TransactionItem[] = extractArray(txRaw, "transactions").map((tx: any) => ({
       id: tx._id || tx.id || "",
       title: tx.description || tx.title || tx.recipientName || "Transaction",
       description: tx.category || tx.type || "",
@@ -99,7 +117,7 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Budgets (sorted by usage ratio DESC — highest pressure first) ──────
   const budgets = useMemo<BudgetItem[]>(() => {
-    const mapped: BudgetItem[] = toArray(budgetRaw).map((b: any) => ({
+    const mapped: BudgetItem[] = extractArray(budgetRaw, "budgets", "categories").map((b: any) => ({
       id: b._id || b.category || b.name || "",
       category: b.category || b.name || "Budget",
       spent: b.spent || b.current || 0,
@@ -113,8 +131,9 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Investment Snapshot (topK holdings by abs change) ──────────────────
   const investments = useMemo<InvestmentSnapshot>(() => {
-    const p: any = (portfolioRaw as any)?.data || portfolioRaw || {};
-    const allHoldings: HoldingItem[] = (p.holdings || p.assets || []).map(
+    const p: any = portfolioRaw || {};
+    const portfolioArr = extractArray(portfolioRaw, "portfolios", "holdings", "assets");
+    const allHoldings: HoldingItem[] = (p.holdings || p.assets || portfolioArr).map(
       (h: any) => ({
         id: h._id || h.id || h.symbol || "",
         name: h.name || h.symbol || "Asset",
@@ -138,7 +157,7 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Loans Snapshot (sorted by outstanding DESC) ────────────────────────
   const loans = useMemo<LoansSnapshot>(() => {
-    const list = toArray(loansRaw);
+    const list = extractArray(loansRaw, "loans");
     const active = list.filter(
       (l: any) => l.status === "active" || l.status === "approved",
     );
@@ -164,7 +183,7 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Cards ────────────────────────────────────────────────────────────────
   const cards = useMemo<CardItem[]>(() => {
-    return toArray(cardsRaw)
+    return extractArray(cardsRaw, "cards")
       .filter((c: any) => c.status === "active" || !c.status)
       .slice(0, 2)
       .map((c: any) => ({
@@ -181,7 +200,7 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Savings Goals ────────────────────────────────────────────────────────
   const savingsGoals = useMemo<SavingsGoalItem[]>(() => {
-    return toArray(goalsRaw).slice(0, 3).map((g: any) => {
+    return extractArray(goalsRaw, "goals", "savingsGoals").slice(0, 3).map((g: any) => {
       const current = g.currentAmount || g.saved || 0;
       const target = g.targetAmount || g.target || 1;
       return {
@@ -196,7 +215,7 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Notifications ────────────────────────────────────────────────────────
   const notifications = useMemo<NotificationItem[]>(() => {
-    return toArray(notifsRaw).slice(0, 5).map((n: any) => ({
+    return extractArray(notifsRaw, "notifications").slice(0, 5).map((n: any) => ({
       id: n._id || n.id || "",
       title: n.title || n.message || "Notification",
       type: n.type || "info",
@@ -210,9 +229,8 @@ export function useClientDashboard(): ClientDashboardData {
 
   // ── Insights ─────────────────────────────────────────────────────────────
   const insights = useMemo<InsightItem[]>(() => {
-    const raw: any[] = (insightsRaw as any)?.data || insightsRaw || [];
-    if (!Array.isArray(raw)) return [];
-    return raw.slice(0, 3).map((ins: any) => ({
+    const insArr: any[] = extractArray(insightsRaw, "insights", "recommendations");
+    return insArr.slice(0, 3).map((ins: any) => ({
       id: ins._id || ins.id || "",
       title: ins.title || ins.message || "Insight",
       description: ins.description,
@@ -223,14 +241,117 @@ export function useClientDashboard(): ClientDashboardData {
   // ── Security/Verification ────────────────────────────────────────────────
   const security = useMemo<SecurityStatus>(() => {
     const profile: any = profileRaw || {};
+    const userInfo = profile.user || profile;
     const tfa: any = tfaRaw || {};
-    const kycStatus = profile.kycStatus || "pending";
+    const kycStatus = userInfo.kycStatus || profile.kycStatus || "pending";
     return {
       kycVerified: kycStatus === "verified" || kycStatus === "approved",
       kycStatus,
       twoFaEnabled: !!tfa.enabled || !!tfa.isEnabled,
     };
   }, [profileRaw, tfaRaw]);
+
+  // ── Loans Detail Panel (richer view for dedicated section) ───────────────
+  const loansDetail = useMemo<ClientLoansDetailData>(() => {
+    const list = extractArray(loansRaw, "loans");
+    const activeLoans = list.filter(
+      (l: any) => l.status === "active" || l.status === "approved" || l.status === "disbursed",
+    );
+    const overdueLoans = list.filter(
+      (l: any) => l.status === "overdue" || l.isOverdue,
+    );
+    const pendingApps = list.filter(
+      (l: any) => l.status === "pending" || l.status === "under_review",
+    );
+    const totalDisbursed = list.reduce(
+      (s: number, l: any) => s + (l.amount || l.principal || 0), 0,
+    );
+    const totalRepaid = list.reduce(
+      (s: number, l: any) => s + (l.totalPaid || l.amountPaid || 0), 0,
+    );
+    const repaymentRate =
+      totalDisbursed > 0 ? Math.min(Math.round((totalRepaid / totalDisbursed) * 100), 100) : 0;
+
+    return {
+      totalLoans: list.length,
+      activeLoans: activeLoans.length,
+      totalDisbursed,
+      totalRepaid,
+      overdueLoans: overdueLoans.length,
+      pendingApplications: pendingApps.length,
+      repaymentRate,
+      recentLoans: list.slice(0, 5).map((l: any) => ({
+        id: l._id || l.id || "",
+        type: l.type || l.loanType || "Personal",
+        amount: l.amount || l.principal || 0,
+        status: l.status || "pending",
+      })),
+    };
+  }, [loansRaw]);
+
+  // ── Investments Detail Panel (richer view for dedicated section) ─────────
+  const investmentsDetail = useMemo<ClientInvestmentsDetailData>(() => {
+    const list = extractArray(investmentsListRaw, "investments");
+    const portfolio: any = portfolioRaw || {};
+    const activeInvestments = list.filter((i: any) => i.status === "active").length;
+    const totalPortfolioValue =
+      portfolio.currentValue || portfolio.totalValue ||
+      list.reduce((s: number, i: any) => s + (i.currentValue || i.amount || 0), 0);
+    const totalReturns =
+      portfolio.totalReturns ||
+      list.reduce((s: number, i: any) => s + (i.returns || i.profit || 0), 0);
+    const returnRate =
+      portfolio.returnPercentage || portfolio.returnPct ||
+      (totalPortfolioValue > 0 ? Math.round((totalReturns / totalPortfolioValue) * 100) : 0);
+
+    const topProducts = portfolio.byType
+      ? Object.entries(portfolio.byType).map(([name, data]: [string, any]) => ({
+          id: name,
+          name,
+          type: name,
+          returnRate: data?.returnPercentage || 0,
+        }))
+      : list.slice(0, 3).map((i: any) => ({
+          id: i._id || i.id || "",
+          name: i.name || i.productName || "Investment",
+          type: i.type || "Fixed",
+          returnRate: i.returnPercentage || 0,
+        }));
+
+    return {
+      totalPortfolioValue,
+      activeInvestments: activeInvestments || 0,
+      totalReturns,
+      returnRate,
+      savingsGoals: savingsGoals.length,
+      savingsProgress:
+        savingsGoals.length > 0
+          ? Math.round(savingsGoals.reduce((s, g) => s + g.percentage, 0) / savingsGoals.length)
+          : 0,
+      topProducts,
+    };
+  }, [investmentsListRaw, portfolioRaw, savingsGoals]);
+
+  // ── Cards Detail Panel (richer view for dedicated section) ───────────────
+  const cardsDetail = useMemo<ClientCardsDetailData>(() => {
+    const all = extractArray(cardsRaw, "cards");
+    const active = all.filter((c: any) => c.status === "active" || !c.status);
+    const frozen = all.filter((c: any) => c.status === "frozen" || c.status === "blocked");
+    const virtual = all.filter((c: any) => !!c.isVirtual || c.type === "virtual");
+    const physical = all.filter((c: any) => !c.isVirtual && c.type !== "virtual");
+    const totalSpending = all.reduce(
+      (s: number, c: any) => s + (c.usedAmount || c.currentSpend || 0), 0,
+    );
+
+    return {
+      totalCards: all.length,
+      activeCards: active.length,
+      frozenCards: frozen.length,
+      totalSpending,
+      virtualCards: virtual.length,
+      physicalCards: physical.length,
+    };
+  }, [cardsRaw]);
 
   // ── Return ───────────────────────────────────────────────────────────────
   return {
@@ -246,10 +367,14 @@ export function useClientDashboard(): ClientDashboardData {
     insights,
     security,
 
+    loansDetail,
+    investmentsDetail,
+    cardsDetail,
+
     isAccountLoading: overviewLoading && walletsLoading,
     isTransactionsLoading: txLoading,
     isBudgetsLoading: budgetLoading,
-    isInvestmentsLoading: portfolioLoading,
+    isInvestmentsLoading: portfolioLoading || investmentsListLoading,
     isLoansLoading: loansLoading,
     isCardsLoading: cardsLoading,
     isSavingsLoading: goalsLoading,
