@@ -419,8 +419,8 @@ export const useClerkSyncAdmin = () => {
         const accessToken = data.tokens?.accessToken || data.accessToken;
         const refreshToken = data.tokens?.refreshToken || data.refreshToken;
         TokenManager.setTokens(accessToken, refreshToken);
-        if (data.user) {
-          queryClient.setQueryData(queryKeys.auth.currentUser(), data.user);
+        if (data.admin) {
+          queryClient.setQueryData(queryKeys.auth.currentUser(), data.admin);
         }
         showToast("Admin login successful", "success");
       }

@@ -5,7 +5,16 @@
 import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 
 const SSOCallback = () => {
-  return <AuthenticateWithRedirectCallback />;
+  // Read the callback path stored before the OAuth redirect
+  const callbackPath =
+    sessionStorage.getItem("clerk_callback_path") || "/auth/clerk-callback";
+
+  return (
+    <AuthenticateWithRedirectCallback
+      signInForceRedirectUrl={callbackPath}
+      signUpForceRedirectUrl={callbackPath}
+    />
+  );
 };
 
 export default SSOCallback;

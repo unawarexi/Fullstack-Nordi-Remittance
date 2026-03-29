@@ -21,6 +21,9 @@ const ClerkCallback = () => {
     if (!isLoaded || !isSignedIn || hasRun.current) return;
     hasRun.current = true;
 
+    // Clean up stored callback path
+    sessionStorage.removeItem("clerk_callback_path");
+
     const sync = async () => {
       try {
         const token = await getToken();

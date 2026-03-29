@@ -1,6 +1,4 @@
-// ============================================================================
 // CLERK AUTH CONTROLLER — Clerk ↔ Backend sync, OTP step-up, webhook
-// ============================================================================
 
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
@@ -13,28 +11,29 @@ import {
   getAccessTokenCookieOptions,
   getRefreshTokenCookieOptions,
 } from "../core/helpers/token.helper.js";
-import { generateSecureToken, generateOTP } from "../core/helpers/crypto.helper.js";
 import {
-  generateAccountNumber,
-  generateWalletNumber,
-} from "../core/helpers/generator.js";
+  generateSecureToken,
+  generateOTP,
+} from "../core/helpers/crypto.helper.js";
 import {
   sendSuccess,
-  sendCreated,
   sendError,
   sendUnauthorized,
 } from "../core/helpers/response.helper.js";
 import { UnauthorizedError, ValidationError } from "../core/errors/AppError.js";
 import { constants, env } from "../config/env.config.js";
-import { store2FACode, verify2FACode as redisVerify2FACode, cacheGet } from "../services/redis.service.js";
-import { sendMail } from "../services/mailer.service.js";
+import {
+  store2FACode,
+  verify2FACode as redisVerify2FACode,
+  cacheGet,
+} from "../services/redis.service.js";
+import { sendTemplatedMail } from "../services/mailer.service.js";
+import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { createClerkClient } from "@clerk/express";
 import { Webhook } from "svix";
 import mongoose from "mongoose";
 
-// ============================================================================
 // HELPERS
-// ============================================================================
 
 /** Generate a 6-char alphanumeric OTP */
 function generateAlphanumericOTP(length = 6): string {
@@ -52,7 +51,11 @@ function buildDeviceFingerprint(req: Request): string {
   const ua = req.headers["user-agent"] || "unknown";
   const ip = (req as any).clientIp || req.ip || "unknown";
   // Combine user-agent + ip for a rough fingerprint
-  return crypto.createHash("sha256").update(`${ua}::${ip}`).digest("hex").slice(0, 32);
+  return crypto
+    .createHash("sha256")
+    .update(`${ua}::${ip}`)
+    .digest("hex")
+    .slice(0, 32);
 }
 
 /** Determine if OTP step-up is required */
@@ -66,7 +69,9 @@ function isOtpRequired(user: any, deviceFingerprint: string): boolean {
 
   // 3. Prolonged absence (>7 days since last OTP verification)
   if (user.lastOtpVerifiedAt) {
-    const daysSinceOtp = (Date.now() - new Date(user.lastOtpVerifiedAt).getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceOtp =
+      (Date.now() - new Date(user.lastOtpVerifiedAt).getTime()) /
+      (1000 * 60 * 60 * 24);
     if (daysSinceOtp > 7) return true;
   } else {
     // If never verified OTP, require it
@@ -76,14 +81,12 @@ function isOtpRequired(user: any, deviceFingerprint: string): boolean {
   return false;
 }
 
-// ============================================================================
 // POST /auth/clerk-sync
 // Called after Clerk sign-in / sign-up succeeds on the frontend.
 // 1. Verifies Clerk token (already done by middleware)
 // 2. Finds or creates the local user
 // 3. Checks if OTP is required
 // 4. Returns app JWT tokens or OTP-required flag
-// ============================================================================
 
 export async function clerkSync(
   req: AuthenticatedRequest,
@@ -113,124 +116,46 @@ export async function clerkSync(
     const lastName = clerkUser.lastName || "";
     const avatar = clerkUser.imageUrl || null;
 
-    // ------------------------------------------------------------------
     // Find by clerkUserId first, then by email (link existing accounts)
-    // ------------------------------------------------------------------
+
     let user: any = await Users.findOne({
       $or: [{ clerkUserId }, { email: email.toLowerCase() }],
     });
 
-    let isNewUser = false;
-
     if (!user) {
-      // ------------------------------------------------------------------
-      // NEW USER — create local account + wallet in a transaction
-      // ------------------------------------------------------------------
-      isNewUser = true;
-      const session = await mongoose.startSession();
-      session.startTransaction();
+      // User must register first — Clerk login is not for signup
+      sendError(
+        res,
+        "Account not found. Please sign up first before using Google sign-in.",
+        "USER_NOT_FOUND",
+        404,
+      );
+      return;
+    }
 
-      try {
-        const accountNumber = generateAccountNumber();
-
-        user = new Users({
-          firstName,
-          lastName,
-          email: email.toLowerCase(),
-          clerkUserId,
-          authProvider: clerkUser.externalAccounts?.length ? "google" : "clerk",
-          accountNumber,
-          role: "user",
-          status: "active",
-          isActive: true,
-          kycStatus: "pending",
-          emailVerified: true, // Clerk verifies email
-          phoneVerified: false,
-          twoFactorEnabled: false,
-          // Fill required schema fields with sensible defaults
-          dateOfBirth: new Date("2000-01-01"),
-          gender: "prefer_not_to_say",
-          nationality: "US",
-          countryOfResidence: "US",
-          idType: "passport",
-          idNumber: `CLK-${accountNumber}`,
-          idExpiryDate: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000),
-          addressDocType: "utility_bill",
-          taxIdentificationNumber: `TAX-${accountNumber}`,
-          mobileNumber: clerkUser.phoneNumbers?.[0]?.phoneNumber || `+1${Date.now().toString().slice(-10)}`,
-          homeAddress: "To be updated",
-          city: "To be updated",
-          stateProvince: "To be updated",
-          zipCode: "00000",
-          country: "US",
-          accountType: "savings",
-          currency: "USD",
-          sourceOfIncome: "employment",
-          monthlyIncomeRange: "0-5000",
-          initialDeposit: 0,
-          employmentStatus: "employed",
-          occupation: "Not specified",
-          accountName: `${firstName} ${lastName}`,
-          externalAccountNumber: accountNumber,
-          bankName: "Nordea",
-          bankAddress: "Nordea HQ",
-          routingNumber: `R${accountNumber.slice(0, 9)}`,
-          swiftBic: "NORDSESS",
-          password: crypto.randomBytes(32).toString("hex"), // Random password (Clerk handles auth)
-          securityQuestion: "Managed by Clerk",
-          securityAnswer: crypto.randomBytes(16).toString("hex"),
-          enableTwoFactor: false,
-          agreeToTerms: true,
-          agreeToPrivacy: true,
-          profilePicture: avatar,
-          knownDeviceFingerprints: [],
-          lastOtpVerifiedAt: null,
-        });
-
-        await user.save({ session });
-
-        const wallet = new Wallets({
-          userId: user._id,
-          walletNumber: generateWalletNumber(),
-          currency: "USD",
-          balance: 0,
-          availableBalance: 0,
-          ledgerBalance: 0,
-          status: "active",
-          type: "primary",
-          createdAt: new Date(),
-        });
-
-        await wallet.save({ session });
-        await session.commitTransaction();
-        session.endSession();
-      } catch (err) {
-        await session.abortTransaction();
-        session.endSession();
-        throw err;
-      }
-    } else if (!user.clerkUserId) {
-      // ------------------------------------------------------------------
+    if (!user.clerkUserId) {
       // EXISTING USER found by email — link Clerk ID
-      // ------------------------------------------------------------------
+
       user.clerkUserId = clerkUserId;
-      user.authProvider = clerkUser.externalAccounts?.length ? "google" : "clerk";
+      user.authProvider = clerkUser.externalAccounts?.length
+        ? "google"
+        : "clerk";
       user.emailVerified = true;
       if (avatar && !user.profilePicture) user.profilePicture = avatar;
       await user.save();
     }
 
-    // ------------------------------------------------------------------
     // Check if account is locked / suspended
-    // ------------------------------------------------------------------
     if (user.status === "suspended" || user.status === "banned") {
-      sendUnauthorized(res, "Your account has been suspended. Contact support.");
+      sendUnauthorized(
+        res,
+        "Your account has been suspended. Contact support.",
+      );
       return;
     }
 
-    // ------------------------------------------------------------------
     // OTP STEP-UP CHECK
-    // ------------------------------------------------------------------
+
     const deviceFingerprint = buildDeviceFingerprint(req);
 
     if (isOtpRequired(user, deviceFingerprint)) {
@@ -240,28 +165,18 @@ export async function clerkSync(
       // Store in Redis (5 min TTL)
       await store2FACode(user._id.toString(), otpCode);
 
-      // Send OTP email
-      const otpEmailContent = {
-        subject: "Nordea — Your verification code",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-            <h2 style="color: #0044cc;">Nordea Verification Code</h2>
-            <p>Hello ${user.firstName},</p>
-            <p>We detected a sign-in that requires additional verification. Enter the code below to continue:</p>
-            <div style="text-align: center; margin: 24px 0;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0044cc; background: #f0f4ff; padding: 12px 24px; border-radius: 8px;">
-                ${otpCode}
-              </span>
-            </div>
-            <p style="color: #666;">This code expires in <strong>5 minutes</strong>.</p>
-            <p style="color: #666;">If you did not attempt to sign in, please secure your account immediately.</p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-            <p style="font-size: 12px; color: #999;">Nordea Internet Banking — Security Team</p>
-          </div>
-        `,
-      };
+      // Send OTP email using template
+      const emailGenerator = new EmailContentGenerator();
+      const otpTemplateData = emailGenerator.otpEmail({
+        firstName: user.firstName,
+        email: user.email as string,
+        otpCode,
+        purpose: "Sign-in Verification",
+        expiresIn: "5 minutes",
+        userId: user._id.toString(),
+      });
 
-      sendMail(user.email as string, otpEmailContent.subject, otpEmailContent.html).catch((err) =>
+      sendTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
         console.error("Failed to send OTP email:", err),
       );
 
@@ -275,31 +190,27 @@ export async function clerkSync(
           requiresOtp: true,
           otpSessionToken,
           email: user.email,
-          reason: isNewUser
-            ? "first_login"
-            : !(user.knownDeviceFingerprints || []).includes(deviceFingerprint)
-              ? "new_device"
-              : "prolonged_absence",
+          reason: !(user.knownDeviceFingerprints || []).includes(
+            deviceFingerprint,
+          )
+            ? "new_device"
+            : "prolonged_absence",
         },
         "OTP verification required. Check your email.",
       );
       return;
     }
 
-    // ------------------------------------------------------------------
     // No OTP needed — issue JWT tokens
-    // ------------------------------------------------------------------
+
     await issueTokensAndRespond(req, res, user, deviceFingerprint);
   } catch (error) {
     next(error);
   }
 }
 
-// ============================================================================
 // POST /auth/clerk-sync/admin
 // Admin variant — verifies the Clerk user has an admin record
-// ============================================================================
-
 export async function clerkSyncAdmin(
   req: AuthenticatedRequest,
   res: Response,
@@ -327,11 +238,14 @@ export async function clerkSyncAdmin(
     let admin: any = await AdminUsers.findOne({ email: email.toLowerCase() });
 
     if (!admin) {
-      sendUnauthorized(res, "No admin account found for this email. Access denied.");
+      sendUnauthorized(
+        res,
+        "No admin account found for this email. Access denied.",
+      );
       return;
     }
 
-    if (admin.status !== "active") {
+    if (!admin.isActive) {
       sendUnauthorized(res, "Admin account is not active.");
       return;
     }
@@ -351,24 +265,17 @@ export async function clerkSyncAdmin(
       const userId = adminUser._id.toString();
       await store2FACode(userId, otpCode);
 
-      const otpEmailContent = {
-        subject: "Nordea Admin — Your verification code",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-            <h2 style="color: #0044cc;">Admin Verification Code</h2>
-            <p>Hello ${admin.firstName || "Admin"},</p>
-            <p>Enter the code below to access the admin console:</p>
-            <div style="text-align: center; margin: 24px 0;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0044cc; background: #f0f4ff; padding: 12px 24px; border-radius: 8px;">
-                ${otpCode}
-              </span>
-            </div>
-            <p style="color: #666;">This code expires in <strong>5 minutes</strong>.</p>
-          </div>
-        `,
-      };
+      const emailGenerator = new EmailContentGenerator();
+      const otpTemplateData = emailGenerator.otpEmail({
+        firstName: admin.firstName || "Admin",
+        email,
+        otpCode,
+        purpose: "Admin Console Verification",
+        expiresIn: "5 minutes",
+        userId: userId,
+      });
 
-      sendMail(email, otpEmailContent.subject, otpEmailContent.html).catch((err) =>
+      sendTemplatedMail(email, otpTemplateData).catch((err) =>
         console.error("Failed to send admin OTP email:", err),
       );
 
@@ -398,8 +305,16 @@ export async function clerkSyncAdmin(
       sessionId,
     );
 
-    res.cookie("accessToken", tokens.accessToken, getAccessTokenCookieOptions());
-    res.cookie("refreshToken", tokens.refreshToken, getRefreshTokenCookieOptions());
+    res.cookie(
+      "accessToken",
+      tokens.accessToken,
+      getAccessTokenCookieOptions(),
+    );
+    res.cookie(
+      "refreshToken",
+      tokens.refreshToken,
+      getRefreshTokenCookieOptions(),
+    );
 
     sendSuccess(
       res,
@@ -424,10 +339,8 @@ export async function clerkSyncAdmin(
   }
 }
 
-// ============================================================================
 // POST /auth/verify-clerk-otp
 // Verifies the OTP code and returns JWT tokens on success
-// ============================================================================
 
 export async function verifyClerkOtp(
   req: Request,
@@ -442,7 +355,9 @@ export async function verifyClerkOtp(
     }
 
     // Resolve userId from the OTP session token (stored as { code: userId })
-    const sessionData = await cacheGet<{ code: string }>(`remit:2fa:otp_session:${otpSessionToken}`);
+    const sessionData = await cacheGet<{ code: string }>(
+      `remit:2fa:otp_session:${otpSessionToken}`,
+    );
     const storedUserId = sessionData?.code;
     if (!storedUserId) {
       throw new UnauthorizedError("Invalid or expired OTP session");
@@ -480,10 +395,23 @@ export async function verifyClerkOtp(
       }
 
       const sessionId = generateSecureToken(16);
-      const tokens = generateAuthTokens(admin._id.toString(), user.email, "admin", sessionId);
+      const tokens = generateAuthTokens(
+        admin._id.toString(),
+        user.email,
+        "admin",
+        sessionId,
+      );
 
-      res.cookie("accessToken", tokens.accessToken, getAccessTokenCookieOptions());
-      res.cookie("refreshToken", tokens.refreshToken, getRefreshTokenCookieOptions());
+      res.cookie(
+        "accessToken",
+        tokens.accessToken,
+        getAccessTokenCookieOptions(),
+      );
+      res.cookie(
+        "refreshToken",
+        tokens.refreshToken,
+        getRefreshTokenCookieOptions(),
+      );
 
       sendSuccess(
         res,
@@ -513,10 +441,8 @@ export async function verifyClerkOtp(
   }
 }
 
-// ============================================================================
 // POST /auth/resend-clerk-otp
 // Resends a new OTP code for a pending OTP session
-// ============================================================================
 
 export async function resendClerkOtp(
   req: Request,
@@ -530,7 +456,9 @@ export async function resendClerkOtp(
       throw new ValidationError("OTP session token is required");
     }
 
-    const sessionData2 = await cacheGet<{ code: string }>(`remit:2fa:otp_session:${otpSessionToken}`);
+    const sessionData2 = await cacheGet<{ code: string }>(
+      `remit:2fa:otp_session:${otpSessionToken}`,
+    );
     const storedUserId = sessionData2?.code;
     if (!storedUserId) {
       throw new UnauthorizedError("Invalid or expired OTP session");
@@ -548,38 +476,33 @@ export async function resendClerkOtp(
     // Re-store the session token mapping
     await store2FACode(`otp_session:${otpSessionToken}`, user._id.toString());
 
-    // Send email
-    const otpEmailContent = {
-      subject: "Nordea — Your new verification code",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-          <h2 style="color: #0044cc;">New Verification Code</h2>
-          <p>Hello ${user.firstName},</p>
-          <p>Here is your new verification code:</p>
-          <div style="text-align: center; margin: 24px 0;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #0044cc; background: #f0f4ff; padding: 12px 24px; border-radius: 8px;">
-              ${otpCode}
-            </span>
-          </div>
-          <p style="color: #666;">This code expires in <strong>5 minutes</strong>.</p>
-        </div>
-      `,
-    };
+    // Send email using template
+    const emailGenerator = new EmailContentGenerator();
+    const otpTemplateData = emailGenerator.otpEmail({
+      firstName: user.firstName,
+      email: user.email as string,
+      otpCode,
+      purpose: "Sign-in Verification (Resend)",
+      expiresIn: "5 minutes",
+      userId: user._id.toString(),
+    });
 
-    sendMail(user.email as string, otpEmailContent.subject, otpEmailContent.html).catch((err) =>
+    sendTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
       console.error("Failed to send OTP email:", err),
     );
 
-    sendSuccess(res, { sent: true }, "New verification code sent to your email.");
+    sendSuccess(
+      res,
+      { sent: true },
+      "New verification code sent to your email.",
+    );
   } catch (error) {
     next(error);
   }
 }
 
-// ============================================================================
 // POST /auth/clerk-webhook
 // Handles Clerk webhook events (user.created, user.updated, user.deleted, session.created)
-// ============================================================================
 
 export async function clerkWebhook(
   req: Request,
@@ -624,7 +547,9 @@ export async function clerkWebhook(
           });
           if (existing && !existing.clerkUserId) {
             existing.clerkUserId = data.id;
-            existing.authProvider = data.external_accounts?.length ? "google" : "clerk";
+            existing.authProvider = data.external_accounts?.length
+              ? "google"
+              : "clerk";
             existing.emailVerified = true;
             await existing.save();
           }
@@ -671,9 +596,7 @@ export async function clerkWebhook(
   }
 }
 
-// ============================================================================
 // HELPER — Issue JWT tokens and respond
-// ============================================================================
 
 async function issueTokensAndRespond(
   req: Request,
@@ -695,7 +618,6 @@ async function issueTokensAndRespond(
       lastLogin: new Date(),
       lastLoginIp: clientIp,
       knownDeviceFingerprints: knownDevices,
-      loginAttempts: 0,
       lockUntil: null,
     },
   );
@@ -710,12 +632,17 @@ async function issueTokensAndRespond(
   );
 
   res.cookie("accessToken", tokens.accessToken, getAccessTokenCookieOptions());
-  res.cookie("refreshToken", tokens.refreshToken, getRefreshTokenCookieOptions());
+  res.cookie(
+    "refreshToken",
+    tokens.refreshToken,
+    getRefreshTokenCookieOptions(),
+  );
 
   // Get wallet
-  const wallet = await Wallets.findOne({ userId: user._id, type: "primary" }).select(
-    "walletNumber balances",
-  );
+  const wallet = await Wallets.findOne({
+    user: String(user._id),
+    isPrimary: true,
+  }).select("walletNumber balances");
 
   sendSuccess(
     res,
@@ -734,7 +661,11 @@ async function issueTokensAndRespond(
         avatar: user.profilePicture,
       },
       wallet: wallet
-        ? { id: wallet._id, walletNumber: wallet.walletNumber, balances: wallet.balances }
+        ? {
+            id: wallet._id,
+            walletNumber: wallet.walletNumber,
+            balances: wallet.balances,
+          }
         : null,
       tokens: {
         accessToken: tokens.accessToken,

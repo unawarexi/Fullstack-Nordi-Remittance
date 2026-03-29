@@ -52,7 +52,7 @@ const AdminLogin = () => {
 
   // Clerk sign-in
   const { signIn, isLoaded: isClerkLoaded, setActive } = useSignIn();
-  const { getToken } = useClerkAuth();
+  const { getToken, isSignedIn, signOut } = useClerkAuth();
   const [clerkError, setClerkError] = useState<string | null>(null);
 
   const {
@@ -102,6 +102,11 @@ const AdminLogin = () => {
     setClerkError(null);
 
     try {
+      // If already signed in with Clerk (e.g. incomplete previous flow), sign out first
+      if (isSignedIn) {
+        await signOut();
+      }
+
       const result = await signIn.create({
         identifier: data.email,
         password: data.password,
@@ -129,6 +134,14 @@ const AdminLogin = () => {
     setClerkError(null);
 
     try {
+      // If already signed in with Clerk (e.g. incomplete previous flow), sign out first
+      if (isSignedIn) {
+        await signOut();
+      }
+
+      // Store admin callback path so SSOCallback knows where to redirect after OAuth
+      sessionStorage.setItem("clerk_callback_path", "/auth/clerk-admin-callback");
+
       await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: "/auth/sso-callback",

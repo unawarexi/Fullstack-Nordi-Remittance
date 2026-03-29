@@ -156,21 +156,18 @@ export async function register(
       twoFactorEnabled: false,
       createdAt: new Date(),
       lastLogin: null,
-      loginAttempts: 0,
+      loginAttempts: [],
     });
 
     await user.save({ session });
 
     // Create default wallet
     const wallet = new Wallets({
-      userId: user._id,
+      user: user._id.toString(),
       walletNumber: generateWalletNumber(),
-      currency: currency || "USD",
-      balance: 0,
-      availableBalance: 0,
-      ledgerBalance: 0,
       status: "active",
-      type: "primary",
+      isPrimary: true,
+      walletType: "personal",
       createdAt: new Date(),
     });
 
@@ -659,10 +656,20 @@ export async function login(
       const { attempts, locked } = await trackLoginAttempt(email, false);
 
       // Increment login attempts
-      const dbAttempts = ((user.loginAttempts as number) || 0) + 1;
-      const updates: any = { loginAttempts: dbAttempts };
+      const updates: any = {
+        $push: {
+          loginAttempts: {
+            timestamp: new Date(),
+            successful: false,
+            ipAddress: clientIp,
+            userAgent: req.headers["user-agent"] || "unknown",
+          },
+        },
+      };
 
-      if (dbAttempts >= constants.MAX_LOGIN_ATTEMPTS || locked) {
+      const currentAttemptCount = (Array.isArray(user.loginAttempts) ? user.loginAttempts.length : 0) + 1;
+
+      if (currentAttemptCount >= constants.MAX_LOGIN_ATTEMPTS || locked) {
         updates.lockUntil = new Date(
           Date.now() + constants.LOCKOUT_DURATION_MINUTES * 60 * 1000,
         );
@@ -689,7 +696,7 @@ export async function login(
         createdAt: new Date(),
       });
 
-      const remainingAttempts = constants.MAX_LOGIN_ATTEMPTS - dbAttempts;
+      const remainingAttempts = constants.MAX_LOGIN_ATTEMPTS - currentAttemptCount;
       if (remainingAttempts > 0) {
         throw new UnauthorizedError(
           `Invalid email or password. ${remainingAttempts} attempts remaining.`,
@@ -757,7 +764,7 @@ export async function login(
     await Users.updateOne(
       { _id: user._id },
       {
-        loginAttempts: 0,
+        loginAttempts: [],
         lockUntil: null,
         lastLogin: new Date(),
         lastLoginIp: clientIp,
@@ -957,7 +964,7 @@ export async function verify2FA(
     await Users.updateOne(
       { _id: user._id },
       {
-        loginAttempts: 0,
+        loginAttempts: [],
         lockUntil: null,
         lastLogin: new Date(),
         lastLoginIp: clientIp,
@@ -1423,7 +1430,7 @@ export async function resetPassword(
       tokenDoc.userId,
       {
         password: hashedPassword,
-        loginAttempts: 0,
+        loginAttempts: [],
         lockUntil: null,
       },
       { new: true },

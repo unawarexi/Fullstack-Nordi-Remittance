@@ -21,6 +21,9 @@ const ClerkAdminCallback = () => {
     if (!isLoaded || !isSignedIn || hasRun.current) return;
     hasRun.current = true;
 
+    // Clean up stored callback path
+    sessionStorage.removeItem("clerk_callback_path");
+
     const sync = async () => {
       try {
         const token = await getToken();
@@ -42,12 +45,13 @@ const ClerkAdminCallback = () => {
           return;
         }
 
-        if (response.user) {
+        // Admin endpoint returns response.admin (not response.user)
+        if (response.admin) {
           setAuthenticated({
-            id: response.user.id || (response.user as any)._id,
-            email: response.user.email,
-            firstName: response.user.firstName || "Admin",
-            lastName: response.user.lastName || "",
+            id: response.admin.id || (response.admin as any)._id,
+            email: response.admin.email,
+            firstName: response.admin.firstName || "Admin",
+            lastName: response.admin.lastName || "",
             role: "admin",
             kycStatus: "verified",
             isEmailVerified: true,

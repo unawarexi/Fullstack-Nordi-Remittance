@@ -136,6 +136,13 @@ declare global {
     otpSessionToken?: string;
     email?: string;
     user?: User;
+    admin?: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      role: string;
+    };
     tokens?: {
       accessToken: string;
       refreshToken: string;
