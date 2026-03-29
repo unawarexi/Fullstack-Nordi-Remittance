@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { dashboardContainerVariants } from "@core/animation/Animation";
+import { dashboardContainerVariants, dashboardItemVariants } from "@core/animation/Animation";
 import { PageContainer } from "@components/shared/DashboardPrimitives";
 import { FullPageSkeleton } from "@components/skeletons/Skeletons";
 import { useClientDashboard } from "../../domain/useClientDashboard";
@@ -8,6 +8,9 @@ import { useClientSpending } from "../../domain/useClientSpending";
 import AccountSummaryPanel from "./AccountSummary";
 import DashboardMain from "./DashbaordMain";
 import DashboardSidebar from "./DashBoardSideBar";
+import ClientLoansPanel from "./ClientLoansPanel";
+import ClientInvestmentsPanel from "./ClientInvestmentsPanel";
+import ClientSecurityPanel from "./ClientSecurityPanel";
 
 const UserDashboardOverview: React.FC = () => {
   const dashboard = useClientDashboard();
@@ -20,41 +23,69 @@ const UserDashboardOverview: React.FC = () => {
   if (dashboard.isAccountLoading) return <FullPageSkeleton />;
 
   return (
-    <PageContainer>
+    <PageContainer className="[&>div]:max-w-full">
       <motion.div
-        className="flex-1"
         variants={dashboardContainerVariants}
         initial="hidden"
         animate="visible"
+        exit="exit"
+        className="space-y-5"
       >
-        <AccountSummaryPanel data={dashboard.account} isLoading={dashboard.isAccountLoading} />
+        {/* KPI Stats Row */}
+        <motion.div variants={dashboardItemVariants}>
+          <AccountSummaryPanel data={dashboard.account} isLoading={dashboard.isAccountLoading} />
+        </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-4">
+        {/* Main Dashboard + Sidebar */}
+        <motion.div variants={dashboardItemVariants} className="flex flex-col lg:flex-row items-start gap-5">
           <DashboardMain
             transactions={dashboard.recentTransactions}
             spending={spending}
             budgets={dashboard.budgets}
-            investments={dashboard.investments}
-            loans={dashboard.loans}
             isTransactionsLoading={dashboard.isTransactionsLoading}
             isBudgetsLoading={dashboard.isBudgetsLoading}
-            isInvestmentsLoading={dashboard.isInvestmentsLoading}
-            isLoansLoading={dashboard.isLoansLoading}
+            cards={dashboard.cards}
+            cardsData={dashboard.cardsDetail}
+            isCardsLoading={dashboard.isCardsLoading}
           />
           <DashboardSidebar
-            cards={dashboard.cards}
             savingsGoals={dashboard.savingsGoals}
             security={dashboard.security}
             notifications={dashboard.notifications}
             unreadCount={dashboard.unreadCount}
             insights={dashboard.insights}
-            isCardsLoading={dashboard.isCardsLoading}
             isSavingsLoading={dashboard.isSavingsLoading}
             isSecurityLoading={dashboard.isSecurityLoading}
             isNotificationsLoading={dashboard.isNotificationsLoading}
             isInsightsLoading={dashboard.isInsightsLoading}
           />
-        </div>
+        </motion.div>
+
+        {/* Loans & Investments Row */}
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-5">
+          <div className="flex">
+            <ClientLoansPanel
+              loansData={dashboard.loansDetail}
+              isLoading={dashboard.isLoansLoading}
+            />
+          </div>
+          <div className="flex">
+            <ClientInvestmentsPanel
+              investmentsData={dashboard.investmentsDetail}
+              isLoading={dashboard.isInvestmentsLoading}
+            />
+          </div>
+        </motion.div>
+
+        {/* Security Row */}
+        <motion.div variants={dashboardItemVariants}>
+          <ClientSecurityPanel
+            security={dashboard.security}
+            notifications={dashboard.notifications}
+            unreadCount={dashboard.unreadCount}
+            isLoading={dashboard.isSecurityLoading}
+          />
+        </motion.div>
       </motion.div>
     </PageContainer>
   );

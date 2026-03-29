@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Filter, Calendar, ChevronRight, TrendingUp } from "lucide-react";
+import { Filter, Calendar } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -16,12 +16,8 @@ import {
   Legend,
 } from "recharts";
 import { useInView } from "@hooks/useInView";
-import { TransactionItem as TransactionItemComponent } from "@components/banking/TransactionItem";
-import type { TransactionStatus, TransactionCategory } from "@components/banking/TransactionItem";
 import {
-  TransactionListSkeleton,
   ChartSkeleton,
-  StatsCardSkeleton,
   SkeletonBlock,
 } from "@components/skeletons/Skeletons";
 import {
@@ -34,6 +30,8 @@ import {
   QUICK_ACTIONS,
   SPENDING_FILTER_OPTIONS,
 } from "../../domain/constants/dashboard.constants";
+import ClientTransferHistory from "./ClientTransferHistory";
+import ClientCardsPanel from "./ClientCardsPanel";
 
 // ========================
 // PROPS INTERFACE
@@ -44,56 +42,10 @@ interface DashboardMainProps {
   spending: ClientSpendingData;
   budgets: BudgetItem[];
   isBudgetsLoading: boolean;
-  investments: InvestmentSnapshot;
-  isInvestmentsLoading: boolean;
-  loans: LoansSnapshot;
-  isLoansLoading: boolean;
+  cards: CardItem[];
+  cardsData: ClientCardsDetailData;
+  isCardsLoading: boolean;
 }
-
-// ========================
-// RECENT TRANSACTIONS
-// ========================
-const RecentTransactionsSection: React.FC<{
-  transactions: TransactionItem[];
-  isLoading: boolean;
-}> = React.memo(({ transactions, isLoading }) => {
-  const navigate = useNavigate();
-
-  if (isLoading) return <TransactionListSkeleton count={4} />;
-
-  return (
-    <DashCard>
-      <SectionHeader
-        title="Recent Transactions"
-        subtitle="Latest activity"
-        onActionClick={() => navigate("/customer/transactions")}
-      />
-      {transactions.length === 0 ? (
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-          No recent transactions
-        </p>
-      ) : (
-        <div className="divide-y divide-gray-100 dark:divide-gray-800">
-          {transactions.map((tx, i) => (
-            <TransactionItemComponent
-              key={tx.id || i}
-              id={tx.id || String(i)}
-              title={tx.title}
-              description={tx.description}
-              amount={tx.amount}
-              currency={tx.currency}
-              type={tx.type}
-              status={tx.status as TransactionStatus}
-              category={tx.category as TransactionCategory}
-              date={tx.date}
-              onClick={() => navigate("/customer/transactions")}
-            />
-          ))}
-        </div>
-      )}
-    </DashCard>
-  );
-});
 
 // ========================
 // SPENDING ANALYTICS
@@ -370,132 +322,6 @@ const BudgetProgressSection: React.FC<{
 });
 
 // ========================
-// INVESTMENTS SNAPSHOT
-// ========================
-const InvestmentsSnapshotSection: React.FC<{
-  data: InvestmentSnapshot;
-  isLoading: boolean;
-}> = React.memo(({ data, isLoading }) => {
-  const navigate = useNavigate();
-
-  if (isLoading) {
-    return (
-      <DashCard>
-        <SkeletonBlock className="h-5 w-40 mb-3" />
-        <SkeletonBlock className="h-24 w-full" />
-      </DashCard>
-    );
-  }
-
-  return (
-    <DashCard hover onClick={() => navigate("/customer/investments")}>
-      <SectionHeader
-        title="Investments"
-        subtitle="Portfolio snapshot"
-        action={
-          <div className="flex items-center gap-1">
-            <TrendingUp size={14} className="text-emerald-500" />
-            <ChevronRight
-              size={14}
-              className="text-gray-400 dark:text-gray-500"
-            />
-          </div>
-        }
-      />
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-lg p-3 mb-3">
-        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-          Portfolio Value
-        </p>
-        <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-          {formatCurrency(data.totalValue)}
-        </p>
-        <p
-          className={`text-[10px] sm:text-xs font-medium mt-0.5 ${data.totalReturn >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
-        >
-          {data.totalReturn >= 0 ? "+" : ""}{formatCurrency(Math.abs(data.totalReturn))}{" "}
-          ({data.returnPct}%)
-        </p>
-      </div>
-      {data.holdings.length > 0 && (
-        <div className="space-y-1.5">
-          {data.holdings.map((h, i) => (
-            <div
-              key={h.id || i}
-              className="flex justify-between text-[10px] sm:text-xs"
-            >
-              <span className="text-gray-600 dark:text-gray-400">
-                {h.name}
-              </span>
-              <span
-                className={`font-medium ${h.change >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
-              >
-                {h.change >= 0 ? "+" : ""}
-                {h.change}%
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </DashCard>
-  );
-});
-
-// ========================
-// LOANS OVERVIEW
-// ========================
-const LoansOverviewSection: React.FC<{
-  data: LoansSnapshot;
-  isLoading: boolean;
-}> = React.memo(({ data, isLoading }) => {
-  const navigate = useNavigate();
-
-  if (isLoading) {
-    return (
-      <DashCard>
-        <SkeletonBlock className="h-5 w-32 mb-3" />
-        <SkeletonBlock className="h-16 w-full" />
-      </DashCard>
-    );
-  }
-
-  if (data.activeCount === 0) return null;
-
-  return (
-    <DashCard hover onClick={() => navigate("/customer/loans")}>
-      <SectionHeader
-        title="Active Loans"
-        subtitle={`${data.activeCount} active loan${data.activeCount !== 1 ? "s" : ""}`}
-        action={
-          <ChevronRight
-            size={14}
-            className="text-gray-400 dark:text-gray-500"
-          />
-        }
-      />
-      <div className="bg-rose-50 dark:bg-rose-950/30 rounded-lg p-3 mb-2">
-        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-          Total Outstanding
-        </p>
-        <p className="text-base sm:text-lg font-bold text-rose-700 dark:text-rose-400">
-          {formatCurrency(data.totalOutstanding)}
-        </p>
-      </div>
-      {data.loans.map((loan, i) => (
-        <div
-          key={loan.id || i}
-          className="flex justify-between items-center py-1.5 border-t border-gray-100 dark:border-gray-800 text-[10px] sm:text-xs"
-        >
-          <span className="text-gray-600 dark:text-gray-400">{loan.type}</span>
-          <span className="font-medium text-gray-900 dark:text-white">
-            {formatCurrency(loan.monthlyPayment)}/mo
-          </span>
-        </div>
-      ))}
-    </DashCard>
-  );
-});
-
-// ========================
 // MAIN DASHBOARD COMPONENT
 // ========================
 const DashboardMain: React.FC<DashboardMainProps> = ({
@@ -504,55 +330,74 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
   spending,
   budgets,
   isBudgetsLoading,
-  investments,
-  isInvestmentsLoading,
-  loans,
-  isLoansLoading,
+  cards,
+  cardsData,
+  isCardsLoading,
 }) => {
   const navigate = useNavigate();
   const [txRef, txInView] = useInView();
   const [spendRef, spendInView] = useInView();
   const [budgetRef, budgetInView] = useInView();
-  const [extraRef, extraInView] = useInView();
 
   return (
-    <div className="flex-1 space-y-4">
-      {/* Quick Actions */}
-      <DashCard>
-        <SectionHeader title="Quick Actions" />
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-          {QUICK_ACTIONS.map((action, index) => (
-            <motion.div
-              key={action.title}
-              className={`flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl cursor-pointer transition-colors ${action.color} ${action.hoverColor}`}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                transition: { delay: 0.05 + index * 0.04 },
-              }}
-              onClick={() => navigate(action.route)}
-            >
-              {action.icon}
-              <span className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 font-medium">
-                {action.title}
-              </span>
-            </motion.div>
-          ))}
+    <div className="flex-1 space-y-5">
+      {/* Quick Actions + Cards Panel — side by side */}
+      <div className="flex flex-col lg:flex-row items-stretch gap-5">
+        {/* Quick Actions — 60% */}
+        <div className="w-full lg:w-[58%] flex">
+          <DashCard className="flex-1 flex flex-col">
+            <SectionHeader title="Quick Actions" />
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 flex-1 content-start">
+              {QUICK_ACTIONS.map((action, index) => (
+                <motion.div
+                  key={action.title}
+                  className={`flex flex-col items-center justify-center p-2 sm:p-2.5 rounded-xl cursor-pointer transition-colors ${action.color} ${action.hoverColor}`}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    transition: { delay: 0.05 + index * 0.04 },
+                  }}
+                  onClick={() => navigate(action.route)}
+                >
+                  {action.icon}
+                  <span className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 font-medium">
+                    {action.title}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </DashCard>
         </div>
-      </DashCard>
 
-      {/* Recent Transactions — lazy render */}
+        {/* Cards Panel — 40% */}
+        <div className="w-full lg:w-[42%] flex">
+          <ClientCardsPanel
+            cards={cards}
+            cardsData={cardsData}
+            isLoading={isCardsLoading}
+          />
+        </div>
+      </div>
+
+      {/* Transaction History — lazy render */}
       <div ref={txRef}>
         {txInView ? (
-          <RecentTransactionsSection
+          <ClientTransferHistory
             transactions={transactions}
             isLoading={isTransactionsLoading}
           />
         ) : (
-          <TransactionListSkeleton count={3} />
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4">
+            <SkeletonBlock className="h-5 w-40 mb-4" />
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <SkeletonBlock key={i} className="h-10 w-full" />
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
@@ -581,24 +426,6 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
               ))}
             </div>
           </DashCard>
-        )}
-      </div>
-
-      {/* Investments & Loans — lazy render, side by side */}
-      <div ref={extraRef}>
-        {extraInView ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InvestmentsSnapshotSection
-              data={investments}
-              isLoading={isInvestmentsLoading}
-            />
-            <LoansOverviewSection data={loans} isLoading={isLoansLoading} />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <StatsCardSkeleton />
-            <StatsCardSkeleton />
-          </div>
         )}
       </div>
     </div>

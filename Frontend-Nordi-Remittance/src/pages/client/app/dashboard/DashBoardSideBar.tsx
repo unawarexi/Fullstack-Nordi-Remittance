@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  CreditCard,
   CheckCircle,
   AlertTriangle,
   Bell,
@@ -16,7 +15,6 @@ import {
 } from "lucide-react";
 import { useInView } from "@hooks/useInView";
 import {
-  CreditCardSkeleton,
   SkeletonBlock,
 } from "@components/skeletons/Skeletons";
 import {
@@ -27,7 +25,7 @@ import {
 import {
   sidebarItemVariants,
 } from "@core/animation/Animation";
-import { formatCurrency, maskSensitive } from "@core/algo";
+import { formatCurrency } from "@core/algo";
 import {
   SIDEBAR_TOOLS,
   NOTIFICATION_TYPE_COLORS,
@@ -38,8 +36,6 @@ import {
 // PROPS INTERFACE
 // ========================
 interface DashboardSidebarProps {
-  cards: CardItem[];
-  isCardsLoading: boolean;
   savingsGoals: SavingsGoalItem[];
   isSavingsLoading: boolean;
   security: SecurityStatus;
@@ -50,108 +46,6 @@ interface DashboardSidebarProps {
   insights: InsightItem[];
   isInsightsLoading: boolean;
 }
-
-// ========================
-// CARDS PREVIEW
-// ========================
-const CardsPreviewSection: React.FC<{
-  cards: CardItem[];
-  isLoading: boolean;
-}> = React.memo(({ cards, isLoading }) => {
-  const navigate = useNavigate();
-
-  if (isLoading) {
-    return (
-      <DashCard>
-        <SkeletonBlock className="h-5 w-24 mb-3" />
-        <CreditCardSkeleton />
-      </DashCard>
-    );
-  }
-
-  return (
-    <DashCard>
-      <SectionHeader title="Your Cards" icon={<CreditCard size={16} />} />
-      {cards.length === 0 ? (
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-          No cards found
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {cards.map((card) => {
-            const gradient = card.isVirtual
-              ? "bg-gradient-to-r from-purple-500 to-pink-500"
-              : "bg-gradient-to-r from-indigo-600 to-purple-600";
-            const usagePct =
-              card.spendLimit > 0
-                ? (card.usedAmount / card.spendLimit) * 100
-                : 0;
-
-            return (
-              <motion.div
-                key={card.id}
-                className="rounded-xl overflow-hidden cursor-pointer"
-                variants={sidebarItemVariants}
-                whileHover={{ y: -3 }}
-                onClick={() => navigate("/customer/cards")}
-              >
-                <div
-                  className={`${gradient} p-3 text-white relative h-32`}
-                >
-                  <div className="flex justify-between">
-                    <div>
-                      <p className="text-[10px] opacity-80">
-                        {card.isVirtual ? "Virtual" : "Physical"}
-                      </p>
-                      <h3 className="text-xs sm:text-sm font-semibold">
-                        {card.name}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      <div className="w-4 h-4 bg-red-500 rounded-full opacity-80" />
-                      <div className="w-4 h-4 bg-amber-400 rounded-full opacity-80 -ml-1.5" />
-                    </div>
-                  </div>
-                  <p className="text-xs sm:text-sm font-mono tracking-wider mt-4">
-                    {maskSensitive(card.lastFour.padStart(16, "0"))}
-                  </p>
-                  <div className="flex justify-between mt-1.5 text-[10px] opacity-80">
-                    <p>Exp: {card.expiryDate}</p>
-                    <p>
-                      {card.status === "active" ? "Active" : card.status}
-                    </p>
-                  </div>
-                </div>
-                {card.spendLimit > 0 && (
-                  <div className="bg-gray-50 dark:bg-gray-800 p-2">
-                    <div className="flex justify-between text-[10px] sm:text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">
-                        Usage
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(card.usedAmount)} / {formatCurrency(card.spendLimit)}
-                      </span>
-                    </div>
-                    <ProgressBar value={usagePct} height="sm" />
-                  </div>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-      <div className="mt-2">
-        <motion.button
-          className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center"
-          whileHover={{ x: 2 }}
-          onClick={() => navigate("/customer/cards")}
-        >
-          Manage Cards <ChevronRight size={14} />
-        </motion.button>
-      </div>
-    </DashCard>
-  );
-});
 
 // ========================
 // SAVINGS GOALS
@@ -477,8 +371,6 @@ const SmartInsightsSection: React.FC<{
 // MAIN SIDEBAR
 // ========================
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
-  cards,
-  isCardsLoading,
   savingsGoals,
   isSavingsLoading,
   security,
@@ -507,9 +399,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   );
 
   return (
-    <div className="w-full lg:w-80 flex flex-col gap-4">
-      <CardsPreviewSection cards={cards} isLoading={isCardsLoading} />
-
+    <div className="w-full lg:w-80 flex flex-col gap-5">
       <div ref={goalsRef}>
         {goalsInView ? (
           <SavingsGoalsSection

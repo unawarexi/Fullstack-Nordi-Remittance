@@ -40,17 +40,19 @@ const AccountSummaryPanel: React.FC<Props> = ({ data, isLoading }) => {
 
   const { totalBalance, monthlyIncome, monthlyExpenses, wallets } = data;
 
-  const displayCurrency = (v: number) =>
-    showBalance ? algoFormatCurrency(v) : "••••••";
+  const formatCurrency = (v: number) =>
+    showBalance
+      ? `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : "••••••";
 
   if (isLoading) return <StatsGridSkeleton count={4} />;
 
   return (
-    <motion.div className="mb-4" variants={dashboardItemVariants}>
+    <motion.div variants={dashboardItemVariants}>
       <StatsGrid cols={4}>
         <StatCard
           label="Total Balance"
-          value={displayCurrency(totalBalance)}
+          value={formatCurrency(totalBalance)}
           icon={<Wallet size={20} />}
           iconColor="from-indigo-500 to-purple-500"
           index={0}
@@ -58,7 +60,7 @@ const AccountSummaryPanel: React.FC<Props> = ({ data, isLoading }) => {
         />
         <StatCard
           label="Monthly Income"
-          value={displayCurrency(monthlyIncome)}
+          value={formatCurrency(monthlyIncome)}
           icon={<TrendingUp size={20} />}
           iconColor="from-emerald-500 to-teal-500"
           index={1}
@@ -66,7 +68,7 @@ const AccountSummaryPanel: React.FC<Props> = ({ data, isLoading }) => {
         />
         <StatCard
           label="Monthly Expenses"
-          value={displayCurrency(monthlyExpenses)}
+          value={formatCurrency(monthlyExpenses)}
           icon={<TrendingDown size={20} />}
           iconColor="from-rose-500 to-pink-500"
           index={2}
@@ -144,7 +146,7 @@ const AccountSummaryPanel: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm">
-                      {displayCurrency(wallet.balance)}
+                      {formatCurrency(wallet.balance)}
                     </p>
                     <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">{wallet.currency}</p>
                   </div>
