@@ -46,14 +46,12 @@ import {
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useInvestments,
-  useInvestmentProducts,
-  useInvestmentPortfolio,
-  useInvestmentPerformance,
-} from "@hooks/queries/useInvestments";
+  useClientInvestments,
+  useClientInvestmentProducts,
+  useClientPortfolio,
+  useClientInvestmentPerformance,
+} from "../../domain/useInvestmentsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -75,8 +73,7 @@ const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 
 const MutualFunds: React.FC = () => {
-  const { data, isLoading } = useInvestmentProducts({ type: "mutual_fund" as any });
-  const allProducts: any[] = safeArray(data);
+  const { products: allProducts, isLoading } = useClientInvestmentProducts({ type: "mutual_fund" as any });
   const products = allProducts.filter(
     (p: any) =>
       p.type === "mutual_fund" || p.category === "mutual_funds" || true

@@ -16,15 +16,12 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useBeneficiaries, useAddBeneficiary, useRemoveBeneficiary } from "@hooks/queries/useAccounts";
+import { useClientBeneficiaries } from "../../domain/useAccountsDomain";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 
 const RecentRecipients: React.FC = () => {
-  const { data: bData, isLoading } = useBeneficiaries();
-  const beneficiaries = safeArray(bData);
+  const { beneficiaries, isLoading } = useClientBeneficiaries();
   const recent = [...beneficiaries]
     .sort((a: any, b: any) => new Date(b.lastTransferDate || 0).getTime() - new Date(a.lastTransferDate || 0).getTime())
     .slice(0, 10);

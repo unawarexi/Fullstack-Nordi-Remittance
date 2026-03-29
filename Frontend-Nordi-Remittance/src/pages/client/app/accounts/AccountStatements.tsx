@@ -17,10 +17,8 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useWallets } from "@hooks/queries/useAccounts";
+import { useClientWallets } from "../../domain/useAccountsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
@@ -29,8 +27,7 @@ const fmt = (n: number, c = "USD") =>
 const AccountStatements: React.FC = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [format, setFormat] = useState("pdf");
-  const { data: walletsData, isLoading } = useWallets();
-  const wallets = safeArray(walletsData);
+  const { wallets, isLoading } = useClientWallets();
   const [selectedAccount, setSelectedAccount] = useState("");
 
   const inputCls =

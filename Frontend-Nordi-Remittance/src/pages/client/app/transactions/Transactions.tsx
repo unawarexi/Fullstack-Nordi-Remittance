@@ -26,9 +26,8 @@ import {
   TransactionListSkeleton,
 } from "@components/skeletons";
 import {
-  useTransactions,
-  useRecentTransactions,
-} from "@hooks/queries/useTransactions";
+  useClientTransactions,
+} from "../../domain/useTransactionsDomain";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -72,8 +71,7 @@ const Transactions: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
-  const { data: transactionsData, isLoading, refetch } = useTransactions({ page: 1, limit: 50 });
-  const transactions = transactionsData?.data || [];
+  const { transactions, isLoading, refetch } = useClientTransactions({ page: 1, limit: 50 });
 
   const stats = useMemo(() => {
     const total = transactions.length;

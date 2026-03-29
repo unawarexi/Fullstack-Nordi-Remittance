@@ -18,8 +18,8 @@ import {
   Star,
   Info,
 } from "@constants/icons";
-import { useWallets, useBeneficiaries } from "@hooks/queries/useAccounts";
-import { useTransfer } from "@hooks/queries/useTransactions";
+import { useClientWallets, useClientBeneficiaries } from "../../domain/useAccountsDomain";
+import { useTransfer } from "../../domain/useTransactionsDomain";
 import {
   TransferLayout,
   StepIndicator,
@@ -33,7 +33,6 @@ import {
   ReviewSection,
   FeeSummary,
   TransferResult,
-  safeArray,
   formatCurrency,
 } from "@components/shared/TransferPrimitives";
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
@@ -103,12 +102,12 @@ const DomesticTransfer: React.FC = () => {
   const [beneficiarySearch, setBeneficiarySearch] = useState("");
 
   // Hooks
-  const { data: walletsRaw, isLoading: walletsLoading } = useWallets();
-  const { data: beneficiariesRaw, isLoading: beneLoading } = useBeneficiaries();
+  const { wallets: walletsArr, isLoading: walletsLoading } = useClientWallets();
+  const { beneficiaries: beneficiariesArr, isLoading: beneLoading } = useClientBeneficiaries();
   const transfer = useTransfer();
 
-  const wallets: AccountOption[] = safeArray(walletsRaw);
-  const beneficiaries = safeArray(beneficiariesRaw);
+  const wallets: AccountOption[] = walletsArr;
+  const beneficiaries = beneficiariesArr;
 
   const filteredBeneficiaries = useMemo(
     () =>

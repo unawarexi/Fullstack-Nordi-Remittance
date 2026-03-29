@@ -17,10 +17,8 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useSecuritySettings, useLoginHistory, useSecurityActivityLog, useUpdateSecuritySettings, useEnable2FA } from "@hooks/queries/useSecurity";
+import { useClientSecuritySettings } from "../../domain/useSecurityDomain";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 
 const BiometricAccess: React.FC = () => {

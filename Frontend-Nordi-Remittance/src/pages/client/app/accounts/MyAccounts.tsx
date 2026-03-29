@@ -27,7 +27,7 @@ import {
   StatsGridSkeleton,
   AccountListSkeleton,
 } from "@components/skeletons";
-import { useWallets, useAccountSummary } from "@hooks/queries/useAccounts";
+import { useClientWallets, useClientAccountSummary } from "../../domain/useAccountsDomain";
 import { useAuthStore } from "@store/auth.store";
 import { useUIStore } from "@store/ui.store";
 import {
@@ -69,11 +69,9 @@ const MyAccounts: React.FC = () => {
   const toggleShowBalances = useUIStore((s) => s.toggleShowBalances);
   const [selectedType, setSelectedType] = useState<string>("all");
 
-  const { data: walletsData, isLoading: walletsLoading } = useWallets();
-  const { data: summaryData, isLoading: summaryLoading } = useAccountSummary();
+  const { wallets, isLoading: walletsLoading } = useClientWallets();
+  const { summary, isLoading: summaryLoading } = useClientAccountSummary();
 
-  const wallets = (walletsData as any)?.data ? (walletsData as any).data : walletsData || [];
-  const summary = summaryData?.data;
   const isLoading = walletsLoading || summaryLoading;
 
   const filteredWallets =

@@ -19,10 +19,8 @@ import {
   CreditCardSkeleton, TransactionListSkeleton, FormSkeleton, StatsGridSkeleton,
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useCards, useCardTransactions } from "@hooks/queries/useCards";
+import { useClientCards, useClientCardTransactions } from "../../domain/useCardsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
@@ -60,11 +58,9 @@ const CardVisual: React.FC<{ card: any; show: boolean; gradient?: string }> = ({
 
 const CardTransactions: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data: cardsData } = useCards();
-  const cards = safeArray(cardsData);
-  const selectedCardId = cards?.[0]?.id ?? cards?.[0]?._id ?? "";
-  const { data: txData, isLoading } = useCardTransactions(selectedCardId);
-  const txns = safeArray(txData);
+  const { cards } = useClientCards();
+  const selectedCardId = cards?.[0]?.id ?? (cards?.[0] as any)?._id ?? "";
+  const { transactions: txns, isLoading } = useClientCardTransactions(selectedCardId);
 
   const txnIcon = (t: string) =>
     (t || "").toLowerCase().includes("online") ? <Globe size={16} /> : <ShoppingBag size={16} />;

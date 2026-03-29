@@ -24,7 +24,7 @@ import {
   StatsGridSkeleton,
   AccountListSkeleton,
 } from "@components/skeletons";
-import { useSavingsGoals } from "@hooks/queries/useInvestments";
+import { useClientSavingsGoals } from "../../domain/useSavingsDomain";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -52,8 +52,7 @@ const SavingGoals: React.FC = () => {
   const navigate = useNavigate();
   const showBalances = useUIStore((s) => s.preferences.showBalances);
 
-  const { data: goalsData, isLoading } = useSavingsGoals();
-  const goals = (goalsData as any)?.data ? (goalsData as any).data : goalsData || [];
+  const { goals, isLoading } = useClientSavingsGoals();
 
   const formatCurrency = (amount: number, currency = "USD") =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);

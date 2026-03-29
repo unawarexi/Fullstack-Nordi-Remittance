@@ -19,10 +19,8 @@ import {
   CreditCardSkeleton, TransactionListSkeleton, FormSkeleton, StatsGridSkeleton,
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useCards, useCardTransactions } from "@hooks/queries/useCards";
+import { useClientCards } from "../../domain/useCardsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
@@ -60,8 +58,7 @@ const CardVisual: React.FC<{ card: any; show: boolean; gradient?: string }> = ({
 
 const CardsOverview: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data: cardsData, isLoading } = useCards();
-  const cards = safeArray(cardsData);
+  const { cards, isLoading } = useClientCards();
 
   const gradients = [
     "from-indigo-600 via-purple-600 to-fuchsia-600",

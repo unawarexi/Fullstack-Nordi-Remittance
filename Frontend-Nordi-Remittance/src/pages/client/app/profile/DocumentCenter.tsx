@@ -16,7 +16,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useToastStore } from "@store/toast.store";
-import { useUserProfile } from "@hooks/queries/useUsers";
+import { useClientProfile } from "../../domain/useProfileDomain";
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
@@ -155,9 +155,8 @@ const ProfileDocCard: React.FC<{
 const DocumentCenter: React.FC = () => {
 
   /* ── Hooks ── */
-  const { data: profileData, isLoading: profileLoading } = useUserProfile();
+  const { user: profile, isLoading: profileLoading } = useClientProfile();
 
-  const profile = ((profileData ?? {}) as Record<string, any>);
   const kycStatus = (profile.kycStatus || "pending") as string;
 
   const capitalize = (s?: string | null) =>
@@ -177,7 +176,7 @@ const DocumentCenter: React.FC = () => {
     {
       key: "profilePicture",
       label: "Profile Picture",
-      url: profile.profilePicture || profile.avatar,
+      url: profile.profilePicture || profile._raw?.avatar,
       icon: <Camera size={18} />,
       iconBg: "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400",
       fileType: "image" as const,
@@ -185,26 +184,26 @@ const DocumentCenter: React.FC = () => {
     {
       key: "governmentId",
       label: "Government ID",
-      url: profile.governmentId,
+      url: profile._raw?.governmentId,
       icon: <Shield size={18} />,
       iconBg: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400",
-      detail: profile.idType ? `${capitalize(profile.idType)} • ${profile.idNumber || ""}` : undefined,
-      expiry: profile.idExpiryDate,
+      detail: profile._raw?.idType ? `${capitalize(profile._raw.idType)} • ${profile._raw.idNumber || ""}` : undefined,
+      expiry: profile._raw?.idExpiryDate,
       fileType: "auto" as const,
     },
     {
       key: "proofOfAddress",
       label: "Proof of Address",
-      url: profile.proofOfAddress,
+      url: profile._raw?.proofOfAddress,
       icon: <FileText size={18} />,
       iconBg: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400",
-      detail: profile.addressDocType ? capitalize(profile.addressDocType) : undefined,
+      detail: profile._raw?.addressDocType ? capitalize(profile._raw.addressDocType) : undefined,
       fileType: "auto" as const,
     },
     {
       key: "selfieWithId",
       label: "Selfie with ID",
-      url: profile.selfieWithId,
+      url: profile._raw?.selfieWithId,
       icon: <ScanFace size={18} />,
       iconBg: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400",
       fileType: "image" as const,
@@ -212,7 +211,7 @@ const DocumentCenter: React.FC = () => {
     {
       key: "signature",
       label: "Signature",
-      url: profile.signature,
+      url: profile._raw?.signature,
       icon: <PenTool size={18} />,
       iconBg: "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400",
       fileType: "auto" as const,

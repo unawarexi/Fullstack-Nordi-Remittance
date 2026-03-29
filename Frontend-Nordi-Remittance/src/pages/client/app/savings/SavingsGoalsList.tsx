@@ -18,12 +18,10 @@ import {
 import { StatsGridSkeleton, AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useSavingsGoals, useCreateSavingsGoal, useSavingsGoalProgress,
-} from "@hooks/queries/useInvestments";
+  useClientSavingsGoals, useCreateSavingsGoal, useClientSavingsGoalProgress,
+} from "../../domain/useSavingsDomain";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Shared helpers
@@ -47,8 +45,7 @@ const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const SavingsGoalsList: React.FC = () => {
-  const { data: gData, isLoading } = useSavingsGoals();
-  const goals = safeArray(gData);
+  const { goals, isLoading } = useClientSavingsGoals();
 
   const totalSaved = useMemo(
     () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),

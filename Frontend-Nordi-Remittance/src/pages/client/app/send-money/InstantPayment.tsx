@@ -15,11 +15,11 @@ import {
   Info,
   Clock,
 } from "@constants/icons";
-import { useWallets } from "@hooks/queries/useAccounts";
+import { useClientWallets } from "../../domain/useAccountsDomain";
 import {
   useTransfer,
-  useRecentRecipients,
-} from "@hooks/queries/useTransactions";
+  useClientRecentRecipients,
+} from "../../domain/useTransactionsDomain";
 import {
   TransferLayout,
   StepIndicator,
@@ -33,7 +33,6 @@ import {
   ReviewSection,
   FeeSummary,
   TransferResult,
-  safeArray,
   formatCurrency,
 } from "@components/shared/TransferPrimitives";
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
@@ -69,12 +68,12 @@ const InstantPayment: React.FC = () => {
   } | null>(null);
 
   // Hooks
-  const { data: walletsRaw, isLoading: walletsLoading } = useWallets();
-  const { data: recentRaw } = useRecentRecipients(6);
+  const { wallets: walletsArr, isLoading: walletsLoading } = useClientWallets();
+  const { recipients: recentArr } = useClientRecentRecipients(6);
   const transfer = useTransfer();
 
-  const wallets: AccountOption[] = safeArray(walletsRaw);
-  const recentRecipients = safeArray(recentRaw);
+  const wallets: AccountOption[] = walletsArr;
+  const recentRecipients = recentArr;
 
   // Form
   const formik = useFormik({

@@ -14,9 +14,9 @@ import PageHeader from "@components/shared/PageHeader";
 import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useUserNotificationPreferences,
+  useClientNotificationPreferences,
   useUpdateUserNotificationPreferences,
-} from "@hooks/queries/useUsers";
+} from "../../domain/useProfileDomain";
 
 /* ── Types ───────────────────────────────────────────────────────────── */
 interface ChannelPrefs {
@@ -104,7 +104,7 @@ const Toggle: React.FC<{ on: boolean; onChange: () => void }> = ({ on, onChange 
    MAIN COMPONENT
    ══════════════════════════════════════════════════════════════════════════ */
 const Communication: React.FC = () => {
-  const { data: prefData, isLoading } = useUserNotificationPreferences();
+  const { preferences: prefData, isLoading } = useClientNotificationPreferences();
   const updatePrefs = useUpdateUserNotificationPreferences();
 
   const [prefs, setPrefs] = useState<NotifPrefs>(defaultPrefs);

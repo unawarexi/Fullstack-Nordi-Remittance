@@ -46,14 +46,12 @@ import {
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useInvestments,
-  useInvestmentProducts,
-  useInvestmentPortfolio,
-  useInvestmentPerformance,
-} from "@hooks/queries/useInvestments";
+  useClientInvestments,
+  useClientInvestmentProducts,
+  useClientPortfolio,
+  useClientInvestmentPerformance,
+} from "../../domain/useInvestmentsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,8 +74,7 @@ const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 const StocksETFs: React.FC = () => {
   const [search, setSearch] = useState("");
-  const { data: productsData, isLoading } = useInvestmentProducts({ type: "stock" as any });
-  const apiStocks: any[] = safeArray(productsData);
+  const { products: apiStocks, isLoading } = useClientInvestmentProducts({ type: "stock" as any });
 
   const defaultStocks = [
     { symbol: "AAPL", name: "Apple Inc.", price: 189.25, change: 2.34, pctChange: 1.25, marketCap: 2940000000000 },

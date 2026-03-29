@@ -20,11 +20,11 @@ import {
   Info,
   Lock,
 } from "@constants/icons";
-import { useWallets } from "@hooks/queries/useAccounts";
+import { useClientWallets } from "../../domain/useAccountsDomain";
 import {
   useTransferToUser,
-  useRecentRecipients,
-} from "@hooks/queries/useTransactions";
+  useClientRecentRecipients,
+} from "../../domain/useTransactionsDomain";
 import {
   TransferLayout,
   StepIndicator,
@@ -38,7 +38,6 @@ import {
   ReviewSection,
   FeeSummary,
   TransferResult,
-  safeArray,
   formatCurrency,
 } from "@components/shared/TransferPrimitives";
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
@@ -104,13 +103,13 @@ const QuickTransfer: React.FC = () => {
   const [contactSearch, setContactSearch] = useState("");
 
   // Hooks
-  const { data: walletsRaw, isLoading: walletsLoading } = useWallets();
-  const { data: recentRaw, isLoading: recipientsLoading } =
-    useRecentRecipients(20);
+  const { wallets: walletsArr, isLoading: walletsLoading } = useClientWallets();
+  const { recipients: recentArr, isLoading: recipientsLoading } =
+    useClientRecentRecipients(20);
   const transferToUser = useTransferToUser();
 
-  const wallets: AccountOption[] = safeArray(walletsRaw);
-  const recentContacts = safeArray(recentRaw);
+  const wallets: AccountOption[] = walletsArr;
+  const recentContacts = recentArr;
 
   const filteredContacts = useMemo(
     () =>

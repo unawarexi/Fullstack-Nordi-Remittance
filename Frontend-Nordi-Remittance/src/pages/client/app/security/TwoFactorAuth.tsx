@@ -17,18 +17,15 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useSecuritySettings, useLoginHistory, useSecurityActivityLog, useUpdateSecuritySettings, useEnable2FA } from "@hooks/queries/useSecurity";
+import { useClientSecuritySettings, useEnable2FA } from "../../domain/useSecurityDomain";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 
 const TwoFactorAuth: React.FC = () => {
-  const { data: settings } = useSecuritySettings();
+  const { settings: securityData } = useClientSecuritySettings();
   const enable2FA = useEnable2FA();
   const { showToast } = useToastStore();
-  const securityData = (settings as any)?.data ?? settings ?? {};
-  const is2FAEnabled = securityData.twoFactorEnabled ?? false;
+  const is2FAEnabled = (securityData._raw as any)?.twoFactorEnabled ?? false;
 
   const methods = [
     { key: "sms", icon: Smartphone, label: "SMS Verification", desc: "Receive codes via text message" },

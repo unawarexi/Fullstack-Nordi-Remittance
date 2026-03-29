@@ -23,7 +23,7 @@ import {
   StatsGridSkeleton,
   CreditCardSkeleton,
 } from "@components/skeletons";
-import { useCards } from "@hooks/queries/useCards";
+import { useClientCards } from "../../domain/useCardsDomain";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -52,8 +52,7 @@ const Cards: React.FC = () => {
   const toggleShowBalances = useUIStore((s) => s.toggleShowBalances);
   const [selectedCard, setSelectedCard] = useState<number>(0);
 
-  const { data: cardsData, isLoading } = useCards();
-  const cards = cardsData?.data || [];
+  const { cards, isLoading } = useClientCards();
 
   const formatCurrency = (amount: number, currency = "USD") =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);

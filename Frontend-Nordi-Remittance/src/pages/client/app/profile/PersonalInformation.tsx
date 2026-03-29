@@ -20,8 +20,8 @@ import {
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useAuth } from "@store/auth.store";
 import {
-  useUserProfile, useUserAddress, useUserEmployment, useUserBankAccounts,
-} from "@hooks/queries/useUsers";
+  useClientProfile, useClientAddress, useClientEmployment, useClientBankAccounts,
+} from "../../domain/useProfileDomain";
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 const fmtDate = (d?: string | null) => {
@@ -35,9 +35,6 @@ const fmtDate = (d?: string | null) => {
 
 const capitalize = (s?: string | null) =>
   s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ") : null;
-
-const safeArr = (d: unknown): any[] =>
-  Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 /* ── InfoField ───────────────────────────────────────────────────────── */
 const InfoField: React.FC<{
@@ -155,10 +152,10 @@ const PersonalInformation: React.FC = () => {
   const { user: authUser } = useAuth();
 
   /* ── Data Hooks ── */
-  const { data: profileData, isLoading: pLoad } = useUserProfile();
-  const { data: addressData, isLoading: aLoad } = useUserAddress();
-  const { data: employmentData, isLoading: eLoad } = useUserEmployment();
-  const { data: banksData } = useUserBankAccounts();
+  const { user: profileData, isLoading: pLoad } = useClientProfile();
+  const { address: addressData, isLoading: aLoad } = useClientAddress();
+  const { employment: employmentData, isLoading: eLoad } = useClientEmployment();
+  const { accounts: banks } = useClientBankAccounts();
 
   if (pLoad) return <ProfileSkeleton />;
 
@@ -166,7 +163,6 @@ const PersonalInformation: React.FC = () => {
   const p = { ...(authUser || {}), ...((profileData as any) || {}) } as Record<string, any>;
   const addr = ((addressData as any) || {}) as Record<string, any>;
   const emp = ((employmentData as any) || {}) as Record<string, any>;
-  const banks = safeArr(banksData);
 
   const initials = [p.firstName, p.lastName]
     .filter(Boolean)

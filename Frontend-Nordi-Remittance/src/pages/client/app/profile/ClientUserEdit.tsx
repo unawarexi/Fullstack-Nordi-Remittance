@@ -14,10 +14,10 @@ import PageHeader from "@components/shared/PageHeader";
 import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useUserProfile, useUserAddress, useUserEmployment,
+  useClientProfile, useClientAddress, useClientEmployment,
   useUpdateProfile, useUpdateAddress, useUpdateEmployment,
   useUpdateAvatar, useDeleteAvatar,
-} from "@hooks/queries/useUsers";
+} from "../../domain/useProfileDomain";
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 const inputCls =
@@ -38,9 +38,9 @@ const ClientUserEdit: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>("personal");
 
   /* ── Data hooks ── */
-  const { data: profileData } = useUserProfile();
-  const { data: addressData } = useUserAddress();
-  const { data: employmentData } = useUserEmployment();
+  const { user: profileData } = useClientProfile();
+  const { address: addressData } = useClientAddress();
+  const { employment: employmentData } = useClientEmployment();
 
   /* ── Mutation hooks ── */
   const updateProfile = useUpdateProfile();

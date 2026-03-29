@@ -41,10 +41,8 @@ import {
   FormSkeleton,
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useLoans, useLoanProducts } from "@hooks/queries/useLoans";
+import { useClientLoans, useClientLoanProducts } from "../../domain/useLoansDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

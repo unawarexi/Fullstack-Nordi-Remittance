@@ -24,9 +24,9 @@ import {
   TableSkeleton,
 } from "@components/skeletons";
 import {
-  useLoans,
-  useLoanProducts,
-} from "@hooks/queries/useLoans";
+  useClientLoans,
+  useClientLoanProducts,
+} from "../../domain/useLoansDomain";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -45,11 +45,8 @@ const Loans_Credits: React.FC = () => {
   const navigate = useNavigate();
   const showBalances = useUIStore((s) => s.preferences.showBalances);
 
-  const { data: loansData, isLoading: loansLoading } = useLoans();
-  const { data: productsData, isLoading: productsLoading } = useLoanProducts();
-
-  const loans = (loansData as any)?.data ? (loansData as any).data : loansData || [];
-  const products = (productsData as any)?.data ? (productsData as any).data : productsData || [];
+  const { loans, isLoading: loansLoading } = useClientLoans();
+  const { products, isLoading: productsLoading } = useClientLoanProducts();
 
   const isLoading = loansLoading || productsLoading;
 

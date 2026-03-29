@@ -17,17 +17,14 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useSecuritySettings, useLoginHistory, useSecurityActivityLog, useUpdateSecuritySettings, useEnable2FA } from "@hooks/queries/useSecurity";
+import { useClientSecuritySettings, useUpdateSecuritySettings } from "../../domain/useSecurityDomain";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 
 const SecuritySettings: React.FC = () => {
-  const { data: settings, isLoading } = useSecuritySettings();
+  const { settings: securityData, isLoading } = useClientSecuritySettings();
   const updateMutation = useUpdateSecuritySettings();
   const { showToast } = useToastStore();
-  const securityData = (settings as any)?.data ?? settings ?? {};
 
   const [showPassword, setShowPassword] = useState(false);
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });

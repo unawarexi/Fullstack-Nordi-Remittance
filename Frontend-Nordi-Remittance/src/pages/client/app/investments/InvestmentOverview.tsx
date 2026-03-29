@@ -46,14 +46,12 @@ import {
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useInvestments,
-  useInvestmentProducts,
-  useInvestmentPortfolio,
-  useInvestmentPerformance,
-} from "@hooks/queries/useInvestments";
+  useClientInvestments,
+  useClientInvestmentProducts,
+  useClientPortfolio,
+  useClientInvestmentPerformance,
+} from "../../domain/useInvestmentsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,18 +74,16 @@ const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 const InvestmentOverview: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data: portfolioData, isLoading: pLoading } = useInvestmentPortfolio();
-  const { data: invData, isLoading: iLoading } = useInvestments();
-  const portfolio = (portfolioData as any)?.data ?? portfolioData ?? {};
-  const investments: any[] = safeArray(invData);
+  const { portfolio, isLoading: pLoading } = useClientPortfolio();
+  const { investments, isLoading: iLoading } = useClientInvestments();
   const isLoading = pLoading || iLoading;
 
   const totalValue = portfolio?.totalValue ?? 0;
   const totalReturns = portfolio?.totalReturns ?? 0;
-  const returnPct = portfolio?.returnPercentage ?? portfolio?.dailyChangePercent ?? 0;
+  const returnPct = portfolio?.returnPercentage ?? (portfolio?._raw as any)?.dailyChangePercent ?? 0;
 
   // Allocation breakdown (dummy if API doesn't return)
-  const allocation = portfolio?.allocation ?? [
+  const allocation = (portfolio?._raw as any)?.allocation ?? [
     { label: "Equities", pct: 45, color: "bg-indigo-500 dark:bg-indigo-400" },
     { label: "Fixed Income", pct: 25, color: "bg-emerald-500 dark:bg-emerald-400" },
     { label: "Mutual Funds", pct: 20, color: "bg-amber-500 dark:bg-amber-400" },
@@ -159,7 +155,7 @@ const InvestmentOverview: React.FC = () => {
               label="Today's Change"
               value={
                 show
-                  ? pct(portfolio?.dailyChangePercent ?? 0)
+                  ? pct((portfolio?._raw as any)?.dailyChangePercent ?? 0)
                   : "••"
               }
               icon={<BarChart3 size={20} />}

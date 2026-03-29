@@ -26,9 +26,9 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import { AccountListSkeleton, StatsGridSkeleton } from "@components/skeletons";
 import {
-  useBeneficiaries,
+  useClientBeneficiaries,
   useRemoveBeneficiary,
-} from "@hooks/queries/useAccounts";
+} from "../../domain/useAccountsDomain";
 import {
   PageContainer,
   StatCard,
@@ -49,10 +49,8 @@ const Beneficiaries: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const { data: beneficiariesData, isLoading } = useBeneficiaries();
+  const { beneficiaries, isLoading } = useClientBeneficiaries();
   const removeBeneficiary = useRemoveBeneficiary();
-
-  const beneficiaries = (beneficiariesData as any)?.data ? (beneficiariesData as any).data : beneficiariesData || [];
 
   const stats = useMemo(() => {
     const total = beneficiaries.length;

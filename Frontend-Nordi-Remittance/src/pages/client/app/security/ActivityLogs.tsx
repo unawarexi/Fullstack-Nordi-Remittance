@@ -17,18 +17,14 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useSecuritySettings, useLoginHistory, useSecurityActivityLog, useUpdateSecuritySettings, useEnable2FA } from "@hooks/queries/useSecurity";
+import { useClientSecurityActivityLog, useClientLoginHistory } from "../../domain/useSecurityDomain";
 import { useToastStore } from "@store/toast.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 
 const ActivityLogs: React.FC = () => {
-  const { data: logData, isLoading } = useSecurityActivityLog();
-  const logs = safeArray(logData);
+  const { events: logs, isLoading } = useClientSecurityActivityLog();
 
-  const { data: loginData } = useLoginHistory();
-  const logins = safeArray(loginData);
+  const { history: logins } = useClientLoginHistory();
   const allLogs = [...logs, ...logins].sort(
     (a: any, b: any) => new Date(b.timestamp || b.date || 0).getTime() - new Date(a.timestamp || a.date || 0).getTime()
   );

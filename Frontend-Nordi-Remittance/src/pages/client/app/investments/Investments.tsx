@@ -26,10 +26,10 @@ import {
   TableSkeleton,
 } from "@components/skeletons";
 import {
-  useInvestments,
-  useInvestmentPortfolio,
-  useInvestmentProducts,
-} from "@hooks/queries/useInvestments";
+  useClientInvestments,
+  useClientPortfolio,
+  useClientInvestmentProducts,
+} from "../../domain/useInvestmentsDomain";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -49,13 +49,9 @@ const Investments: React.FC = () => {
   const showBalances = useUIStore((s) => s.preferences.showBalances);
   const toggleShowBalances = useUIStore((s) => s.toggleShowBalances);
 
-  const { data: investmentsData, isLoading: investmentsLoading } = useInvestments();
-  const { data: portfolioData, isLoading: portfolioLoading } = useInvestmentPortfolio();
-  const { data: productsData, isLoading: productsLoading } = useInvestmentProducts();
-
-  const investments = (investmentsData as any)?.data ? (investmentsData as any).data : investmentsData || [];
-  const portfolio = (portfolioData as any)?.data ? (portfolioData as any).data : portfolioData;
-  const products = (productsData as any)?.data ? (productsData as any).data : productsData || [];
+  const { investments, isLoading: investmentsLoading } = useClientInvestments();
+  const { portfolio, isLoading: portfolioLoading } = useClientPortfolio();
+  const { products, isLoading: productsLoading } = useClientInvestmentProducts();
 
   const isLoading = investmentsLoading || portfolioLoading;
 

@@ -17,10 +17,8 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { TransactionListSkeleton, StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useTransactions, useRecentTransactions } from "@hooks/queries/useTransactions";
+import { useClientTransactions } from "../../domain/useTransactionsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
@@ -81,8 +79,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ tx, show }) => (
 
 const ScheduledTransfers: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data: txData, isLoading } = useTransactions();
-  const allTxns = safeArray(txData);
+  const { transactions: allTxns, isLoading } = useClientTransactions();
   const scheduled = allTxns.filter((t: any) => (t.status || "").toLowerCase() === "pending" || (t.status || "").toLowerCase() === "scheduled");
 
   return (

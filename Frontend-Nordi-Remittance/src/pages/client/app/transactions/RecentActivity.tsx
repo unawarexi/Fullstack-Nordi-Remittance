@@ -17,10 +17,8 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { TransactionListSkeleton, StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useTransactions, useRecentTransactions } from "@hooks/queries/useTransactions";
+import { useClientRecentTransactions } from "../../domain/useTransactionsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
@@ -81,8 +79,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ tx, show }) => (
 
 const RecentActivity: React.FC = () => {
   const show = useUIStore((s) => s.preferences.showBalances);
-  const { data: txData, isLoading } = useRecentTransactions();
-  const txns = safeArray(txData);
+  const { transactions: txns, isLoading } = useClientRecentTransactions();
 
   const totalIn = txns.filter((t: any) => (t.type || "").toLowerCase().includes("credit")).reduce((a: number, t: any) => a + (t.amount || 0), 0);
   const totalOut = txns.filter((t: any) => !(t.type || "").toLowerCase().includes("credit")).reduce((a: number, t: any) => a + (t.amount || 0), 0);

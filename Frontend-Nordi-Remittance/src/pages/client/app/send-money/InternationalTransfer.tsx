@@ -18,14 +18,14 @@ import {
   Info,
   AlertTriangle,
 } from "@constants/icons";
-import { useWallets } from "@hooks/queries/useAccounts";
+import { useClientWallets } from "../../domain/useAccountsDomain";
 import {
   useSendRemittance,
   useRemittanceQuote,
-  useRemittanceCountries,
-  useRecipients,
+  useClientRemittanceCountries,
+  useClientRecipients,
   useCreateRecipient,
-} from "@hooks/queries/useTransactions";
+} from "../../domain/useTransactionsDomain";
 import {
   TransferLayout,
   StepIndicator,
@@ -40,7 +40,6 @@ import {
   ReviewSection,
   FeeSummary,
   TransferResult,
-  safeArray,
   formatCurrency,
 } from "@components/shared/TransferPrimitives";
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
@@ -142,16 +141,16 @@ const InternationalTransfer: React.FC = () => {
   const [recipientSearch, setRecipientSearch] = useState("");
 
   // Hooks
-  const { data: walletsRaw, isLoading: walletsLoading } = useWallets();
-  const { data: countriesRaw } = useRemittanceCountries();
-  const { data: recipientsRaw, isLoading: recipientsLoading } = useRecipients();
+  const { wallets: walletsArr, isLoading: walletsLoading } = useClientWallets();
+  const { countries: countriesArr } = useClientRemittanceCountries();
+  const { recipients: recipientsArr, isLoading: recipientsLoading } = useClientRecipients();
   const remittance = useSendRemittance();
   const quote = useRemittanceQuote();
   const createRecipient = useCreateRecipient();
 
-  const wallets: AccountOption[] = safeArray(walletsRaw);
-  const countries = safeArray(countriesRaw);
-  const recipients = safeArray(recipientsRaw);
+  const wallets: AccountOption[] = walletsArr;
+  const countries = countriesArr;
+  const recipients = recipientsArr;
 
   const filteredRecipients = useMemo(
     () =>

@@ -46,14 +46,12 @@ import {
 } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useInvestments,
-  useInvestmentProducts,
-  useInvestmentPortfolio,
-  useInvestmentPerformance,
-} from "@hooks/queries/useInvestments";
+  useClientInvestments,
+  useClientInvestmentProducts,
+  useClientPortfolio,
+  useClientInvestmentPerformance,
+} from "../../domain/useInvestmentsDomain";
 import { useUIStore } from "@store/ui.store";
-
-const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -75,7 +73,7 @@ const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 
 const MarketInsights: React.FC = () => {
-  const { data: productsData, isLoading } = useInvestmentProducts();
+  const { products: productsData, isLoading } = useClientInvestmentProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const defaultInsights = [
