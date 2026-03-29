@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
@@ -30,6 +30,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
+import { useCommunications } from "../../domain/useCommunications";
 
 const sections = [
   { id: "email", label: "Email Templates", icon: <Mail size={16} /> },
@@ -38,41 +39,23 @@ const sections = [
   { id: "campaigns", label: "Campaigns", icon: <Megaphone size={16} /> },
 ];
 
-const emailTemplates = [
-  { id: "ET-001", name: "Welcome Email", subject: "Welcome to Nordi Remittance!", category: "onboarding", status: "active", lastEdited: "2026-03-15", sentCount: 12450, openRate: 68 },
-  { id: "ET-002", name: "KYC Approved", subject: "Your identity has been verified", category: "verification", status: "active", lastEdited: "2026-03-10", sentCount: 8200, openRate: 72 },
-  { id: "ET-003", name: "KYC Rejected", subject: "Additional documents required", category: "verification", status: "active", lastEdited: "2026-03-10", sentCount: 1300, openRate: 85 },
-  { id: "ET-004", name: "Transaction Confirmation", subject: "Your transfer of {{amount}} was successful", category: "transaction", status: "active", lastEdited: "2026-02-28", sentCount: 45600, openRate: 58 },
-  { id: "ET-005", name: "Password Reset", subject: "Reset your password", category: "security", status: "active", lastEdited: "2026-01-20", sentCount: 3400, openRate: 92 },
-  { id: "ET-006", name: "Monthly Statement", subject: "Your monthly account statement", category: "report", status: "draft", lastEdited: "2026-03-18", sentCount: 0, openRate: 0 },
-  { id: "ET-007", name: "Promotional Offer", subject: "Special rates on international transfers!", category: "marketing", status: "draft", lastEdited: "2026-03-20", sentCount: 0, openRate: 0 },
-];
-
-const smsTemplates = [
-  { id: "SMS-001", name: "OTP Verification", message: "Your Nordi verification code is {{code}}. Expires in 5 min.", category: "security", status: "active", sentCount: 34000 },
-  { id: "SMS-002", name: "Transfer Alert", message: "{{amount}} sent to {{recipient}}. Ref: {{ref}}", category: "transaction", status: "active", sentCount: 28000 },
-  { id: "SMS-003", name: "Login Alert", message: "New login detected on your Nordi account from {{device}}.", category: "security", status: "active", sentCount: 15000 },
-  { id: "SMS-004", name: "Deposit Received", message: "{{amount}} deposited to your wallet. Balance: {{balance}}", category: "transaction", status: "active", sentCount: 22000 },
-];
-
-const pushTemplates = [
-  { id: "PUSH-001", name: "Transfer Complete", title: "Transfer Successful", body: "Your transfer of {{amount}} to {{name}} is complete.", status: "active", sentCount: 41000 },
-  { id: "PUSH-002", name: "Loan Approved", title: "Loan Application Approved", body: "Your loan of {{amount}} has been approved!", status: "active", sentCount: 2800 },
-  { id: "PUSH-003", name: "Promo Rate", title: "Special Exchange Rate!", body: "Send money to {{country}} at just {{rate}} today.", status: "draft", sentCount: 0 },
-];
-
-const campaigns = [
-  { id: "CMP-001", name: "Q1 New User Welcome", type: "email", status: "completed", recipients: 5200, opened: 3400, clicked: 1200, sentDate: "2026-01-15" },
-  { id: "CMP-002", name: "Remittance Promo - Africa", type: "email+sms", status: "active", recipients: 8500, opened: 5100, clicked: 2300, sentDate: "2026-03-01" },
-  { id: "CMP-003", name: "Feature Announcement - Cards", type: "push", status: "scheduled", recipients: 13200, opened: 0, clicked: 0, sentDate: "2026-03-25" },
-  { id: "CMP-004", name: "Re-engagement Campaign", type: "email", status: "draft", recipients: 0, opened: 0, clicked: 0, sentDate: "" },
-];
-
 export default function EmailCommunications() {
   const toast = useToast();
-  const [activeSection, setActiveSection] = useState("email");
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const {
+    emailTemplates,
+    smsTemplates,
+    pushTemplates,
+    campaigns,
+    stats,
+    search,
+    categoryFilter,
+    activeSection,
+    isLoading,
+    setSearch,
+    setCategoryFilter,
+    setActiveSection,
+    refetch,
+  } = useCommunications();
 
   return (
     <PageContainer>
@@ -87,10 +70,10 @@ export default function EmailCommunications() {
       />
 
       <StatsGrid>
-        <StatCard label="Email Templates" value={emailTemplates.length} icon={<Mail size={18} />} iconColor="from-blue-500 to-blue-600" index={0} />
-        <StatCard label="SMS Templates" value={smsTemplates.length} icon={<MessageSquare size={18} />} iconColor="from-emerald-500 to-emerald-600" index={1} />
-        <StatCard label="Push Templates" value={pushTemplates.length} icon={<Bell size={18} />} iconColor="from-violet-500 to-violet-600" index={2} />
-        <StatCard label="Active Campaigns" value={campaigns.filter((c) => c.status === "active").length} icon={<Megaphone size={18} />} iconColor="from-amber-500 to-amber-600" index={3} />
+        <StatCard label="Email Templates" value={stats.emailCount} icon={<Mail size={18} />} iconColor="from-blue-500 to-blue-600" index={0} />
+        <StatCard label="SMS Templates" value={stats.smsCount} icon={<MessageSquare size={18} />} iconColor="from-emerald-500 to-emerald-600" index={1} />
+        <StatCard label="Push Templates" value={stats.pushCount} icon={<Bell size={18} />} iconColor="from-violet-500 to-violet-600" index={2} />
+        <StatCard label="Active Campaigns" value={stats.activeCampaigns} icon={<Megaphone size={18} />} iconColor="from-amber-500 to-amber-600" index={3} />
       </StatsGrid>
 
       {/* Section Tabs */}
@@ -100,7 +83,7 @@ export default function EmailCommunications() {
             key={s.id}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            onClick={() => setActiveSection(s.id)}
+            onClick={() => setActiveSection(s.id as any)}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
               activeSection === s.id
                 ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg"
@@ -117,7 +100,7 @@ export default function EmailCommunications() {
       {activeSection === "email" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <SectionHeader title="Email Templates" subtitle="Manage transactional and marketing email templates" />
-          {emailTemplates.map((tmpl, i) => (
+          {emailTemplates.map((tmpl: any, i: number) => (
             <motion.div key={tmpl.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: i * 0.04 } }}>
               <DashCard hover>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -162,7 +145,7 @@ export default function EmailCommunications() {
       {activeSection === "sms" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <SectionHeader title="SMS Templates" subtitle="Short message templates for OTP, alerts, and notifications" />
-          {smsTemplates.map((tmpl, i) => (
+          {smsTemplates.map((tmpl: any, i: number) => (
             <motion.div key={tmpl.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: i * 0.04 } }}>
               <DashCard hover>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -192,7 +175,7 @@ export default function EmailCommunications() {
       {activeSection === "push" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <SectionHeader title="Push Notification Templates" subtitle="In-app and browser push notification templates" />
-          {pushTemplates.map((tmpl, i) => (
+          {pushTemplates.map((tmpl: any, i: number) => (
             <motion.div key={tmpl.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { delay: i * 0.04 } }}>
               <DashCard hover>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -232,7 +215,7 @@ export default function EmailCommunications() {
                   </tr>
                 </thead>
                 <tbody>
-                  {campaigns.map((cmp, i) => (
+                  {campaigns.map((cmp: any, i: number) => (
                     <motion.tr key={cmp.id} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.05 } }} className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                       <td className="py-3 px-2 font-medium text-gray-900 dark:text-white">{cmp.name}</td>
                       <td className="py-3 px-2">

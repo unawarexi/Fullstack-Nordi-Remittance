@@ -32,7 +32,6 @@ import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useAllUsers } from "../../domain/useAllUsers";
 import type { UserStatusFilter, KycStatusFilter } from "../../domain/useAllUsers";
-import { useDeleteUser } from "@hooks/queries";
 
 const statusFilterOptions = [
   { value: "all", label: "All Statuses" },
@@ -64,8 +63,8 @@ const OverviewUsers: React.FC = () => {
     resetFilters,
     refetch,
     updateStatus,
+    deleteUser,
   } = useAllUsers();
-  const deleteUser = useDeleteUser();
   const [confirmModal, setConfirmModal] = React.useState<{
     userId: string;
     userName: string;

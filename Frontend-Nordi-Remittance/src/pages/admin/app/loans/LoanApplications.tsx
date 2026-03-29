@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Banknote,
@@ -30,18 +30,9 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
+import { useLoansManagement } from "../../domain/useLoansManagement";
 
 const statusFilters = ["All", "Pending", "Approved", "Rejected", "Active", "Delinquent", "Completed"];
-
-const sampleLoans = [
-  { id: "LN-001", user: "Anna Johansson", email: "anna@example.com", type: "personal", amount: 25000, currency: "EUR", rate: 5.9, term: 36, monthlyPayment: 760, outstanding: 18500, status: "active", appliedAt: "2026-01-15", disbursedAt: "2026-01-20", nextPayment: "2026-04-01" },
-  { id: "LN-002", user: "Erik Lundgren", email: "erik@example.com", type: "business", amount: 150000, currency: "EUR", rate: 4.5, term: 60, monthlyPayment: 2800, outstanding: 150000, status: "pending", appliedAt: "2026-03-20", disbursedAt: null, nextPayment: null },
-  { id: "LN-003", user: "Sofia Bergman", email: "sofia@example.com", type: "mortgage", amount: 350000, currency: "EUR", rate: 3.2, term: 240, monthlyPayment: 1980, outstanding: 342000, status: "active", appliedAt: "2025-06-10", disbursedAt: "2025-07-01", nextPayment: "2026-04-01" },
-  { id: "LN-004", user: "Lars Nilsson", email: "lars@example.com", type: "personal", amount: 10000, currency: "EUR", rate: 7.2, term: 24, monthlyPayment: 450, outstanding: 4200, status: "delinquent", appliedAt: "2025-08-05", disbursedAt: "2025-08-10", nextPayment: "2026-03-01", daysOverdue: 21 },
-  { id: "LN-005", user: "Maria Svensson", email: "maria@example.com", type: "auto", amount: 45000, currency: "EUR", rate: 4.8, term: 48, monthlyPayment: 1030, outstanding: 45000, status: "pending", appliedAt: "2026-03-21", disbursedAt: null, nextPayment: null },
-  { id: "LN-006", user: "Olof Andersson", email: "olof@example.com", type: "personal", amount: 5000, currency: "EUR", rate: 8.5, term: 12, monthlyPayment: 440, outstanding: 0, status: "completed", appliedAt: "2025-03-01", disbursedAt: "2025-03-05", nextPayment: null },
-  { id: "LN-007", user: "Karin Holm", email: "karin@example.com", type: "business", amount: 80000, currency: "EUR", rate: 5.1, term: 48, monthlyPayment: 1850, outstanding: 80000, status: "rejected", appliedAt: "2026-03-18", disbursedAt: null, nextPayment: null, rejectionReason: "Insufficient credit score" },
-];
 
 const typeLabels: Record<string, string> = {
   personal: "Personal Loan",
@@ -52,26 +43,20 @@ const typeLabels: Record<string, string> = {
 
 export default function LoanApplications() {
   const toast = useToast();
-  const [search, setSearch] = useState("");
-  const [activeStatus, setActiveStatus] = useState("All");
-  const [typeFilter, setTypeFilter] = useState("all");
-
-  const filtered = sampleLoans.filter((loan) => {
-    const matchesSearch =
-      !search ||
-      loan.user.toLowerCase().includes(search.toLowerCase()) ||
-      loan.id.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      activeStatus === "All" ||
-      loan.status.toLowerCase() === activeStatus.toLowerCase();
-    const matchesType = typeFilter === "all" || loan.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
-  });
-
-  const totalPortfolio = sampleLoans.reduce((a, l) => a + l.outstanding, 0);
-  const activeLoans = sampleLoans.filter((l) => l.status === "active").length;
-  const pendingApps = sampleLoans.filter((l) => l.status === "pending").length;
-  const delinquent = sampleLoans.filter((l) => l.status === "delinquent").length;
+  const {
+    loans: filtered,
+    stats,
+    search,
+    setSearch,
+    statusFilter: activeStatus,
+    setStatusFilter: setActiveStatus,
+    typeFilter,
+    setTypeFilter,
+    approveLoan,
+    rejectLoan,
+    refetch,
+    isLoading,
+  } = useLoansManagement();
 
   return (
     <PageContainer>
@@ -85,21 +70,21 @@ export default function LoanApplications() {
         actions={
           <div className="flex gap-2">
             <ActionButton label="Export" icon={<Download size={14} />} onClick={() => {}} variant="secondary" />
-            <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => {}} />
+            <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => refetch()} />
           </div>
         }
       />
 
       <StatsGrid>
-        <StatCard label="Total Portfolio" value={`€${(totalPortfolio / 1000).toFixed(0)}K`} icon={<DollarSign size={18} />} iconColor="from-blue-500 to-blue-600" change="+€45K" positive index={0} />
-        <StatCard label="Active Loans" value={activeLoans} icon={<Banknote size={18} />} iconColor="from-emerald-500 to-emerald-600" index={1} />
-        <StatCard label="Pending Applications" value={pendingApps} icon={<Clock size={18} />} iconColor="from-amber-500 to-amber-600" index={2} />
-        <StatCard label="Delinquent" value={delinquent} icon={<AlertTriangle size={18} />} iconColor="from-rose-500 to-rose-600" change={delinquent > 0 ? "Attention needed" : ""} positive={false} index={3} />
+        <StatCard label="Total Portfolio" value={`€${(stats.totalDisbursed / 1000).toFixed(0)}K`} icon={<DollarSign size={18} />} iconColor="from-blue-500 to-blue-600" positive index={0} />
+        <StatCard label="Active Loans" value={stats.activeLoans} icon={<Banknote size={18} />} iconColor="from-emerald-500 to-emerald-600" index={1} />
+        <StatCard label="Pending Applications" value={stats.pendingApplications} icon={<Clock size={18} />} iconColor="from-amber-500 to-amber-600" index={2} />
+        <StatCard label="Overdue" value={stats.overdueLoans} icon={<AlertTriangle size={18} />} iconColor="from-rose-500 to-rose-600" change={stats.overdueLoans > 0 ? "Attention needed" : ""} positive={false} index={3} />
       </StatsGrid>
 
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
         {statusFilters.map((s) => (
-          <FilterPill key={s} label={s} active={activeStatus === s} onClick={() => setActiveStatus(s)} />
+          <FilterPill key={s} label={s} active={activeStatus === s} onClick={() => setActiveStatus(s as any)} />
         ))}
       </div>
 
@@ -137,7 +122,7 @@ export default function LoanApplications() {
                         <Banknote size={18} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{loan.user}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{loan.applicant}</p>
                         <p className="text-[10px] sm:text-xs text-gray-400">{loan.id} · {typeLabels[loan.type]}</p>
                       </div>
                     </div>
@@ -150,7 +135,7 @@ export default function LoanApplications() {
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-400">Rate</p>
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{loan.rate}%</p>
+                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{loan.interestRate}%</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-400">Term</p>

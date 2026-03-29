@@ -1,35 +1,26 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
-
-interface Transaction {
-  id: string;
-  type: string;
-  amount: string;
-  status: "Approved" | "Liquidated" | "Awaiting Approval";
-  date: string;
-}
+import { useTransferHistory } from "../../domain/useTransferHistory";
 
 const TransactionHistory = () => {
-  const [activeFilter, setActiveFilter] = useState("3 years");
-  const [statusFilter, setStatusFilter] = useState("Approved");
-  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    transactions,
+    total,
+    isLoading,
+    statusFilter,
+    timeFilter,
+    page,
+    pagination,
+    pageNumbers,
+    setStatusFilter,
+    setTimeFilter,
+    setPage,
+  } = useTransferHistory();
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
-  const transactions: Transaction[] = [
-    { id: "TXN0012345", type: "Liquidation", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012346", type: "Awaiting Approval", amount: "₦200,000.00", status: "Liquidated", date: "2024-09-12" },
-    { id: "TXN0012347", type: "Withdrawal", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012348", type: "Collateral", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012349", type: "Collateral", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012350", type: "Deposit", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012351", type: "Collateral", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012352", type: "Stock Investment", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-    { id: "TXN0012353", type: "Collateral", amount: "₦200,000.00", status: "Awaiting Approval", date: "2024-09-12" },
-    { id: "TXN0012354", type: "Transfer", amount: "₦200,000.00", status: "Approved", date: "2024-09-12" },
-  ];
-
-  const totalPages = 30;
+  const totalPages = pagination.totalPages;
+  const currentPage = pagination.page;
   const timeFilters = ["3 years", "1 year", "6 months", "30 days"];
   const statusFilters = ["Approved", "Pending", "Liquidated"];
 
@@ -72,12 +63,12 @@ const TransactionHistory = () => {
               <motion.button
                 key={filter}
                 className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
-                  activeFilter === filter
+                  timeFilter === filter
                     ? "border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 font-medium"
                     : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveFilter(filter)}
+                onClick={() => setTimeFilter(filter as any)}
               >
                 {filter}
               </motion.button>
@@ -92,12 +83,12 @@ const TransactionHistory = () => {
               <motion.button
                 key={filter}
                 className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
-                  statusFilter === filter
+                  statusFilter === filter.toLowerCase()
                     ? "border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium"
                     : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setStatusFilter(filter)}
+                onClick={() => setStatusFilter(filter.toLowerCase() as any)}
               >
                 {filter}
               </motion.button>
@@ -157,7 +148,7 @@ const TransactionHistory = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction, index) => (
+            {transactions.map((transaction: any, index: number) => (
               <motion.tr
                 key={transaction.id + index}
                 className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
@@ -176,7 +167,7 @@ const TransactionHistory = () => {
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{transaction.date}</td>
+                <td className="px-4 py-2.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{transaction.date ? new Date(transaction.date).toLocaleDateString("en-GB", { year: "numeric", month: "2-digit", day: "2-digit" }) : ""}</td>
                 <td className="px-4 py-2.5 text-xs whitespace-nowrap">
                   <motion.button
                     className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1 text-xs transition-colors"
@@ -201,31 +192,31 @@ const TransactionHistory = () => {
           <motion.button
             className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 transition-colors"
             whileTap={{ scale: 0.9 }}
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            onClick={() => setPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
             <ChevronLeft size={14} className={currentPage === 1 ? "text-gray-300 dark:text-gray-600" : "text-gray-600 dark:text-gray-300"} />
           </motion.button>
 
-          {[1, 2, 3, 4, 5].map((page) => (
+          {pageNumbers.map((pg: number) => (
             <motion.button
-              key={page}
+              key={pg}
               className={`w-7 h-7 flex text-xs items-center justify-center rounded-lg transition-colors ${
-                currentPage === page
+                currentPage === pg
                   ? "bg-indigo-600 dark:bg-indigo-500 text-white"
                   : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
               }`}
               whileTap={{ scale: 0.9 }}
-              onClick={() => setCurrentPage(page)}
+              onClick={() => setPage(pg)}
             >
-              {page}
+              {pg}
             </motion.button>
           ))}
 
           <motion.button
             className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 transition-colors"
             whileTap={{ scale: 0.9 }}
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
           >
             <ChevronRight size={14} className={currentPage === totalPages ? "text-gray-300 dark:text-gray-600" : "text-gray-600 dark:text-gray-300"} />

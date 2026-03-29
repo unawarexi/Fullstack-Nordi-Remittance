@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
@@ -43,33 +43,9 @@ import {
   Legend,
 } from "recharts";
 import { useToast } from "@store/toast.store";
-
-const allocationData = [
-  { name: "Fixed Deposits", value: 35, color: "#6366f1" },
-  { name: "Mutual Funds", value: 28, color: "#10b981" },
-  { name: "Bonds", value: 22, color: "#f59e0b" },
-  { name: "Equity", value: 15, color: "#ef4444" },
-];
-
-const performanceData = [
-  { month: "Oct", value: 12400 },
-  { month: "Nov", value: 13100 },
-  { month: "Dec", value: 12800 },
-  { month: "Jan", value: 14200 },
-  { month: "Feb", value: 15600 },
-  { month: "Mar", value: 16800 },
-];
+import { useInvestmentsManagement } from "../../domain/useInvestmentsManagement";
 
 const statusFilters = ["All", "Active", "Matured", "Pending", "Closed"];
-
-const sampleInvestments = [
-  { id: "INV-001", user: "Anna Johansson", product: "Nordic Growth Fund", type: "mutual_fund", invested: 50000, currentValue: 56200, returns: 12.4, status: "active", startDate: "2025-10-01", maturityDate: "2026-10-01", autoRenew: true },
-  { id: "INV-002", user: "Erik Lundgren", product: "12M Fixed Deposit", type: "fixed_deposit", invested: 100000, currentValue: 104500, returns: 4.5, status: "active", startDate: "2025-09-15", maturityDate: "2026-09-15", autoRenew: false },
-  { id: "INV-003", user: "Sofia Bergman", product: "Government Bond 2028", type: "bond", invested: 25000, currentValue: 26250, returns: 5.0, status: "active", startDate: "2025-06-01", maturityDate: "2028-06-01", autoRenew: false },
-  { id: "INV-004", user: "Lars Nilsson", product: "Tech Equity Portfolio", type: "equity", invested: 30000, currentValue: 27800, returns: -7.3, status: "active", startDate: "2026-01-10", maturityDate: null, autoRenew: false },
-  { id: "INV-005", user: "Maria Svensson", product: "6M Fixed Deposit", type: "fixed_deposit", invested: 20000, currentValue: 20800, returns: 4.0, status: "matured", startDate: "2025-09-01", maturityDate: "2026-03-01", autoRenew: false },
-  { id: "INV-006", user: "Olof Andersson", product: "Balanced Income Fund", type: "mutual_fund", invested: 75000, currentValue: 75000, returns: 0, status: "pending", startDate: "2026-03-22", maturityDate: null, autoRenew: true },
-];
 
 const typeIcons: Record<string, React.ReactNode> = {
   fixed_deposit: <Landmark size={16} />,
@@ -80,20 +56,26 @@ const typeIcons: Record<string, React.ReactNode> = {
 
 export default function AdminInvestments() {
   const toast = useToast();
-  const [search, setSearch] = useState("");
-  const [activeStatus, setActiveStatus] = useState("All");
-  const [typeFilter, setTypeFilter] = useState("all");
+  const {
+    investments: filtered,
+    portfolio,
+    performanceData,
+    stats,
+    search,
+    setSearch,
+    statusFilter: activeStatus,
+    setStatusFilter: setActiveStatus,
+    typeFilter,
+    setTypeFilter,
+    refetch,
+    isLoading,
+  } = useInvestmentsManagement();
 
-  const filtered = sampleInvestments.filter((inv) => {
-    const matchesSearch = !search || inv.user.toLowerCase().includes(search.toLowerCase()) || inv.product.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = activeStatus === "All" || inv.status.toLowerCase() === activeStatus.toLowerCase();
-    const matchesType = typeFilter === "all" || inv.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
-  });
+  const allocationData = portfolio.allocation;
 
-  const totalAUM = sampleInvestments.reduce((a, i) => a + i.currentValue, 0);
-  const totalInvested = sampleInvestments.reduce((a, i) => a + i.invested, 0);
-  const avgReturn = sampleInvestments.filter((i) => i.status === "active").reduce((a, i) => a + i.returns, 0) / (sampleInvestments.filter((i) => i.status === "active").length || 1);
+  const totalAUM = portfolio.totalValue;
+  const totalInvested = portfolio.totalInvested;
+  const avgReturn = portfolio.returnPercentage;
 
   return (
     <PageContainer>
@@ -107,7 +89,7 @@ export default function AdminInvestments() {
         actions={
           <div className="flex gap-2">
             <ActionButton label="Export" icon={<Download size={14} />} onClick={() => {}} variant="secondary" />
-            <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => {}} />
+            <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => refetch()} />
           </div>
         }
       />
@@ -116,7 +98,7 @@ export default function AdminInvestments() {
         <StatCard label="Total AUM" value={`€${(totalAUM / 1000).toFixed(0)}K`} icon={<DollarSign size={18} />} iconColor="from-blue-500 to-blue-600" change="+8.2%" positive index={0} />
         <StatCard label="Total Invested" value={`€${(totalInvested / 1000).toFixed(0)}K`} icon={<Briefcase size={18} />} iconColor="from-indigo-500 to-indigo-600" index={1} />
         <StatCard label="Avg Return" value={`${avgReturn.toFixed(1)}%`} icon={<TrendingUp size={18} />} iconColor="from-emerald-500 to-emerald-600" change="annualized" positive index={2} />
-        <StatCard label="Active Investments" value={sampleInvestments.filter((i) => i.status === "active").length} icon={<BarChart2 size={18} />} iconColor="from-purple-500 to-purple-600" index={3} />
+        <StatCard label="Active Investments" value={stats.activeInvestments} icon={<BarChart2 size={18} />} iconColor="from-purple-500 to-purple-600" index={3} />
       </StatsGrid>
 
       {/* Charts Row */}
@@ -163,7 +145,7 @@ export default function AdminInvestments() {
       {/* Filters */}
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
         {statusFilters.map((s) => (
-          <FilterPill key={s} label={s} active={activeStatus === s} onClick={() => setActiveStatus(s)} />
+          <FilterPill key={s} label={s} active={activeStatus === s} onClick={() => setActiveStatus(s as any)} />
         ))}
       </div>
 
@@ -206,15 +188,15 @@ export default function AdminInvestments() {
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">{typeIcons[inv.type]}</div>
                         <div>
-                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{inv.user}</p>
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{inv.investor}</p>
                           <p className="text-[10px] text-gray-400">{inv.id}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-xs text-gray-700 dark:text-gray-300">{inv.product}</p>
+                      <p className="text-xs text-gray-700 dark:text-gray-300">{inv.productName}</p>
                     </td>
-                    <td className="px-4 py-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-white">€{inv.invested.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-white">€{inv.amount.toLocaleString()}</td>
                     <td className="px-4 py-3 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">€{inv.currentValue.toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <span className={`text-xs font-medium ${inv.returns >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>

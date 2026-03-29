@@ -10,7 +10,7 @@ import Select, { StylesConfig } from "react-select";
 import FormContainer from "@container/FormContainer";
 import DatePicker from "@components/ui/DatePicker";
 import RoutingCountries from "@core/data/Routing";
-import { SubmitSpinner } from "@components/shared/Spinner";
+import { SubmitSpinner } from "@components/ui/Spinner";
 import { Error, Success } from "@components/shared/InfoBankingPop";
 import {
   addressDocTypes,
