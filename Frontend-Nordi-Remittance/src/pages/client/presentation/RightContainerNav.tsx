@@ -19,8 +19,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@store/auth.store";
 import useThemeStore from "@store/theme.store";
-import { useWallets, useUnreadNotificationsCount } from "@hooks/queries";
-import { useUserProfile } from "@hooks/queries/useUsers";
+import { useClientWallets } from "../domain/useAccountsDomain";
+import { useClientUnreadCount } from "../domain/useNotificationsDomain";
+import { useClientProfile } from "../domain/useProfileDomain";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -58,29 +59,17 @@ const RightContainerNav: React.FC = () => {
   const { user, userName, logout } = useAuth();
 
   // ── Profile (for profilePicture fallback) ──
-  const { data: profileData } = useUserProfile();
-  const profile = (profileData ?? {}) as Record<string, any>;
-  const avatarUrl = profile.profilePicture || user?.avatar || null;
+  const { user: profileUser } = useClientProfile();
+  const avatarUrl = profileUser.profilePicture || user?.avatar || null;
 
   // ── Theme ──
   const { mode, isDarkMode, setMode, toggleDarkMode } = useThemeStore();
 
   // ── Wallets (real data) ──
-  const { data: walletsRes } = useWallets();
-  const wallets: any[] = Array.isArray(walletsRes)
-    ? walletsRes
-    : Array.isArray((walletsRes as any)?.data)
-      ? (walletsRes as any).data
-      : [];
+  const { wallets } = useClientWallets();
 
   // ── Notifications (real count) ──
-  const { data: countRes } = useUnreadNotificationsCount();
-  const unreadCount =
-    typeof countRes === "number"
-      ? countRes
-      : typeof (countRes as any)?.count === "number"
-        ? (countRes as any).count
-        : 0;
+  const { count: unreadCount } = useClientUnreadCount();
 
   // ── Local UI state ──
   const [isAccountOpen, setIsAccountOpen] = useState(false);

@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLogout } from "@hooks/queries/useAuth";
+import { useLogout } from "../domain/useAuthDomain";
 import { useAuth } from "@store/auth.store";
-import { useUserProfile } from "@hooks/queries/useUsers";
+import { useClientProfile } from "../domain/useProfileDomain";
 import {
   LayoutDashboard,
   Wallet,
@@ -252,7 +252,7 @@ const UserLeftContainer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout: clearAuthState, user, userName } = useAuth();
-  const { data: profileData } = useUserProfile();
+  const { user: profileUser } = useClientProfile();
   const logoutMutation = useLogout();
   const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState(false);
@@ -260,14 +260,13 @@ const UserLeftContainer: React.FC = () => {
   const [alertCount, setAlertCount] = useState(2);
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  const profile = (profileData ?? {}) as Record<string, any>;
-  const avatarUrl = profile.profilePicture || user?.avatar || null;
-  const displayName = userName || `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || "User";
+  const avatarUrl = profileUser.profilePicture || user?.avatar || null;
+  const displayName = userName || `${profileUser.firstName || ""} ${profileUser.lastName || ""}`.trim() || "User";
   const initials = user
     ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
     : displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "U";
-  const memberTier = profile.accountType
-    ? `${(profile.accountType as string).charAt(0).toUpperCase()}${(profile.accountType as string).slice(1)} Account`
+  const memberTier = profileUser.accountType
+    ? `${(profileUser.accountType as string).charAt(0).toUpperCase()}${(profileUser.accountType as string).slice(1)} Account`
     : user?.kycStatus === "verified" ? "Verified Member" : "Member";
 
   const handleLogout = () => {
