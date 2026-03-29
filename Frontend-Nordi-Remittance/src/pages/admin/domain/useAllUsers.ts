@@ -3,6 +3,7 @@ import {
   useSearchUsers,
   useUpdateUserStatus,
   useAdminDashboardStats,
+  useDeleteUser,
 } from "@hooks/queries";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -125,5 +126,6 @@ export function useAllUsers() {
     resetFilters,
     refetch,
     updateStatus,
+    deleteUser: useDeleteUser(),
   };
 }
