@@ -28,8 +28,8 @@ export interface SectionProps extends Omit<HTMLMotionProps<'section'>, 'children
 const sizeStyles: Record<SectionSize, string> = {
   sm: 'max-w-3xl',
   md: 'max-w-5xl',
-  lg: 'max-w-7xl',
-  xl: 'max-w-[1536px]',
+  lg: 'max-w-[1440px]',
+  xl: 'max-w-[1640px]',
   full: 'max-w-full',
 };
 
@@ -108,7 +108,7 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
         <div
           className={cn(
             // Container
-            'w-full px-4 sm:px-6 md:px-8 lg:px-10',
+            'w-full px-4 sm:px-6 md:px-8 lg:px-12',
             sizeStyles[size],
             centered && 'mx-auto',
           )}

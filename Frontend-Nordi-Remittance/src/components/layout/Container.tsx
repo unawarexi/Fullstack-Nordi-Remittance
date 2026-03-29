@@ -27,8 +27,8 @@ const sizeStyles: Record<ContainerSize, string> = {
   sm: 'max-w-xl',      // 576px
   md: 'max-w-3xl',     // 768px
   lg: 'max-w-5xl',     // 1024px
-  xl: 'max-w-7xl',     // 1280px
-  '2xl': 'max-w-[1536px]',
+  xl: 'max-w-[1440px]', // 1440px
+  '2xl': 'max-w-[1640px]',
   full: 'max-w-full',
 };
 
@@ -55,7 +55,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
           'w-full',
           sizeStyles[size],
           centered && 'mx-auto',
-          !noPadding && 'px-4 sm:px-6 md:px-8',
+          !noPadding && 'px-4 sm:px-6 md:px-8 lg:px-12',
           className
         )}
         {...props}
