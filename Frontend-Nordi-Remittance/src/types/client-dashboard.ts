@@ -165,6 +165,52 @@ declare global {
     route: string;
   }
 
+  /* ─── Detailed Loans Panel ────────────────────────────────────────────── */
+
+  interface ClientLoansDetailData {
+    totalLoans: number;
+    activeLoans: number;
+    totalDisbursed: number;
+    totalRepaid: number;
+    overdueLoans: number;
+    pendingApplications: number;
+    repaymentRate: number;
+    recentLoans: Array<{
+      id: string;
+      type: string;
+      amount: number;
+      status: string;
+    }>;
+  }
+
+  /* ─── Detailed Investments Panel ────────────────────────────────────── */
+
+  interface ClientInvestmentsDetailData {
+    totalPortfolioValue: number;
+    activeInvestments: number;
+    totalReturns: number;
+    returnRate: number;
+    savingsGoals: number;
+    savingsProgress: number;
+    topProducts: Array<{
+      id: string;
+      name: string;
+      type: string;
+      returnRate: number;
+    }>;
+  }
+
+  /* ─── Detailed Cards Panel ──────────────────────────────────────────── */
+
+  interface ClientCardsDetailData {
+    totalCards: number;
+    activeCards: number;
+    frozenCards: number;
+    totalSpending: number;
+    virtualCards: number;
+    physicalCards: number;
+  }
+
   /* ─── Aggregate Return ──────────────────────────────────────────────────── */
 
   interface ClientDashboardData {
@@ -179,6 +225,10 @@ declare global {
     unreadCount: number;
     insights: InsightItem[];
     security: SecurityStatus;
+
+    loansDetail: ClientLoansDetailData;
+    investmentsDetail: ClientInvestmentsDetailData;
+    cardsDetail: ClientCardsDetailData;
 
     isAccountLoading: boolean;
     isTransactionsLoading: boolean;
