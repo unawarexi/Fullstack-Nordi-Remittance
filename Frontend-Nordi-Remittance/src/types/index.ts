@@ -5,6 +5,9 @@
 // Types are organized by domain for better maintainability.
 // ============================================================================
 
+// Client Dashboard Types (global declarations — no import needed)
+// ./client-dashboard.ts
+
 // API & Entity Types (existing)
 // UI Component Types
 

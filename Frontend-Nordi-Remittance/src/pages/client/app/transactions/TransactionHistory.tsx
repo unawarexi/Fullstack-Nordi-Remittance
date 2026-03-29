@@ -1,0 +1,153 @@
+// ============================================================================
+// TRANSACTIONS SUB-PAGES — Recent Activity, Scheduled, History, Download
+// Dark mode + DashboardPrimitives + grey borders + responsive typography
+// ============================================================================
+
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowUpRight, ArrowDownLeft, Clock, Download, Search, Filter,
+  ChevronDown, Calendar, FileText, TrendingUp, TrendingDown,
+  CheckCircle2, XCircle, Timer, AlertTriangle,
+} from "@constants/icons";
+import PageHeader from "@components/shared/PageHeader";
+import { EmptyState } from "@components/shared/EmptyState";
+import {
+  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge, SectionHeader,
+} from "@components/shared/DashboardPrimitives";
+import { TransactionListSkeleton, StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
+import { dashboardItemVariants } from "@core/animation/Animation";
+import { useTransactions, useRecentTransactions } from "@hooks/queries/useTransactions";
+import { useUIStore } from "@store/ui.store";
+
+const safeArray = (d: unknown): any[] => Array.isArray(d) ? d : Array.isArray((d as any)?.data) ? (d as any).data : [];
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+
+const txnIcon = (type: string) => {
+  const t = (type || "").toLowerCase();
+  if (t.includes("debit") || t.includes("send") || t.includes("out"))
+    return <ArrowUpRight size={16} />;
+  return <ArrowDownLeft size={16} />;
+};
+
+const txnColor = (type: string) => {
+  const t = (type || "").toLowerCase();
+  if (t.includes("debit") || t.includes("send") || t.includes("out"))
+    return "text-red-500 bg-red-50 dark:bg-red-950/50 dark:text-red-400";
+  return "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400";
+};
+
+const statusIcon = (s: string) => {
+  switch ((s || "").toLowerCase()) {
+    case "completed": case "success": return <CheckCircle2 size={14} className="text-emerald-500" />;
+    case "failed": return <XCircle size={14} className="text-red-500" />;
+    case "pending": return <Timer size={14} className="text-amber-500" />;
+    default: return <AlertTriangle size={14} className="text-gray-400" />;
+  }
+};
+
+interface TransactionRowProps {
+  tx: any;
+  show: boolean;
+}
+
+const TransactionRow: React.FC<TransactionRowProps> = ({ tx, show }) => (
+  <div className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+    <div className="flex items-center gap-3">
+      <div className={`p-2 rounded-xl ${txnColor(tx.type)}`}>{txnIcon(tx.type)}</div>
+      <div>
+        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+          {tx.description || tx.name || "Transaction"}
+        </h4>
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+            {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+          </p>
+          {tx.status && <span className="flex items-center gap-1">{statusIcon(tx.status)}</span>}
+        </div>
+      </div>
+    </div>
+    <p className={`text-xs sm:text-sm font-bold ${
+      (tx.type || "").toLowerCase().includes("credit") || (tx.type || "").toLowerCase().includes("in")
+        ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+    }`}>
+      {show ? ((tx.type || "").toLowerCase().includes("credit") ? "+" : "-") + fmt(Math.abs(tx.amount || 0)) : "••••••"}
+    </p>
+  </div>
+);
+
+
+const TransactionHistory: React.FC = () => {
+  const show = useUIStore((s) => s.preferences.showBalances);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const { data: txData, isLoading } = useTransactions();
+  const allTxns = safeArray(txData);
+
+  const filtered = allTxns.filter((t: any) => {
+    const matchSearch = !search || (t.description || "").toLowerCase().includes(search.toLowerCase());
+    const matchType = typeFilter === "all" || (t.type || "").toLowerCase().includes(typeFilter);
+    return matchSearch && matchType;
+  });
+
+  const inputCls =
+    "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
+
+  return (
+    <PageContainer>
+      <motion.div variants={dashboardItemVariants}>
+        <PageHeader
+          title="Transaction History"
+          subtitle="Search and filter your complete transaction history"
+          breadcrumbs={[
+            { label: "Dashboard", href: "/customer/dashboard" },
+            { label: "Transactions", href: "/customer/transactions" },
+            { label: "History" },
+          ]}
+        />
+      </motion.div>
+
+      <DashCard className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search transactions..."
+              className={`${inputCls} pl-10`}
+            />
+          </div>
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className={`${inputCls} sm:w-44`}>
+            <option value="all">All Types</option>
+            <option value="credit">Credits</option>
+            <option value="debit">Debits</option>
+          </select>
+        </div>
+      </DashCard>
+
+      {isLoading ? (
+        <TransactionListSkeleton count={8} />
+      ) : filtered.length === 0 ? (
+        <EmptyState title="No Transactions Found" description="Try adjusting your search or filter criteria." />
+      ) : (
+        <DashCard padding="none">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">All Transactions</h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{filtered.length} results</span>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {filtered.map((tx: any, i: number) => (
+              <TransactionRow key={tx._id || tx.id || i} tx={tx} show={show} />
+            ))}
+          </div>
+        </DashCard>
+      )}
+    </PageContainer>
+  );
+};
+
+export default TransactionHistory;

@@ -3,69 +3,108 @@ import { Routes, Route } from "react-router-dom";
 import NotAvailableYet from "@components/shared/RenderContent";
 
 // Dashboard
-import UserDashboardOverview from "./components/UserOverview";
+import UserDashboardOverview from "./app/dashboard/UserOverview";
+
+// Accounts
+import MyAccounts from "./app/accounts/MyAccounts";
+import SavingsAccount from "./app/accounts/SavingsAccount";
+import CurrentAccount from "./app/accounts/CurrentAccount";
+import FixedDeposits from "./app/accounts/FixedDeposits";
+import AccountStatements from "./app/accounts/AccountStatements";
+
+// Transactions
+import Transactions from "./app/transactions/Transactions";
+import RecentActivity from "./app/transactions/RecentActivity";
+import ScheduledTransfers from "./app/transactions/ScheduledTransfers";
+import TransactionHistory from "./app/transactions/TransactionHistory";
+import DownloadStatement from "./app/transactions/DownloadStatement";
 
 // Send Money
-import DomesticTransfer from "./components/send_money/DomesticTransfer";
-import InternationalWire from "./components/send_money/InternationalTransfer";
-import QuickTransfer from "./components/send_money/QuickTransfer";
-import InstantPayment from "./components/send_money/InstantPayment";
+import DomesticTransfer from "./app/send-money/DomesticTransfer";
+import InternationalWire from "./app/send-money/InternationalTransfer";
+import QuickTransfer from "./app/send-money/QuickTransfer";
+import InstantPayment from "./app/send-money/InstantPayment";
 
-// Profile (existing)
-import PersonalInformation from "./components/profile_preferences/Personal_Infomation";
-import Communication from "./components/profile_preferences/Communication";
-import ClientUserEdit from "./components/profile_preferences/ClientUserEdit";
+// Beneficiaries
+import Beneficiaries from "./app/beneficiaries/Beneficiaries";
+import AllBeneficiaries from "./app/beneficiaries/AllBeneficiaries";
+import AddBeneficiary from "./app/beneficiaries/AddBeneficiary";
+import BeneficiaryCategories from "./app/beneficiaries/BeneficiaryCategories";
+import RecentRecipients from "./app/beneficiaries/RecentRecipients";
 
-// Main section pages
-import MyAccounts from "./components/MyAccounts";
-import Transactions from "./components/Transactions";
-import Cards from "./components/Cards";
-import Beneficiaries from "./components/Beneficiaries";
-import LoansCredits from "./components/Loans_Credits";
-import Investments from "./components/Investments";
-import SavingGoals from "./components/SavingGoals";
+// Cards
+import Cards from "./app/cards/Cards";
+import CardsOverview from "./app/cards/CardsOverview";
+import CardTransactions from "./app/cards/CardTransactions";
+import ApplyForCard from "./app/cards/ApplyForCard";
+import CardSecurity from "./app/cards/CardSecurity";
+import VirtualCards from "./app/cards/VirtualCards";
 
-// Account sub-pages
-import { SavingsAccount, CurrentAccount, FixedDeposits, AccountStatements } from "./components/accounts/AccountSubPages";
+// Loans & Credit
+import LoansCredits from "./app/loans/LoansCredits";
+import LoansOverview from "./app/loans/LoansOverview";
+import ApplyForLoan from "./app/loans/ApplyForLoan";
+import LoanCalculator from "./app/loans/LoanCalculator";
+import CreditScore from "./app/loans/CreditScore";
 
-// Transaction sub-pages
-import { RecentActivity, ScheduledTransfers, TransactionHistory, DownloadStatement } from "./components/transactions/TransactionSubPages";
+// Investments
+import Investments from "./app/investments/Investments";
+import InvestmentOverview from "./app/investments/InvestmentOverview";
+import MutualFunds from "./app/investments/MutualFunds";
+import StocksETFs from "./app/investments/StocksETFs";
+import FixedIncome from "./app/investments/FixedIncome";
+import MarketInsights from "./app/investments/MarketInsights";
 
-// Card sub-pages
-import { CardsOverview, CardTransactions, ApplyForCard, CardSecurity, VirtualCards } from "./components/cards/CardSubPages";
+// Savings Goals
+import SavingGoals from "./app/savings/SavingGoals";
+import SavingsGoalsList from "./app/savings/SavingsGoalsList";
+import CreateGoal from "./app/savings/CreateGoal";
+import AutoSaveRules from "./app/savings/AutoSaveRules";
+import SavingsAnalytics from "./app/savings/SavingsAnalytics";
 
-// Beneficiary sub-pages
-import { AllBeneficiaries, AddBeneficiary, BeneficiaryCategories, RecentRecipients } from "./components/beneficiaries/BeneficiarySubPages";
+// Bill Payments
+import PayBills from "./app/bills/PayBills";
+import ScheduledPayments from "./app/bills/ScheduledPayments";
+import Utilities from "./app/bills/Utilities";
+import AutopaySetup from "./app/bills/AutopaySetup";
 
-// Loan sub-pages
-import { LoansOverview, ApplyForLoan, LoanCalculator, CreditScore } from "./components/loans/LoanSubPages";
+// Foreign Exchange
+import CurrencyExchange from "./app/forex/CurrencyExchange";
+import LiveRates from "./app/forex/LiveRates";
+import CurrencyAlerts from "./app/forex/CurrencyAlerts";
+import ExchangeHistory from "./app/forex/ExchangeHistory";
 
-// Investment sub-pages
-import { InvestmentOverview, MutualFunds, StocksETFs, FixedIncome, MarketInsights } from "./components/investments/InvestmentSubPages";
+// Mobile Banking
+import MobileApp from "./app/mobile/MobileApp";
+import DeviceManagement from "./app/mobile/DeviceManagement";
+import QRPayments from "./app/mobile/QRPayments";
+import PushNotifications from "./app/mobile/PushNotifications";
 
-// Savings sub-pages
-import { SavingsGoalsList, CreateGoal, AutoSaveRules, SavingsAnalytics } from "./components/savings/SavingsSubPages";
+// Rewards & Offers
+import MyRewards from "./app/rewards/MyRewards";
+import RedeemPoints from "./app/rewards/RedeemPoints";
+import SpecialOffers from "./app/rewards/SpecialOffers";
+import PartnerDiscounts from "./app/rewards/PartnerDiscounts";
 
-// Bills sub-pages
-import { PayBills, ScheduledPayments, Utilities, AutopaySetup } from "./components/bills/BillSubPages";
+// Support
+import ContactUs from "./app/support/ContactUs";
+import LiveChat from "./app/support/LiveChat";
+import FAQs from "./app/support/FAQs";
+import ScheduleAppointment from "./app/support/ScheduleAppointment";
 
-// Forex sub-pages
-import { CurrencyExchange, LiveRates, CurrencyAlerts, ExchangeHistory } from "./components/forex/ForexSubPages";
+// Security Center
+import SecuritySettings from "./app/security/SecuritySettings";
+import TwoFactorAuth from "./app/security/TwoFactorAuth";
+import BiometricAccess from "./app/security/BiometricAccess";
+import ActivityLogs from "./app/security/ActivityLogs";
+import SecurityAlertsList from "./app/security/SecurityAlertsList";
 
-// Mobile sub-pages
-import { MobileApp, DeviceManagement, QRPayments, PushNotifications } from "./components/mobile/MobileSubPages";
-
-// Rewards sub-pages
-import { MyRewards, RedeemPoints, SpecialOffers, PartnerDiscounts } from "./components/rewards/RewardSubPages";
-
-// Support sub-pages
-import { ContactUs, LiveChat, FAQs, ScheduleAppointment } from "./components/support/SupportSubPages";
-
-// Security sub-pages
-import { SecuritySettings, TwoFactorAuth, BiometricAccess, ActivityLogs, SecurityAlertsList } from "./components/security/SecuritySubPages";
-
-// Profile sub-pages
-import { LanguageRegion, DocumentCenter } from "./components/profile/ProfileSubPages";
+// Profile & Preferences
+import PersonalInformation from "./app/profile/PersonalInformation";
+import ClientUserEdit from "./app/profile/ClientUserEdit";
+import Communication from "./app/profile/Communication";
+import LanguageRegion from "./app/profile/LanguageRegion";
+import DocumentCenter from "./app/profile/DocumentCenter";
 
 // Main user routes based on UserLeftContainer menuItems
 export default function UserRoutes() {
