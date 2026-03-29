@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Mail, Lock, Shield, ShieldCheck, Globe, Fingerprint } from "lucide-react";
+import { useSignIn, useAuth as useClerkAuth } from "@clerk/clerk-react";
 
 import { Button, Input, Spinner } from "@components/ui";
 import Images from '@constants/images';
 import GetLocation from "@utils/GetLocation";
 import { useAdminLogin } from "@hooks/queries/useAdmin";
+import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
 
@@ -46,6 +48,12 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { setAuthenticated } = useAuthStore();
   const loginMutation = useAdminLogin();
+  const clerkSyncAdminMutation = useClerkSyncAdmin();
+
+  // Clerk sign-in
+  const { signIn, isLoaded: isClerkLoaded, setActive } = useSignIn();
+  const { getToken } = useClerkAuth();
+  const [clerkError, setClerkError] = useState<string | null>(null);
 
   const {
     register,
@@ -56,33 +64,85 @@ const AdminLogin = () => {
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      const res = await loginMutation.mutateAsync(data);
+  // Sync Clerk session with admin backend endpoint
+  const syncAdminWithBackend = async () => {
+    const token = await getToken();
+    if (!token) throw new Error("Failed to obtain session token");
 
-      if (res?.token) {
-        const { TokenManager } = await import("@core/api/client");
-        TokenManager.setTokens(res.token, res.token);
-      }
+    const response = await clerkSyncAdminMutation.mutateAsync(token);
 
-      if (res?.admin) {
-        setAuthenticated({
-          id: res.admin.id || "admin",
-          email: res.admin.email,
-          firstName: res.admin.firstName || "Admin",
-          lastName: res.admin.lastName || "",
-          role: "admin",
-          kycStatus: "verified",
-          isEmailVerified: true,
-          isPhoneVerified: true,
-        });
-      }
+    if (response.requiresOtp) {
+      navigate("/auth/verify-otp", {
+        state: {
+          otpSessionToken: response.otpSessionToken,
+          email: response.email,
+          isAdmin: true,
+        },
+      });
+      return;
+    }
 
+    if (response.user) {
+      setAuthenticated({
+        id: response.user.id || (response.user as any)._id,
+        email: response.user.email,
+        firstName: response.user.firstName || "Admin",
+        lastName: response.user.lastName || "",
+        role: "admin",
+        kycStatus: "verified",
+        isEmailVerified: true,
+        isPhoneVerified: true,
+      });
       navigate("/admin/dashboard");
-    } catch {
-      // Error is handled by mutation's onError / displayed below
     }
   };
+
+  const onSubmit = async (data: LoginFormData) => {
+    if (!isClerkLoaded || !signIn) return;
+    setClerkError(null);
+
+    try {
+      const result = await signIn.create({
+        identifier: data.email,
+        password: data.password,
+      });
+
+      if (result.status === "complete" && result.createdSessionId) {
+        await setActive({ session: result.createdSessionId });
+        await syncAdminWithBackend();
+      } else {
+        setClerkError("Additional verification required. Please try again.");
+      }
+    } catch (err: any) {
+      setClerkError(
+        err?.errors?.[0]?.longMessage ||
+        err?.errors?.[0]?.message ||
+        err?.message ||
+        "Login failed. Please check your credentials.",
+      );
+    }
+  };
+
+  // Google Sign-In for admins
+  const handleGoogleSignIn = async () => {
+    if (!isClerkLoaded || !signIn) return;
+    setClerkError(null);
+
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/auth/sso-callback",
+        redirectUrlComplete: "/auth/clerk-admin-callback",
+      });
+    } catch (err: any) {
+      setClerkError(
+        err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.",
+      );
+    }
+  };
+
+  const isPending =
+    isSubmitting || loginMutation.isPending || clerkSyncAdminMutation.isPending;
 
   return (
     <section className="relative flex min-h-screen w-full overflow-hidden">
@@ -164,9 +224,9 @@ const AdminLogin = () => {
           />
 
           {/* API Error */}
-          {loginMutation.error && (
+          {(clerkError || loginMutation.error || clerkSyncAdminMutation.error) && (
             <div className="rounded-lg border border-error-200 dark:border-red-800 bg-error-50 dark:bg-red-950/30 p-3 text-sm text-error-600 dark:text-red-400">
-              {(loginMutation.error as any)?.message || "Login failed. Please check your credentials."}
+              {clerkError || (clerkSyncAdminMutation.error as any)?.message || (loginMutation.error as any)?.message || "Login failed. Please check your credentials."}
             </div>
           )}
 
@@ -186,10 +246,10 @@ const AdminLogin = () => {
             variant="primary"
             size="lg"
             fullWidth
-            isLoading={isSubmitting || loginMutation.isPending}
+            isLoading={isPending}
             className="bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700"
           >
-            {isSubmitting || loginMutation.isPending ? (
+            {isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <Spinner size="sm" variant="white" />
                 Authenticating...
@@ -197,6 +257,37 @@ const AdminLogin = () => {
             ) : (
               "Sign In to Admin"
             )}
+          </Button>
+
+          {/* Divider */}
+          <div className="relative my-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-neutral-300 dark:border-neutral-600" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-slate-50 px-3 text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">or</span>
+            </div>
+          </div>
+
+          {/* Google Sign-In */}
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            fullWidth
+            disabled={isPending}
+            onClick={handleGoogleSignIn}
+            className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+              </svg>
+              Continue with Google
+            </span>
           </Button>
         </motion.form>
 

@@ -4,6 +4,10 @@ import Signup from "./signup";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import VerifySuccess from "./VerifySuccess";
+import ClerkOtpVerification from "./ClerkOtpVerification";
+import SSOCallback from "./SSOCallback";
+import ClerkCallback from "./ClerkCallback";
+import ClerkAdminCallback from "./ClerkAdminCallback";
 
 // component to handle the routing
 const Auth = () => {
@@ -16,6 +20,10 @@ const Auth = () => {
       {page === "forgot-password" && <ForgotPassword />}
       {page === "reset-password" && <ResetPassword />}
       {page === "verify-email" && <VerifySuccess />}
+      {page === "verify-otp" && <ClerkOtpVerification />}
+      {page === "sso-callback" && <SSOCallback />}
+      {page === "clerk-callback" && <ClerkCallback />}
+      {page === "clerk-admin-callback" && <ClerkAdminCallback />}
     </>
   );
 };
