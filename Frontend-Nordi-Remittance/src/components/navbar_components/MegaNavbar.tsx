@@ -232,20 +232,13 @@ const MegaNavbar: React.FC = () => {
       animate="visible"
       exit="exit"
       className={cn(
-        "w-full rounded-2xl bg-slate-50 dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800",
-        "overflow-hidden"
+        "w-full rounded-2xl overflow-hidden",
+        "bg-white dark:bg-neutral-900",
+        "border border-neutral-200/60 dark:border-neutral-700/60",
+        "shadow-xl shadow-neutral-200/40 dark:shadow-neutral-950/40"
       )}
     >
-      {/* Fixed Container - Centered */}
-      <div className="container mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-neutral-800 dark:to-neutral-800 px-6 py-4">
-          <h3 className="text-lg lg:text-xl font-bold text-neutral-800 dark:text-neutral-100">
-            {activeContent.leftHeader}
-          </h3>
-        </div>
-
-        {/* Content - Changes based on activeMegaMenuItem */}
+      <div className="mx-auto max-w-[1440px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeMegaMenuItem}
@@ -253,72 +246,70 @@ const MegaNavbar: React.FC = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="px-6 py-6"
+            className="grid grid-cols-12 min-h-[380px]"
           >
-            <div className="grid grid-cols-12 gap-6">
-              {/* Left Section - Links */}
-              <div className="col-span-12 lg:col-span-4">
-                <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-4 lg:p-6 h-full">
-                  <ul className="space-y-1">
-                    {activeContent.leftLinks?.map((link, idx) => (
-                      <li key={idx}>
-                        <a
-                          href={link.url}
-                          className={cn(
-                            "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm",
-                            "text-neutral-600 dark:text-neutral-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30",
-                            "transition-all duration-200 group"
-                          )}
-                        >
-                          <ChevronRight 
-                            size={14} 
-                            className="text-neutral-400 dark:text-neutral-500 group-hover:text-amber-500 transition-colors" 
-                          />
-                          {link.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Right Section - Description & Image */}
-              <div className="col-span-12 lg:col-span-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-                  {/* Description */}
-                  <div className="flex flex-col justify-center">
-                    <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-amber-600 mb-3">
-                      {activeContent.rightHeader}
-                    </h2>
-                    <p className="text-neutral-600 dark:text-neutral-400 text-sm lg:text-base leading-relaxed mb-4">
-                      {activeContent.rightDescription}
-                    </p>
-                    <Button
-                      variant="primary"
-                      className="bg-amber-500 hover:bg-amber-600 w-fit"
+            {/* Left - Navigation Links */}
+            <div className="col-span-12 lg:col-span-3 border-r border-neutral-100 dark:border-neutral-800 p-5 lg:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-4">
+                {activeContent.leftHeader}
+              </p>
+              <ul className="space-y-0.5">
+                {activeContent.leftLinks?.map((link, idx) => (
+                  <li key={idx}>
+                    <a
+                      href={link.url}
+                      className={cn(
+                        "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium",
+                        "text-neutral-600 dark:text-neutral-300",
+                        "hover:text-amber-600 dark:hover:text-amber-400",
+                        "hover:bg-neutral-50 dark:hover:bg-neutral-800",
+                        "transition-all duration-150 group"
+                      )}
                     >
-                      {activeContent.buttonText}
-                      <ArrowRight size={16} className="ml-2" />
-                    </Button>
-                  </div>
+                      <ChevronRight 
+                        size={13} 
+                        className="text-neutral-300 dark:text-neutral-600 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" 
+                      />
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-                  {/* Image */}
-                  <div className="flex flex-col items-center justify-center">
-                    <motion.img
-                      key={activeContent.imageSrc}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3 }}
-                      src={activeContent.imageSrc}
-                      alt={activeContent.imageAlt}
-                      className="w-full max-w-[180px] lg:max-w-[220px] xl:max-w-[250px] "
-                    />
-                    <p className="text-center text-neutral-500 dark:text-neutral-400 text-sm mt-3">
-                      {activeContent.imageCaption}
-                    </p>
-                  </div>
-                </div>
+            {/* Center - Title & Description */}
+            <div className="col-span-12 lg:col-span-5 flex flex-col justify-center p-6 lg:px-10 lg:py-8">
+              <h2 className="text-2xl lg:text-3xl font-bold text-amber-500 dark:text-amber-400 leading-tight">
+                {activeContent.rightHeader}
+              </h2>
+              <p className="mt-3 text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed max-w-md">
+                {activeContent.rightDescription}
+              </p>
+              <div className="mt-6">
+                <Button
+                  variant="primary"
+                  className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-5 py-2.5 text-sm font-medium w-fit"
+                >
+                  {activeContent.buttonText}
+                  <ArrowRight size={15} className="ml-2" />
+                </Button>
               </div>
+              <p className="mt-6 text-xs text-neutral-400 dark:text-neutral-500">
+                {activeContent.imageCaption}
+              </p>
+            </div>
+
+            {/* Right - Image */}
+            <div className="col-span-12 lg:col-span-4 bg-neutral-50 dark:bg-neutral-800/50 flex items-center justify-center p-6">
+              <motion.img
+                key={activeContent.imageSrc}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                src={activeContent.imageSrc}
+                alt={activeContent.imageAlt}
+                className="w-full max-w-[240px] xl:max-w-[280px] object-contain"
+              />
             </div>
           </motion.div>
         </AnimatePresence>
