@@ -74,7 +74,7 @@ const ATMServices: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm font-medium mb-4">
             <MapPin className="w-4 h-4" />
             ATM Services
           </span>
@@ -99,7 +99,7 @@ const ATMServices: React.FC = () => {
               key={stat.label}
               className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <p className="text-2xl lg:text-3xl font-bold text-purple-600">{stat.value}</p>
+              <p className="text-2xl lg:text-3xl font-bold text-purple-600 dark:text-purple-400">{stat.value}</p>
               <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{stat.label}</p>
             </div>
           ))}
@@ -120,11 +120,11 @@ const ATMServices: React.FC = () => {
                 <div
                   key={service.name}
                   className={cn(
-                    "p-4 rounded-xl bg-purple-50 border border-purple-100",
-                    "hover:bg-purple-100 transition-colors"
+                    "p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/30",
+                    "hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-3">
                     {service.icon}
                   </div>
                   <h5 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{service.name}</h5>
@@ -147,18 +147,18 @@ const ATMServices: React.FC = () => {
                 key={type.name}
                 className={cn(
                   "p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                  "hover:shadow-md hover:border-purple-300 transition-all"
+                  "hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600 transition-all"
                 )}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h5 className="font-semibold text-neutral-900 dark:text-white">{type.name}</h5>
-                  <span className="text-sm font-semibold text-purple-600">{type.count}</span>
+                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">{type.count}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {type.features.map((feature) => (
                     <span
                       key={feature}
-                      className="px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs"
+                      className="px-2 py-1 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs"
                     >
                       {feature}
                     </span>

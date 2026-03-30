@@ -32,7 +32,7 @@ const accounts: AccountType[] = [
     name: "Basic Checking",
     tagline: "For everyday banking needs",
     monthlyFee: "$0",
-    color: "bg-neutral-50 dark:bg-neutral-700/500",
+    color: "bg-neutral-500 dark:bg-neutral-400",
     features: [
       { name: "Monthly fee", included: true, value: "Free" },
       { name: "Minimum balance", included: true, value: "None" },
@@ -49,7 +49,7 @@ const accounts: AccountType[] = [
     tagline: "Enhanced features for active users",
     monthlyFee: "$9.99",
     popular: true,
-    color: "bg-indigo-50 dark:bg-indigo-900/300",
+    color: "bg-indigo-500 dark:bg-indigo-400",
     features: [
       { name: "Monthly fee", included: true, value: "$9.99" },
       { name: "Minimum balance", included: true, value: "None" },
@@ -65,7 +65,7 @@ const accounts: AccountType[] = [
     name: "Premium Checking",
     tagline: "The ultimate banking experience",
     monthlyFee: "$24.99",
-    color: "bg-amber-50 dark:bg-amber-900/200",
+    color: "bg-amber-500 dark:bg-amber-400",
     features: [
       { name: "Monthly fee", included: true, value: "$24.99" },
       { name: "Minimum balance", included: true, value: "None" },
@@ -103,7 +103,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     {/* Popular Badge */}
     {account.popular && (
       <div className="absolute top-0 right-0">
-        <div className="flex items-center gap-1 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/300 text-white text-xs font-medium rounded-bl-lg">
+        <div className="flex items-center gap-1 px-3 py-1 bg-indigo-500 text-white text-xs font-medium rounded-bl-lg">
           <Sparkles className="w-3 h-3" />
           Most Popular
         </div>
@@ -135,7 +135,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
               <span
                 className={cn(
                   "text-sm",
-                  feature.included ? "text-neutral-700 dark:text-neutral-300" : "text-neutral-400 dark:text-neutral-500 dark:text-neutral-400"
+                  feature.included ? "text-neutral-700 dark:text-neutral-300" : "text-neutral-400 dark:text-neutral-500"
                 )}
               >
                 {feature.name}
@@ -160,7 +160,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
           "text-sm font-medium transition-colors",
           account.popular
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600"
+            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-600"
         )}
       >
         Open Account

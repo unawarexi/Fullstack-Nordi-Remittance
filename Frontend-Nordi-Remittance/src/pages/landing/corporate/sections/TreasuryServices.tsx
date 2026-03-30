@@ -100,7 +100,7 @@ const marketInsights = [
 // ========================
 const TreasuryServices: React.FC = () => {
   return (
-    <Section id="treasury-services" className="py-16 lg:py-24 bg-gradient-to-b from-white to-slate-50">
+    <Section id="treasury-services" className="py-16 lg:py-24 bg-gradient-to-b from-white to-slate-50 dark:from-neutral-900 dark:to-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -109,7 +109,7 @@ const TreasuryServices: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
             <TrendingUp className="w-4 h-4" />
             Treasury Services
           </span>
@@ -139,12 +139,12 @@ const TreasuryServices: React.FC = () => {
                 )}
               >
                 {product.badge && (
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-xs font-medium">
+                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs font-medium">
                     {product.badge}
                   </span>
                 )}
                 
-                <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-4">
                   {product.icon}
                 </div>
                 
@@ -208,7 +208,7 @@ const TreasuryServices: React.FC = () => {
             {/* Risk Assessment */}
             <div className="p-5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                   <Calculator className="w-5 h-5" />
                 </div>
                 <div>
@@ -220,7 +220,7 @@ const TreasuryServices: React.FC = () => {
                 Get a comprehensive analysis of your currency and interest rate exposures 
                 with recommended hedging strategies.
               </p>
-              <Button variant="primary" className="w-full bg-amber-600 hover:bg-amber-700 text-sm">
+              <Button variant="primary" className="w-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-sm">
                 Request Assessment
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>

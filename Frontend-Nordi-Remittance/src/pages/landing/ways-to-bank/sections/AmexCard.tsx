@@ -90,7 +90,7 @@ const globalBenefits = [
 // ========================
 const AmexCard: React.FC = () => {
   return (
-    <Section id="amex-card" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
+    <Section id="amex-card" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-neutral-900 dark:to-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -99,7 +99,7 @@ const AmexCard: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-4">
             <CreditCard className="w-4 h-4" />
             American Express
           </span>
@@ -124,7 +124,7 @@ const AmexCard: React.FC = () => {
               key={benefit.title}
               className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
@@ -175,21 +175,21 @@ const AmexCard: React.FC = () => {
 
               {/* Card Details */}
               <div className="p-6 flex-1 flex flex-col">
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 mb-4 text-center">
+                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 mb-4 text-center">
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">Welcome Bonus</p>
-                  <p className="text-lg font-bold text-blue-600">{card.rewards}</p>
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{card.rewards}</p>
                 </div>
 
                 <ul className="space-y-2 flex-1 mb-6">
                   {card.benefits.map((benefit) => (
                     <li key={benefit} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-blue-500" />
+                      <Check className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                       <span className="text-sm text-neutral-600 dark:text-neutral-300">{benefit}</span>
                     </li>
                   ))}
                 </ul>
 
-                <Button variant="outline" className="w-full group-hover:border-blue-500 group-hover:text-blue-600">
+                <Button variant="outline" className="w-full group-hover:border-blue-500 dark:group-hover:border-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                   Apply Now
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -203,7 +203,7 @@ const AmexCard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-blue-900 text-white text-center"
+          className="mt-12 p-6 rounded-2xl bg-blue-900 dark:bg-blue-950 text-white text-center"
         >
           <h3 className="text-xl font-bold mb-2">Already Have an AMEX?</h3>
           <p className="text-blue-200 mb-4">

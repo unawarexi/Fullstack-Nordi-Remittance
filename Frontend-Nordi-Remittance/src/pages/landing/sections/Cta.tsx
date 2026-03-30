@@ -170,7 +170,7 @@ const CtaSection: React.FC = () => {
               className={cn(
                 "absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-20",
                 "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-                "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600",
+                "bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700",
                 "flex items-center justify-center",
                 "text-white shadow-lg",
                 "transition-all duration-300 hover:scale-110"
@@ -185,7 +185,7 @@ const CtaSection: React.FC = () => {
               className={cn(
                 "absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-20",
                 "w-10 h-10 sm:w-12 sm:h-12 rounded-full",
-                "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600",
+                "bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700",
                 "flex items-center justify-center",
                 "text-white shadow-lg",
                 "transition-all duration-300 hover:scale-110"
@@ -228,8 +228,8 @@ const CtaSection: React.FC = () => {
                   className={cn(
                     "h-2 rounded-full transition-all duration-300",
                     currentIndex === index
-                      ? "w-6 sm:w-8 bg-amber-50 dark:bg-amber-900/200"
-                      : "w-2 bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/500"
+                      ? "w-6 sm:w-8 bg-amber-500 dark:bg-amber-400"
+                      : "w-2 bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-500"
                   )}
                   aria-label={`Go to slide ${index + 1}`}
                 />

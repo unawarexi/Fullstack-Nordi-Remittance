@@ -64,7 +64,7 @@ const USSDbanking: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm font-medium mb-4">
             <Phone className="w-4 h-4" />
             *901# USSD Banking
           </span>
@@ -89,7 +89,7 @@ const USSDbanking: React.FC = () => {
               key={benefit.title}
               className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
                 <benefit.icon className="w-5 h-5" />
               </div>
               <div>
@@ -115,11 +115,11 @@ const USSDbanking: React.FC = () => {
                 <div
                   key={service.code}
                   className={cn(
-                    "flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100",
-                    "hover:bg-orange-50 hover:border-orange-200 transition-all"
+                    "flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-slate-700",
+                    "hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-200 dark:hover:border-orange-700 transition-all"
                   )}
                 >
-                  <div className="w-20 font-mono text-sm font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded text-center">
+                  <div className="w-20 font-mono text-sm font-semibold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded text-center">
                     {service.code}
                   </div>
                   <div className="flex-1">

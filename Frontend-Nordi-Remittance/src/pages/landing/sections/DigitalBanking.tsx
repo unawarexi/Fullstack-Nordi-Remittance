@@ -147,7 +147,7 @@ const DigitalBanking: React.FC = () => {
             viewport={{ once: true }}
             className={cn(
               "p-6 rounded-2xl",
-              "bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:border-neutral-700"
+              "bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700"
             )}
           >
             <div className="flex items-center gap-3 mb-6">
@@ -171,9 +171,9 @@ const DigitalBanking: React.FC = () => {
                 href="/online-banking"
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
-                  "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 dark:bg-neutral-800 dark:border-neutral-700",
+                  "bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                   "text-sm font-medium text-neutral-700 dark:text-neutral-200",
-                  "hover:bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-neutral-700 transition-colors"
+                  "hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                 )}
               >
                 <Laptop className="w-4 h-4" />
@@ -234,9 +234,9 @@ const DigitalBanking: React.FC = () => {
                   rel="noopener noreferrer"
                   className={cn(
                     "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
-                    "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white dark:bg-neutral-800 dark:text-neutral-100",
+                    "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100",
                     "text-xs font-medium",
-                    "hover:bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-neutral-700 transition-colors"
+                    "hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                   )}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -250,9 +250,9 @@ const DigitalBanking: React.FC = () => {
                   rel="noopener noreferrer"
                   className={cn(
                     "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
-                    "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white dark:bg-neutral-800 dark:text-neutral-100",
+                    "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100",
                     "text-xs font-medium",
-                    "hover:bg-neutral-100 dark:bg-neutral-700 dark:hover:bg-neutral-700 transition-colors"
+                    "hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                   )}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -282,7 +282,7 @@ const DigitalBanking: React.FC = () => {
               key={stat.label}
               className={cn(
                 "text-center p-4 rounded-xl",
-                "bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:border-neutral-700"
+                "bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700"
               )}
             >
               <div className="text-xl font-bold text-indigo-600">{stat.value}</div>

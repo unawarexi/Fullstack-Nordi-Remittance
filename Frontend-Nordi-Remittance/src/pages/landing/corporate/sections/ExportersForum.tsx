@@ -109,7 +109,7 @@ const successMetrics = [
 // ========================
 const ExportersForum: React.FC = () => {
   return (
-    <Section id="exporters-forum" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white">
+    <Section id="exporters-forum" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-neutral-900 dark:to-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -118,7 +118,7 @@ const ExportersForum: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 text-cyan-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-medium mb-4">
             <Ship className="w-4 h-4" />
             Exporters Forum
           </span>
@@ -141,9 +141,9 @@ const ExportersForum: React.FC = () => {
           {successMetrics.map((metric) => (
             <div
               key={metric.label}
-              className="text-center p-4 rounded-xl bg-cyan-50 border border-cyan-100"
+              className="text-center p-4 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/30"
             >
-              <p className="text-2xl lg:text-3xl font-bold text-cyan-600">{metric.value}</p>
+              <p className="text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-cyan-400">{metric.value}</p>
               <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{metric.label}</p>
             </div>
           ))}
@@ -163,7 +163,7 @@ const ExportersForum: React.FC = () => {
                 "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-cyan-300 transition-all duration-300"
               )}
             >
-              <div className="w-14 h-14 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center mb-4">
+              <div className="w-14 h-14 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4">
                 {solution.icon}
               </div>
               
@@ -179,7 +179,7 @@ const ExportersForum: React.FC = () => {
                 ))}
               </ul>
 
-              <Button variant="outline" className="w-full group-hover:border-cyan-500 group-hover:text-cyan-600">
+              <Button variant="outline" className="w-full group-hover:border-cyan-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
                 Learn More
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -206,7 +206,7 @@ const ExportersForum: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{dest.region}</span>
-                      <span className="text-sm text-cyan-600">{dest.share}</span>
+                      <span className="text-sm text-cyan-600 dark:text-cyan-400">{dest.share}</span>
                     </div>
                     <div className="h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
                       <div

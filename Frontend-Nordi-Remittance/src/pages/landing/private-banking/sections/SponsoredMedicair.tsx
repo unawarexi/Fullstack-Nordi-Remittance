@@ -86,7 +86,7 @@ const partnerHospitals = [
 // ========================
 const SponsoredMedicair: React.FC = () => {
   return (
-    <Section id="sponsored-medicair" className="py-16 lg:py-24 bg-gradient-to-b from-rose-50 to-white">
+    <Section id="sponsored-medicair" className="py-16 lg:py-24 bg-gradient-to-b from-rose-50 to-white dark:from-neutral-900 dark:to-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -95,7 +95,7 @@ const SponsoredMedicair: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-sm font-medium mb-4">
             <Heart className="w-4 h-4" />
             Sponsored Medicair
           </span>
@@ -122,7 +122,7 @@ const SponsoredMedicair: React.FC = () => {
                 "hover:shadow-md hover:border-rose-300 transition-all"
               )}
             >
-              <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-4">
                 {feature.icon}
               </div>
               <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{feature.title}</h3>
@@ -155,12 +155,12 @@ const SponsoredMedicair: React.FC = () => {
             </div>
 
             {/* Coverage Limit */}
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-neutral-600 dark:text-neutral-300">Annual Coverage Limit</span>
                 <Award className="w-5 h-5 text-rose-600" />
               </div>
-              <p className="text-3xl font-bold text-rose-600">$5,000,000</p>
+              <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">$5,000,000</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Per member, per annum</p>
             </div>
           </motion.div>

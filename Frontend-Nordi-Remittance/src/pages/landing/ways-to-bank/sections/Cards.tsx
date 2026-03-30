@@ -110,7 +110,7 @@ const Cards: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-4">
             <CreditCard className="w-4 h-4" />
             Cards
           </span>
@@ -135,7 +135,7 @@ const Cards: React.FC = () => {
               key={feature.title}
               className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                 <feature.icon className="w-5 h-5" />
               </div>
               <div>
@@ -192,7 +192,7 @@ const Cards: React.FC = () => {
                 <ul className="space-y-2 flex-1 mb-4">
                   {card.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-blue-500" />
+                      <Check className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                       <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
                     </li>
                   ))}

@@ -113,7 +113,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
   >
     {/* Popular Badge */}
     {card.popular && (
-      <div className="absolute top-0 right-0 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/300 text-white text-xs font-medium rounded-bl-xl">
+      <div className="absolute top-0 right-0 px-3 py-1 bg-indigo-500 text-white text-xs font-medium rounded-bl-xl">
         Most Popular
       </div>
     )}
@@ -167,7 +167,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
       </ul>
 
       {/* APR Info */}
-      <p className="text-xs text-neutral-400 dark:text-neutral-500 dark:text-neutral-400">APR: {card.apr} variable</p>
+      <p className="text-xs text-neutral-400 dark:text-neutral-500">APR: {card.apr} variable</p>
     </div>
 
     {/* CTA */}
@@ -179,7 +179,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
           "font-medium text-sm transition-colors",
           card.popular
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
-            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600"
+            : "bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-600"
         )}
       >
         Apply Now

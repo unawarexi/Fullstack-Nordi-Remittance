@@ -144,7 +144,7 @@ const Banner: React.FC = () => {
             src={Images.bannerCard1} 
             alt="Nordea bank card"
             className={cn(
-              "w-32 sm:w-40 md:w-48 lg:w-56 xl:w-64",
+              "",
               "rounded-lg shadow-xl",
               "hover:-rotate-6 transition-transform duration-300"
             )}
@@ -154,7 +154,7 @@ const Banner: React.FC = () => {
             src={Images.bannerCard2} 
             alt="Nordea bank card"
             className={cn(
-              "w-32 sm:w-40 md:w-48 lg:w-56 xl:w-64",
+              "",
               "rounded-lg shadow-xl",
               "hover:rotate-6 transition-transform duration-300"
             )}
@@ -169,10 +169,10 @@ const Banner: React.FC = () => {
         )}>
           <div className={cn(
             "rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8",
-            "bg-amber-50 dark:bg-amber-900/200/10 dark:bg-amber-50 dark:bg-amber-900/200/20 backdrop-blur-md",
+            "bg-amber-50 dark:bg-amber-900/20 backdrop-blur-md",
             "border border-amber-200/30 dark:border-amber-700/30"
           )}>
-            <Grid cols={{ base: 1, md: 3 }} gap="md">
+            <Grid cols={{ xs: 1, md: 3 }} gap="md">
               {services.map((service, index) => (
                 <ServiceCard key={index} service={service} index={index} />
               ))}

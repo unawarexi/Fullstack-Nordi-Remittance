@@ -148,7 +148,7 @@ const BankingServices = () => {
   }, [visibleSlides]);
 
   return (
-    <Section className="relative bg-slate-100 py-12 sm:py-16 md:py-20 -mt-6 sm:-mt-10">
+    <Section className="relative bg-slate-100 dark:bg-neutral-900 py-12 sm:py-16 md:py-20 -mt-6 sm:-mt-10">
       <Container>
         {/* Section Header */}
         <motion.div 
@@ -158,10 +158,10 @@ const BankingServices = () => {
           transition={{ duration: 0.6 }}
           className="mb-8 sm:mb-12 text-center"
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 dark:text-neutral-100">
             Access More <span className="text-amber-500">Banking Services</span>
           </h2>
-          <p className="mx-auto mt-3 sm:mt-4 max-w-3xl text-sm sm:text-base text-slate-600 px-4">
+          <p className="mx-auto mt-3 sm:mt-4 max-w-3xl text-sm sm:text-base text-slate-600 dark:text-neutral-400 px-4">
             Whether it's your child's first savings account, your personal savings
             account, your first retirement plan, or a business loan, we offer
             personal and corporate banking products and services tailored to meet
@@ -188,7 +188,7 @@ const BankingServices = () => {
             )}
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700 dark:text-neutral-300" />
           </button>
 
           <button
@@ -203,7 +203,7 @@ const BankingServices = () => {
             )}
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-700 dark:text-neutral-300" />
           </button>
 
           {/* Slides Container */}
@@ -239,8 +239,8 @@ const BankingServices = () => {
                 className={cn(
                   "h-2 rounded-full transition-all duration-300",
                   currentSlide === index 
-                    ? "w-8 sm:w-10 bg-amber-50 dark:bg-amber-900/200" 
-                    : "w-2 bg-slate-300 hover:bg-slate-400"
+                    ? "w-8 sm:w-10 bg-amber-500 dark:bg-amber-400" 
+                    : "w-2 bg-slate-300 dark:bg-neutral-600 hover:bg-slate-400 dark:hover:bg-neutral-500"
                 )}
                 aria-label={`Go to slide ${index + 1}`}
               />

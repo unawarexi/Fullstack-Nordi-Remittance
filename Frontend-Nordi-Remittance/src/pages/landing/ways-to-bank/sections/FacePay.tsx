@@ -60,7 +60,7 @@ const merchants = [
 // ========================
 const FacePay: React.FC = () => {
   return (
-    <Section id="facepay" className="py-16 lg:py-24 bg-gradient-to-br from-violet-50 to-indigo-50">
+    <Section id="facepay" className="py-16 lg:py-24 bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-neutral-900 dark:to-neutral-800">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -69,7 +69,7 @@ const FacePay: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-sm font-medium mb-4">
             <Scan className="w-4 h-4" />
             FacePay
           </span>
@@ -94,7 +94,7 @@ const FacePay: React.FC = () => {
               key={benefit.title}
               className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-12 h-12 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
+              <div className="w-12 h-12 mx-auto rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-3">
                 <benefit.icon className="w-6 h-6" />
               </div>
               <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</h4>
@@ -170,7 +170,7 @@ const FacePay: React.FC = () => {
                 {merchants.map((merchant) => (
                   <span
                     key={merchant}
-                    className="px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 text-xs font-medium"
+                    className="px-3 py-1.5 rounded-full bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 text-xs font-medium"
                   >
                     {merchant}
                   </span>

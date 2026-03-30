@@ -76,7 +76,7 @@ const MobileBanking: React.FC = () => {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 text-cyan-700 text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-medium mb-4">
             <Smartphone className="w-4 h-4" />
             Mobile Banking
           </span>
@@ -99,7 +99,7 @@ const MobileBanking: React.FC = () => {
           {appStats.map((stat) => (
             <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <stat.icon className="w-4 h-4 text-cyan-600" />
+                <stat.icon className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span className="text-xl font-bold text-neutral-900 dark:text-white">{stat.value}</span>
               </div>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">{stat.label}</p>
@@ -186,10 +186,10 @@ const MobileBanking: React.FC = () => {
                   key={feature.name}
                   className={cn(
                     "p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                    "hover:shadow-md hover:border-cyan-300 transition-all"
+                    "hover:shadow-md hover:border-cyan-300 dark:hover:border-cyan-600 transition-all"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-3">
                     {feature.icon}
                   </div>
                   <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{feature.name}</h4>
