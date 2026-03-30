@@ -3,8 +3,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  esbuild: {
+    drop: mode === 'production' ? ['console', 'debugger'] : [],
+  },
   resolve: {
     alias: {
       "@core": path.resolve(__dirname, "src/core"),
@@ -21,4 +24,4 @@ export default defineConfig({
       "@types": path.resolve(__dirname, "src/types"),
     },
   },
-});
+}));
