@@ -77,20 +77,18 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
     },
     ref
   ) => {
-    const Component = animate ? motion.section : 'section';
-
     const motionProps = animate
       ? {
-          initial: 'hidden',
-          whileInView: 'visible',
+          initial: 'hidden' as const,
+          whileInView: 'visible' as const,
           viewport: { once: true, margin: '-100px' },
           variants: sectionVariants,
         }
       : {};
 
     return (
-      <Component
-        ref={ref as React.Ref<HTMLElement>}
+      <motion.section
+        ref={ref}
         className={cn(
           // Base styles
           'relative w-full',
@@ -115,7 +113,7 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
         >
           {children}
         </div>
-      </Component>
+      </motion.section>
     );
   }
 );
