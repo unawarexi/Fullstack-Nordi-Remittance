@@ -118,22 +118,22 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ feature, index }) => (
 // ========================
 const DigitalBanking: React.FC = () => {
   return (
-    <Section background="white" className="py-12 lg:py-16">
+    <Section background="white" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+          <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
             Digital Experience
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
             Banking That Fits Your Life
           </h2>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
             Access your accounts anytime, anywhere with our award-winning online and mobile platforms.
           </p>
         </motion.div>
@@ -146,7 +146,7 @@ const DigitalBanking: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className={cn(
-              "p-6 rounded-2xl",
+              "p-4 sm:p-5 md:p-6 rounded-2xl",
               "bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700"
             )}
           >
@@ -189,7 +189,7 @@ const DigitalBanking: React.FC = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className={cn(
-              "p-6 rounded-2xl",
+              "p-4 sm:p-5 md:p-6 rounded-2xl",
               "bg-indigo-600"
             )}
           >

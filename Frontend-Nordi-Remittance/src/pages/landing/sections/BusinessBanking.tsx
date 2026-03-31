@@ -74,21 +74,21 @@ const benefits = [
 // ========================
 const BusinessBanking: React.FC = () => {
   return (
-    <Section background="dark" className="py-12 lg:py-16 bg-slate-900">
+    <Section background="dark" className="py-8 sm:py-12 lg:py-16 bg-slate-900">
       <Container size="xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-50 dark:bg-indigo-900/300/10 rounded-full mb-4">
-              <Briefcase className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-400 bg-indigo-50 dark:bg-indigo-900/300/10 rounded-full mb-3 sm:mb-4">
+              <Briefcase className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               Business Banking
             </span>
 
-            <h2 className="text-2xl lg:text-3xl font-bold text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
               Powerful Tools for Growing Businesses
             </h2>
 
@@ -143,7 +143,7 @@ const BusinessBanking: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
                 className={cn(
-                  "p-4 rounded-xl",
+                  "p-3 sm:p-4 rounded-xl",
                   "bg-slate-800 border border-slate-700",
                   "hover:bg-slate-750 hover:border-slate-600 transition-all"
                 )}

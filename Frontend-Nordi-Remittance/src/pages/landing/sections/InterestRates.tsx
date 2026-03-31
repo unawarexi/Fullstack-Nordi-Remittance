@@ -67,7 +67,7 @@ const RateRow: React.FC<RateRowProps> = ({ rate, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.3, delay: index * 0.05 }}
     className={cn(
-      "flex items-center justify-between py-3 px-4",
+      "flex items-center justify-between py-2 sm:py-3 px-3 sm:px-4",
       "border-b border-neutral-100 dark:border-neutral-700 last:border-0",
       "hover:bg-neutral-50 dark:hover:bg-neutral-700 dark:bg-neutral-700/50 transition-colors"
     )}
@@ -101,7 +101,7 @@ interface RateTableProps {
 
 const RateTable: React.FC<RateTableProps> = ({ title, rates, color }) => (
   <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-100 dark:border-neutral-700 overflow-hidden">
-    <div className={cn("px-4 py-3 border-b border-neutral-100 dark:border-neutral-700", color)}>
+    <div className={cn("px-3 sm:px-4 py-2 sm:py-3 border-b border-neutral-100 dark:border-neutral-700", color)}>
       <h3 className="font-semibold text-white text-sm">{title}</h3>
     </div>
     <div className="divide-y divide-neutral-100 dark:divide-neutral-700">
@@ -125,22 +125,22 @@ const InterestRates: React.FC = () => {
   });
 
   return (
-    <Section background="white" className="py-12 lg:py-16">
+    <Section background="white" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+            <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
               Current Rates
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Competitive Interest Rates
             </h2>
-            <p className="mt-2 text-neutral-600 dark:text-neutral-300">
+            <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-300">
               Updated daily to give you the best possible rates.
             </p>
           </motion.div>
@@ -176,7 +176,7 @@ const InterestRates: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={cn(
-            "mt-6 p-4 rounded-lg",
+            "mt-6 p-3 sm:p-4 rounded-lg",
             "bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30"
           )}
         >

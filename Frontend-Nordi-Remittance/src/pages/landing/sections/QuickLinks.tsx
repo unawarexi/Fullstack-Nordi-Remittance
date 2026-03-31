@@ -124,7 +124,7 @@ const QuickLinkCard: React.FC<QuickLinkCardProps> = ({ link, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.3, delay: index * 0.04 }}
     className={cn(
-      "group flex items-center gap-3 p-4 rounded-xl",
+      "group flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all duration-300"
     )}
@@ -139,10 +139,10 @@ const QuickLinkCard: React.FC<QuickLinkCardProps> = ({ link, index }) => (
       {link.icon}
     </div>
     <div className="flex-1 min-w-0">
-      <h4 className="font-medium text-neutral-900 dark:text-white text-sm group-hover:text-indigo-600 transition-colors">
+      <h4 className="font-medium text-neutral-900 dark:text-white text-xs sm:text-sm group-hover:text-indigo-600 transition-colors truncate">
         {link.title}
       </h4>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{link.description}</p>
+      <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 truncate">{link.description}</p>
     </div>
     <ArrowRight
       className={cn(
@@ -158,22 +158,22 @@ const QuickLinkCard: React.FC<QuickLinkCardProps> = ({ link, index }) => (
 // ========================
 const QuickLinks: React.FC = () => {
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+          <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
             Quick Access
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
             Popular Services
           </h2>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-300">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-300">
             Quick shortcuts to the things you do most
           </p>
         </motion.div>
@@ -191,8 +191,8 @@ const QuickLinks: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={cn(
-            "mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
-            "p-6 rounded-2xl",
+            "mt-8 sm:mt-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+            "p-4 sm:p-5 md:p-6 rounded-2xl",
             "bg-indigo-600"
           )}
         >

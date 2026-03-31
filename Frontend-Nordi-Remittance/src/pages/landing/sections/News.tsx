@@ -110,11 +110,11 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, index }) => (
     </div>
 
     {/* Content */}
-    <div className="p-4">
+    <div className="p-3 sm:p-4">
       <h3
         className={cn(
           "font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors line-clamp-2",
-          article.featured ? "text-lg" : "text-sm"
+          article.featured ? "text-base sm:text-lg" : "text-sm"
         )}
       >
         {article.title}
@@ -122,15 +122,15 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, index }) => (
       
       <p
         className={cn(
-          "mt-2 text-neutral-500 dark:text-neutral-400 line-clamp-2",
-          article.featured ? "text-sm" : "text-xs"
+          "mt-1.5 sm:mt-2 text-neutral-500 dark:text-neutral-400 line-clamp-2",
+          article.featured ? "text-xs sm:text-sm" : "text-xs"
         )}
       >
         {article.excerpt}
       </p>
 
       {/* Meta */}
-      <div className="mt-3 flex items-center gap-3 text-xs text-neutral-400">
+      <div className="mt-2.5 sm:mt-3 flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-neutral-400">
         <span className="flex items-center gap-1">
           <Calendar className="w-3 h-3" />
           {article.date}
@@ -149,19 +149,19 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, index }) => (
 // ========================
 const News: React.FC = () => {
   return (
-    <Section background="white" className="py-12 lg:py-16">
+    <Section background="white" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+            <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
               News & Updates
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Latest From Nordea Access
             </h2>
           </motion.div>
@@ -182,7 +182,7 @@ const News: React.FC = () => {
         </div>
 
         {/* News Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           {newsArticles.map((article, index) => (
             <NewsCard key={article.id} article={article} index={index} />
           ))}
@@ -194,16 +194,16 @@ const News: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className={cn(
-            "mt-10 p-6 rounded-xl",
+            "mt-8 sm:mt-10 p-4 sm:p-5 md:p-6 rounded-xl",
             "bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700"
           )}
         >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
             <div>
-              <h4 className="font-semibold text-neutral-900 dark:text-white">
+              <h4 className="font-semibold text-neutral-900 dark:text-white text-sm sm:text-base">
                 Stay Updated with Our Newsletter
               </h4>
-              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              <p className="mt-1 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
                 Get the latest financial tips, product updates, and exclusive offers.
               </p>
             </div>

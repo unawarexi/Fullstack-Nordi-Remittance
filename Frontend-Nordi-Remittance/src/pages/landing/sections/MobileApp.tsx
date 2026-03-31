@@ -38,9 +38,9 @@ const appRatings = [
 // ========================
 const MobileApp: React.FC = () => {
   return (
-    <Section background="white" className="py-12 lg:py-16 overflow-hidden">
+    <Section background="white" className="py-8 sm:py-12 lg:py-16 overflow-hidden">
       <Container size="xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -48,16 +48,16 @@ const MobileApp: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-4">
-              <Smartphone className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3 sm:mb-4">
+              <Smartphone className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               Mobile Banking
             </span>
 
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Banking at Your Fingertips
             </h2>
 
-            <p className="mt-3 text-neutral-600 dark:text-neutral-300 leading-relaxed">
+            <p className="mt-2 sm:mt-3 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
               Download our award-winning mobile app and manage your finances anytime,
               anywhere. Available for iOS and Android devices.
             </p>
@@ -67,10 +67,10 @@ const MobileApp: React.FC = () => {
               {appFeatures.map((feature) => (
                 <div
                   key={feature.text}
-                  className="flex items-center gap-2.5 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
+                  className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
                 >
                   <div className="text-indigo-500">{feature.icon}</div>
-                  <span className="text-sm text-neutral-700 dark:text-neutral-200">{feature.text}</span>
+                  <span className="text-[10px] sm:text-sm text-neutral-700 dark:text-neutral-200">{feature.text}</span>
                 </div>
               ))}
             </div>
@@ -156,8 +156,8 @@ const MobileApp: React.FC = () => {
               <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-800/30 rounded-[3rem] blur-3xl opacity-40 scale-110" />
               
               {/* Phone */}
-              <div className="relative w-64 sm:w-72 bg-neutral-900 rounded-[2.5rem] p-3 shadow-2xl">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-6 bg-neutral-900 rounded-b-xl" />
+              <div className="relative w-56 sm:w-64 md:w-72 bg-neutral-900 rounded-[2.5rem] p-2 sm:p-3 shadow-2xl">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-5 sm:h-6 bg-neutral-900 rounded-b-xl" />
                 
                 {/* Screen */}
                 <div className="bg-white dark:bg-neutral-800 rounded-[2rem] overflow-hidden">

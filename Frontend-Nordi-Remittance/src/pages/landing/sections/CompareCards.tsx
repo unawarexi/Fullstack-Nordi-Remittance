@@ -119,34 +119,34 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
     )}
 
     {/* Card Visual */}
-    <div className={cn("relative h-40 bg-neutral-900 overflow-hidden")}>
+    <div className={cn("relative h-32 sm:h-40 bg-neutral-900 overflow-hidden")}>
       <div
         className={cn(
-          "absolute -right-10 -top-10 w-40 h-40 rounded-full opacity-30 bg-gradient-to-br",
+          "absolute -right-10 -top-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full opacity-30 bg-gradient-to-br",
           card.color
         )}
       />
-      <div className="absolute bottom-4 left-5 right-5">
-        <div className="flex items-center gap-2 mb-3">
-          <CreditCard className="w-6 h-6 text-white/80" />
-          <span className="text-white/60 text-xs">NORDEA</span>
+      <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-5 right-4 sm:right-5">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+          <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
+          <span className="text-white/60 text-[10px] sm:text-xs">NORDEA</span>
         </div>
-        <div className="text-white font-semibold">{card.name}</div>
-        <div className="text-white/60 text-xs mt-0.5">{card.tagline}</div>
+        <div className="text-white text-sm sm:text-base font-semibold">{card.name}</div>
+        <div className="text-white/60 text-[10px] sm:text-xs mt-0.5">{card.tagline}</div>
       </div>
     </div>
 
     {/* Content */}
-    <div className="flex-1 p-5">
+    <div className="flex-1 p-4 sm:p-5">
       {/* Key Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
-          <div className="text-xs text-neutral-500 dark:text-neutral-400">Annual Fee</div>
-          <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{card.annualFee}</div>
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+        <div className="p-2 sm:p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+          <div className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">Annual Fee</div>
+          <div className="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100">{card.annualFee}</div>
         </div>
-        <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
-          <div className="text-xs text-neutral-500 dark:text-neutral-400">Rewards</div>
-          <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{card.rewards}</div>
+        <div className="p-2 sm:p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+          <div className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">Rewards</div>
+          <div className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400">{card.rewards}</div>
         </div>
       </div>
 
@@ -171,7 +171,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
     </div>
 
     {/* CTA */}
-    <div className="p-5 pt-0">
+    <div className="p-4 sm:p-5 pt-0">
       <a
         href={`/cards/${card.id}`}
         className={cn(
@@ -194,23 +194,23 @@ const CardPreview: React.FC<CardPreviewProps> = ({ card, index }) => (
 // ========================
 const CompareCards: React.FC = () => {
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/50 rounded-full mb-3">
-            <CreditCard className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/50 rounded-full mb-2 sm:mb-3">
+            <CreditCard className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             Credit Cards
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
             Find Your Perfect Card
           </h2>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
             Whether you want cashback, travel rewards, or low APR, we have a card for you.
           </p>
         </motion.div>

@@ -86,15 +86,15 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.3, delay: index * 0.05 }}
     className={cn(
-      "flex flex-col items-center p-4 rounded-xl",
+      "flex flex-col items-center p-3 sm:p-4 rounded-xl",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all"
     )}
   >
-    <div className="p-3 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 mb-3">
+    <div className="p-2 sm:p-3 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 mb-2 sm:mb-3">
       {reward.icon}
     </div>
-    <span className="text-2xl font-bold text-indigo-600">{reward.cashback}</span>
+    <span className="text-xl sm:text-2xl font-bold text-indigo-600">{reward.cashback}</span>
     <span className="text-xs text-neutral-500 dark:text-neutral-400 text-center mt-1">
       {reward.category}
     </span>
@@ -116,23 +116,23 @@ const TierCard: React.FC<TierCardProps> = ({ tier, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative p-5 rounded-xl",
+      "relative p-4 sm:p-5 rounded-xl",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-shadow"
     )}
   >
-    <div className="flex items-center gap-3 mb-4">
+    <div className="flex items-center gap-3 mb-3 sm:mb-4">
       <div className={cn("p-2 rounded-lg text-white", tier.color)}>
         {tier.icon}
       </div>
       <div>
-        <h4 className="font-semibold text-neutral-900 dark:text-white">{tier.name}</h4>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">{tier.requirement}</p>
+        <h4 className="font-semibold text-neutral-900 dark:text-white text-sm sm:text-base">{tier.name}</h4>
+        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">{tier.requirement}</p>
       </div>
     </div>
-    <ul className="space-y-2">
+    <ul className="space-y-1.5 sm:space-y-2">
       {tier.benefits.map((benefit) => (
-        <li key={benefit} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
+        <li key={benefit} className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
           <div className="w-1.5 h-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/300" />
           {benefit}
         </li>
@@ -146,23 +146,23 @@ const TierCard: React.FC<TierCardProps> = ({ tier, index }) => (
 // ========================
 const Rewards: React.FC = () => {
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16">
           {/* Left - Cashback Categories */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-4">
-              <Gift className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3 sm:mb-4">
+              <Gift className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               Rewards Program
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               Earn Cashback on Every Purchase
             </h2>
-            <p className="mt-3 text-neutral-600 dark:text-neutral-300 leading-relaxed">
+            <p className="mt-2 sm:mt-3 text-sm md:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
               Turn your everyday spending into rewards. Earn up to 3% cashback on purchases
               across popular categories with no annual fee.
             </p>

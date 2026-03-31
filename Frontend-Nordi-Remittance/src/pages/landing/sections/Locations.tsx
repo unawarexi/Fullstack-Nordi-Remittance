@@ -94,7 +94,7 @@ const LocationCard: React.FC<LocationCardProps> = ({ location, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "p-4 rounded-xl",
+      "p-3 sm:p-4 rounded-xl",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-md hover:border-neutral-200 dark:border-neutral-700 transition-all"
     )}
@@ -213,9 +213,9 @@ const Locations: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           {/* Left - Map Placeholder */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -225,7 +225,7 @@ const Locations: React.FC = () => {
           >
             <div
               className={cn(
-                "relative h-80 lg:h-full min-h-[400px] rounded-xl overflow-hidden",
+                "relative h-64 sm:h-80 lg:h-full min-h-[300px] sm:min-h-[400px] rounded-xl overflow-hidden",
                 "bg-neutral-200"
               )}
             >
@@ -265,13 +265,13 @@ const Locations: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+              <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
                 Find Us
               </span>
-              <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
                 Branches & ATMs Near You
               </h2>
-              <p className="mt-2 text-neutral-600 dark:text-neutral-300">
+              <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-300">
                 Find a branch or fee-free ATM in your neighborhood.
               </p>
             </motion.div>

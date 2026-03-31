@@ -55,7 +55,7 @@ const awards = [
 // ========================
 const Partners: React.FC = () => {
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Partners Section */}
         <motion.div
@@ -74,7 +74,7 @@ const Partners: React.FC = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="flex flex-wrap justify-center items-center gap-6 lg:gap-10 mb-16"
+          className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 lg:gap-10 mb-10 sm:mb-16"
         >
           {partners.map((partner, index) => (
             <motion.div
@@ -84,9 +84,9 @@ const Partners: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className={cn(
-                "px-6 py-3 rounded-lg",
+                "px-3 sm:px-6 py-2 sm:py-3 rounded-lg",
                 "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
-                "text-neutral-400 font-bold text-lg",
+                "text-neutral-400 font-bold text-sm sm:text-lg",
                 "hover:text-neutral-600 dark:text-neutral-300 hover:border-neutral-200 dark:border-neutral-700 transition-all"
               )}
             >
@@ -103,18 +103,18 @@ const Partners: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+          <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white">
             Award-Winning Banking
           </h3>
-          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="mt-1 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
             Recognized globally for excellence in banking services
           </p>
         </motion.div>
 
         {/* Awards Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {awards.map((award, index) => (
             <motion.div
               key={award.title}
@@ -123,19 +123,19 @@ const Partners: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "text-center p-5 rounded-xl",
+                "text-center p-4 sm:p-5 rounded-xl",
                 "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
                 "hover:shadow-md transition-shadow"
               )}
             >
-              <div className="inline-flex p-3 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-500 mb-3">
+              <div className="inline-flex p-2.5 sm:p-3 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-500 mb-2.5 sm:mb-3">
                 {award.icon}
               </div>
-              <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">
+              <h4 className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm line-clamp-1">
                 {award.title}
               </h4>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{award.org}</p>
-              <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 rounded">
+              <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1">{award.org}</p>
+              <span className="inline-block mt-2 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 rounded">
                 {award.year}
               </span>
             </motion.div>

@@ -58,7 +58,7 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, index }) => {
       whileHover={{ y: -5, scale: 1.02 }}
       className={cn(
         "flex flex-col items-center",
-        "p-4 sm:p-5 md:p-6",
+        "p-3 sm:p-4 md:p-6",
         "bg-gradient-to-br from-lime-500/90 to-lime-600/90",
         "backdrop-blur-sm rounded-xl sm:rounded-2xl",
         "border border-lime-400/30 shadow-lg",
@@ -68,20 +68,20 @@ const ContentCard: React.FC<ContentCardProps> = ({ item, index }) => {
     >
       {/* Icon */}
       <div className={cn(
-        "p-3 sm:p-4 rounded-full",
+        "p-2 sm:p-3 md:p-4 rounded-full",
         "bg-white/20 backdrop-blur-sm",
-        "mb-3 sm:mb-4",
+        "mb-2.5 sm:mb-4",
         "group-hover:bg-white/30 transition-colors"
       )}>
         <img 
           src={item.icon} 
           alt={item.title} 
-          className="w-8 h-8 sm:w-10 sm:h-10 object-contain" 
+          className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" 
         />
       </div>
       
       {/* Title */}
-      <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 text-center">
+      <h3 className="text-sm sm:text-base md:text-lg font-semibold text-white mb-1 md:mb-2 text-center">
         {item.title}
       </h3>
       
