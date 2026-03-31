@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavbar } from "@contexts/navbar-context";
 import {
@@ -196,13 +196,13 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
         {hasChildren ? (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex w-full items-center justify-between px-4 py-4 text-left"
+            className="flex w-full items-center justify-between px-3 py-2.5 sm:px-4 sm:py-4 text-left"
           >
-            <span className="flex items-center gap-3">
+            <span className="flex items-center gap-2.5 sm:gap-3">
               {item.icon && (
                 <span className="text-primary-500">{item.icon}</span>
               )}
-              <span className="font-medium text-neutral-800 dark:text-neutral-200">
+              <span className="text-sm sm:text-base font-medium text-neutral-800 dark:text-neutral-200">
                 {item.label}
               </span>
             </span>
@@ -220,10 +220,10 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
           <Link
             to={item.href}
             onClick={closeMobileMenu}
-            className="flex w-full items-center gap-3 px-4 py-4"
+            className="flex w-full items-center gap-2.5 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-4"
           >
             {item.icon && <span className="text-primary-500">{item.icon}</span>}
-            <span className="font-medium text-neutral-800 dark:text-neutral-200">
+            <span className="text-sm sm:text-base font-medium text-neutral-800 dark:text-neutral-200">
               {item.label}
             </span>
           </Link>
@@ -245,9 +245,9 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
                 key={childIndex}
                 to={child.href}
                 onClick={closeMobileMenu}
-                className="flex items-center gap-2 px-8 py-3 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-primary-600 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
+                className="flex items-center gap-2 px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-primary-600 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
               >
-                <ChevronRight size={14} />
+                <ChevronRight size={14} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {child.label}
               </Link>
             ))}
@@ -263,6 +263,12 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
 // ========================
 export const MobileNavbar: React.FC = () => {
   const { isMobileMenuOpen, closeMobileMenu } = useNavbar();
+  const location = useLocation();
+
+  // Force close menu unconditionally on route change
+  useEffect(() => {
+    closeMobileMenu();
+  }, [location.pathname, closeMobileMenu]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -347,25 +353,25 @@ export const MobileNavbar: React.FC = () => {
             </motion.nav>
 
             {/* Country Selector */}
-            <div className="border-t border-neutral-200 p-4 dark:border-neutral-800">
-              <div className="mb-4 flex items-center gap-2 relative z-50">
+            <div className="border-t border-neutral-200 p-3 sm:p-4 dark:border-neutral-800">
+              <div className="mb-3 sm:mb-4 flex items-center gap-2 relative z-50">
                 <Globe
-                  size={18}
-                  className="text-neutral-500 dark:text-neutral-400"
+                  size={16}
+                  className="text-neutral-500 dark:text-neutral-400 sm:w-[18px] sm:h-[18px]"
                 />
                 <CountrySelect className="flex-1 w-full" value="US" />
               </div>
 
               {/* CTA Buttons */}
-              <div className="space-y-2">
-                <Link to="/auth/login" onClick={closeMobileMenu}>
-                  <Button variant="primary" className="w-full">
-                    <Lock size={16} className="mr-2" />
+              <div className="space-y-2 sm:space-y-2.5">
+                <Link to="/auth/login" onClick={closeMobileMenu} className="block w-full">
+                  <Button variant="primary" className="w-full text-xs sm:text-sm py-1.5 sm:py-2 h-9 sm:h-10">
+                    <Lock size={14} className="mr-1.5 sm:mr-2 sm:w-[16px] sm:h-[16px]" />
                     Internet Banking
                   </Button>
                 </Link>
-                <Link to="/auth/signup" onClick={closeMobileMenu}>
-                  <Button variant="outline" className="w-full">
+                <Link to="/auth/signup" onClick={closeMobileMenu} className="block w-full">
+                  <Button variant="outline" className="w-full text-xs sm:text-sm py-1.5 sm:py-2 h-9 sm:h-10">
                     Open Account
                   </Button>
                 </Link>

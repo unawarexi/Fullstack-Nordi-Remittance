@@ -55,8 +55,8 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-sm font-medium text-neutral-800 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700/80 outline-none focus:ring-2 focus:ring-primary-500/50",
-          compact ? "py-1.5 px-2" : "py-2 px-3"
+          "flex items-center gap-1 sm:gap-1.5 rounded-md sm:rounded-lg border border-neutral-200 bg-white px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs sm:text-sm font-medium text-neutral-800 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700/80 outline-none focus:ring-2 focus:ring-primary-500/50",
+          compact ? "py-1 px-1.5 sm:py-1.5 sm:px-2" : "py-1.5 px-2 sm:py-2 sm:px-3"
         )}
       >
         <span className="text-base">{selectedCountry.flag}</span>
@@ -76,18 +76,33 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
       {/* DROPDOWN MENU */}
       <AnimatePresence>
         {isOpen && (
+            <motion.div
+              key="backdrop-cs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-[105] bg-black/20 backdrop-blur-[2px] sm:hidden"
+            />
+        )}
+        {isOpen && (
           <motion.div
+            key="panel-cs"
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-neutral-900/80"
+            className={cn(
+              "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[320px] origin-center z-[110]",
+              "sm:absolute sm:left-auto sm:top-auto sm:-translate-x-0 sm:-translate-y-0 sm:right-0 sm:mt-2 sm:w-64 sm:origin-top-right",
+              "rounded-xl border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-neutral-900/80"
+            )}
           >
             {/* Search Input */}
             <div className="relative mb-2">
               <Search
                 size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500"
+                className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 w-3.5 h-3.5 sm:w-4 sm:h-4"
               />
               <input
                 type="text"
@@ -95,7 +110,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
                 placeholder="Search specific country..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border-none bg-neutral-100 py-2 pl-9 pr-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500/50 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500"
+                className="w-full rounded-md sm:rounded-lg border-none bg-neutral-100 py-1.5 pl-7 pr-2.5 sm:py-2 sm:pl-9 sm:pr-3 text-xs sm:text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500/50 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500"
               />
             </div>
 
@@ -107,7 +122,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
                     key={country.code}
                     onClick={() => handleSelect(country.code)}
                     className={cn(
-                      "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                      "flex w-full items-center justify-between rounded-md sm:rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 text-left text-xs sm:text-sm transition-colors",
                       value === country.code
                         ? "bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 font-medium"
                         : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800/80"
