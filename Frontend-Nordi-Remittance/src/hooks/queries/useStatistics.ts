@@ -13,12 +13,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 interface DateRangeParams {
   startDate?: string;
   endDate?: string;
-  period?: "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
+  period?: string | "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
+  [key: string]: any;
 }
 
 interface StatisticsFilters extends DateRangeParams {
   accountId?: UUID;
   currency?: string;
+  type?: string;
+  [key: string]: any;
 }
 
 // ============================================================================

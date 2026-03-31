@@ -307,6 +307,20 @@ export const securityApi = {
   // ==========================================================================
 
   /**
+   * Request security review
+   */
+  requestSecurityReview: async (data: {
+    reason: string;
+    contactMethod: 'email' | 'phone';
+  }): Promise<ApiResponse<{ message: string }>> => {
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(
+      `${SECURITY_BASE}/review/request`,
+      data
+    );
+    return response.data;
+  },
+
+  /**
    * Get security activity log
    */
   getActivityLog: async (params?: {
