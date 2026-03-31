@@ -1,13 +1,26 @@
 {
   "name": "remitwave",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:analyze": "vite build --mode analyze",
+    "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "validate": "npm run typecheck && npm run lint && npm run test",
+    "docker:build": "docker build -t nordi-frontend .",
+    "docker:run": "docker run -p 3001:80 nordi-frontend",
+    "clean": "rm -rf dist coverage node_modules/.cache"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
