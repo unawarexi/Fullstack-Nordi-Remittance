@@ -249,26 +249,26 @@ const MegaNavbar: React.FC = () => {
             className="grid grid-cols-12 min-h-[380px]"
           >
             {/* Left - Navigation Links */}
-            <div className="col-span-12 lg:col-span-3 border-r border-neutral-100 dark:border-neutral-800 p-5 lg:p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-4">
+            <div className="col-span-12 lg:col-span-3 border-r border-neutral-100 dark:border-neutral-800 p-6 lg:p-8">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-6 italic">
                 {activeContent.leftHeader}
               </p>
-              <ul className="space-y-0.5">
+              <ul className="space-y-1">
                 {activeContent.leftLinks?.map((link, idx) => (
                   <li key={idx}>
                     <a
                       href={link.url}
                       className={cn(
-                        "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium",
+                        "flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-bold",
                         "text-neutral-600 dark:text-neutral-300",
-                        "hover:text-amber-600 dark:hover:text-amber-400",
-                        "hover:bg-neutral-50 dark:hover:bg-neutral-800",
-                        "transition-all duration-150 group"
+                        "hover:text-blue-600 dark:hover:text-blue-400",
+                        "hover:bg-blue-50/50 dark:hover:bg-blue-900/20",
+                        "transition-all duration-200 group"
                       )}
                     >
                       <ChevronRight 
-                        size={13} 
-                        className="text-neutral-300 dark:text-neutral-600 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" 
+                        size={12} 
+                        className="text-neutral-300 dark:text-neutral-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" 
                       />
                       {link.label}
                     </a>
@@ -278,23 +278,23 @@ const MegaNavbar: React.FC = () => {
             </div>
 
             {/* Center - Title & Description */}
-            <div className="col-span-12 lg:col-span-5 flex flex-col justify-center p-6 lg:px-10 lg:py-8">
-              <h2 className="text-2xl lg:text-3xl font-bold text-amber-500 dark:text-amber-400 leading-tight">
+            <div className="col-span-12 lg:col-span-5 flex flex-col justify-center p-8 lg:px-12 lg:py-10">
+              <h2 className="text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white leading-tight uppercase tracking-tighter italic">
                 {activeContent.rightHeader}
               </h2>
-              <p className="mt-3 text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed max-w-md">
+              <p className="mt-4 text-neutral-500 dark:text-neutral-400 text-sm font-bold leading-relaxed max-w-md opacity-80">
                 {activeContent.rightDescription}
               </p>
-              <div className="mt-6">
+              <div className="mt-8">
                 <Button
                   variant="primary"
-                  className="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-5 py-2.5 text-sm font-medium w-fit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest w-fit shadow-xl hover:scale-105 transition-all"
                 >
                   {activeContent.buttonText}
-                  <ArrowRight size={15} className="ml-2" />
+                  <ArrowRight size={14} className="ml-3" />
                 </Button>
               </div>
-              <p className="mt-6 text-xs text-neutral-400 dark:text-neutral-500">
+              <p className="mt-8 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest opacity-60">
                 {activeContent.imageCaption}
               </p>
             </div>

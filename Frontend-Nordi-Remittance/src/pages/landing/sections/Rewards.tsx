@@ -91,11 +91,13 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward, index }) => (
       "hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-700 transition-all"
     )}
   >
-    <div className="p-2 sm:p-3 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 mb-2 sm:mb-3">
-      {reward.icon}
+    <div className="p-3 sm:p-4 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 mb-3 sm:mb-4 group-hover:scale-110 transition-transform shadow-inner">
+      {React.isValidElement(reward.icon) 
+        ? React.cloneElement(reward.icon as React.ReactElement, { className: "w-6 h-6" })
+        : reward.icon}
     </div>
-    <span className="text-xl sm:text-2xl font-bold text-indigo-600">{reward.cashback}</span>
-    <span className="text-xs text-neutral-500 dark:text-neutral-400 text-center mt-1">
+    <span className="text-2xl sm:text-4xl font-black text-indigo-600 italic tabular-nums tracking-tighter">{reward.cashback}</span>
+    <span className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-widest text-center mt-2 opacity-80">
       {reward.category}
     </span>
   </motion.div>

@@ -144,16 +144,16 @@ const Xtravaganza: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-12"
+          className="grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto mb-12 sm:mb-20"
         >
           {[
-            { value: "₦500M+", label: "Rewards Given" },
-            { value: "2M+", label: "Active Members" },
-            { value: "10K+", label: "Winners Monthly" },
+            { value: "₦500M+", label: "Rewards" },
+            { value: "2M+", label: "Members" },
+            { value: "10K+", label: "Winners" },
           ].map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white/10 backdrop-blur-sm">
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
-              <p className="text-sm text-purple-200">{stat.label}</p>
+            <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 shadow-2xl">
+              <p className="text-xl sm:text-3xl font-black text-white tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-purple-200 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -163,34 +163,41 @@ const Xtravaganza: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-4 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mb-12 sm:mb-20"
         >
           {rewardTiers.map((tier, index) => (
             <div
               key={tier.name}
               className={cn(
-                "relative p-6 rounded-2xl overflow-hidden",
-                "bg-white/10 backdrop-blur-sm border border-white/20",
-                index === 2 && "md:scale-105 md:-translate-y-2"
+                "relative p-8 rounded-[2.5rem] overflow-hidden group transition-all duration-500",
+                "bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl hover:bg-white/15",
+                index === 2 && "lg:scale-110 lg:-translate-y-2 lg:z-20 border-white/40"
               )}
             >
               {/* Tier Badge */}
               <div className={cn(
-                "inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm font-bold mb-4",
+                "inline-flex items-center gap-3 px-5 py-2 rounded-2xl text-white text-sm font-black mb-6 shadow-xl uppercase tracking-widest",
                 `bg-gradient-to-r ${tier.color}`
               )}>
-                {tier.icon}
+                {tier.icon && React.isValidElement(tier.icon) 
+                  ? React.cloneElement(tier.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                  : tier.icon}
                 {tier.name}
               </div>
 
-              <p className="text-white/70 text-sm mb-4">
-                {tier.pointsRequired === "0" ? "Start here" : `${tier.pointsRequired}+ points`}
-              </p>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="text-3xl font-black text-white italic tracking-tighter">
+                  {tier.pointsRequired === "0" ? "FREE" : tier.pointsRequired}
+                </span>
+                <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest">Points Threshold</span>
+              </div>
 
-              <ul className="space-y-2">
+              <ul className="space-y-4">
                 {tier.benefits.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-2 text-sm text-white/90">
-                    <Check className="w-4 h-4 mt-0.5 text-emerald-400 flex-shrink-0" />
+                  <li key={benefit} className="flex items-start gap-3 text-[13px] sm:text-sm text-white/90 font-medium group-hover:translate-x-1 transition-transform">
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 text-emerald-300 font-black" />
+                    </div>
                     {benefit}
                   </li>
                 ))}
@@ -267,26 +274,26 @@ const Xtravaganza: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center"
+          className="mt-12 sm:mt-20 text-center"
         >
-          <div className="inline-flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-sm">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map((i) => (
+          <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 rounded-[3rem] bg-white/10 backdrop-blur-md border border-white/20 shadow-3xl">
+            <div className="flex -space-x-4">
+              {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-pink-400 border-2 border-white flex items-center justify-center text-white text-xs font-bold"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-amber-300 via-pink-400 to-violet-600 border-4 border-white/10 flex items-center justify-center text-white text-xs sm:text-sm font-black shadow-xl"
                 >
                   {String.fromCharCode(64 + i)}
                 </div>
               ))}
             </div>
-            <div className="text-left">
-              <p className="text-white font-medium">Join 2M+ members earning rewards</p>
-              <p className="text-sm text-purple-200">Your first 1,000 points are on us!</p>
+            <div className="text-center sm:text-left">
+              <p className="text-lg sm:text-xl font-black text-white uppercase tracking-tighter italic">Join 2M+ Legacy Earners</p>
+              <p className="text-xs sm:text-sm text-purple-200 font-bold uppercase tracking-widest">Your first 1,000 points await your command!</p>
             </div>
-            <Button variant="secondary" className="ml-4 bg-white dark:bg-neutral-800 text-purple-900 hover:bg-purple-50">
-              <Users className="w-4 h-4 mr-2" />
-              Join Now
+            <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-purple-900 font-black py-4 px-10 rounded-2xl shadow-2xl hover:scale-105 transition-transform uppercase tracking-widest text-xs">
+              <Users className="w-5 h-5 mr-3" />
+              Claim My Legacy
             </Button>
           </div>
         </motion.div>

@@ -102,18 +102,20 @@ const WiFiBranches: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 mb-12 sm:mb-20"
         >
           {amenities.map((amenity) => (
             <div
               key={amenity.name}
-              className="p-4 rounded-xl bg-white/10 backdrop-blur-sm text-center hover:bg-white/20 transition-colors"
+              className="group p-6 rounded-[2rem] bg-white/10 backdrop-blur-md border border-white/10 text-center hover:bg-white/20 transition-all duration-500 shadow-2xl"
             >
-              <div className="w-12 h-12 rounded-xl bg-cyan-500/30 text-cyan-300 flex items-center justify-center mx-auto mb-3">
-                {amenity.icon}
+              <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                {React.isValidElement(amenity.icon) 
+                  ? React.cloneElement(amenity.icon as React.ReactElement, { className: "w-6 h-6" })
+                  : amenity.icon}
               </div>
-              <h4 className="font-semibold text-white text-sm mb-1">{amenity.name}</h4>
-              <p className="text-xs text-cyan-200">{amenity.description}</p>
+              <h4 className="font-black text-white text-[13px] sm:text-sm uppercase tracking-tight leading-tight mb-2 italic">{amenity.name}</h4>
+              <p className="text-[10px] sm:text-xs text-cyan-200 font-bold opacity-80">{amenity.description}</p>
             </div>
           ))}
         </motion.div>

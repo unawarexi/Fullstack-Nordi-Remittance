@@ -92,15 +92,15 @@ const StatCard: React.FC<StatCardProps> = ({ stat, index }) => {
           {stat.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
+          <div className="text-2xl sm:text-4xl font-black text-neutral-900 dark:text-white tracking-tighter italic uppercase">
             {stat.value}
           </div>
-          <div className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 mt-1">
+          <div className="text-[11px] sm:text-sm font-black text-neutral-500 uppercase tracking-widest mt-1">
             {stat.label}
           </div>
-          <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+          <p className="text-[10px] sm:text-xs text-neutral-400 font-bold mt-1 opacity-70">
             {stat.description}
-          </div>
+          </p>
         </div>
       </div>
     </motion.div>

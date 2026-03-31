@@ -63,14 +63,18 @@ const MobileApp: React.FC = () => {
             </p>
 
             {/* Features List */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-8 grid grid-cols-2 gap-4">
               {appFeatures.map((feature) => (
                 <div
                   key={feature.text}
-                  className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
+                  className="flex items-center gap-3 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm group hover:shadow-md transition-all"
                 >
-                  <div className="text-indigo-500">{feature.icon}</div>
-                  <span className="text-[10px] sm:text-sm text-neutral-700 dark:text-neutral-200">{feature.text}</span>
+                  <div className="text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                    {React.isValidElement(feature.icon) 
+                      ? React.cloneElement(feature.icon as React.ReactElement, { className: "w-5 h-5" })
+                      : feature.icon}
+                  </div>
+                  <span className="text-[11px] sm:text-sm text-neutral-900 dark:text-white font-black uppercase tracking-tight italic">{feature.text}</span>
                 </div>
               ))}
             </div>

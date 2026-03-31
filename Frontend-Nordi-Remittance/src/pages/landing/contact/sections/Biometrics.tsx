@@ -119,27 +119,31 @@ const Biometrics: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-20"
         >
           {biometricTypes.map((type) => (
             <div
               key={type.name}
               className={cn(
-                "p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-violet-300 transition-all"
+                "p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-700 shadow-xl bg-white dark:bg-neutral-800 group transition-all duration-500",
+                "hover:shadow-2xl dark:hover:shadow-neutral-900/50 hover:border-violet-500/30"
               )}
             >
-              <div className={cn("w-16 h-16 rounded-2xl text-white flex items-center justify-center mb-4", type.color)}>
-                {type.icon}
+              <div className={cn("w-16 h-16 sm:w-20 sm:h-20 rounded-3xl text-white flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-500", type.color)}>
+                {React.isValidElement(type.icon) 
+                  ? React.cloneElement(type.icon as React.ReactElement, { className: "w-8 h-8 sm:w-10 sm:h-10" })
+                  : type.icon}
               </div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{type.name}</h3>
-              <p className="text-neutral-600 dark:text-neutral-300 text-sm mb-4">{type.description}</p>
+              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{type.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-6">{type.description}</p>
               
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase">Use Cases:</p>
+              <div className="space-y-3">
+                <p className="text-[10px] sm:text-xs font-black text-neutral-400 uppercase tracking-widest mb-2">Auth Protocols:</p>
                 {type.useCases.map((use) => (
-                  <div key={use} className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <div key={use} className="flex items-center gap-3 text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 font-bold group/use">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover/use:scale-110 transition-transform">
+                      <CheckCircle className="w-3 h-3 text-emerald-500 font-black" />
+                    </div>
                     {use}
                   </div>
                 ))}

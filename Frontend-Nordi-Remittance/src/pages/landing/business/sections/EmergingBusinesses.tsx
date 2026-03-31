@@ -124,39 +124,41 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "relative flex flex-col h-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Icon */}
-    <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", program.color)}>
-      {program.icon}
+    <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4 shrink-0 shadow-md", program.color)}>
+      {React.isValidElement(program.icon) 
+        ? React.cloneElement(program.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+        : program.icon}
     </div>
 
     {/* Header */}
-    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-1">{program.name}</h3>
-    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{program.description}</p>
+    <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1 leading-tight">{program.name}</h3>
+    <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-4 leading-tight">{program.description}</p>
 
     {/* Benefit Badge */}
-    <div className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-emerald-50 border border-emerald-100 mb-3 sm:mb-4">
-      <p className="text-[10px] text-emerald-600 font-medium uppercase tracking-wider">Key Benefit</p>
-      <p className="text-base sm:text-lg font-bold text-emerald-700 leading-tight">{program.benefit}</p>
+    <div className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 mb-4 sm:mb-5">
+      <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-0.5">Key Benefit</p>
+      <p className="text-base sm:text-lg font-bold text-emerald-700 dark:text-emerald-300 leading-tight">{program.benefit}</p>
     </div>
 
     {/* Features */}
-    <ul className="space-y-2 flex-1 mb-6">
+    <ul className="space-y-1.5 sm:space-y-2 flex-1 mb-6 sm:mb-8">
       {program.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
-          <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
+          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+          <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
         </li>
       ))}
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" className={cn("w-full text-sm py-1.5 sm:py-2", program.color, "hover:opacity-90")}>
+    <Button variant="primary" className={cn("w-full text-sm py-2.5 sm:py-3 font-bold shadow-md", program.color, "hover:opacity-90")}>
       Apply Now
-      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
+      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -244,18 +246,30 @@ const EmergingBusinesses: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-10 sm:mt-12 text-center p-6 sm:p-10 rounded-2xl bg-indigo-900 text-white"
+          className="mt-10 sm:mt-16 text-center p-6 sm:p-12 rounded-3xl bg-indigo-900 text-white border border-white/5 shadow-2xl relative overflow-hidden"
         >
-          <Gift className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 mx-auto mb-3 sm:mb-4" />
-          <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Join Our Startup Community</h3>
-          <p className="text-sm sm:text-lg text-indigo-200 mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed">
-            Get access to exclusive events, mentorship opportunities, and connect 
-            with other founders building the future.
-          </p>
-          <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-sm py-2.5 sm:py-3 px-8">
-            Apply for Startup Program
-            <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 ml-2" />
-          </Button>
+          {/* Subtle Background Pattern */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23ffffff' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+              backgroundSize: '30px 30px'
+            }} />
+          </div>
+
+          <div className="relative z-10">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg backdrop-blur-sm">
+              <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400" />
+            </div>
+            <h3 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4 leading-tight">Join Our Startup Community</h3>
+            <p className="text-sm sm:text-xl text-indigo-200 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
+              Get access to exclusive events, mentorship opportunities, and connect 
+              with other founders building the future of African tech.
+            </p>
+            <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-400 hover:bg-amber-500 text-indigo-900 font-bold px-10 py-3.5 sm:py-4 shadow-xl">
+              Apply for Startup Program
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+            </Button>
+          </div>
         </motion.div>
       </Container>
     </Section>

@@ -92,13 +92,15 @@ const IVRBanking: React.FC = () => {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-8">
               {features.map((feature) => (
-                <div key={feature.label} className="flex items-start gap-2 p-3 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-                  <feature.icon className="w-5 h-5 text-rose-600 mt-0.5" />
+                <div key={feature.label} className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 p-4 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm group hover:shadow-xl transition-all">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                    <feature.icon className="w-5 h-5" />
+                  </div>
                   <div>
-                    <p className="font-medium text-neutral-900 dark:text-white text-sm">{feature.label}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.desc}</p>
+                    <p className="font-black text-[13px] sm:text-sm text-neutral-900 dark:text-white uppercase tracking-tight leading-tight mb-1">{feature.label}</p>
+                    <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed">{feature.desc}</p>
                   </div>
                 </div>
               ))}

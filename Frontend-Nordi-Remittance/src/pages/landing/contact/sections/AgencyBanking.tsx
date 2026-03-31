@@ -92,12 +92,12 @@ const AgencyBanking: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-12"
+          className="grid grid-cols-3 gap-3 sm:gap-6 max-w-2xl mx-auto mb-12 sm:mb-20"
         >
           {agentStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-              <p className="text-2xl font-bold text-orange-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
+            <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all">
+              <p className="text-xl sm:text-3xl font-black text-orange-600 dark:text-orange-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -109,23 +109,25 @@ const AgencyBanking: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+            className="p-6 sm:p-10 rounded-[2.5rem] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-xl"
           >
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-4">Services Available</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-8 uppercase tracking-tight italic">Nexus Services</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {agentServices.map((service) => (
                 <div
                   key={service.name}
                   className={cn(
-                    "p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50",
-                    "hover:bg-orange-50 transition-colors"
+                    "p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 border border-transparent shadow-sm transition-all group",
+                    "hover:bg-orange-500/5 hover:border-orange-500/20"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center mb-3">
-                    {service.icon}
+                  <div className="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                    {React.isValidElement(service.icon) 
+                      ? React.cloneElement(service.icon as React.ReactElement, { className: "w-6 h-6" })
+                      : service.icon}
                   </div>
-                  <h4 className="font-semibold text-neutral-900 dark:text-white text-sm mb-1">{service.name}</h4>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.description}</p>
+                  <h4 className="font-black text-neutral-900 dark:text-white text-[15px] sm:text-base uppercase tracking-tight mb-1">{service.name}</h4>
+                  <p className="text-[13px] text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed">{service.description}</p>
                 </div>
               ))}
             </div>

@@ -198,11 +198,11 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex w-full items-center justify-between px-3 py-2.5 sm:px-4 sm:py-4 text-left"
           >
-            <span className="flex items-center gap-2.5 sm:gap-3">
+            <span className="flex items-center gap-3 sm:gap-4">
               {item.icon && (
-                <span className="text-primary-500">{item.icon}</span>
+                <span className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">{item.icon}</span>
               )}
-              <span className="text-sm sm:text-base font-medium text-neutral-800 dark:text-neutral-200">
+              <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight italic">
                 {item.label}
               </span>
             </span>
@@ -222,8 +222,8 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
             onClick={closeMobileMenu}
             className="flex w-full items-center gap-2.5 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-4"
           >
-            {item.icon && <span className="text-primary-500">{item.icon}</span>}
-            <span className="text-sm sm:text-base font-medium text-neutral-800 dark:text-neutral-200">
+            {item.icon && <span className="text-blue-600 dark:text-blue-400">{item.icon}</span>}
+            <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight italic">
               {item.label}
             </span>
           </Link>
@@ -247,7 +247,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
                 onClick={closeMobileMenu}
                 className="flex items-center gap-2 px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-primary-600 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-primary-400"
               >
-                <ChevronRight size={14} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <ChevronRight size={12} className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500/50" />
                 {child.label}
               </Link>
             ))}

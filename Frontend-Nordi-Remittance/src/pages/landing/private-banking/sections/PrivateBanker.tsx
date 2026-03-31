@@ -103,7 +103,7 @@ const PrivateBanker: React.FC = () => {
         </motion.div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20">
           {bankerServices.map((service, index) => (
             <motion.div
               key={service.id}
@@ -112,15 +112,17 @@ const PrivateBanker: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-md hover:border-amber-300 transition-all"
+                "p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-all group",
+                "hover:shadow-xl hover:border-amber-400 hover:-translate-y-1"
               )}
             >
-              <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
-                {service.icon}
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-amber-400/10 text-amber-600 flex items-center justify-center mb-3 sm:mb-5 group-hover:scale-110 transition-transform shadow-inner">
+                {React.isValidElement(service.icon) 
+                  ? React.cloneElement(service.icon as React.ReactElement, { className: "w-5 h-5 sm:w-7 sm:h-7" })
+                  : service.icon}
               </div>
-              <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">{service.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">{service.description}</p>
+              <h3 className="font-bold text-[13px] sm:text-base text-neutral-900 dark:text-white mb-1.5 sm:mb-2 uppercase tracking-tight leading-tight">{service.name}</h3>
+              <p className="text-[10px] sm:text-[13px] text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">{service.description}</p>
             </motion.div>
           ))}
         </div>
@@ -132,40 +134,47 @@ const PrivateBanker: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-8 rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-800 text-white"
+            className="p-6 sm:p-10 rounded-3xl bg-neutral-900 text-white shadow-2xl relative overflow-hidden"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <Award className="w-6 h-6 text-amber-400" />
-              <h3 className="text-xl font-semibold">The Private Banking Difference</h3>
-            </div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full -mr-32 -mt-32 blur-[80px]" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-8 sm:mb-12">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shadow-lg">
+                  <Award className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight italic">Private Difference</h3>
+              </div>
 
-            <ul className="space-y-4 mb-8">
-              {[
-                "Personal cell phone number of your private banker",
-                "Same-day response guarantee",
-                "Annual wealth review and strategy sessions",
-                "Exclusive event invitations and networking",
-                "Priority processing for all requests",
-                "Complimentary notary and document services",
-                "Airport lounge access worldwide",
-                "Concierge services for lifestyle needs",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-amber-400 mt-0.5" />
-                  <span className="text-neutral-200 text-sm">{item}</span>
-                </li>
-              ))}
-            </ul>
+              <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
+                {[
+                  "Direct cell access to your private banker",
+                  "Guaranteed same-day response",
+                  "Annual strategic wealth forensic audits",
+                  "VIP access to exclusive networking events",
+                  "Concierge processing for all requests",
+                  "Global lifestyle & concierge services",
+                  "Worldwide airport lounge infinity access",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-4 group">
+                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      <Check className="w-3 h-3 text-amber-400 font-bold" />
+                    </div>
+                    <span className="text-[13px] sm:text-sm text-neutral-200 font-bold group-hover:text-white transition-colors">{item}</span>
+                  </li>
+                ))}
+              </ul>
 
-            <div className="flex flex-wrap gap-3">
-              <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-neutral-900 dark:text-white">
-                <Phone className="w-4 h-4 mr-2" />
-                Request a Call
-              </Button>
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                <Calendar className="w-4 h-4 mr-2" />
-                Book Meeting
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-400 hover:bg-amber-500 text-neutral-900 font-bold py-4 px-8 shadow-xl shadow-amber-400/20">
+                  <Phone className="w-5 h-5 mr-3" />
+                  Request a Call
+                </Button>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto border-white/20 text-white hover:bg-white/5 font-bold py-4 px-8">
+                  <Calendar className="w-5 h-5 mr-3" />
+                  Book Meeting
+                </Button>
+              </div>
             </div>
           </motion.div>
 
@@ -174,45 +183,46 @@ const PrivateBanker: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-4 flex flex-col justify-between"
           >
-            <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Meet Our Private Bankers</h4>
-            
-            {bankerProfiles.map((banker) => (
-              <div
-                key={banker.name}
-                className={cn(
-                  "flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                  "hover:shadow-md hover:border-amber-300 transition-all"
-                )}
-              >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-semibold text-lg">
-                  {banker.initials}
-                </div>
-                <div className="flex-1">
-                  <h5 className="font-semibold text-neutral-900 dark:text-white">{banker.name}</h5>
-                  <p className="text-sm text-amber-600">{banker.title}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-                    <span>{banker.specialty}</span>
-                    <span>•</span>
-                    <span>{banker.experience}</span>
+            <div className="space-y-4">
+              <h4 className="text-sm font-black text-neutral-400 uppercase tracking-[0.2em] mb-6">World-Class Private Bankers</h4>
+              
+              {bankerProfiles.map((banker) => (
+                <div
+                  key={banker.name}
+                  className={cn(
+                    "group flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm transition-all",
+                    "hover:shadow-xl hover:border-amber-400 hover:-translate-x-1"
+                  )}
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-black text-xl shadow-lg group-hover:rotate-3 transition-transform shrink-0">
+                    {banker.initials}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="font-black text-neutral-900 dark:text-white text-base sm:text-lg tracking-tight truncate">{banker.name}</h5>
+                    <p className="text-[11px] sm:text-xs text-amber-600 font-black uppercase tracking-widest leading-none mb-2">{banker.title}</p>
+                    <div className="flex items-center gap-3 text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-tighter">
+                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> {banker.specialty}</span>
+                      <span className="text-neutral-300">•</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {banker.experience}</span>
+                    </div>
+                  </div>
+                  <Button variant="ghost" className="w-10 h-10 p-0 text-amber-600 hover:bg-amber-400/10 group-hover:scale-110 transition-transform flex items-center justify-center">
+                    <MessageSquare className="w-6 h-6" />
+                  </Button>
                 </div>
-                <Button variant="ghost" className="p-2 h-auto text-amber-600">
-                  <MessageSquare className="w-5 h-5" />
-                </Button>
-              </div>
-            ))}
+              ))}
+            </div>
 
             {/* Contact Card */}
-            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
-              <p className="text-sm text-neutral-700 dark:text-neutral-200 mb-3">
-                Ready to experience private banking at its finest? Let us match you 
-                with the perfect private banker for your needs.
+            <div className="p-6 rounded-3xl bg-amber-400/5 border border-amber-400/20 shadow-inner group hover:bg-amber-400/10 transition-colors">
+              <p className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-200 font-bold leading-relaxed mb-4">
+                Ready to experience legacy banking? Let us match you with the perfect wealth consultant for your global aspirations.
               </p>
-              <Button variant="ghost" className="text-amber-700 dark:text-amber-300 p-0 h-auto text-sm font-medium">
-                Get Matched
-                <ArrowRight className="w-4 h-4 ml-1" />
+              <Button variant="ghost" className="text-amber-600 font-black uppercase tracking-[0.2em] text-[11px] sm:text-xs p-0 h-auto group-hover:translate-x-1 transition-transform">
+                Find My Banker
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </motion.div>

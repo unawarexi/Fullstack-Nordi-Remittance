@@ -92,15 +92,15 @@ const ATMServices: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20"
         >
           {networkStats.map((stat) => (
             <div
               key={stat.label}
-              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all"
             >
-              <p className="text-2xl lg:text-3xl font-bold text-purple-600 dark:text-purple-400">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{stat.label}</p>
+              <p className="text-2xl sm:text-4xl font-black text-purple-600 dark:text-purple-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-2">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -191,24 +191,30 @@ const ATMServices: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-8 p-6 rounded-2xl bg-neutral-900 text-white"
+          className="mt-8 sm:mt-16 p-6 sm:p-10 rounded-3xl bg-neutral-900 text-white shadow-2xl relative overflow-hidden"
         >
-          <div className="flex items-start gap-4">
-            <Shield className="w-8 h-8 text-purple-400 flex-shrink-0" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full -mr-32 -mt-32 blur-[80px]" />
+          
+          <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-10 relative z-10">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-[2rem] bg-purple-500/10 flex items-center justify-center shrink-0 shadow-lg border border-white/5">
+              <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
+            </div>
             <div>
-              <h4 className="font-semibold mb-2">ATM Safety Tips</h4>
-              <ul className="grid md:grid-cols-2 gap-2 text-sm text-neutral-300">
+              <h4 className="text-xl sm:text-2xl font-black mb-4 uppercase tracking-tighter italic">ATM Security Integrity</h4>
+              <ul className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-[13px] sm:text-sm text-neutral-400 font-medium">
                 {[
-                  "Shield your PIN when entering",
-                  "Be aware of your surroundings",
-                  "Don't accept help from strangers",
-                  "Report suspicious activity immediately",
-                  "Take your card and cash promptly",
-                  "Check your account balance regularly",
+                  "Shield your PIN with tactical focus",
+                  "Constant environment awareness",
+                  "Refuse unsolicited assistance",
+                  "Immediate suspicious activity reporting",
+                  "Rapid card & cash retrieval",
+                  "Daily balance forensic verification",
                 ].map((tip) => (
-                  <li key={tip} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-purple-400" />
-                    {tip}
+                  <li key={tip} className="flex items-center gap-3 group">
+                    <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                      <Check className="w-3 h-3 text-purple-400 font-bold" />
+                    </div>
+                    <span className="group-hover:text-white transition-colors">{tip}</span>
                   </li>
                 ))}
               </ul>

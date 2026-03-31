@@ -152,41 +152,46 @@ const SolutionCard: React.FC<SolutionCardProps> = ({ solution, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.08 }}
     className={cn(
-      "relative flex flex-col h-full p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "relative flex flex-col h-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Header */}
-    <div className="flex items-start gap-3 mb-2.5 sm:mb-3">
-      <div className={cn("p-2 sm:p-2.5 rounded-lg text-white", solution.color)}>
-        {React.cloneElement(solution.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
+    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white shadow-sm shrink-0", solution.color)}>
+        {React.isValidElement(solution.icon) 
+          ? React.cloneElement(solution.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+          : solution.icon}
       </div>
       <div className="flex-1">
-        <h3 className="text-[15px] sm:text-base font-semibold text-neutral-900 dark:text-white leading-tight">{solution.name}</h3>
-        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 leading-tight mt-0.5">{solution.description}</p>
+        <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-tight">{solution.name}</h3>
+        <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 leading-tight mt-1">{solution.description}</p>
       </div>
     </div>
 
     {/* Transaction Fee */}
-    <div className="py-2.5 sm:py-3 border-y border-neutral-100 dark:border-neutral-700 mb-2.5 sm:mb-3">
-      <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-medium">Transaction Fee</p>
-      <p className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">{solution.transactionFee}</p>
+    <div className="py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
+      <p className="text-[10px] sm:text-[11px] text-neutral-400 uppercase tracking-widest font-bold mb-0.5">Transaction Fee</p>
+      <div className="flex items-baseline gap-1">
+        <p className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white">{solution.transactionFee}</p>
+        <p className="text-[10px] sm:text-xs text-neutral-500 font-medium">per transaction</p>
+      </div>
     </div>
 
     {/* Features */}
-    <ul className="space-y-1 sm:space-y-1.5 flex-1 mb-3.5 sm:mb-4">
+    <ul className="space-y-1.5 sm:space-y-2 flex-1 mb-6 sm:mb-8">
       {solution.features.slice(0, 4).map((feature) => (
         <li key={feature} className="flex items-start gap-2">
-          <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-[11px] sm:text-xs text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
+          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+          <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
         </li>
       ))}
     </ul>
 
     {/* CTA */}
-    <Button variant="outline" size="sm" className="w-full text-xs py-1.5 sm:py-2">
+    <Button variant="outline" size="lg" className="w-full text-sm py-2.5 sm:py-3 font-bold group">
       Learn More
-      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
+      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" />
     </Button>
   </motion.div>
 );
@@ -223,19 +228,19 @@ const ESolutions: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-12"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-16"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-3.5 sm:p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100"
+              className="flex items-center gap-4 p-5 sm:p-6 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors group"
             >
-              <div className="p-2 sm:p-2.5 rounded-lg bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 shrink-0">
-                <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                <benefit.icon className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
-                <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 leading-tight">{benefit.description}</p>
+                <p className="font-bold text-neutral-900 dark:text-white text-base sm:text-lg leading-tight mb-1">{benefit.title}</p>
+                <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -253,23 +258,28 @@ const ESolutions: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-10 sm:mt-12 text-center p-6 sm:p-10 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50"
+          className="mt-12 sm:mt-20 text-center p-8 sm:p-12 rounded-3xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 shadow-xl overflow-hidden relative"
         >
-          <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-3">
-            Ready to Start Accepting Payments?
-          </h3>
-          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed">
-            Our integration team will help you set up the perfect payment solution 
-            for your business in as little as 24 hours.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-            <Button variant="primary" size="lg" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-sm py-2.5 sm:py-3 px-8">
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 ml-2" />
-            </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-sm py-2.5 sm:py-3 px-8">
-              View API Docs
-            </Button>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-violet-500/5 rounded-full -ml-16 -mb-16 blur-2xl" />
+          
+          <div className="relative z-10">
+            <h3 className="text-2xl sm:text-4xl font-bold text-neutral-900 dark:text-white mb-3 sm:mb-4 leading-tight">
+              Ready to Start Accepting Payments?
+            </h3>
+            <p className="text-sm sm:text-xl text-neutral-600 dark:text-neutral-300 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed">
+              Our specialized integration team will help you set up the perfect payment solution 
+              for your business in as little as 24 hours. No hidden fees, no stress.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-base py-4 px-10 font-bold shadow-lg">
+                Get Started Now
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button variant="outline" size="lg" className="w-full sm:w-auto text-base py-4 px-10 font-bold border-2">
+                View API Docs
+              </Button>
+            </div>
           </div>
         </motion.div>
       </Container>

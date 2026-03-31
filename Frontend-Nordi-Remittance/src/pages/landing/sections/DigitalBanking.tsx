@@ -103,12 +103,14 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ feature, index }) => (
     transition={{ duration: 0.3, delay: index * 0.05 }}
     className="flex items-start gap-3"
   >
-    <div className="flex-shrink-0 p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-      {feature.icon}
+    <div className="flex-shrink-0 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 shadow-inner group-hover:scale-110 transition-transform">
+      {React.isValidElement(feature.icon) 
+        ? React.cloneElement(feature.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+        : feature.icon}
     </div>
     <div>
-      <h4 className="font-medium text-neutral-900 dark:text-neutral-100 text-sm">{feature.title}</h4>
-      <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">{feature.description}</p>
+      <h4 className="text-sm sm:text-base font-black text-neutral-900 dark:text-neutral-100 uppercase tracking-tight italic">{feature.title}</h4>
+      <p className="mt-1 text-[10px] sm:text-xs text-neutral-400 font-bold opacity-75 leading-relaxed">{feature.description}</p>
     </div>
   </motion.div>
 );
@@ -281,12 +283,12 @@ const DigitalBanking: React.FC = () => {
             <div
               key={stat.label}
               className={cn(
-                "text-center p-4 rounded-xl",
-                "bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700"
+                "text-center p-6 rounded-[2rem]",
+                "bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all group"
               )}
             >
-              <div className="text-xl font-bold text-indigo-600">{stat.value}</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400">{stat.label}</div>
+              <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 italic tabular-nums tracking-tighter group-hover:scale-110 transition-transform">{stat.value}</div>
+              <div className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-widest mt-1">{stat.label}</div>
             </div>
           ))}
         </motion.div>

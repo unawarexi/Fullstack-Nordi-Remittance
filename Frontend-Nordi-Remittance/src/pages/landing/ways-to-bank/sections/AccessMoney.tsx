@@ -100,18 +100,18 @@ const AccessMoney: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30"
+              className="text-center p-4 sm:p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30 shadow-sm hover:shadow-xl transition-all group"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-black text-[13px] sm:text-sm text-neutral-900 dark:text-white uppercase tracking-tight leading-tight mb-1">{benefit.title}</p>
+              <p className="text-[10px] sm:text-[13px] text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -125,7 +125,7 @@ const AccessMoney: React.FC = () => {
         >
           <h3 className="text-xl font-semibold text-center mb-8">How Access Money Works</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
             {withdrawalSteps.map((step, index) => (
               <motion.div
                 key={step.step}
@@ -133,26 +133,28 @@ const AccessMoney: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="relative"
+                className="relative group"
               >
                 {/* Connector Line */}
                 {index < withdrawalSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-white/20 -translate-y-1/2">
-                    <div className="absolute right-0 w-2 h-2 rounded-full bg-white dark:bg-neutral-800 -translate-y-1/2" />
+                  <div className="hidden lg:block absolute top-10 left-full w-full h-0.5 bg-white/10 -translate-y-1/2">
+                    <div className="absolute right-0 w-2 h-2 rounded-full bg-white/40 -translate-y-1/2" />
                   </div>
                 )}
                 
-                <div className="text-center">
-                  <div className="relative inline-flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                      {step.icon}
+                <div className="text-center sm:text-left lg:text-center">
+                  <div className="relative inline-flex items-center justify-center mb-6">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[2rem] bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform shadow-2xl">
+                      {React.isValidElement(step.icon) 
+                        ? React.cloneElement(step.icon as React.ReactElement, { className: "w-8 h-8 sm:w-10 sm:h-10 text-white" })
+                        : step.icon}
                     </div>
-                    <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-emerald-400 text-emerald-900 text-xs font-bold flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 w-8 h-8 rounded-2xl bg-emerald-400 text-emerald-950 text-xs font-black flex items-center justify-center shadow-lg border-2 border-emerald-600">
                       {step.step}
                     </span>
                   </div>
-                  <h4 className="font-semibold mb-2">{step.title}</h4>
-                  <p className="text-sm text-emerald-100">{step.description}</p>
+                  <h4 className="text-lg sm:text-xl font-black mb-3 uppercase tracking-tight italic">{step.title}</h4>
+                  <p className="text-[13px] sm:text-sm text-emerald-50 font-bold leading-relaxed opacity-80">{step.description}</p>
                 </div>
               </motion.div>
             ))}

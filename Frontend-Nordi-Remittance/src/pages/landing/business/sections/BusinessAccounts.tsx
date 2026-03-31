@@ -185,11 +185,11 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     </div>
 
     {/* Features */}
-    <ul className="space-y-2 flex-1 mb-6">
+    <ul className="space-y-1.5 sm:space-y-2 flex-1 mb-6 sm:mb-8">
       {account.features.map((feature) => (
         <li key={feature} className="flex items-start gap-2">
-          <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-          <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
+          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+          <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
         </li>
       ))}
     </ul>
@@ -198,8 +198,8 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     <Button
       variant={account.popular ? "primary" : "outline"}
       className={cn(
-        "w-full text-sm py-1.5 sm:py-2",
-        account.popular && "bg-emerald-600 hover:bg-emerald-700"
+        "w-full text-sm py-2 sm:py-2.5 font-bold",
+        account.popular && "bg-emerald-600 hover:bg-emerald-700 shadow-md"
       )}
     >
       {account.monthlyFee === "Custom" ? "Contact Sales" : "Open Account"}

@@ -98,26 +98,30 @@ const MyAccess: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-3 gap-6 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-20"
         >
           {platforms.map((platform) => (
             <div
               key={platform.name}
               className={cn(
-                "p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-blue-300 transition-all"
+                "p-8 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-700 shadow-xl bg-white dark:bg-neutral-800 group transition-all duration-500",
+                "hover:shadow-2xl dark:hover:shadow-neutral-900/50 hover:border-blue-500/30"
               )}
             >
-              <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
-                {platform.icon}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                {React.isValidElement(platform.icon) 
+                  ? React.cloneElement(platform.icon as React.ReactElement, { className: "w-8 h-8 sm:w-10 sm:h-10" })
+                  : platform.icon}
               </div>
-              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{platform.name}</h3>
-              <p className="text-neutral-600 dark:text-neutral-300 text-sm mb-4">{platform.description}</p>
+              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{platform.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-8">{platform.description}</p>
               
-              <ul className="space-y-2">
+              <ul className="space-y-4">
                 {platform.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-200">
-                    <Check className="w-4 h-4 text-blue-500" />
+                  <li key={feature} className="flex items-center gap-3 text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 font-bold group/feat">
+                    <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 group-hover/feat:scale-110 transition-transform">
+                      <Check className="w-3 h-3 text-blue-500 font-black" />
+                    </div>
                     {feature}
                   </li>
                 ))}

@@ -116,22 +116,24 @@ const ContactHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-4">Quick Contact</h3>
-              <div className="space-y-4">
+            <div className="p-6 sm:p-10 rounded-[2.5rem] bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
+              <h3 className="text-xl sm:text-2xl font-black text-white mb-6 uppercase tracking-tight italic">Relay Command Center</h3>
+              <div className="space-y-4 sm:space-y-6">
                 {quickContacts.map((contact) => (
                   <div
                     key={contact.label}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group cursor-pointer"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-teal-500/30 text-teal-300 flex items-center justify-center flex-shrink-0">
-                      {contact.icon}
+                    <div className="w-12 h-12 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                      {React.isValidElement(contact.icon) 
+                        ? React.cloneElement(contact.icon as React.ReactElement, { className: "w-6 h-6" })
+                        : contact.icon}
                     </div>
                     <div>
-                      <p className="text-sm text-teal-200">{contact.label}</p>
-                      <p className="font-semibold text-white">{contact.value}</p>
+                      <p className="text-[10px] sm:text-xs text-teal-300 font-bold uppercase tracking-widest mb-1">{contact.label}</p>
+                      <p className="text-sm sm:text-base font-black text-white tracking-tight">{contact.value}</p>
                       {contact.subtext && (
-                        <p className="text-xs text-teal-300">{contact.subtext}</p>
+                        <p className="text-[10px] sm:text-xs text-teal-400 font-bold opacity-80">{contact.subtext}</p>
                       )}
                     </div>
                   </div>
@@ -139,10 +141,10 @@ const ContactHero: React.FC = () => {
               </div>
 
               {/* Hours */}
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="flex items-center gap-2 text-teal-200 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>24/7 Customer Support Available</span>
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-center gap-3 text-teal-200 text-[13px] sm:text-sm font-bold italic">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Tactical Support: Always Active (24/7)</span>
                 </div>
               </div>
             </div>

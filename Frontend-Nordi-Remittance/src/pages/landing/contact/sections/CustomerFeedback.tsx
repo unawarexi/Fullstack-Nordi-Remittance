@@ -95,12 +95,12 @@ const CustomerFeedback: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-12"
+          className="grid grid-cols-3 gap-3 sm:gap-6 max-w-2xl mx-auto mb-12 sm:mb-20"
         >
           {feedbackStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
-              <p className="text-2xl font-bold text-indigo-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
+            <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 shadow-sm hover:shadow-xl transition-all">
+              <p className="text-xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -114,21 +114,21 @@ const CustomerFeedback: React.FC = () => {
         >
           <form onSubmit={handleSubmit} className="p-6 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             {/* Category Selection */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2">
-                What's your feedback about?
+            <div className="mb-8">
+              <label className="block text-[10px] sm:text-xs font-black text-neutral-400 uppercase tracking-widest mb-4">
+                Transmission Source
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {feedbackCategories.map((category) => (
                   <button
                     key={category}
                     type="button"
                     onClick={() => setSelectedCategory(category)}
                     className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                      "px-5 py-2.5 rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-tight transition-all duration-300",
                       selectedCategory === category
-                        ? "bg-indigo-600 text-white"
-                        : "bg-white dark:bg-neutral-800 border border-neutral-300 text-neutral-700 dark:text-neutral-200 hover:border-indigo-300"
+                        ? "bg-indigo-600 text-white shadow-xl scale-105"
+                        : "bg-white dark:bg-neutral-800 border-2 border-neutral-100 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:border-indigo-500/30"
                     )}
                   >
                     {category}

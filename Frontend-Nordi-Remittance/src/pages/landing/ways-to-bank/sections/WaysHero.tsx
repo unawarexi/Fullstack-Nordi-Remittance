@@ -92,22 +92,22 @@ const WaysHero: React.FC = () => {
             </div>
 
             {/* Quick Links */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-10 sm:mb-0">
               {quickLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg",
+                    "flex items-center gap-3 p-3 sm:p-4 rounded-2xl",
                     "bg-white/5 border border-white/10",
-                    "hover:bg-white/10 hover:border-cyan-400/50 transition-all"
+                    "hover:bg-white/10 hover:border-cyan-400/50 transition-all group shadow-sm"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-white/10 text-cyan-300 flex items-center justify-center">
-                    <link.icon className="w-5 h-5" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 text-cyan-300 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+                    <link.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <span className="text-white font-medium text-sm">{link.label}</span>
-                  <ChevronRight className="w-4 h-4 text-blue-300 ml-auto" />
+                  <span className="text-white font-bold text-[13px] sm:text-base tracking-tight">{link.label}</span>
+                  <ChevronRight className="w-4 h-4 text-blue-300 ml-auto group-hover:translate-x-1 transition-transform" />
                 </a>
               ))}
             </div>

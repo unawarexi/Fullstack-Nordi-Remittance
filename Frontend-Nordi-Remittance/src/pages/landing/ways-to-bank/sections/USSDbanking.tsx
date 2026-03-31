@@ -82,19 +82,19 @@ const USSDbanking: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all group"
             >
-              <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
+                <p className="font-black text-[13px] sm:text-sm text-neutral-900 dark:text-white uppercase tracking-tight leading-tight mb-1">{benefit.title}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -107,24 +107,24 @@ const USSDbanking: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+            className="p-6 sm:p-10 rounded-3xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-xl"
           >
-            <h4 className="font-semibold text-neutral-900 dark:text-white mb-6">Quick USSD Codes</h4>
-            <div className="space-y-3">
+            <h4 className="text-sm font-black text-neutral-400 uppercase tracking-[0.2em] mb-8">Quick Access Codes</h4>
+            <div className="space-y-3 sm:space-y-4">
               {ussdServices.map((service) => (
                 <div
                   key={service.code}
                   className={cn(
-                    "flex items-center gap-4 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-slate-700",
-                    "hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-200 dark:hover:border-orange-700 transition-all"
+                    "flex items-center gap-4 p-3 sm:p-4 rounded-2xl bg-slate-50 dark:bg-neutral-900/50 border border-transparent shadow-sm transition-all group",
+                    "hover:bg-orange-500/5 hover:border-orange-500/20 hover:-translate-x-1"
                   )}
                 >
-                  <div className="w-20 font-mono text-sm font-semibold text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded text-center">
-                    {service.code}
+                  <div className="w-24 sm:w-28 font-mono text-xs sm:text-sm font-black text-orange-600 dark:text-orange-400 bg-orange-500/10 px-3 py-2 rounded-xl text-center shadow-inner group-hover:scale-105 transition-transform uppercase">
+                    {service.code.replace('*', '').replace('#', '')}#
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-neutral-900 dark:text-white text-sm">{service.name}</p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{service.description}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-neutral-900 dark:text-white text-[13px] sm:text-base tracking-tight truncate group-hover:text-orange-600 transition-colors">{service.name}</p>
+                    <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest truncate">{service.description}</p>
                   </div>
                 </div>
               ))}

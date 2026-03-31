@@ -118,12 +118,12 @@ const WeCare: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto mb-12 sm:mb-20"
         >
           {impactStats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-rose-200">
-              <p className="text-2xl font-bold text-rose-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
+            <div key={stat.label} className="text-center p-4 sm:p-8 rounded-[2rem] bg-white dark:bg-neutral-800 border border-rose-100 dark:border-rose-900/30 shadow-sm hover:shadow-xl transition-all group">
+              <p className="text-xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums tracking-tighter italic group-hover:scale-110 transition-transform">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -133,26 +133,28 @@ const WeCare: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-20"
         >
           {csrPillars.map((pillar) => (
             <div
               key={pillar.name}
               className={cn(
-                "p-5 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-rose-300 transition-all"
+                "p-8 rounded-[2.5rem] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-xl group transition-all duration-500",
+                "hover:shadow-2xl dark:hover:shadow-neutral-900/50 hover:border-rose-500/30"
               )}
             >
               <div className={cn(
-                "w-12 h-12 rounded-xl text-white flex items-center justify-center mb-4",
+                "w-14 h-14 rounded-2xl text-white flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-500",
                 `bg-gradient-to-br ${pillar.color}`
               )}>
-                {pillar.icon}
+                {React.isValidElement(pillar.icon) 
+                  ? React.cloneElement(pillar.icon as React.ReactElement, { className: "w-6 h-6" })
+                  : pillar.icon}
               </div>
-              <h3 className="font-bold text-neutral-900 dark:text-white mb-2">{pillar.name}</h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-3">{pillar.description}</p>
-              <div className="pt-3 border-t border-neutral-100 dark:border-neutral-700">
-                <p className="text-xs font-semibold text-rose-600">{pillar.impact}</p>
+              <h3 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{pillar.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-6">{pillar.description}</p>
+              <div className="pt-4 border-t border-neutral-100 dark:border-neutral-700">
+                <p className="text-[11px] sm:text-xs font-black text-rose-600 uppercase tracking-widest">{pillar.impact}</p>
               </div>
             </div>
           ))}

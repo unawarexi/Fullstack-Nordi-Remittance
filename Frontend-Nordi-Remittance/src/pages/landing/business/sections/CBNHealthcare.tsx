@@ -137,43 +137,45 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative flex flex-col h-full p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+      "relative flex flex-col h-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
     )}
   >
     {/* Icon */}
-    <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4", loan.color)}>
-      {React.cloneElement(loan.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
+    <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4 shrink-0 shadow-md", loan.color)}>
+      {React.isValidElement(loan.icon) 
+        ? React.cloneElement(loan.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+        : loan.icon}
     </div>
 
     {/* Content */}
-    <h3 className="text-[15px] sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{loan.name}</h3>
-    <p className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-tight">{loan.description}</p>
+    <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{loan.name}</h3>
+    <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-4 leading-tight">{loan.description}</p>
 
     {/* Loan Details */}
-    <div className="grid grid-cols-3 gap-2 py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
+    <div className="grid grid-cols-3 gap-2 py-3 sm:py-5 border-y border-neutral-100 dark:border-neutral-700 mb-4 sm:mb-5">
       <div>
-        <p className="text-[10px] text-neutral-400 leading-tight">Max Amount</p>
-        <p className="text-sm sm:text-lg font-bold text-neutral-900 dark:text-white leading-tight">{loan.maxAmount}</p>
+        <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold leading-tight mb-0.5">Max Amount</p>
+        <p className="text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-tight">{loan.maxAmount}</p>
       </div>
       <div>
-        <p className="text-[10px] text-neutral-400 leading-tight">Rate</p>
-        <p className="text-sm sm:text-lg font-bold text-emerald-600 leading-tight">{loan.rate}</p>
+        <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold leading-tight mb-0.5">Rate</p>
+        <p className="text-base sm:text-lg font-black text-emerald-600 leading-tight">{loan.rate}</p>
       </div>
       <div>
-        <p className="text-[10px] text-neutral-400 leading-tight">Tenure</p>
-        <p className="text-sm sm:text-lg font-bold text-neutral-900 dark:text-white leading-tight">{loan.tenure}</p>
+        <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold leading-tight mb-0.5">Tenure</p>
+        <p className="text-base sm:text-lg font-black text-neutral-900 dark:text-white leading-tight">{loan.tenure}</p>
       </div>
     </div>
 
     {/* Eligible For */}
-    <div className="flex-1 mb-5 sm:mb-6">
-      <p className="text-[10px] font-semibold text-neutral-400 uppercase mb-1.5 sm:mb-2">Eligible Businesses</p>
-      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+    <div className="flex-1 mb-6 sm:mb-8">
+      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2 sm:mb-3">Eligible Businesses</p>
+      <div className="flex flex-wrap gap-2">
         {loan.eligibleFor.map((item) => (
           <span
             key={item}
-            className="px-2 py-0.5 sm:py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-[10px] sm:text-xs rounded"
+            className="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-300 text-[10px] sm:text-xs font-bold rounded-lg border border-blue-100 dark:border-blue-800/30"
           >
             {item}
           </span>
@@ -182,9 +184,9 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     </div>
 
     {/* CTA */}
-    <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700 text-sm py-1.5 sm:py-2">
+    <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700 text-sm py-2.5 sm:py-3 font-bold shadow-md">
       Apply Now
-      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
+      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -249,30 +251,37 @@ const CBNHealthcare: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="p-5 sm:p-6 rounded-2xl bg-blue-900 text-white"
+          className="p-6 sm:p-10 rounded-3xl bg-blue-900 text-white border border-blue-800 shadow-2xl relative overflow-hidden"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 blur-3xl" />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center relative z-10">
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Eligibility Requirements</h3>
-              <p className="text-sm sm:text-base text-blue-200 mb-4 sm:mb-6 leading-tight">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 leading-tight">Eligibility Requirements</h3>
+              <p className="text-sm sm:text-lg text-blue-200 mb-6 sm:mb-8 leading-relaxed max-w-xl">
                 To qualify for the CBN Healthcare Sector Intervention Fund, your 
-                business must meet the following criteria:
+                business must meet the following core criteria:
               </p>
-              <ul className="space-y-2.5 sm:space-y-3">
+              <ul className="space-y-3 sm:space-y-4">
                 {eligibilityCriteria.map((criteria) => (
-                  <li key={criteria} className="flex items-start gap-2.5 sm:gap-3">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-[13px] sm:text-sm text-white/90 leading-snug">{criteria}</span>
+                  <li key={criteria} className="flex items-start gap-3 sm:gap-4 font-medium">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-400/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </div>
+                    <span className="text-[13px] sm:text-base text-white/90 leading-snug">{criteria}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="text-center bg-white/5 p-6 rounded-2xl border border-white/10">
-              <p className="text-3xl sm:text-4xl font-bold text-amber-400 mb-1 sm:mb-2 leading-tight">$50M+</p>
-              <p className="text-[13px] sm:text-base text-blue-200 mb-5 sm:mb-6 leading-tight">Total funds disbursed to healthcare sector</p>
-              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-sm py-2 px-6">
+            <div className="text-center bg-white/5 p-8 sm:p-12 rounded-3xl border border-white/10 backdrop-blur-sm">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg">
+                <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400" />
+              </div>
+              <p className="text-3xl sm:text-5xl font-black text-amber-400 mb-2 sm:mb-3 leading-tight tracking-tighter">$50M+</p>
+              <p className="text-sm sm:text-lg text-blue-200 mb-8 sm:mb-10 font-bold leading-tight">Total funds disbursed to Nigeria's healthcare sector</p>
+              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-400 hover:bg-amber-500 text-blue-900 font-bold px-10 py-4 shadow-xl">
                 Check Your Eligibility
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
           </div>

@@ -88,12 +88,14 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => (
       "hover:bg-slate-750 hover:border-slate-600 transition-all duration-300"
     )}
   >
-    <div className="flex-shrink-0 p-2 sm:p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/300/20 text-indigo-400">
-      {feature.icon}
+    <div className="flex-shrink-0 p-3 rounded-xl bg-indigo-500/10 text-indigo-400 shadow-inner group-hover:scale-110 transition-transform">
+      {React.isValidElement(feature.icon) 
+        ? React.cloneElement(feature.icon as React.ReactElement, { className: "w-6 h-6" })
+        : feature.icon}
     </div>
     <div>
-      <h4 className="font-semibold text-white">{feature.title}</h4>
-      <p className="mt-1 text-sm text-slate-400 leading-relaxed">
+      <h4 className="text-base sm:text-lg font-black text-white uppercase tracking-tight italic">{feature.title}</h4>
+      <p className="mt-2 text-[11px] sm:text-sm text-slate-400 font-bold opacity-75 leading-relaxed">
         {feature.description}
       </p>
     </div>

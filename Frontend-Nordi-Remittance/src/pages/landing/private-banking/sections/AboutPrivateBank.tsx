@@ -90,21 +90,21 @@ const AboutPrivateBank: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20"
         >
           {values.map((value, index) => (
             <div
               key={value.title}
               className={cn(
-                "p-5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-center",
-                "hover:shadow-md hover:border-amber-300 transition-all"
+                "p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-center transition-all group",
+                "hover:shadow-xl hover:border-amber-400 group-hover:scale-105"
               )}
             >
-              <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
-                <value.icon className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-amber-400/10 text-amber-600 flex items-center justify-center mb-3 sm:mb-5 shadow-inner group-hover:bg-amber-400 group-hover:text-white transition-all">
+                <value.icon className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h4 className="font-semibold text-neutral-900 dark:text-white mb-1">{value.title}</h4>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">{value.description}</p>
+              <h4 className="font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 text-sm sm:text-base uppercase tracking-tight">{value.title}</h4>
+              <p className="text-[10px] sm:text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed group-hover:text-neutral-600 transition-colors">{value.description}</p>
             </div>
           ))}
         </motion.div>
@@ -116,15 +116,17 @@ const AboutPrivateBank: React.FC = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-100 dark:border-neutral-700"
+            className="p-6 sm:p-10 rounded-3xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 shadow-sm"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <History className="w-5 h-5 text-amber-600" />
-              <h4 className="font-semibold text-neutral-900 dark:text-white">Our Journey</h4>
+            <div className="flex items-center gap-4 mb-8 sm:mb-12">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-400/10 flex items-center justify-center">
+                <History className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+              </div>
+              <h4 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white uppercase tracking-tight">Our Journey</h4>
             </div>
 
-            <div className="relative pl-8">
-              <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-amber-200" />
+            <div className="relative pl-8 sm:pl-10">
+              <div className="absolute left-4 sm:left-5 top-0 bottom-0 w-[2px] bg-amber-200 dark:bg-amber-900/30" />
               {milestones.map((milestone, index) => (
                 <motion.div
                   key={milestone.year}
@@ -132,15 +134,13 @@ const AboutPrivateBank: React.FC = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="relative pb-6 last:pb-0"
+                  className="relative pb-8 sm:pb-12 last:pb-0"
                 >
-                  <div className="absolute left-0 w-6 h-6 -translate-x-1/2 rounded-full bg-amber-50 dark:bg-amber-900/200 flex items-center justify-center">
-                    <span className="w-2 h-2 rounded-full bg-white dark:bg-neutral-800" />
-                  </div>
-                  <div className="ml-4">
-                    <span className="text-xs font-semibold text-amber-600">{milestone.year}</span>
-                    <h5 className="font-semibold text-neutral-900 dark:text-white">{milestone.title}</h5>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">{milestone.description}</p>
+                  <div className="absolute -left-[2.05rem] sm:-left-[2.55rem] w-6 h-6 rounded-full bg-amber-400 border-4 border-white dark:border-neutral-800 shadow-md flex items-center justify-center shrink-0 z-10" />
+                  <div className="bg-white dark:bg-neutral-800/80 p-4 sm:p-6 rounded-2xl border border-neutral-100 dark:border-neutral-700 shadow-sm">
+                    <span className="text-[10px] sm:text-xs font-black text-amber-600 uppercase tracking-[0.2em] mb-1 block">{milestone.year}</span>
+                    <h5 className="font-bold text-neutral-900 dark:text-white text-base sm:text-lg mb-1 leading-tight">{milestone.title}</h5>
+                    <p className="text-[12px] sm:text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-medium">{milestone.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -152,44 +152,50 @@ const AboutPrivateBank: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white"
+            className="p-6 sm:p-10 rounded-3xl bg-neutral-900 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <Award className="w-5 h-5" />
-              <h4 className="font-semibold">Recognition & Awards</h4>
-            </div>
-
-            <div className="space-y-4 mb-6">
-              {awards.map((award) => (
-                <div
-                  key={award.award}
-                  className="flex items-center gap-4 p-3 rounded-lg bg-white/10"
-                >
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <Award className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">{award.award}</p>
-                    <p className="text-xs text-amber-100">{award.org}</p>
-                  </div>
-                  <span className="text-xs font-semibold bg-white/20 px-2 py-1 rounded">{award.year}</span>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-400/10 rounded-full -mr-24 -mt-24 blur-3xl opacity-50" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-8 sm:mb-12">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shadow-lg">
+                  <Award className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-              ))}
+                <h4 className="text-lg sm:text-xl font-black uppercase tracking-tight">Global Recognition</h4>
+              </div>
+
+              <div className="space-y-3 sm:space-y-4 mb-10 sm:mb-16">
+                {awards.map((award) => (
+                  <div
+                    key={award.award}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group cursor-default"
+                  >
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-400/10 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+                      <Award className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-[13px] sm:text-base leading-tight truncate uppercase tracking-tight">{award.award}</p>
+                      <p className="text-[10px] sm:text-xs text-amber-400/70 font-bold uppercase tracking-widest mt-0.5">{award.org}</p>
+                    </div>
+                    <span className="text-[10px] sm:text-xs font-black bg-white/10 px-2 sm:px-3 py-1.5 rounded-lg border border-white/5 tabular-nums">{award.year}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
-              <div className="text-center">
-                <p className="text-2xl font-bold">25+</p>
-                <p className="text-xs text-amber-100">Years</p>
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-10 border-t border-white/10 relative z-10 w-full">
+              <div className="text-center group">
+                <p className="text-xl sm:text-3xl font-black group-hover:text-amber-400 transition-colors leading-none tracking-tighter tabular-nums">25+</p>
+                <p className="text-[9px] sm:text-[11px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-2 group-hover:text-white transition-colors">Years</p>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold">2,500+</p>
-                <p className="text-xs text-amber-100">Clients</p>
+              <div className="text-center group border-x border-white/5">
+                <p className="text-xl sm:text-3xl font-black group-hover:text-amber-400 transition-colors leading-none tracking-tighter tabular-nums">2,500+</p>
+                <p className="text-[9px] sm:text-[11px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-2 group-hover:text-white transition-colors">Clients</p>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold">$5B+</p>
-                <p className="text-xs text-amber-100">AUM</p>
+              <div className="text-center group">
+                <p className="text-xl sm:text-3xl font-black group-hover:text-amber-400 transition-colors leading-none tracking-tighter tabular-nums">$5B+</p>
+                <p className="text-[9px] sm:text-[11px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-2 group-hover:text-white transition-colors">AUM</p>
               </div>
             </div>
           </motion.div>

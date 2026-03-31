@@ -137,13 +137,13 @@ const BranchLocator: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-12"
+          className="grid grid-cols-3 gap-3 sm:gap-6 max-w-2xl mx-auto mb-12 sm:mb-20"
         >
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center p-4 rounded-xl bg-teal-50">
-              <stat.icon className="w-6 h-6 text-teal-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-neutral-900 dark:text-white">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">{stat.label}</p>
+            <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-teal-50 dark:bg-teal-900/10 border border-teal-100 dark:border-teal-800/30 shadow-sm hover:shadow-xl transition-all group">
+              <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-teal-600 dark:text-teal-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+              <p className="text-xl sm:text-3xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -153,41 +153,41 @@ const BranchLocator: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto mb-8"
+          className="max-w-4xl mx-auto mb-12"
         >
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
             {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-teal-500 transition-colors" />
               <input
                 type="text"
-                placeholder="Search by branch name or location..."
+                placeholder="Find Your Local Hub..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-neutral-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+                className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 font-black text-xs uppercase tracking-widest focus:border-teal-500 outline-none transition-all placeholder:text-neutral-400"
               />
             </div>
 
             {/* State Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+            <div className="relative group">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 group-focus-within:text-teal-500 transition-colors" />
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="pl-10 pr-8 py-3 rounded-xl border border-neutral-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none appearance-none bg-white dark:bg-neutral-800 min-w-[160px]"
+                className="w-full md:w-auto pl-12 pr-10 py-4 rounded-2xl border-2 border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 font-black text-xs uppercase tracking-widest focus:border-teal-500 outline-none appearance-none transition-all cursor-pointer"
               >
                 {states.map((state) => (
                   <option key={state} value={state}>
-                    {state === "all" ? "All States" : state}
+                    {state === "all" ? "NEAREST RADIUS" : state.toUpperCase()}
                   </option>
                 ))}
               </select>
             </div>
 
             {/* Use Location Button */}
-            <Button variant="primary" className="bg-teal-600 hover:bg-teal-700">
-              <Navigation className="w-4 h-4 mr-2" />
-              Use My Location
+            <Button variant="primary" size="lg" className="w-full md:w-auto bg-teal-600 hover:bg-teal-700 font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-95 uppercase tracking-widest text-xs">
+              <Navigation className="w-5 h-5 mr-3 animate-pulse" />
+              Target My Position
             </Button>
           </div>
         </motion.div>

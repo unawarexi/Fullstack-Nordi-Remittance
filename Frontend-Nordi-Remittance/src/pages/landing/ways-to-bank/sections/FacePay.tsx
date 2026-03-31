@@ -87,18 +87,18 @@ const FacePay: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12 sm:mb-20"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all group"
             >
-              <div className="w-12 h-12 mx-auto rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-3">
-                <benefit.icon className="w-6 h-6" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                <benefit.icon className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <h4 className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</h4>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <h4 className="font-black text-[13px] sm:text-base text-neutral-900 dark:text-white uppercase tracking-tight leading-tight mb-1">{benefit.title}</h4>
+              <p className="text-[10px] sm:text-[13px] text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -204,15 +204,16 @@ const FacePay: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-8 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-start gap-4"
+          className="mt-8 sm:mt-16 p-6 sm:p-10 rounded-3xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 shadow-xl"
         >
-          <Shield className="w-6 h-6 text-violet-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h5 className="font-semibold text-neutral-900 dark:text-white mb-1">Your Privacy Matters</h5>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              Your facial data is encrypted and stored only on your device, never on our servers. 
-              FacePay uses liveness detection to prevent spoofing and requires your explicit 
-              consent for every transaction.
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center shrink-0 shadow-lg group">
+            <Shield className="w-8 h-8 sm:w-9 sm:h-9 text-violet-600 group-hover:scale-110 transition-transform" />
+          </div>
+          <div className="text-center sm:text-left">
+            <h5 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">Privacy Protocol X-10</h5>
+            <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed max-w-2xl">
+              Your facial data is encrypted via military-grade RSA-4096 and remains strictly localized on your secure element. 
+              FacePay uses advanced liveness detection to neutralize spoofing threats. Your biometric hash is <span className="text-violet-600">never transmitted</span> to external servers.
             </p>
           </div>
         </motion.div>
