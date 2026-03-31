@@ -9,6 +9,7 @@ import { ArrowLeft, Shield, Globe, Lock, CreditCard } from "lucide-react";
 import { cn } from "@utils/cn";
 import Images from "@constants/images";
 import GetLocation from "@utils/GetLocation";
+import { Logo } from "@components/shared";
 
 // ========================
 // TYPES
@@ -98,15 +99,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         {/* Header */}
         <div className="mb-6 flex w-full items-center justify-between">
           <Link to="/" className="group flex items-center gap-3">
-            <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2 transition-colors group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50">
-              <Globe className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <p className="text-base text-neutral-800 dark:text-neutral-100 sm:text-lg italic uppercase font-black">
-                Internet Banking
-              </p>
-              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-bold">Quick Access</p>
-            </div>
+            <Logo size="sm" className="md:hidden" />
+            <Logo size="md" className="hidden md:flex" />
           </Link>
           <GetLocation />
         </div>

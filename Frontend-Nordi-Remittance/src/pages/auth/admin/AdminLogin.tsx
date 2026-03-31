@@ -8,12 +8,13 @@ import { Mail, Lock, Shield, ShieldCheck, Globe, Fingerprint } from "lucide-reac
 import { useSignIn, useAuth as useClerkAuth } from "@clerk/clerk-react";
 
 import { Button, Input, Spinner } from "@components/ui";
-import Images from '@constants/images';
+import Images from "@constants/images";
 import GetLocation from "@utils/GetLocation";
 import { useAdminLogin } from "@hooks/queries/useAdmin";
 import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
+import { Logo } from "@components/shared";
 
 // ============================================================================
 // ANIMATION VARIANTS
@@ -34,7 +35,7 @@ const itemVariants = {
 const FeaturePill: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
   <motion.div
     variants={itemVariants}
-    className="flex items-center gap-2.5 rounded-lg bg-white/10 backdrop-blur-sm px-4 py-3"
+    className="flex items-center gap-2.5 rounded-lg bg-white/10 px-4 py-3 backdrop-blur-sm"
   >
     <span className="text-white/90">{icon}</span>
     <span className="text-sm font-medium text-white/80">{text}</span>
@@ -121,9 +122,9 @@ const AdminLogin = () => {
     } catch (err: any) {
       setClerkError(
         err?.errors?.[0]?.longMessage ||
-        err?.errors?.[0]?.message ||
-        err?.message ||
-        "Login failed. Please check your credentials.",
+          err?.errors?.[0]?.message ||
+          err?.message ||
+          "Login failed. Please check your credentials.",
       );
     }
   };
@@ -148,14 +149,11 @@ const AdminLogin = () => {
         redirectUrlComplete: "/auth/clerk-admin-callback",
       });
     } catch (err: any) {
-      setClerkError(
-        err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.",
-      );
+      setClerkError(err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.");
     }
   };
 
-  const isPending =
-    isSubmitting || loginMutation.isPending || clerkSyncAdminMutation.isPending;
+  const isPending = isSubmitting || loginMutation.isPending || clerkSyncAdminMutation.isPending;
 
   return (
     <section className="relative flex min-h-screen w-full overflow-hidden">
@@ -164,20 +162,13 @@ const AdminLogin = () => {
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex w-full flex-col justify-center bg-slate-50 dark:bg-neutral-900 px-6 py-8 md:w-1/2 lg:w-[55%] md:px-12 lg:px-20 transition-colors duration-300"
+        className="flex w-full flex-col justify-center bg-slate-50 px-6 py-8 transition-colors duration-300 dark:bg-neutral-900 md:w-1/2 md:px-12 lg:w-[55%] lg:px-20"
       >
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <Link to="/" className="group flex items-center gap-3">
-            <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-2 transition-colors group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50">
-              <Globe className="h-5 w-5 text-blue-600 sm:h-6 sm:w-6" />
-            </div>
-            <div>
-              <p className="text-base text-neutral-800 dark:text-neutral-100 sm:text-lg italic uppercase font-black">
-                Internet Banking
-              </p>
-              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 uppercase tracking-widest font-bold">Quick Access</p>
-            </div>
+            <Logo size="sm" className="md:hidden" />
+            <Logo size="md" className="hidden md:flex" />
           </Link>
           <GetLocation />
         </div>
@@ -187,10 +178,10 @@ const AdminLogin = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="mb-2 inline-flex w-fit items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-3 py-1"
+          className="mb-2 inline-flex w-fit items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 dark:border-blue-800 dark:bg-blue-950/40"
         >
           <Shield className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-          <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
+          <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300">
             Admin Portal
           </span>
         </motion.div>
@@ -202,10 +193,10 @@ const AdminLogin = () => {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white md:text-3xl lg:text-4xl">
             Administration Console
           </h1>
-          <p className="mt-3 text-neutral-600 dark:text-neutral-400 text-base md:text-lg">
+          <p className="mt-3 text-base text-neutral-600 dark:text-neutral-400 md:text-lg">
             Sign in with your administrator credentials to access the management dashboard.
           </p>
         </motion.div>
@@ -241,8 +232,11 @@ const AdminLogin = () => {
 
           {/* API Error */}
           {(clerkError || loginMutation.error || clerkSyncAdminMutation.error) && (
-            <div className="rounded-lg border border-error-200 dark:border-red-800 bg-error-50 dark:bg-red-950/30 p-3 text-sm text-error-600 dark:text-red-400">
-              {clerkError || (clerkSyncAdminMutation.error as any)?.message || (loginMutation.error as any)?.message || "Login failed. Please check your credentials."}
+            <div className="rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+              {clerkError ||
+                (clerkSyncAdminMutation.error as any)?.message ||
+                (loginMutation.error as any)?.message ||
+                "Login failed. Please check your credentials."}
             </div>
           )}
 
@@ -250,7 +244,7 @@ const AdminLogin = () => {
           <div className="text-right">
             <Link
               to="/auth/forgot-password"
-              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+              className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
             >
               Forgot Admin Password?
             </Link>
@@ -297,10 +291,22 @@ const AdminLogin = () => {
           >
             <span className="flex items-center justify-center gap-2">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
               </svg>
               Continue with Google
             </span>
@@ -312,14 +318,14 @@ const AdminLogin = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-6 w-full max-w-md rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 p-4"
+          className="mt-6 w-full max-w-md rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-950/20"
         >
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-amber-100 dark:bg-amber-900/40 p-2">
+            <div className="rounded-lg bg-amber-100 p-2 dark:bg-amber-900/40">
               <ShieldCheck className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="font-medium text-neutral-900 dark:text-white text-sm">Restricted Access</p>
+              <p className="text-sm font-medium text-neutral-900 dark:text-white">Restricted Access</p>
               <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
                 Authorized personnel only. All login attempts are logged and monitored for security compliance.
               </p>
@@ -336,15 +342,15 @@ const AdminLogin = () => {
         >
           <p>&copy; {new Date().getFullYear()} Nordea Bank PLC. (Licensed by the International Monetary Fund)</p>
           <div className="mt-2 flex items-center justify-center gap-4">
-            <Link to="/privacy" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+            <Link to="/privacy" className="transition-colors hover:text-primary-600 dark:hover:text-primary-400">
               Privacy Policy
             </Link>
             <span>&middot;</span>
-            <Link to="/terms" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+            <Link to="/terms" className="transition-colors hover:text-primary-600 dark:hover:text-primary-400">
               Terms of Service
             </Link>
             <span>&middot;</span>
-            <Link to="/contact" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+            <Link to="/contact" className="transition-colors hover:text-primary-600 dark:hover:text-primary-400">
               IT Support
             </Link>
           </div>
@@ -356,14 +362,10 @@ const AdminLogin = () => {
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="hidden md:flex md:w-1/2 lg:w-[45%] relative overflow-hidden"
+        className="relative hidden overflow-hidden md:flex md:w-1/2 lg:w-[45%]"
       >
         {/* Background Image */}
-        <img
-          src={Images.adminLoginBg}
-          alt="Admin Portal"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        <img src={Images.adminLoginBg} alt="Admin Portal" className="absolute inset-0 h-full w-full object-cover" />
 
         {/* Dark overlay for legibility */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-slate-900/70 to-slate-900/90" />
@@ -373,44 +375,29 @@ const AdminLogin = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative z-10 flex flex-col items-center justify-center w-full p-8 lg:p-14"
+          className="relative z-10 flex w-full flex-col items-center justify-center p-8 lg:p-14"
         >
           {/* Title */}
-          <motion.div variants={itemVariants} className="text-center mb-10">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20">
+          <motion.div variants={itemVariants} className="mb-10 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/15 backdrop-blur-sm">
               <Shield className="h-7 w-7 text-white" />
             </div>
-            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-              Nordi Admin Console
-            </h2>
-            <p className="text-white/70 text-sm max-w-xs mx-auto">
+            <h2 className="mb-2 text-2xl font-bold text-white lg:text-3xl">Nordi Admin Console</h2>
+            <p className="mx-auto max-w-xs text-sm text-white/70">
               Secure management portal for system administrators and compliance officers
             </p>
           </motion.div>
 
           {/* Feature pills */}
           <div className="w-full max-w-sm space-y-3">
-            <FeaturePill
-              icon={<ShieldCheck className="h-4 w-4" />}
-              text="256-bit encrypted sessions & audit logging"
-            />
-            <FeaturePill
-              icon={<Fingerprint className="h-4 w-4" />}
-              text="Multi-factor authentication enforced"
-            />
-            <FeaturePill
-              icon={<Globe className="h-4 w-4" />}
-              text="Real-time monitoring & compliance tools"
-            />
+            <FeaturePill icon={<ShieldCheck className="h-4 w-4" />} text="256-bit encrypted sessions & audit logging" />
+            <FeaturePill icon={<Fingerprint className="h-4 w-4" />} text="Multi-factor authentication enforced" />
+            <FeaturePill icon={<Globe className="h-4 w-4" />} text="Real-time monitoring & compliance tools" />
           </div>
 
           {/* Card image */}
           <motion.div variants={itemVariants} className="mt-10">
-            <img
-              src={Images.authCard1}
-              alt="Banking Card"
-              className="w-full max-w-[260px] mx-auto drop-shadow-2xl"
-            />
+            <img src={Images.authCard1} alt="Banking Card" className="mx-auto w-full max-w-[260px] drop-shadow-2xl" />
           </motion.div>
         </motion.div>
       </motion.div>
