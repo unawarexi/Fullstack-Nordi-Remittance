@@ -49,7 +49,7 @@ const SubNavBar: React.FC = () => {
 
   return (
     <div className="w-full border-b border-border-primary bg-surface-secondary dark:bg-neutral-900">
-      <div className="container mx-auto px-4 py-2 sm:py-3">
+      <div className="container mx-auto px-4 py-1 sm:py-3">
         <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
           {/* Nav Items - Hidden on mobile, visible on md+ */}
           <div
@@ -210,7 +210,7 @@ export const ResponsiveNavbar: React.FC = () => {
           onMouseLeave={handleMegaMenuMouseLeave}
           className={cn(
             "bg-surface-primary/95 border-b border-border-primary backdrop-blur-md dark:bg-neutral-900/95",
-            isScrolled ? "py-2" : "py-3 sm:py-4",
+            isScrolled ? "py-1.5" : "py-2 sm:py-4",
           )}
         >
           <div className="container mx-auto px-4">
@@ -222,7 +222,7 @@ export const ResponsiveNavbar: React.FC = () => {
                   alt="Nordea"
                   className={cn(
                     "transition-all duration-300",
-                    isScrolled ? "w-28 sm:w-32" : "w-32 sm:w-40",
+                    isScrolled ? "w-24 sm:w-32" : "w-28 sm:w-40",
                   )}
                 />
               </Link>
@@ -299,7 +299,7 @@ export const ResponsiveNavbar: React.FC = () => {
       <div
         className={cn(
           "transition-all duration-300",
-          isScrolled ? "h-16 sm:h-20" : "h-24 sm:h-32 lg:h-36",
+          isScrolled ? "h-12 sm:h-20" : "h-[85px] sm:h-32 lg:h-36",
         )}
       />
     </>
