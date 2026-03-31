@@ -128,7 +128,7 @@ const RemitFooter: React.FC = () => {
 
   return (
     <footer className="relative overflow-hidden">
-      {/* Background Image - Always visible in the background layer */}
+      {/* Background Image */}
       <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-100">
         <img
           src={Images.FooterImg}
