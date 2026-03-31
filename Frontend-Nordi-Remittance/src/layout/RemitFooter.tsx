@@ -2,14 +2,14 @@
 // REMIT FOOTER - Responsive footer with newsletter and social links
 // ============================================================================
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Send, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
-import { cn } from '@utils/cn';
-import { useBreakpoint, useIsMobile } from '@hooks/index';
-import { Button } from '@components/ui/Button';
-import { Container } from '@components/layout/Container';
-import Images from '@constants/images';
+import React from "react";
+import { motion } from "framer-motion";
+import { Send, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import { cn } from "@utils/cn";
+import { useBreakpoint, useIsMobile } from "@hooks/index";
+import { Button } from "@components/ui/Button";
+import { Container } from "@components/layout/Container";
+import Images from "@constants/images";
 
 // ========================
 // FOOTER DATA
@@ -28,25 +28,6 @@ const footerCategoriesItem = [
     ],
   },
   {
-    title: "Careers",
-    links: [
-      "Working At Nordea Bank",
-      "Your Career",
-      "Recruitment Process",
-    ],
-  },
-  {
-    title: "Contact Us",
-    links: [
-      "Agent Banking Details",
-      "Biometrics Enrollment",
-      "Branch & ATM Locator",
-      "Branches With Wi-Fi",
-      "My Access",
-      "We Care",
-    ],
-  },
-  {
     title: "Quick Links",
     links: [
       "Dormant Accounts",
@@ -61,6 +42,18 @@ const footerCategoriesItem = [
     ],
   },
   {
+    title: "Contact Us",
+    links: [
+      "Agent Banking Details",
+      "Biometrics Enrollment",
+      "Branch & ATM Locator",
+      "Branches With Wi-Fi",
+      "My Access",
+      "We Care",
+    ],
+  },
+
+  {
     title: "You are...",
     links: [
       "An Individual",
@@ -73,13 +66,17 @@ const footerCategoriesItem = [
       "An Investor",
     ],
   },
+  {
+    title: "Careers",
+    links: ["Working At Nordea Bank", "Your Career", "Recruitment Process"],
+  },
 ];
 
 // ========================
 // FOOTER COLUMN COMPONENT
 // ========================
 interface FooterColumnProps {
-  category: typeof footerCategoriesItem[0];
+  category: (typeof footerCategoriesItem)[0];
   index: number;
 }
 
@@ -92,9 +89,7 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ category, index }) => {
       transition={{ delay: index * 0.1 }}
       className="mb-8 lg:mb-0"
     >
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-        {category.title}
-      </h3>
+      <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">{category.title}</h3>
       <nav className="space-y-2">
         {category.links.map((link, i) => (
           <a
@@ -102,8 +97,8 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ category, index }) => {
             href="#"
             className={cn(
               "block text-sm text-neutral-300 dark:text-neutral-400",
-              "hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-200",
-              "hover:translate-x-1 transform"
+              "transition-colors duration-200 hover:text-primary-500 dark:hover:text-primary-400",
+              "transform hover:translate-x-1",
             )}
           >
             {link}
@@ -118,10 +113,10 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ category, index }) => {
 // SOCIAL LINKS
 // ========================
 const socialLinks = [
-  { icon: <Facebook size={18} />, href: '#', label: 'Facebook' },
-  { icon: <Twitter size={18} />, href: '#', label: 'Twitter' },
-  { icon: <Instagram size={18} />, href: '#', label: 'Instagram' },
-  { icon: <Linkedin size={18} />, href: '#', label: 'LinkedIn' },
+  { icon: <Facebook size={18} />, href: "#", label: "Facebook" },
+  { icon: <Twitter size={18} />, href: "#", label: "Twitter" },
+  { icon: <Instagram size={18} />, href: "#", label: "Instagram" },
+  { icon: <Linkedin size={18} />, href: "#", label: "LinkedIn" },
 ];
 
 // ========================
@@ -135,24 +130,17 @@ const RemitFooter: React.FC = () => {
     <footer className="relative">
       {/* Background Image - Hidden on mobile */}
       {isLgUp && (
-        <div className="absolute bottom-0 right-0 pointer-events-none opacity-30">
-          <img 
-            src={Images.FooterImg} 
-            alt="footer decoration" 
-            className="w-[300px] lg:w-[400px] xl:w-[500px] h-auto" 
-          />
+        <div className="pointer-events-none absolute bottom-0 right-0 opacity-30">
+          <img src={Images.FooterImg} alt="footer decoration" className="h-auto w-[300px] lg:w-[400px] xl:w-[500px]" />
         </div>
       )}
-  
+
       {/* Main Footer */}
-      <section className="bg-slate-800/95 dark:bg-neutral-900/95 backdrop-blur-sm relative z-10 transition-colors duration-300">
+      <section className="relative z-10 bg-slate-800/95 backdrop-blur-sm transition-colors duration-300 dark:bg-neutral-900/95">
         <Container>
           <div className="py-12 sm:py-16 md:py-20 lg:py-24">
             {/* Footer Grid */}
-            <div className={cn(
-              "grid gap-8",
-              "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-            )}>
+            <div className={cn("grid gap-8", "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}>
               {footerCategoriesItem.map((category, index) => (
                 <FooterColumn key={index} category={category} index={index} />
               ))}
@@ -164,13 +152,10 @@ const RemitFooter: React.FC = () => {
         <div className="border-t border-neutral-700 dark:border-neutral-800">
           <Container>
             <div className="py-8 sm:py-10">
-              <div className={cn(
-                "flex flex-col gap-6",
-                "md:flex-row md:items-center md:justify-between"
-              )}>
+              <div className={cn("flex flex-col gap-6", "md:flex-row md:items-center md:justify-between")}>
                 {/* Newsletter Form */}
-                <div className="flex-1 max-w-md">
-                  <label className="block text-sm font-medium text-neutral-300 dark:text-neutral-400 mb-2">
+                <div className="max-w-md flex-1">
+                  <label className="mb-2 block text-sm font-medium text-neutral-300 dark:text-neutral-400">
                     Subscribe to Newsletter
                   </label>
                   <div className="flex gap-2">
@@ -178,14 +163,14 @@ const RemitFooter: React.FC = () => {
                       type="email"
                       placeholder="Enter your email"
                       className={cn(
-                        "flex-1 px-4 py-2.5 rounded-lg",
-                        "bg-neutral-700/50 dark:bg-neutral-800/50 border border-neutral-600 dark:border-neutral-700",
-                        "text-white placeholder-neutral-400 dark:placeholder-neutral-500 text-sm",
-                        "focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500",
-                        "transition-all duration-200"
+                        "flex-1 rounded-lg px-4 py-2.5",
+                        "border border-neutral-600 bg-neutral-700/50 dark:border-neutral-700 dark:bg-neutral-800/50",
+                        "text-sm text-white placeholder-neutral-400 dark:placeholder-neutral-500",
+                        "focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50",
+                        "transition-all duration-200",
                       )}
                     />
-                    <Button 
+                    <Button
                       size={isMobile ? "sm" : "md"}
                       className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700"
                     >
@@ -193,7 +178,7 @@ const RemitFooter: React.FC = () => {
                       {!isMobile && "Subscribe"}
                     </Button>
                   </div>
-                  <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-2">
+                  <p className="mt-2 text-xs text-neutral-400 dark:text-neutral-500">
                     Get updates on Nordea's banking services and promotions.
                   </p>
                 </div>
@@ -207,11 +192,11 @@ const RemitFooter: React.FC = () => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "w-10 h-10 rounded-full",
-                        "bg-neutral-700 dark:bg-neutral-800 hover:bg-primary-500 dark:hover:bg-primary-600",
+                        "h-10 w-10 rounded-full",
+                        "bg-neutral-700 hover:bg-primary-500 dark:bg-neutral-800 dark:hover:bg-primary-600",
                         "flex items-center justify-center",
-                        "text-neutral-300 dark:text-neutral-400 hover:text-white",
-                        "transition-all duration-200"
+                        "text-neutral-300 hover:text-white dark:text-neutral-400",
+                        "transition-all duration-200",
                       )}
                       aria-label={social.label}
                     >
@@ -223,27 +208,25 @@ const RemitFooter: React.FC = () => {
             </div>
           </Container>
         </div>
-  
+
         {/* Bottom Bar */}
-        <div className="bg-slate-900 dark:bg-neutral-950 transition-colors duration-300">
+        <div className="bg-slate-900 transition-colors duration-300 dark:bg-neutral-950">
           <Container>
-            <div className={cn(
-              "py-4 sm:py-5",
-              "flex flex-col sm:flex-row items-center justify-between gap-3"
-            )}>
-              <p className="text-xs sm:text-sm text-neutral-400 dark:text-neutral-500 text-center sm:text-left">
+            <div className={cn("py-4 sm:py-5", "flex flex-col items-center justify-between gap-3 sm:flex-row")}>
+              <p className="text-center text-xs text-neutral-400 dark:text-neutral-500 sm:text-left sm:text-sm">
                 © {new Date().getFullYear()} Nordea Bank — All rights reserved.{" "}
-                <a
-                  href="#"
-                  className="text-primary-500 hover:text-primary-400 transition-colors"
-                >
+                <a href="#" className="text-primary-500 transition-colors hover:text-primary-400">
                   @Nordea
                 </a>
               </p>
-              <div className="flex items-center gap-4 text-xs sm:text-sm text-neutral-400 dark:text-neutral-500">
-                <a href="#" className="hover:text-primary-500 transition-colors">Privacy Policy</a>
+              <div className="flex items-center gap-4 text-xs text-neutral-400 dark:text-neutral-500 sm:text-sm">
+                <a href="#" className="transition-colors hover:text-primary-500">
+                  Privacy Policy
+                </a>
                 <span>•</span>
-                <a href="#" className="hover:text-primary-500 transition-colors">Terms of Service</a>
+                <a href="#" className="transition-colors hover:text-primary-500">
+                  Terms of Service
+                </a>
               </div>
             </div>
           </Container>
