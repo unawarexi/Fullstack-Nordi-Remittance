@@ -161,13 +161,13 @@ const CardVisual: React.FC<CardVisualProps> = ({ card }) => (
     )}
   >
     {/* Card chip */}
-    <div className="absolute top-6 left-6">
-      <div className="w-10 h-8 rounded bg-amber-400/80" />
+    <div className="absolute top-4 sm:top-6 left-4 sm:left-6">
+      <div className="w-8 h-6 sm:w-10 sm:h-8 rounded bg-amber-400/80" />
     </div>
     
     {/* Card number placeholder */}
-    <div className="absolute bottom-16 left-6 right-6">
-      <div className="flex gap-4 text-white/60 text-sm font-mono">
+    <div className="absolute bottom-12 sm:bottom-16 left-4 sm:left-6 right-4 sm:right-6">
+      <div className="flex gap-3 sm:gap-4 text-white/60 text-[10px] sm:text-sm font-mono tracking-tighter sm:tracking-normal">
         <span>****</span>
         <span>****</span>
         <span>****</span>
@@ -176,13 +176,13 @@ const CardVisual: React.FC<CardVisualProps> = ({ card }) => (
     </div>
     
     {/* Card name */}
-    <div className="absolute bottom-6 left-6">
-      <p className="text-white/90 text-sm font-semibold">{card.name}</p>
+    <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6">
+      <p className="text-white/90 text-xs sm:text-sm font-semibold">{card.name}</p>
     </div>
     
     {/* Logo placeholder */}
-    <div className="absolute bottom-6 right-6">
-      <div className="w-12 h-8 bg-white/20 rounded" />
+    <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6">
+      <div className="w-10 h-6 sm:w-12 sm:h-8 bg-white/20 rounded" />
     </div>
 
     {/* Premium shine effect */}
@@ -220,10 +220,10 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     {(card.popular || card.premium) && (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
         <span className={cn(
-          "inline-flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded-full",
+          "inline-flex items-center gap-1 px-2.5 py-0.5 text-white text-[10px] font-medium rounded-full",
           card.popular ? "bg-indigo-50 dark:bg-indigo-900/300" : "bg-amber-50 dark:bg-amber-900/200"
         )}>
-          {card.popular ? <Star className="w-3 h-3" /> : <Sparkles className="w-3 h-3" />}
+          {card.popular ? <Star className="w-2.5 h-2.5" /> : <Sparkles className="w-2.5 h-2.5" />}
           {card.popular ? "Most Popular" : "Premium"}
         </span>
       </div>
@@ -235,29 +235,29 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     </div>
 
     {/* Card Info */}
-    <div className="mb-4">
-      <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">{card.name}</h3>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400">{card.tagline}</p>
+    <div className="mb-3 sm:mb-4">
+      <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white leading-tight">{card.name}</h3>
+      <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">{card.tagline}</p>
     </div>
 
     {/* Key Stats */}
-    <div className="grid grid-cols-2 gap-3 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3 py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
       <div>
-        <p className="text-xs text-neutral-400">Annual Fee</p>
-        <p className="text-lg font-bold text-neutral-900 dark:text-white">{card.annualFee}</p>
+        <p className="text-[10px] text-neutral-400">Annual Fee</p>
+        <p className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">{card.annualFee}</p>
       </div>
       <div>
-        <p className="text-xs text-neutral-400">Sign-up Bonus</p>
-        <p className="text-lg font-bold text-emerald-600">{card.signupBonus}</p>
+        <p className="text-[10px] text-neutral-400">Sign-up Bonus</p>
+        <p className="text-base sm:text-lg font-bold text-emerald-600">{card.signupBonus}</p>
       </div>
     </div>
 
     {/* Rewards */}
-    <div className="mb-4">
-      <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase mb-2">Rewards</p>
-      <div className="space-y-1.5">
+    <div className="mb-3 sm:mb-4">
+      <p className="text-[10px] font-medium text-neutral-500 dark:text-neutral-400 uppercase mb-1.5 sm:mb-2">Rewards</p>
+      <div className="space-y-1 sm:space-y-1.5">
         {card.rewards.slice(0, 3).map((reward) => (
-          <div key={reward.category} className="flex items-center justify-between text-sm">
+          <div key={reward.category} className="flex items-center justify-between text-xs sm:text-sm">
             <span className="text-neutral-600 dark:text-neutral-300">{reward.category}</span>
             <span className="font-semibold text-indigo-600">{reward.rate}</span>
           </div>
@@ -266,10 +266,10 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     </div>
 
     {/* Features */}
-    <ul className="space-y-2 flex-1 mb-6">
+    <ul className="space-y-1.5 sm:space-y-2 flex-1 mb-4 sm:mb-6">
       {card.features.slice(0, 4).map((feature) => (
-        <li key={feature} className="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-          <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+        <li key={feature} className="flex items-start gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
           {feature}
         </li>
       ))}
@@ -279,13 +279,13 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
     <Button
       variant={card.popular || card.premium ? "primary" : "outline"}
       className={cn(
-        "w-full",
+        "w-full py-2 sm:py-2.5 text-xs sm:text-sm",
         card.popular && "bg-indigo-600 hover:bg-indigo-700",
         card.premium && "bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600"
       )}
     >
       Apply Now
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -295,23 +295,23 @@ const CreditCardCard: React.FC<CreditCardCardProps> = ({ card, index }) => (
 // ========================
 const CreditCards: React.FC = () => {
   return (
-    <Section id="credit-cards" className="py-16 lg:py-24">
+    <Section id="credit-cards" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
-            <CreditCard className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-violet-100 text-violet-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Credit Cards
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Find The Perfect Card For Your Lifestyle
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             From everyday essentials to premium rewards, our credit cards offer 
             exceptional benefits and industry-leading cashback rates.
           </p>
@@ -322,18 +322,18 @@ const CreditCards: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {cardBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
+              className="text-center p-3 sm:p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

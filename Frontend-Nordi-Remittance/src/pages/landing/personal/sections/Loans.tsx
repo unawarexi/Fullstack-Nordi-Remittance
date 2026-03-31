@@ -156,49 +156,49 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => {
     >
       {/* Icon */}
       <div className={cn(
-        "w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4",
+        "w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4",
         loan.color
       )}>
-        {loan.icon}
+        {React.cloneElement(loan.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
 
       {/* Content */}
-      <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{loan.name}</h3>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{loan.description}</p>
+      <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{loan.name}</h3>
+      <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-tight">{loan.description}</p>
 
       {/* Rate & Details */}
-      <div className="grid grid-cols-3 gap-3 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
         <div>
-          <p className="text-xs text-neutral-400">Rate from</p>
-          <p className="text-lg font-bold text-neutral-900 dark:text-white">{loan.rateFrom}</p>
+          <p className="text-[10px] text-neutral-400">Rate from</p>
+          <p className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">{loan.rateFrom}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400">Max Amount</p>
-          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxAmount}</p>
+          <p className="text-[10px] text-neutral-400">Max Amount</p>
+          <p className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxAmount}</p>
         </div>
         <div>
-          <p className="text-xs text-neutral-400">Max Term</p>
-          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxTerm}</p>
+          <p className="text-[10px] text-neutral-400">Max Term</p>
+          <p className="text-xs sm:text-sm font-semibold text-neutral-700 dark:text-neutral-200">{loan.maxTerm}</p>
         </div>
       </div>
 
       {/* Features */}
-      <ul className="space-y-2 mb-6">
+      <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
         {loan.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-            <Check className="w-4 h-4 text-emerald-500" />
+          <li key={feature} className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+            <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
             {feature}
           </li>
         ))}
       </ul>
 
       {/* CTA */}
-      <div className="flex gap-3">
-        <Button variant="primary" size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
+      <div className="flex gap-2 sm:gap-3">
+        <Button variant="primary" className="flex-1 bg-indigo-600 hover:bg-indigo-700 py-1.5 sm:py-2 text-xs sm:text-sm">
           Apply Now
         </Button>
-        <Button variant="outline" size="sm">
-          <Calculator className="w-4 h-4" />
+        <Button variant="outline" className="px-2.5 sm:px-3 py-1.5 sm:py-2">
+          <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </Button>
       </div>
     </motion.div>
@@ -223,21 +223,21 @@ const LoanCalculatorPreview: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-indigo-900 rounded-2xl p-6 lg:p-8 text-white"
+      className="bg-indigo-900 rounded-2xl p-5 sm:p-6 lg:p-8 text-white"
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 rounded-xl bg-white/10">
-          <Calculator className="w-6 h-6" />
+      <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+        <div className="p-2 sm:p-3 rounded-xl bg-white/10">
+          <Calculator className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold">Loan Calculator</h3>
-          <p className="text-sm text-indigo-200">Estimate your monthly payments</p>
+          <h3 className="text-lg sm:text-xl font-semibold">Loan Calculator</h3>
+          <p className="text-xs sm:text-sm text-indigo-200">Estimate your monthly payments</p>
         </div>
       </div>
 
       {/* Loan Amount */}
-      <div className="mb-6">
-        <label className="block text-sm text-indigo-200 mb-2">Loan Amount</label>
+      <div className="mb-4 sm:mb-6">
+        <label className="block text-xs sm:text-sm text-indigo-200 mb-1.5 sm:mb-2">Loan Amount</label>
         <input
           type="range"
           min="5000"
@@ -247,12 +247,12 @@ const LoanCalculatorPreview: React.FC = () => {
           onChange={(e) => setAmount(Number(e.target.value))}
           className="w-full accent-amber-400"
         />
-        <p className="text-2xl font-bold mt-2">${amount.toLocaleString()}</p>
+        <p className="text-xl sm:text-2xl font-bold mt-1.5 sm:mt-2">${amount.toLocaleString()}</p>
       </div>
 
       {/* Term */}
-      <div className="mb-6">
-        <label className="block text-sm text-indigo-200 mb-2">Term (months)</label>
+      <div className="mb-4 sm:mb-6">
+        <label className="block text-xs sm:text-sm text-indigo-200 mb-1.5 sm:mb-2">Term (months)</label>
         <input
           type="range"
           min="12"
@@ -262,23 +262,23 @@ const LoanCalculatorPreview: React.FC = () => {
           onChange={(e) => setTerm(Number(e.target.value))}
           className="w-full accent-amber-400"
         />
-        <p className="text-2xl font-bold mt-2">{term} months</p>
+        <p className="text-xl sm:text-2xl font-bold mt-1.5 sm:mt-2">{term} months</p>
       </div>
 
       {/* Result */}
-      <div className="p-4 rounded-xl bg-white/10 mb-6">
-        <p className="text-sm text-indigo-200 mb-1">Estimated Monthly Payment</p>
-        <p className="text-4xl font-bold text-amber-400">
+      <div className="p-3 sm:p-4 rounded-xl bg-white/10 mb-4 sm:mb-6">
+        <p className="text-[10px] sm:text-sm text-indigo-200 mb-1">Estimated Monthly Payment</p>
+        <p className="text-3xl sm:text-4xl font-bold text-amber-400">
           ${payment.toFixed(2)}
         </p>
-        <p className="text-xs text-indigo-300 mt-2">
+        <p className="text-[10px] text-indigo-300 mt-1.5 sm:mt-2">
           *Based on {rate}% APR. Actual rate may vary.
         </p>
       </div>
 
-      <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
+      <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 py-2 sm:py-2.5 text-sm">
         Get Pre-Approved
-        <ArrowRight className="w-5 h-5 ml-2" />
+        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
       </Button>
     </motion.div>
   );
@@ -289,23 +289,23 @@ const LoanCalculatorPreview: React.FC = () => {
 // ========================
 const Loans: React.FC = () => {
   return (
-    <Section id="loans" className="py-16 lg:py-24">
+    <Section id="loans" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-            <FileText className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Personal Loans
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Flexible Loan Solutions For Every Need
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Whether you're buying a home, car, or funding your education, we offer 
             competitive rates and flexible terms to help you achieve your goals.
           </p>
@@ -316,18 +316,18 @@ const Loans: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {loanBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
+              className="text-center p-3 sm:p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

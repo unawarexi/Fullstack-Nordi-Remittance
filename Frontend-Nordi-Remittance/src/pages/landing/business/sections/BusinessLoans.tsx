@@ -150,29 +150,29 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     )}
   >
     {/* Header */}
-    <div className="flex items-start gap-3 mb-3">
-      <div className={cn("p-2.5 rounded-lg text-white", loan.color)}>
-        {loan.icon}
+    <div className="flex items-start gap-3 mb-2.5 sm:mb-3">
+      <div className={cn("p-2 sm:p-2.5 rounded-lg text-white", loan.color)}>
+        {React.cloneElement(loan.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div>
-        <h3 className="font-semibold text-neutral-900 dark:text-white">{loan.name}</h3>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">{loan.description}</p>
+        <h3 className="text-[15px] sm:text-base font-semibold text-neutral-900 dark:text-white leading-tight">{loan.name}</h3>
+        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 leading-tight">{loan.description}</p>
       </div>
     </div>
 
     {/* Loan Details */}
-    <div className="grid grid-cols-3 gap-2 py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3">
+    <div className="grid grid-cols-3 gap-1 sm:gap-2 py-2.5 sm:py-3 border-y border-neutral-100 dark:border-neutral-700 mb-2.5 sm:mb-3">
       <div>
-        <p className="text-xs text-neutral-400">Amount</p>
-        <p className="text-sm font-semibold text-neutral-900 dark:text-white">{loan.amountRange}</p>
+        <p className="text-[10px] text-neutral-400 leading-tight">Amount</p>
+        <p className="text-[11px] sm:text-sm font-semibold text-neutral-900 dark:text-white leading-tight">{loan.amountRange}</p>
       </div>
       <div>
-        <p className="text-xs text-neutral-400">Rate from</p>
-        <p className="text-sm font-semibold text-emerald-600">{loan.rateFrom}</p>
+        <p className="text-[10px] text-neutral-400 leading-tight">Rate from</p>
+        <p className="text-[11px] sm:text-sm font-semibold text-emerald-600 leading-tight">{loan.rateFrom}</p>
       </div>
       <div>
-        <p className="text-xs text-neutral-400">Tenure</p>
-        <p className="text-sm font-semibold text-neutral-900 dark:text-white">{loan.tenure}</p>
+        <p className="text-[10px] text-neutral-400 leading-tight">Tenure</p>
+        <p className="text-[11px] sm:text-sm font-semibold text-neutral-900 dark:text-white leading-tight">{loan.tenure}</p>
       </div>
     </div>
 
@@ -187,9 +187,9 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700">
+    <Button variant="primary" size="sm" className="w-full bg-emerald-600 hover:bg-emerald-700 py-1.5 sm:py-2 text-xs sm:text-sm">
       Apply Now
-      <ArrowRight className="w-3 h-3 ml-1" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -199,23 +199,23 @@ const LoanCard: React.FC<LoanCardProps> = ({ loan, index }) => (
 // ========================
 const BusinessLoans: React.FC = () => {
   return (
-    <Section id="business-loans" background="light" className="py-16 lg:py-24">
+    <Section id="business-loans" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
-            <Banknote className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Loans for Businesses
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Financing Solutions For Every Business Need
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Access the capital you need to grow, expand, or manage cash flow with 
             our range of business financing options.
           </p>
@@ -226,18 +226,18 @@ const BusinessLoans: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {loanBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="text-center p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -254,23 +254,23 @@ const BusinessLoans: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-emerald-900 text-white"
+          className="mt-10 sm:mt-12 p-5 sm:p-6 rounded-2xl bg-emerald-900 text-white"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-white/10">
-                <Calculator className="w-8 h-8" />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4 text-center md:text-left">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/10 shrink-0">
+                <Calculator className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold">Business Loan Calculator</h3>
-                <p className="text-emerald-200">
+                <h3 className="text-lg sm:text-xl font-semibold leading-tight">Business Loan Calculator</h3>
+                <p className="text-[13px] sm:text-emerald-200 leading-tight mt-0.5">
                   Estimate your monthly payments and total cost of borrowing
                 </p>
               </div>
             </div>
-            <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap">
+            <Button variant="primary" size="lg" className="w-full md:w-auto bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap text-sm py-2">
               Calculate Now
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
             </Button>
           </div>
         </motion.div>

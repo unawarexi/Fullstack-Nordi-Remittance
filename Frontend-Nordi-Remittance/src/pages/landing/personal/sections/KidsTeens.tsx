@@ -151,24 +151,24 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     )}
   >
     {/* Highlight Badge */}
-    <div className="absolute -top-3 left-6">
+    <div className="absolute -top-3 left-4 sm:left-6">
       <span className={cn(
-        "inline-flex items-center gap-1 px-3 py-1 text-white text-xs font-medium rounded-full",
+        "inline-flex items-center gap-1 px-2.5 py-0.5 text-white text-[10px] font-medium rounded-full",
         account.color
       )}>
-        <Star className="w-3 h-3" />
+        <Star className="w-2.5 h-2.5" />
         {account.highlight}
       </span>
     </div>
 
     {/* Header */}
-    <div className="flex items-start gap-4 mt-2 mb-4">
-      <div className={cn("p-3 rounded-xl text-white", account.color)}>
-        {account.icon}
+    <div className="flex items-start gap-3 sm:gap-4 mt-1.5 sm:mt-2 mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white", account.color)}>
+        {React.cloneElement(account.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div>
-        <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">{account.name}</h3>
-        <p className="text-sm text-indigo-600 font-medium">{account.ageRange}</p>
+        <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white leading-tight">{account.name}</h3>
+        <p className="text-xs sm:text-sm text-indigo-600 font-medium leading-tight">{account.ageRange}</p>
       </div>
     </div>
 
@@ -201,9 +201,9 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     </div>
 
     {/* CTA */}
-    <Button variant="primary" className={cn("w-full", account.color, "hover:opacity-90")}>
+    <Button variant="primary" className={cn("w-full py-1.5 sm:py-2 text-sm", account.color, "hover:opacity-90")}>
       Open Account
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -213,23 +213,23 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
 // ========================
 const KidsTeens: React.FC = () => {
   return (
-    <Section id="kids-teens" className="py-16 lg:py-24">
+    <Section id="kids-teens" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
-            <Users className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-violet-100 text-violet-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Kids & Teens Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Building Financial Skills For The Future
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Help your children develop smart money habits with age-appropriate 
             banking accounts designed to teach financial responsibility.
           </p>
@@ -240,18 +240,18 @@ const KidsTeens: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {learningFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="text-center p-4 rounded-xl bg-violet-50 border border-violet-100"
+              className="text-center p-3 sm:p-4 rounded-xl bg-violet-50 border border-violet-100"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
-                <feature.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-violet-100 text-violet-600 flex items-center justify-center mb-2 sm:mb-3">
+                <feature.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{feature.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{feature.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{feature.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{feature.description}</p>
             </div>
           ))}
         </motion.div>
@@ -268,36 +268,36 @@ const KidsTeens: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50"
+          className="mt-10 sm:mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-8 rounded-2xl bg-neutral-50 dark:bg-neutral-700/50"
         >
           <div>
-            <Gift className="w-8 h-8 text-violet-500 mb-3" />
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">
+            <Gift className="w-6 h-6 sm:w-8 sm:h-8 text-violet-500 mb-2 sm:mb-3" />
+            <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2">
               For Parents & Guardians
             </h3>
-            <p className="text-neutral-600 dark:text-neutral-300 mb-4">
+            <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 mb-3 sm:mb-4">
               Stay connected to your child's financial journey with real-time alerts, 
               spending controls, and the ability to transfer funds instantly. 
               Teach them the value of money while keeping their savings secure.
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               {[
                 "Set daily/weekly spending limits",
                 "Block specific merchant categories",
                 "Receive instant transaction notifications",
                 "Easily transfer allowance money",
               ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-                  <Check className="w-4 h-4 text-emerald-500" />
+                <li key={item} className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+                  <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
                   {item}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center lg:border-l lg:border-neutral-200 dark:lg:border-neutral-700">
             <div className="text-center">
-              <p className="text-5xl font-bold text-violet-600 mb-2">89%</p>
-              <p className="text-neutral-600 dark:text-neutral-300 max-w-xs">
+              <p className="text-4xl sm:text-5xl font-bold text-violet-600 mb-1 sm:mb-2 text-center">89%</p>
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 max-w-xs mx-auto">
                 of parents say our youth banking has improved their child's money management skills
               </p>
             </div>

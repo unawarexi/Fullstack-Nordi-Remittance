@@ -138,9 +138,9 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, index }) => (
     <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{program.description}</p>
 
     {/* Benefit Badge */}
-    <div className="py-3 px-4 rounded-lg bg-emerald-50 border border-emerald-100 mb-4">
-      <p className="text-xs text-emerald-600 font-medium">Key Benefit</p>
-      <p className="text-lg font-bold text-emerald-700">{program.benefit}</p>
+    <div className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-emerald-50 border border-emerald-100 mb-3 sm:mb-4">
+      <p className="text-[10px] text-emerald-600 font-medium uppercase tracking-wider">Key Benefit</p>
+      <p className="text-base sm:text-lg font-bold text-emerald-700 leading-tight">{program.benefit}</p>
     </div>
 
     {/* Features */}
@@ -154,9 +154,9 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" className={cn("w-full", program.color, "hover:opacity-90")}>
+    <Button variant="primary" className={cn("w-full text-sm py-1.5 sm:py-2", program.color, "hover:opacity-90")}>
       Apply Now
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -166,23 +166,23 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ program, index }) => (
 // ========================
 const EmergingBusinesses: React.FC = () => {
   return (
-    <Section id="emerging-businesses" background="light" className="py-16 lg:py-24">
+    <Section id="emerging-businesses" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
-            <Rocket className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Rocket className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Emerging Businesses
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Fuel Your Startup's Growth
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Specialized banking programs designed to support startups and emerging 
             businesses at every stage of their journey.
           </p>
@@ -201,10 +201,10 @@ const EmergingBusinesses: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h3 className="text-2xl font-bold text-neutral-900 dark:text-white text-center mb-8">
+          <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white text-center mb-6 sm:mb-8">
             Success Stories
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             {successStories.map((story, index) => (
               <motion.div
                 key={story.company}
@@ -212,26 +212,26 @@ const EmergingBusinesses: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+                className="p-5 sm:p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-800/30 flex items-center justify-center text-indigo-600 font-bold">
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-100 dark:bg-indigo-800/30 flex items-center justify-center text-indigo-600 font-bold text-sm sm:text-base">
                     {story.founder.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-semibold text-neutral-900 dark:text-white">{story.company}</p>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Founded by {story.founder}</p>
+                    <p className="font-semibold text-neutral-900 dark:text-white text-sm sm:text-base leading-tight">{story.company}</p>
+                    <p className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">Founded by {story.founder}</p>
                   </div>
                 </div>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300 italic mb-4">"{story.quote}"</p>
-                <div className="flex gap-4 pt-4 border-t border-neutral-100 dark:border-neutral-700">
+                <p className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 italic mb-4 leading-relaxed">"{story.quote}"</p>
+                <div className="flex gap-4 pt-3 sm:pt-4 border-t border-neutral-100 dark:border-neutral-700">
                   <div>
-                    <p className="text-xs text-neutral-400">Raised</p>
-                    <p className="font-bold text-emerald-600">{story.raised}</p>
+                    <p className="text-[10px] text-neutral-400 uppercase tracking-wider">Raised</p>
+                    <p className="font-bold text-emerald-600 text-sm sm:text-base leading-tight">{story.raised}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-neutral-400">Employees</p>
-                    <p className="font-bold text-neutral-900 dark:text-white">{story.employees}</p>
+                    <p className="text-[10px] text-neutral-400 uppercase tracking-wider">Employees</p>
+                    <p className="font-bold text-neutral-900 dark:text-white text-sm sm:text-base leading-tight">{story.employees}</p>
                   </div>
                 </div>
               </motion.div>
@@ -244,17 +244,17 @@ const EmergingBusinesses: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center p-8 rounded-2xl bg-indigo-900 text-white"
+          className="mt-10 sm:mt-12 text-center p-6 sm:p-10 rounded-2xl bg-indigo-900 text-white"
         >
-          <Gift className="w-12 h-12 text-amber-400 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold mb-3">Join Our Startup Community</h3>
-          <p className="text-indigo-200 mb-6 max-w-xl mx-auto">
+          <Gift className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400 mx-auto mb-3 sm:mb-4" />
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Join Our Startup Community</h3>
+          <p className="text-sm sm:text-lg text-indigo-200 mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed">
             Get access to exclusive events, mentorship opportunities, and connect 
             with other founders building the future.
           </p>
-          <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
+          <Button variant="primary" size="lg" className="w-full sm:w-auto bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 text-sm py-2.5 sm:py-3 px-8">
             Apply for Startup Program
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 ml-2" />
           </Button>
         </motion.div>
       </Container>

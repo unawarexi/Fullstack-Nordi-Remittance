@@ -46,7 +46,7 @@ const quickLinks = [
 // ========================
 const CorporateHero: React.FC = () => {
   return (
-    <Section id="corporate-hero" className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
+    <Section id="corporate-hero" className="relative pt-24 pb-12 sm:pt-32 sm:pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNiIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+')] bg-center" />
@@ -63,50 +63,50 @@ const CorporateHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-300 text-sm font-medium mb-6 border border-blue-500/30">
-              <Building2 className="w-4 h-4" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full bg-blue-500/20 text-blue-300 text-[10px] sm:text-sm font-medium mb-4 sm:mb-6 border border-blue-500/30 uppercase tracking-wider">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Corporate Banking
             </span>
             
-            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-[1.1]">
               Enterprise Solutions for
-              <span className="text-blue-400"> Industry Leaders</span>
+              <span className="text-blue-400 block sm:inline"> Industry Leaders</span>
             </h1>
             
-            <p className="text-lg text-slate-300 mb-8 max-w-lg">
+            <p className="text-sm sm:text-lg text-slate-300 mb-6 sm:mb-8 max-w-lg leading-relaxed">
               Tailored financial solutions designed for large corporations with complex 
               treasury, financing, and international banking needs. Partner with us to 
               drive your business forward.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-4 mb-12">
-              <Button variant="primary" className="bg-blue-600 hover:bg-blue-700">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2.5 sm:py-3">
                 Speak to a Specialist
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-sm sm:text-base py-2.5 sm:py-3">
                 View Solutions
               </Button>
             </div>
 
             {/* Quick Links */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {quickLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg",
+                    "flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg",
                     "bg-white/5 border border-white/10",
-                    "hover:bg-white/10 hover:border-blue-500/50 transition-all"
+                    "hover:bg-white/10 hover:border-blue-500/50 transition-all group"
                   )}
                 >
-                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                    <link.icon className="w-5 h-5" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                    <link.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <span className="text-white font-medium text-sm">{link.label}</span>
-                  <ChevronRight className="w-4 h-4 text-slate-500 ml-auto" />
+                  <span className="text-white font-medium text-[13px] sm:text-sm">{link.label}</span>
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 ml-auto group-hover:text-blue-400 transition-colors" />
                 </a>
               ))}
             </div>

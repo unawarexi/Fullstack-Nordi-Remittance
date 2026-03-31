@@ -182,20 +182,20 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
     )}
   >
     {/* Header */}
-    <div className="flex items-start gap-3 mb-3">
-      <div className={cn("p-2.5 rounded-lg text-white", product.color)}>
-        {product.icon}
+    <div className="flex items-start gap-3 mb-2.5 sm:mb-3">
+      <div className={cn("p-2 sm:p-2.5 rounded-lg text-white", product.color)}>
+        {React.cloneElement(product.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div className="flex-1">
-        <h3 className="font-semibold text-neutral-900 dark:text-white">{product.name}</h3>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">{product.description}</p>
+        <h3 className="text-[15px] sm:text-base font-semibold text-neutral-900 dark:text-white leading-tight">{product.name}</h3>
+        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 leading-tight">{product.description}</p>
       </div>
     </div>
 
     {/* Pricing */}
-    <div className="flex items-baseline gap-2 py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3">
-      <span className="text-2xl font-bold text-neutral-900 dark:text-white">{product.startingFrom}</span>
-      <span className="text-xs text-neutral-400">Coverage: {product.coverage}</span>
+    <div className="flex items-baseline gap-2 py-2 sm:py-3 border-y border-neutral-100 dark:border-neutral-700 mb-2.5 sm:mb-3">
+      <span className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">{product.startingFrom}</span>
+      <span className="text-[10px] sm:text-xs text-neutral-400">Coverage: {product.coverage}</span>
     </div>
 
     {/* Features */}
@@ -209,7 +209,7 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="outline" size="sm" className="w-full">
+    <Button variant="outline" size="sm" className="w-full text-xs py-1.5 sm:py-2">
       Get Quote
       <ArrowRight className="w-3 h-3 ml-1" />
     </Button>
@@ -221,23 +221,23 @@ const InsuranceCard: React.FC<InsuranceCardProps> = ({ product, index }) => (
 // ========================
 const Bancassurance: React.FC = () => {
   return (
-    <Section id="bancassurance" className="py-16 lg:py-24">
+    <Section id="bancassurance" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-sm font-medium mb-4">
-            <Shield className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Bancassurance
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Protect What Matters Most
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive insurance solutions through our trusted partners. 
             Get coverage for life, health, home, and more - all managed through your banking account.
           </p>
@@ -248,18 +248,18 @@ const Bancassurance: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {insuranceBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
+              className="text-center p-3 sm:p-4 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -276,20 +276,20 @@ const Bancassurance: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-rose-50 border border-rose-100"
+          className="mt-10 sm:mt-12 p-5 sm:p-6 rounded-2xl bg-rose-50 border border-rose-100"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-1">
+              <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-0.5 sm:mb-1 leading-tight">
                 Bundle & Save Up to 25%
               </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">
                 Combine multiple insurance products and enjoy exclusive discounts as a Nordea customer.
               </p>
             </div>
-            <Button variant="primary" className="bg-rose-600 hover:bg-rose-700 whitespace-nowrap">
+            <Button variant="primary" className="w-full md:w-auto bg-rose-600 hover:bg-rose-700 whitespace-nowrap text-sm py-2">
               Get Bundle Quote
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
             </Button>
           </div>
         </motion.div>

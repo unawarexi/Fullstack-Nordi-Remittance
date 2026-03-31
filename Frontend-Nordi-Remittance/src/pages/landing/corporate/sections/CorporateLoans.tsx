@@ -119,23 +119,23 @@ const processSteps = [
 // ========================
 const CorporateLoans: React.FC = () => {
   return (
-    <Section id="corporate-loans" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
+    <Section id="corporate-loans" className="py-10 sm:py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-sm font-medium mb-4">
-            <Landmark className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-rose-100 text-rose-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Corporate Loans
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Financing Your Growth Ambitions
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Comprehensive lending solutions tailored for large corporations, 
             from working capital to long-term project financing.
           </p>
@@ -201,47 +201,47 @@ const CorporateLoans: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="p-8 rounded-2xl bg-slate-900 text-white"
+          className="p-6 sm:p-10 rounded-2xl bg-slate-900 text-white"
         >
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Streamlined Approval Process</h3>
-              <p className="text-slate-300 mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight">Streamlined Approval Process</h3>
+              <p className="text-sm sm:text-base text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 Our dedicated corporate banking team ensures quick turnaround times 
                 with a structured and transparent approval process.
               </p>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="w-4 h-4 text-emerald-400" />
+              <div className="flex flex-wrap gap-x-6 gap-y-3 mb-8 sm:mb-10">
+                <div className="flex items-center gap-2 text-[13px] sm:text-sm">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
                   <span>Fast Processing</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Shield className="w-4 h-4 text-emerald-400" />
+                <div className="flex items-center gap-2 text-[13px] sm:text-sm">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
                   <span>Confidential</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Calculator className="w-4 h-4 text-emerald-400" />
+                <div className="flex items-center gap-2 text-[13px] sm:text-sm">
+                  <Calculator className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
                   <span>Competitive Rates</span>
                 </div>
               </div>
-              <Button variant="primary" className="bg-rose-600 hover:bg-rose-700">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-sm py-2.5 sm:py-3 px-8">
                 Start Application
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
             </div>
-
+ 
             {/* Timeline */}
-            <div className="hidden lg:block">
-              <div className="relative pl-8">
-                <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-slate-700" />
+            <div className="block">
+              <div className="relative pl-7 sm:pl-8">
+                <div className="absolute left-2.5 sm:left-3 top-0 bottom-0 w-0.5 bg-slate-700" />
                 {processSteps.map((step, index) => (
-                  <div key={step.step} className="relative pb-6 last:pb-0">
-                    <div className="absolute left-0 w-6 h-6 -translate-x-1/2 rounded-full bg-rose-500 flex items-center justify-center text-xs font-bold">
+                  <div key={step.step} className="relative pb-6 sm:pb-8 last:pb-0">
+                    <div className="absolute left-0 w-5 h-5 sm:w-6 sm:h-6 -translate-x-1/2 rounded-full bg-rose-500 flex items-center justify-center text-[10px] sm:text-xs font-bold ring-4 ring-slate-900">
                       {step.step}
                     </div>
-                    <div className="ml-6">
-                      <p className="font-medium">{step.title}</p>
-                      <p className="text-xs text-slate-400">{step.duration}</p>
+                    <div className="ml-5 sm:ml-6">
+                      <p className="text-[13px] sm:text-base font-semibold leading-tight">{step.title}</p>
+                      <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 leading-tight">{step.duration}</p>
                     </div>
                   </div>
                 ))}

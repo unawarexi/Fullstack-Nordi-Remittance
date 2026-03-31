@@ -133,23 +133,23 @@ const industrySectors: IndustrySector[] = [
 // ========================
 const CorporateSector: React.FC = () => {
   return (
-    <Section id="corporate-sector" className="py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
+    <Section id="corporate-sector" className="py-10 sm:py-16 lg:py-24 bg-slate-50 dark:bg-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200 text-slate-700 text-sm font-medium mb-4">
-            <Globe className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-slate-200 text-slate-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Industry Solutions
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Sector-Specific Expertise
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Deep industry knowledge combined with tailored financial solutions 
             to address the unique challenges of your sector.
           </p>
@@ -211,19 +211,19 @@ const CorporateSector: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 text-white text-center"
+          className="mt-10 sm:mt-12 p-6 sm:p-10 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 text-white text-center"
         >
-          <h3 className="text-2xl font-bold mb-3">Don't See Your Industry?</h3>
-          <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
+          <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight">Don't See Your Industry?</h3>
+          <p className="text-sm sm:text-lg text-slate-300 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
             Our corporate banking team has expertise across all major industries. 
             Connect with a relationship manager to discuss your specific needs.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" className="bg-blue-600 hover:bg-blue-700">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <Button variant="primary" size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-sm py-2.5 sm:py-3 px-8">
               Contact Us
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </Button>
-            <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-sm py-2.5 sm:py-3 px-8">
               View All Industries
             </Button>
           </div>

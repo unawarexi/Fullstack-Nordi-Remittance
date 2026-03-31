@@ -44,7 +44,7 @@ const PersonalHero: React.FC = () => {
         }} />
       </div>
 
-      <Container className="relative z-10 py-16 lg:py-24">
+      <Container className="relative z-10 py-10 sm:py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <motion.div
@@ -52,30 +52,30 @@ const PersonalHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-indigo-200 text-sm font-medium mb-6">
-              <Users className="w-4 h-4" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/10 text-indigo-200 text-[10px] sm:text-xs font-medium mb-4 sm:mb-6">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Personal Banking
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 sm:mb-6">
               Banking Solutions{" "}
               <span className="text-amber-400">Tailored For You</span>
             </h1>
 
-            <p className="text-lg text-indigo-100 mb-8 max-w-xl">
+            <p className="text-sm sm:text-lg text-indigo-100 mb-6 sm:mb-8 max-w-xl">
               Experience personalized banking services designed around your lifestyle. 
               From savings accounts to investment portfolios, we have everything you need 
               to achieve your financial goals.
             </p>
 
             {/* Quick Links */}
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
               {quickLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium",
+                    "px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-sm font-medium",
                     "bg-white/10 text-white hover:bg-white/20",
                     "transition-all duration-300"
                   )}
@@ -86,20 +86,20 @@ const PersonalHero: React.FC = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <Button
                 variant="primary"
-                size="lg"
-                className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600"
+                size="md"
+                className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base"
               >
                 Open an Account
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
               <Link to="/contact">
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="border-white/30 text-white hover:bg-white/10"
+                  size="md"
+                  className="border-white/30 text-white hover:bg-white/10 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base"
                 >
                   Talk to an Advisor
                 </Button>
@@ -121,14 +121,14 @@ const PersonalHero: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 className={cn(
-                  "p-6 rounded-2xl",
+                  "p-4 sm:p-6 rounded-2xl",
                   "bg-white/10 backdrop-blur-sm border border-white/20",
                   "hover:bg-white/15 transition-all duration-300"
                 )}
               >
-                <stat.icon className="w-8 h-8 text-amber-400 mb-3" />
-                <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                <p className="text-sm text-indigo-200">{stat.label}</p>
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-amber-400 mb-2 sm:mb-3" />
+                <p className="text-xl sm:text-3xl font-bold text-white mb-1">{stat.value}</p>
+                <p className="text-[10px] sm:text-sm text-indigo-200">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>

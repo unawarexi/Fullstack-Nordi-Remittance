@@ -166,43 +166,43 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ option, index }) => (
     )}
   >
     {/* Header */}
-    <div className="flex items-start justify-between mb-4">
-      <div className={cn("p-3 rounded-xl text-white", option.color)}>
-        {option.icon}
+    <div className="flex items-start justify-between mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white", option.color)}>
+        {React.cloneElement(option.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <RiskBadge level={option.riskLevel} />
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{option.name}</h3>
-    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{option.description}</p>
+    <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{option.name}</h3>
+    <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-tight">{option.description}</p>
 
     {/* Stats */}
-    <div className="grid grid-cols-2 gap-4 py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
       <div>
-        <p className="text-xs text-neutral-400">Expected Return</p>
-        <p className="text-lg font-bold text-emerald-600">{option.expectedReturn}</p>
+        <p className="text-[10px] text-neutral-400">Expected Return</p>
+        <p className="text-base sm:text-lg font-bold text-emerald-600">{option.expectedReturn}</p>
       </div>
       <div>
-        <p className="text-xs text-neutral-400">Min. Investment</p>
-        <p className="text-lg font-bold text-neutral-900 dark:text-white">{option.minInvestment}</p>
+        <p className="text-[10px] text-neutral-400">Min. Investment</p>
+        <p className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">{option.minInvestment}</p>
       </div>
     </div>
 
     {/* Features */}
-    <ul className="space-y-2 mb-6">
+    <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
       {option.features.map((feature) => (
-        <li key={feature} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-          <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+        <li key={feature} className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+          <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
           {feature}
         </li>
       ))}
     </ul>
 
     {/* CTA */}
-    <Button variant="outline" className="w-full group-hover:bg-indigo-50 dark:bg-indigo-900/30 group-hover:border-indigo-200">
+    <Button variant="outline" className="w-full group-hover:bg-indigo-50 dark:bg-indigo-900/30 group-hover:border-indigo-200 py-1.5 sm:py-2 text-xs sm:text-sm">
       Learn More
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -212,23 +212,23 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ option, index }) => (
 // ========================
 const Investments: React.FC = () => {
   return (
-    <Section id="investments" background="light" className="py-16 lg:py-24">
+    <Section id="investments" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
-            <TrendingUp className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Investment Solutions
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Build Wealth For Your Future
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             From stocks and bonds to retirement planning, our investment solutions 
             are designed to help you grow your wealth and achieve financial freedom.
           </p>
@@ -239,19 +239,19 @@ const Investments: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {investmentBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600">
-                <benefit.icon className="w-5 h-5" />
+              <div className="p-1.5 sm:p-2 rounded-lg bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{benefit.description}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+                <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 leading-tight">{benefit.description}</p>
               </div>
             </div>
           ))}
@@ -269,19 +269,19 @@ const Investments: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 text-center p-8 rounded-2xl bg-indigo-900 text-white"
+          className="mt-10 sm:mt-16 text-center p-6 sm:p-8 rounded-2xl bg-indigo-900 text-white"
         >
-          <h3 className="text-2xl font-bold mb-3">Ready to Start Investing?</h3>
-          <p className="text-indigo-200 mb-6 max-w-xl mx-auto">
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Ready to Start Investing?</h3>
+          <p className="text-sm sm:text-base text-indigo-200 mb-4 sm:mb-6 max-w-xl mx-auto">
             Schedule a free consultation with our investment advisors and create a 
             personalized investment strategy.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="primary" size="lg" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 py-2 sm:py-2.5 text-sm sm:text-base">
               Schedule Consultation
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
             </Button>
-            <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
+            <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 py-2 sm:py-2.5 text-sm sm:text-base">
               View All Products
             </Button>
           </div>

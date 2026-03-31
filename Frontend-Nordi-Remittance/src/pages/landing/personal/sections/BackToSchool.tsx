@@ -136,13 +136,13 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
     </div>
 
     {/* Icon */}
-    <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", offer.color)}>
-      {offer.icon}
+    <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4", offer.color)}>
+      {React.cloneElement(offer.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{offer.title}</h3>
-    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{offer.description}</p>
+    <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{offer.title}</h3>
+    <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-tight">{offer.description}</p>
 
     {/* Valid Until */}
     <div className="flex items-center gap-2 text-xs text-neutral-400 mb-4">
@@ -161,9 +161,9 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700">
+    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700 py-1.5 sm:py-2 text-sm">
       Learn More
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -173,23 +173,23 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, index }) => (
 // ========================
 const BackToSchool: React.FC = () => {
   return (
-    <Section id="back-to-school" background="light" className="py-16 lg:py-24">
+    <Section id="back-to-school" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-            <BookOpen className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Back to School
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Start The School Year Right With Smart Banking
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Special offers for students and parents to make this academic year 
             financially stress-free. Limited time offers available now!
           </p>
@@ -210,24 +210,24 @@ const BackToSchool: React.FC = () => {
           className="grid grid-cols-1 lg:grid-cols-2 gap-8"
         >
           {/* Checklist */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
               <Gift className="w-5 h-5 text-indigo-500" />
               Student Financial Checklist
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5 sm:space-y-3">
               {schoolChecklist.map((item, index) => (
                 <li
                   key={item.item}
-                  className="flex items-center justify-between p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
+                  className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full border-2 border-neutral-300 flex items-center justify-center text-xs font-bold text-neutral-400">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-neutral-300 flex items-center justify-center text-[10px] sm:text-xs font-bold text-neutral-400">
                       {index + 1}
                     </div>
-                    <span className="text-sm text-neutral-700 dark:text-neutral-200">{item.item}</span>
+                    <span className="text-[13px] sm:text-sm text-neutral-700 dark:text-neutral-200">{item.item}</span>
                   </div>
-                  <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-xs font-medium rounded">
+                  <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-[10px] font-medium rounded">
                     {item.priority}
                   </span>
                 </li>
@@ -236,29 +236,29 @@ const BackToSchool: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="p-6 rounded-2xl bg-indigo-900 text-white">
-            <h3 className="text-xl font-semibold mb-6">Why Students Choose Nordea</h3>
-            <div className="grid grid-cols-2 gap-6">
+          <div className="p-5 sm:p-6 rounded-2xl bg-indigo-900 text-white">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Why Students Choose Nordea</h3>
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <p className="text-4xl font-bold text-amber-400">500K+</p>
-                <p className="text-sm text-indigo-200">Student accounts opened</p>
+                <p className="text-3xl sm:text-4xl font-bold text-amber-400">500K+</p>
+                <p className="text-[10px] sm:text-sm text-indigo-200">Student accounts opened</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-amber-400">$0</p>
-                <p className="text-sm text-indigo-200">Monthly fees for students</p>
+                <p className="text-3xl sm:text-4xl font-bold text-amber-400">$0</p>
+                <p className="text-[10px] sm:text-sm text-indigo-200">Monthly fees for students</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-amber-400">3,000+</p>
-                <p className="text-sm text-indigo-200">Campus ATM locations</p>
+                <p className="text-3xl sm:text-4xl font-bold text-amber-400">3,000+</p>
+                <p className="text-[10px] sm:text-sm text-indigo-200">Campus ATM locations</p>
               </div>
               <div>
-                <p className="text-4xl font-bold text-amber-400">4.8★</p>
-                <p className="text-sm text-indigo-200">App store rating</p>
+                <p className="text-3xl sm:text-4xl font-bold text-amber-400">4.8★</p>
+                <p className="text-[10px] sm:text-sm text-indigo-200">App store rating</p>
               </div>
             </div>
-            <Button variant="primary" className="w-full mt-6 bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
+            <Button variant="primary" className="w-full mt-4 sm:mt-6 bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 py-2 sm:py-2.5 text-sm">
               Open Student Account
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
             </Button>
           </div>
         </motion.div>

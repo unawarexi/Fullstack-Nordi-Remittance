@@ -44,7 +44,7 @@ const BusinessHero: React.FC = () => {
         }} />
       </div>
 
-      <Container className="relative z-10 py-16 lg:py-24">
+      <Container className="relative z-10 py-10 sm:py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <motion.div
@@ -52,30 +52,30 @@ const BusinessHero: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-slate-200 text-sm font-medium mb-6">
-              <Building2 className="w-4 h-4" />
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full bg-white/10 text-slate-200 text-[10px] sm:text-xs font-medium mb-4 sm:mb-6">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Business Banking
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 sm:mb-6">
               Empower Your Business{" "}
               <span className="text-emerald-400">With Smart Banking</span>
             </h1>
 
-            <p className="text-lg text-slate-300 mb-8 max-w-xl">
+            <p className="text-sm sm:text-lg text-slate-300 mb-6 sm:mb-8 max-w-xl leading-relaxed">
               From startups to established enterprises, our comprehensive business 
               banking solutions provide the financial foundation your company needs 
               to grow and succeed.
             </p>
 
             {/* Quick Links */}
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
               {quickLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium",
+                    "px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-medium",
                     "bg-white/10 text-white hover:bg-white/20",
                     "transition-all duration-300"
                   )}
@@ -86,20 +86,20 @@ const BusinessHero: React.FC = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 variant="primary"
                 size="lg"
-                className="bg-emerald-500 hover:bg-emerald-600"
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-sm sm:text-base py-2.5 sm:py-3"
               >
                 Open Business Account
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
-              <Link to="/contact">
+              <Link to="/contact" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white/30 text-white hover:bg-white/10"
+                  className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-sm sm:text-base py-2.5 sm:py-3"
                 >
                   Contact Sales
                 </Button>
@@ -107,12 +107,11 @@ const BusinessHero: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right Stats Grid */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-2 gap-3 sm:gap-4"
           >
             {stats.map((stat, index) => (
               <motion.div
@@ -121,14 +120,14 @@ const BusinessHero: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                 className={cn(
-                  "p-6 rounded-2xl",
+                  "p-4 sm:p-6 rounded-2xl",
                   "bg-white/5 backdrop-blur-sm border border-white/10",
                   "hover:bg-white/10 transition-all duration-300"
                 )}
               >
-                <stat.icon className="w-8 h-8 text-emerald-400 mb-3" />
-                <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                <p className="text-sm text-slate-400">{stat.label}</p>
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400 mb-2 sm:mb-3" />
+                <p className="text-xl sm:text-3xl font-bold text-white mb-0.5 sm:mb-1 leading-tight">{stat.value}</p>
+                <p className="text-[10px] sm:text-sm text-slate-400 font-medium uppercase tracking-wider">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>

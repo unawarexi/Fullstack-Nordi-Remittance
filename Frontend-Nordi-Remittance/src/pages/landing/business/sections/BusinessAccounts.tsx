@@ -156,30 +156,30 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     )}
 
     {/* Header */}
-    <div className="flex items-start gap-4 mb-4">
-      <div className={cn("p-3 rounded-xl text-white", account.color)}>
-        {account.icon}
+    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white", account.color)}>
+        {React.cloneElement(account.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{account.name}</h3>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">{account.tagline}</p>
+        <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white leading-tight">{account.name}</h3>
+        <p className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">{account.tagline}</p>
       </div>
     </div>
 
     {/* Ideal For */}
-    <div className="mb-4">
-      <span className="px-2 py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs rounded">
+    <div className="mb-3 sm:mb-4">
+      <span className="px-2 py-0.5 sm:py-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-[10px] sm:text-xs rounded">
         Ideal for: {account.idealFor}
       </span>
     </div>
 
     {/* Pricing */}
-    <div className="py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+    <div className="py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">/month</span>
+        <span className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
+        <span className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400">/month</span>
       </div>
-      <p className="text-xs text-neutral-400 mt-1">
+      <p className="text-[10px] sm:text-xs text-neutral-400 mt-0.5 sm:mt-1">
         Transactions: {account.transactionLimit}
       </p>
     </div>
@@ -198,12 +198,12 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     <Button
       variant={account.popular ? "primary" : "outline"}
       className={cn(
-        "w-full",
+        "w-full text-sm py-1.5 sm:py-2",
         account.popular && "bg-emerald-600 hover:bg-emerald-700"
       )}
     >
       {account.monthlyFee === "Custom" ? "Contact Sales" : "Open Account"}
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -213,23 +213,23 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
 // ========================
 const BusinessAccounts: React.FC = () => {
   return (
-    <Section id="business-accounts" className="py-16 lg:py-24">
+    <Section id="business-accounts" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
-            <Building2 className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Business Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Choose The Right Account For Your Business
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             From sole proprietors to large enterprises, we have business banking 
             solutions that scale with your company's needs.
           </p>
@@ -240,18 +240,18 @@ const BusinessAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {accountBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-emerald-50 border border-emerald-100"
+              className="text-center p-3 sm:p-4 rounded-xl bg-emerald-50 border border-emerald-100"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{benefit.description}</p>
             </div>
           ))}
         </motion.div>

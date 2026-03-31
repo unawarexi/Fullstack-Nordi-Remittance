@@ -144,22 +144,22 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     )}
   >
     {/* Header */}
-    <div className="flex items-start gap-4 mb-4">
-      <div className={cn("p-3 rounded-xl text-white", account.color)}>
-        {account.icon}
+    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white", account.color)}>
+        {React.cloneElement(account.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div className="flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {account.highlights.map((highlight) => (
             <span
               key={highlight}
-              className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded"
+              className="px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-medium rounded"
             >
               {highlight}
             </span>
           ))}
         </div>
-        <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mt-2">{account.name}</h3>
+        <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mt-1.5 sm:mt-2 leading-tight">{account.name}</h3>
       </div>
     </div>
 
@@ -167,13 +167,13 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{account.description}</p>
 
     {/* Monthly Fee */}
-    <div className="py-3 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+    <div className="py-2.5 sm:py-3 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">/month</span>
+        <span className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">{account.monthlyFee}</span>
+        <span className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">/month</span>
       </div>
       {account.monthlyFee !== "$0" && (
-        <p className="text-xs text-neutral-400 mt-1">
+        <p className="text-[10px] text-neutral-400 mt-0.5 sm:mt-1 leading-tight">
           Waived with $5,000 min. balance
         </p>
       )}
@@ -190,9 +190,9 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700">
+    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700 py-1.5 sm:py-2 text-sm">
       Open Account
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -202,23 +202,23 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
 // ========================
 const EverydayAccounts: React.FC = () => {
   return (
-    <Section id="everyday-accounts" background="light" className="py-16 lg:py-24">
+    <Section id="everyday-accounts" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-neutral-700 text-slate-700 text-sm font-medium mb-4">
-            <Wallet className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-slate-100 dark:bg-neutral-700 text-slate-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Everyday Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Banking Made Simple For Everyday Life
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Open an account in minutes and enjoy seamless banking with no hidden fees, 
             powerful digital tools, and 24/7 access to your money.
           </p>
@@ -229,17 +229,17 @@ const EverydayAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12"
+          className="grid grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {accountFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="text-center p-2.5 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-2">
-                <feature.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center mb-1.5 sm:mb-2">
+                <feature.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-xs">{feature.title}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[10px] sm:text-xs">{feature.title}</p>
             </div>
           ))}
         </motion.div>
@@ -256,20 +256,20 @@ const EverydayAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100"
+          className="mt-10 sm:mt-12 p-5 sm:p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+              <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white leading-tight">
                 Already have a bank account elsewhere?
               </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1">
                 Switch to Nordea in minutes. We'll help you transfer everything seamlessly.
               </p>
             </div>
-            <Button variant="outline" className="border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-800/30">
+            <Button variant="outline" className="w-full md:w-auto border-indigo-300 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-800/30 py-2 text-sm">
               Start Switch Process
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
             </Button>
           </div>
         </motion.div>

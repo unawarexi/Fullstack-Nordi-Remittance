@@ -88,23 +88,23 @@ const requiredDocuments = [
 // ========================
 const DormantAccounts: React.FC = () => {
   return (
-    <Section id="dormant-accounts" className="py-16 lg:py-24">
+    <Section id="dormant-accounts" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-sm font-medium mb-4">
-            <AlertCircle className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-amber-100 text-amber-700 dark:text-amber-300 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Dormant Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Reactivate Your Dormant Account
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Haven't used your account in a while? Don't worry – reactivating your 
             dormant account is simple. Follow these steps to regain full access to your funds.
           </p>
@@ -115,21 +115,23 @@ const DormantAccounts: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 flex flex-col md:flex-row items-start md:items-center gap-4"
+          className="mb-8 sm:mb-12 p-5 sm:p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200"
         >
-          <div className="p-2 rounded-lg bg-amber-100">
-            <Clock className="w-6 h-6 text-amber-600" />
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="p-2 sm:p-3 rounded-xl bg-amber-100">
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white leading-tight">Account Inactive?</h3>
+              <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 mt-0.5 sm:mt-1 leading-tight">
+                If your account has had no activity for 12+ months, it may be classified as dormant. 
+                Your funds are safe, but transactions are temporarily restricted.
+              </p>
+            </div>
+            <Button variant="primary" className="w-full md:w-auto bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap py-2 text-sm">
+              Check Account Status
+            </Button>
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-neutral-900 dark:text-white">Account Inactive?</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              If your account has had no activity for 12+ months, it may be classified as dormant. 
-              Your funds are safe, but transactions are temporarily restricted.
-            </p>
-          </div>
-          <Button variant="primary" className="bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 whitespace-nowrap">
-            Check Account Status
-          </Button>
         </motion.div>
 
         {/* Main Content Grid */}
@@ -139,7 +141,7 @@ const DormantAccounts: React.FC = () => {
             <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-6">
               How to Reactivate Your Account
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {reactivationSteps.map((step, index) => (
                 <motion.div
                   key={step.step}
@@ -147,19 +149,19 @@ const DormantAccounts: React.FC = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+                  className="flex gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
                 >
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center font-bold text-sm sm:text-base">
                       {step.step}
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-neutral-900 dark:text-white flex items-center gap-2">
+                    <h4 className="text-[15px] sm:text-base font-semibold text-neutral-900 dark:text-white flex items-center gap-2 leading-tight">
                       {step.title}
-                      <step.icon className="w-4 h-4 text-neutral-400" />
+                      <step.icon className="w-3.5 h-3.5 text-neutral-400" />
                     </h4>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{step.description}</p>
+                    <p className="text-[11px] sm:text-sm text-neutral-600 dark:text-neutral-300 mt-1 leading-tight">{step.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -170,16 +172,16 @@ const DormantAccounts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 p-6 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
+              className="mt-6 sm:mt-8 p-5 sm:p-6 rounded-xl bg-neutral-50 dark:bg-neutral-700/50"
             >
-              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-500" />
+              <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" />
                 Documents Required
               </h3>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 {requiredDocuments.map((doc) => (
-                  <li key={doc} className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                  <li key={doc} className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
                     {doc}
                   </li>
                 ))}
@@ -194,19 +196,19 @@ const DormantAccounts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="p-5 sm:p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-indigo-500" />
+              <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" />
                 Frequently Asked Questions
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {faqs.map((faq, index) => (
-                  <div key={index} className="pb-4 border-b border-neutral-100 dark:border-neutral-700 last:border-0 last:pb-0">
-                    <h4 className="font-medium text-neutral-900 dark:text-white text-sm mb-1">
+                  <div key={index} className="pb-3 sm:pb-4 border-b border-neutral-100 dark:border-neutral-700 last:border-0 last:pb-0">
+                    <h4 className="font-medium text-neutral-900 dark:text-white text-[13px] sm:text-sm mb-1 leading-tight">
                       {faq.question}
                     </h4>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{faq.answer}</p>
+                    <p className="text-[11px] sm:text-xs text-neutral-500 dark:text-neutral-400 leading-tight">{faq.answer}</p>
                   </div>
                 ))}
               </div>
@@ -217,33 +219,33 @@ const DormantAccounts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-xl bg-indigo-900 text-white"
+              className="p-5 sm:p-6 rounded-xl bg-indigo-900 text-white"
             >
-              <h3 className="text-lg font-semibold mb-4">Need Assistance?</h3>
-              <p className="text-sm text-indigo-200 mb-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Need Assistance?</h3>
+              <p className="text-xs sm:text-sm text-indigo-200 mb-4 sm:mb-6">
                 Our customer service team is ready to help you reactivate your account.
               </p>
               
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-amber-400" />
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                   <div>
-                    <p className="text-sm font-medium">Call Us</p>
-                    <p className="text-xs text-indigo-200">1-800-NORDEA (24/7)</p>
+                    <p className="text-xs sm:text-sm font-medium">Call Us</p>
+                    <p className="text-[11px] sm:text-xs text-indigo-200">1-800-NORDEA (24/7)</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-amber-400" />
+                  <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                   <div>
-                    <p className="text-sm font-medium">Visit a Branch</p>
-                    <p className="text-xs text-indigo-200">Mon-Fri: 9AM - 5PM</p>
+                    <p className="text-xs sm:text-sm font-medium">Visit a Branch</p>
+                    <p className="text-[11px] sm:text-xs text-indigo-200">Mon-Fri: 9AM - 5PM</p>
                   </div>
                 </div>
               </div>
-
-              <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600">
+ 
+              <Button variant="primary" className="w-full bg-amber-50 dark:bg-amber-900/200 hover:bg-amber-600 py-2 text-sm">
                 Find Nearest Branch
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
               </Button>
             </motion.div>
           </div>

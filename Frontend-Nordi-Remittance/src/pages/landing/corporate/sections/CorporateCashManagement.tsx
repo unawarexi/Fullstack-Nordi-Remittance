@@ -105,23 +105,23 @@ const platformFeatures = [
 // ========================
 const CorporateCashManagement: React.FC = () => {
   return (
-    <Section id="corporate-cash-management" className="py-16 lg:py-24">
+    <Section id="corporate-cash-management" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-sm font-medium mb-4">
-            <Wallet className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-teal-100 text-teal-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Corporate Cash Management
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Global Treasury Excellence
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Comprehensive cash management solutions for multinational corporations 
             to optimize liquidity, streamline payments, and gain complete visibility.
           </p>
@@ -132,19 +132,19 @@ const CorporateCashManagement: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {platformFeatures.map((feature) => (
             <div
               key={feature.title}
-              className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100"
+              className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-100"
             >
-              <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center">
-                <feature.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                <feature.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{feature.title}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{feature.value}</p>
+                <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{feature.title}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 leading-tight">{feature.value}</p>
               </div>
             </div>
           ))}
@@ -160,29 +160,29 @@ const CorporateCashManagement: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "group relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                 "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
-              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", solution.color)}>
-                {solution.icon}
+              <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4", solution.color)}>
+                {React.cloneElement(solution.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{solution.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{solution.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{solution.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-relaxed">{solution.description}</p>
               
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6">
                 {solution.capabilities.map((capability) => (
-                  <li key={capability} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-teal-500" />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{capability}</span>
+                  <li key={capability} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-500 mt-0.5 shrink-0" />
+                    <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{capability}</span>
                   </li>
                 ))}
               </ul>
-
-              <Button variant="outline" className="w-full group-hover:border-teal-500 group-hover:text-teal-600">
+ 
+              <Button variant="outline" className="w-full text-sm py-2 group-hover:border-teal-500 group-hover:text-teal-600">
                 Learn More
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
               </Button>
             </motion.div>
           ))}
@@ -199,31 +199,31 @@ const CorporateCashManagement: React.FC = () => {
           
           <div className="relative grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Enterprise Treasury Platform</h3>
-              <p className="text-teal-100 mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight">Enterprise Treasury Platform</h3>
+              <p className="text-sm sm:text-base text-teal-100 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 Connect all your banking relationships, ERP systems, and treasury 
                 workstations through our unified platform with seamless API integration.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="primary" className="bg-white dark:bg-neutral-800 text-teal-700 hover:bg-teal-50">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Button variant="primary" className="w-full sm:w-auto bg-white dark:bg-neutral-800 text-teal-700 hover:bg-teal-50 text-sm py-2.5 sm:py-3 px-6">
                   Request Demo
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1.5 sm:ml-2" />
                 </Button>
-                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                <Button variant="outline" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 text-sm py-2.5 sm:py-3 px-6">
                   View API Docs
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {[
                 { label: "Daily Volume", value: "$100B+" },
                 { label: "Bank Partners", value: "50+" },
                 { label: "ERP Integrations", value: "20+" },
                 { label: "Uptime SLA", value: "99.99%" },
               ].map((stat) => (
-                <div key={stat.label} className="p-4 rounded-xl bg-white/10 text-center">
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
-                  <p className="text-xs text-teal-200 mt-1">{stat.label}</p>
+                <div key={stat.label} className="p-3 sm:p-4 rounded-xl bg-white/10 text-center">
+                  <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-[10px] sm:text-xs text-teal-200 mt-1 uppercase tracking-wider font-medium">{stat.label}</p>
                 </div>
               ))}
             </div>

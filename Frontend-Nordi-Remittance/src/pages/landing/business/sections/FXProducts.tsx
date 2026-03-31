@@ -146,9 +146,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="outline" className="w-full">
+    <Button variant="outline" className="w-full text-sm py-1.5 sm:py-2">
       Learn More
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -158,23 +158,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
 // ========================
 const FXProducts: React.FC = () => {
   return (
-    <Section id="fx-products" className="py-16 lg:py-24">
+    <Section id="fx-products" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-            <Globe className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             FX Products
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Foreign Exchange Solutions
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Manage currency risk and optimize your international transactions with 
             our comprehensive suite of FX products.
           </p>
@@ -195,27 +195,27 @@ const FXProducts: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-2xl bg-slate-900 text-white sticky top-24"
+              className="p-5 sm:p-6 rounded-2xl bg-slate-900 text-white lg:sticky lg:top-24"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold">Live FX Rates</h3>
-                <span className="flex items-center gap-1 text-xs text-emerald-400">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold">Live FX Rates</h3>
+                <span className="flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-400 font-medium uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Live
                 </span>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {liveRates.map((rate) => (
                   <div
                     key={rate.pair}
-                    className="flex items-center justify-between p-3 rounded-lg bg-white/5"
+                    className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg bg-white/5 border border-white/5 shadow-inner"
                   >
-                    <span className="font-medium">{rate.pair}</span>
+                    <span className="text-sm sm:text-base font-medium">{rate.pair}</span>
                     <div className="text-right">
-                      <p className="font-bold">{rate.rate}</p>
+                      <p className="text-sm sm:text-base font-bold leading-tight">{rate.rate}</p>
                       <p className={cn(
-                        "text-xs",
+                        "text-[10px] sm:text-xs font-medium",
                         rate.change.startsWith("+") ? "text-emerald-400" : "text-red-400"
                       )}>
                         {rate.change}
@@ -225,22 +225,22 @@ const FXProducts: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-xs text-slate-400 mb-4">
+              <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-white/10">
+                <p className="text-[11px] sm:text-xs text-slate-400 mb-4 leading-relaxed">
                   Rates are indicative only. Contact our FX desk for live quotes.
                 </p>
-                <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700 text-sm py-2">
                   Contact FX Desk
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
                 </Button>
               </div>
 
-              <div className="mt-6">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/200/10 border border-amber-500/20">
-                  <Shield className="w-5 h-5 text-amber-400" />
+              <div className="mt-5 sm:mt-6">
+                <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 shadow-inner border border-amber-500/10">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-amber-400">Hedging Advisory</p>
-                    <p className="text-xs text-slate-400">Get expert FX risk management advice</p>
+                    <p className="text-[13px] sm:text-sm font-semibold text-amber-400 leading-tight">Hedging Advisory</p>
+                    <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Get expert risk management advice</p>
                   </div>
                 </div>
               </div>

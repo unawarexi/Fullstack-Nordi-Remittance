@@ -155,13 +155,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => (
     )}
   >
     {/* Icon */}
-    <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", service.color)}>
-      {service.icon}
+    <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4", service.color)}>
+      {React.cloneElement(service.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
     </div>
 
     {/* Content */}
-    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{service.name}</h3>
-    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{service.description}</p>
+    <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{service.name}</h3>
+    <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-tight">{service.description}</p>
 
     {/* Features */}
     <ul className="space-y-2 flex-1 mb-6">
@@ -174,9 +174,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => (
     </ul>
 
     {/* CTA */}
-    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700">
+    <Button variant="primary" className="w-full bg-indigo-600 hover:bg-indigo-700 py-1.5 sm:py-2 text-sm">
       {service.cta}
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -186,23 +186,23 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => (
 // ========================
 const DiasporaBanking: React.FC = () => {
   return (
-    <Section id="diaspora-banking" background="light" className="py-16 lg:py-24">
+    <Section id="diaspora-banking" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-4">
-            <Globe className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Diaspora Banking
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Stay Connected To Home, Wherever You Are
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Comprehensive banking solutions designed for the global citizen. 
             Send money, invest, and manage finances across borders with ease.
           </p>
@@ -213,18 +213,18 @@ const DiasporaBanking: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="text-center p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="text-center p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <div className="w-10 h-10 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-                <benefit.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-2 sm:mb-3">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <p className="font-semibold text-neutral-900 dark:text-white text-sm">{benefit.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{benefit.description}</p>
+              <p className="font-semibold text-neutral-900 dark:text-white text-[13px] sm:text-sm leading-tight">{benefit.title}</p>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5 sm:mt-1 leading-tight">{benefit.description}</p>
             </div>
           ))}
         </motion.div>
@@ -244,22 +244,23 @@ const DiasporaBanking: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-2xl bg-indigo-900 text-white h-full"
+              className="p-5 sm:p-6 rounded-2xl bg-indigo-900 text-white h-full"
             >
-              <h3 className="text-xl font-semibold mb-2">Live Transfer Rates</h3>
-              <p className="text-sm text-indigo-200 mb-6">
+              <h3 className="text-lg sm:text-xl font-semibold mb-1.5 sm:mb-2">Live Transfer Rates</h3>
+              <p className="text-xs sm:text-sm text-indigo-200 mb-4 sm:mb-6">
                 Updated every 60 seconds
               </p>
+
 
               <div className="space-y-4">
                 {transferRates.map((rate) => (
                   <div
                     key={rate.corridor}
-                    className="p-4 rounded-xl bg-white/10 border border-white/10"
+                    className="p-3 sm:p-4 rounded-xl bg-white/10 border border-white/10"
                   >
-                    <p className="text-sm text-indigo-200 mb-1">{rate.corridor}</p>
-                    <p className="text-xl font-bold text-amber-400">{rate.rate}</p>
-                    <p className="text-xs text-indigo-300">Fee: {rate.fee}</p>
+                    <p className="text-xs sm:text-sm text-indigo-200 mb-0.5 sm:mb-1">{rate.corridor}</p>
+                    <p className="text-lg sm:text-xl font-bold text-amber-400 leading-tight">{rate.rate}</p>
+                    <p className="text-[10px] sm:text-xs text-indigo-300">Fee: {rate.fee}</p>
                   </div>
                 ))}
               </div>
@@ -277,14 +278,14 @@ const DiasporaBanking: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 text-center p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+          className="mt-10 sm:mt-12 text-center p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
         >
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">Send money to 100+ countries worldwide</p>
-          <div className="flex flex-wrap justify-center gap-2">
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mb-2 sm:mb-3">Send money to 100+ countries worldwide</p>
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
             {["🇳🇬", "🇬🇭", "🇰🇪", "🇮🇳", "🇵🇭", "🇲🇽", "🇨🇴", "🇵🇰", "🇧🇩", "🇪🇬", "🇿🇦", "🇧🇷"].map((flag, i) => (
-              <span key={i} className="text-2xl">{flag}</span>
+              <span key={i} className="text-xl sm:text-2xl">{flag}</span>
             ))}
-            <span className="text-sm text-neutral-400 self-center">+88 more</span>
+            <span className="text-xs sm:text-sm text-neutral-400 self-center">+88 more</span>
           </div>
         </motion.div>
       </Container>

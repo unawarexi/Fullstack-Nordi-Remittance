@@ -152,31 +152,31 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     {/* Popular Badge */}
     {account.popular && (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/300 text-white text-xs font-medium rounded-full">
-          <Star className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-900/300 text-white text-[10px] font-medium rounded-full">
+          <Star className="w-2.5 h-2.5" />
           Most Popular
         </span>
       </div>
     )}
 
     {/* Header */}
-    <div className="flex items-start gap-4 mb-4">
-      <div className={cn("p-3 rounded-xl text-white", account.color)}>
-        {account.icon}
+    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+      <div className={cn("p-2.5 sm:p-3 rounded-xl text-white", account.color)}>
+        {React.cloneElement(account.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{account.name}</h3>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">{account.tagline}</p>
+        <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white leading-tight">{account.name}</h3>
+        <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">{account.tagline}</p>
       </div>
     </div>
 
     {/* Interest Rate */}
-    <div className="py-4 border-y border-neutral-100 dark:border-neutral-700 mb-4">
+    <div className="py-3 sm:py-4 border-y border-neutral-100 dark:border-neutral-700 mb-3 sm:mb-4">
       <div className="flex items-baseline gap-1">
-        <span className="text-4xl font-bold text-neutral-900 dark:text-white">{account.interestRate}</span>
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">APY</span>
+        <span className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-white">{account.interestRate}</span>
+        <span className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">APY</span>
       </div>
-      <p className="text-xs text-neutral-400 mt-1">
+      <p className="text-[10px] sm:text-xs text-neutral-400 mt-0.5 sm:mt-1">
         Min. balance: {account.minBalance}
       </p>
     </div>
@@ -195,12 +195,12 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     <Button
       variant={account.popular ? "primary" : "outline"}
       className={cn(
-        "w-full",
+        "w-full py-2 sm:py-2.5 text-xs sm:text-sm",
         account.popular && "bg-indigo-600 hover:bg-indigo-700"
       )}
     >
       Open Account
-      <ArrowRight className="w-4 h-4 ml-2" />
+      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
     </Button>
   </motion.div>
 );
@@ -210,23 +210,23 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
 // ========================
 const SavingsAccounts: React.FC = () => {
   return (
-    <Section id="savings-accounts" background="light" className="py-16 lg:py-24">
+    <Section id="savings-accounts" background="light" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-4">
-            <PiggyBank className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4">
+            <PiggyBank className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Savings Accounts
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4">
             Grow Your Wealth With Our Savings Solutions
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300">
             Choose from a range of savings accounts designed to help you reach your 
             financial goals faster with competitive interest rates and flexible options.
           </p>
