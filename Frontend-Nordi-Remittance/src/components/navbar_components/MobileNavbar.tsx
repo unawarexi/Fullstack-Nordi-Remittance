@@ -359,7 +359,7 @@ export const MobileNavbar: React.FC = () => {
                   size={16}
                   className="text-neutral-500 dark:text-neutral-400 sm:w-[18px] sm:h-[18px]"
                 />
-                <CountrySelect className="flex-1 w-full" value="US" />
+                <CountrySelect className="flex-1 w-full" value="US" position="top" />
               </div>
 
               {/* CTA Buttons */}

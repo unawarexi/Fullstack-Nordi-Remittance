@@ -9,6 +9,7 @@ interface CountrySelectProps {
   onChange?: (code: string) => void;
   className?: string;
   compact?: boolean;
+  position?: "bottom" | "top";
 }
 
 export const CountrySelect: React.FC<CountrySelectProps> = ({
@@ -16,6 +17,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
   onChange,
   className,
   compact = false,
+  position = "bottom",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,26 +78,17 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
       {/* DROPDOWN MENU */}
       <AnimatePresence>
         {isOpen && (
-            <motion.div
-              key="backdrop-cs"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-[105] bg-black/20 backdrop-blur-[2px] sm:hidden"
-            />
-        )}
-        {isOpen && (
           <motion.div
             key="panel-cs"
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
             className={cn(
-              "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[320px] origin-center z-[110]",
-              "sm:absolute sm:left-auto sm:top-auto sm:-translate-x-0 sm:-translate-y-0 sm:right-0 sm:mt-2 sm:w-64 sm:origin-top-right",
-              "rounded-xl border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-neutral-900/80"
+              "absolute z-[110] w-[260px] sm:w-64 border border-neutral-100 bg-white p-2 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-neutral-900/80 rounded-xl",
+              position === "bottom"
+                ? "top-full mt-2 origin-top left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 sm:origin-top-right"
+                : "bottom-full mb-2 origin-bottom left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 sm:origin-bottom-right"
             )}
           >
             {/* Search Input */}
