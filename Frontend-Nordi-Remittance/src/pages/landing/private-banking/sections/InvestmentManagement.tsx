@@ -153,7 +153,7 @@ const InvestmentManagement: React.FC = () => {
               <div className="p-4 sm:p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 mb-6 sm:mb-8 border border-neutral-100 dark:border-neutral-700 shadow-inner">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest">Target Returns</span>
-                  <span className="text-xl sm:text-2xl font-black text-emerald-600 tabular-nums italic">{strategy.returns}</span>
+                  <span className="text-xl sm:text-2xl font-black text-emerald-600 tabular-nums">{strategy.returns}</span>
                 </div>
               </div>
 
@@ -196,7 +196,7 @@ const InvestmentManagement: React.FC = () => {
               <div className="relative w-48 h-48 sm:w-64 sm:h-64">
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="text-center group">
-                    <p className="text-2xl sm:text-4xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter italic group-hover:scale-110 transition-transform">$1M+</p>
+                    <p className="text-2xl sm:text-4xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter group-hover:scale-110 transition-transform">$1M+</p>
                     <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-widest mt-1">Min. Investment</p>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ const InvestmentManagement: React.FC = () => {
               </div>
 
               <p className="text-sm sm:text-lg text-emerald-100/80 mb-8 sm:mb-12 font-medium leading-relaxed">
-                Our team of <span className="text-emerald-400 font-black italic">CFA-certified</span> investment professionals work closely 
+                Our team of <span className="text-emerald-400 font-black">CFA-certified</span> investment professionals work closely 
                 with you to build and manage portfolios aligned with your goals.
               </p>
 

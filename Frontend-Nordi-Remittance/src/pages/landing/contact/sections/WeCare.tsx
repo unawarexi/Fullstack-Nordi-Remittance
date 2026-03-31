@@ -122,7 +122,7 @@ const WeCare: React.FC = () => {
         >
           {impactStats.map((stat) => (
             <div key={stat.label} className="text-center p-4 sm:p-8 rounded-[2rem] bg-white dark:bg-neutral-800 border border-rose-100 dark:border-rose-900/30 shadow-sm hover:shadow-xl transition-all group">
-              <p className="text-xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums tracking-tighter italic group-hover:scale-110 transition-transform">{stat.value}</p>
+              <p className="text-xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums tracking-tighter group-hover:scale-110 transition-transform">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
@@ -151,7 +151,7 @@ const WeCare: React.FC = () => {
                   ? React.cloneElement(pillar.icon as React.ReactElement, { className: "w-6 h-6" })
                   : pillar.icon}
               </div>
-              <h3 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{pillar.name}</h3>
+              <h3 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight">{pillar.name}</h3>
               <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-6">{pillar.description}</p>
               <div className="pt-4 border-t border-neutral-100 dark:border-neutral-700">
                 <p className="text-[11px] sm:text-xs font-black text-rose-600 uppercase tracking-widest">{pillar.impact}</p>

@@ -86,8 +86,8 @@ const AccessMoney: React.FC = () => {
             <Banknote className="w-4 h-4" />
             Access Money
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
-            Cardless ATM Withdrawal
+          <h2 className="text-3xl sm:text-5xl font-black text-neutral-900 dark:text-white uppercase tracking-tighter mb-6 leading-tight">
+            Access <span className="text-blue-600 dark:text-blue-400">Money</span>.
           </h2>
           <p className="text-lg text-neutral-600 dark:text-neutral-300">
             No card? No problem! Withdraw cash from any of our ATMs using just 
@@ -153,7 +153,7 @@ const AccessMoney: React.FC = () => {
                       {step.step}
                     </span>
                   </div>
-                  <h4 className="text-lg sm:text-xl font-black mb-3 uppercase tracking-tight italic">{step.title}</h4>
+                  <h4 className="text-lg sm:text-xl font-black mb-3 uppercase tracking-tight">{step.title}</h4>
                   <p className="text-[13px] sm:text-sm text-emerald-50 font-bold leading-relaxed opacity-80">{step.description}</p>
                 </div>
               </motion.div>

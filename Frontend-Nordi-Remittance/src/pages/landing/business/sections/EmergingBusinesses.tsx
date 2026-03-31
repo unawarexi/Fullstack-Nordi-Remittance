@@ -225,7 +225,7 @@ const EmergingBusinesses: React.FC = () => {
                     <p className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 leading-tight">Founded by {story.founder}</p>
                   </div>
                 </div>
-                <p className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 italic mb-4 leading-relaxed">"{story.quote}"</p>
+                <p className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 mb-4 leading-relaxed">"{story.quote}"</p>
                 <div className="flex gap-4 pt-3 sm:pt-4 border-t border-neutral-100 dark:border-neutral-700">
                   <div>
                     <p className="text-[10px] text-neutral-400 uppercase tracking-wider">Raised</p>

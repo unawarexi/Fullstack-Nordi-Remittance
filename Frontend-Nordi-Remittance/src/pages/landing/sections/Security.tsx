@@ -94,7 +94,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature, index }) => (
         : feature.icon}
     </div>
     <div>
-      <h4 className="text-base sm:text-lg font-black text-white uppercase tracking-tight italic">{feature.title}</h4>
+      <h4 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">{feature.title}</h4>
       <p className="mt-2 text-[11px] sm:text-sm text-slate-400 font-bold opacity-75 leading-relaxed">
         {feature.description}
       </p>
@@ -139,9 +139,9 @@ const Security: React.FC = () => {
                 >
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <div>
-                    <span className="text-xs font-medium text-white">{cert.name}</span>
-                    <span className="ml-1.5 text-xs text-slate-500">{cert.level}</span>
-                  </div>
+                <h3 className="font-semibold text-white">Mobile Banking</h3>
+                <p className="text-sm text-indigo-200">Banking in your pocket</p>
+              </div>
                 </div>
               ))}
             </div>

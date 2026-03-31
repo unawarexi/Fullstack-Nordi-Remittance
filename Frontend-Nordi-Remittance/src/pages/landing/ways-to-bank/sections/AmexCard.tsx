@@ -168,7 +168,7 @@ const AmexCard: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-[10px] sm:text-xs font-black text-white/70 uppercase tracking-widest mb-1">American Express</p>
-                      <p className="text-lg sm:text-2xl font-black uppercase tracking-tighter italic leading-none">{card.name.replace('American Express ', '')}</p>
+                      <p className="text-lg sm:text-2xl font-black uppercase tracking-tighter leading-none">{card.name.replace('American Express ', '')}</p>
                     </div>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ const AmexCard: React.FC = () => {
               <div className="p-8 pt-4 flex-1 flex flex-col">
                 <div className="p-4 sm:p-5 rounded-2xl bg-blue-500/5 border-2 border-blue-500/10 mb-6 text-center group-hover:bg-blue-500/10 transition-colors">
                   <p className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-[0.2em] mb-1">Welcome Bonus</p>
-                  <p className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums italic tracking-tighter">{card.rewards}</p>
+                  <p className="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums tracking-tighter">{card.rewards}</p>
                 </div>
 
                 <ul className="space-y-3 flex-1 mb-8">

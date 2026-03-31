@@ -134,7 +134,7 @@ const Biometrics: React.FC = () => {
                   ? React.cloneElement(type.icon as React.ReactElement, { className: "w-8 h-8 sm:w-10 sm:h-10" })
                   : type.icon}
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{type.name}</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight">{type.name}</h3>
               <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-6">{type.description}</p>
               
               <div className="space-y-3">

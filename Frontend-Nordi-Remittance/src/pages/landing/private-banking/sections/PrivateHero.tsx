@@ -154,7 +154,7 @@ const PrivateHero: React.FC = () => {
               {/* Eligibility Note */}
               <div className="p-4 sm:p-5 rounded-2xl bg-amber-400/5 border border-amber-400/20 relative z-10">
                 <p className="text-[12px] sm:text-sm text-neutral-300 leading-relaxed">
-                  <span className="font-black text-amber-400 uppercase tracking-tighter mr-2 italic">Exclusive Eligibility:</span>
+                  <span className="font-black text-amber-400 uppercase tracking-tighter mr-2">Exclusive Eligibility:</span>
                   Minimum investable assets of <span className="text-white font-bold">$500,000</span> or annual verifiable income exceeding <span className="text-white font-bold">$200,000</span>.
                 </p>
               </div>

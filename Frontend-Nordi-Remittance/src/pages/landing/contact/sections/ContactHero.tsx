@@ -117,7 +117,7 @@ const ContactHero: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="p-6 sm:p-10 rounded-[2.5rem] bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
-              <h3 className="text-xl sm:text-2xl font-black text-white mb-6 uppercase tracking-tight italic">Relay Command Center</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-white mb-6 uppercase tracking-tight">Relay Command Center</h3>
               <div className="space-y-4 sm:space-y-6">
                 {quickContacts.map((contact) => (
                   <div
@@ -142,7 +142,7 @@ const ContactHero: React.FC = () => {
 
               {/* Hours */}
               <div className="mt-6 pt-6 border-t border-white/10">
-                <div className="flex items-center gap-3 text-teal-200 text-[13px] sm:text-sm font-bold italic">
+                <div className="flex items-center gap-3 text-teal-200 text-[13px] sm:text-sm font-bold">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Tactical Support: Always Active (24/7)</span>
                 </div>

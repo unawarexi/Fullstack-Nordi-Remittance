@@ -205,7 +205,7 @@ const BlackCard: React.FC = () => {
           viewport={{ once: true }}
           className="mt-16 sm:mt-24 pt-16 sm:pt-20 border-t border-white/10"
         >
-          <h3 className="text-xl sm:text-3xl font-black text-center mb-10 sm:mb-16 uppercase tracking-widest italic">Card Tiers</h3>
+          <h3 className="text-xl sm:text-3xl font-black text-center mb-10 sm:mb-16 uppercase tracking-widest">Card Tiers</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {cardTiers.map((tier, index) => (
               <motion.div
@@ -220,7 +220,7 @@ const BlackCard: React.FC = () => {
                 )}
               >
                 <div className={cn("w-20 h-12 mx-auto rounded-xl mb-6 shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-transform", tier.color)} />
-                <h4 className="font-black text-xl sm:text-2xl mb-3 uppercase tracking-tighter italic">{tier.name}</h4>
+                <h4 className="font-black text-xl sm:text-2xl mb-3 uppercase tracking-tighter">{tier.name}</h4>
                 <div className="py-2.5 px-4 rounded-full bg-amber-400/10 border border-amber-400/20 inline-block mb-4">
                   <p className="text-amber-400 font-bold text-sm uppercase tracking-widest">{tier.fee}</p>
                 </div>

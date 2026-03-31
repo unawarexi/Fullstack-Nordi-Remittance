@@ -100,7 +100,7 @@ const MobileBanking: React.FC = () => {
             <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 dark:text-cyan-400" />
-                <span className="text-xl sm:text-3xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter italic">{stat.value}</span>
+                <span className="text-xl sm:text-3xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter">{stat.value}</span>
               </div>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest">{stat.label}</p>
             </div>
@@ -137,7 +137,7 @@ const MobileBanking: React.FC = () => {
                   {/* Balance Card */}
                   <div className="p-6 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 mb-6 shadow-2xl">
                     <p className="text-[10px] sm:text-xs text-cyan-100 font-bold uppercase tracking-widest mb-1">Legacy Balance</p>
-                    <p className="text-2xl sm:text-3xl font-black text-white tabular-nums tracking-tighter italic">₦2,458,900.00</p>
+                    <p className="text-2xl sm:text-3xl font-black text-white tabular-nums tracking-tighter">₦2,458,900.00</p>
                     <div className="flex gap-2 mt-6">
                       {['Send', 'Top-up'].map(btn => (
                         <div key={btn} className="flex-1 py-3 rounded-2xl bg-white/20 text-center text-[10px] sm:text-xs font-black text-white uppercase tracking-widest hover:bg-white/30 transition-colors cursor-pointer">
@@ -204,7 +204,7 @@ const MobileBanking: React.FC = () => {
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
                   <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
                 </div>
-                <h4 className="text-sm sm:text-lg font-black text-white uppercase tracking-tight italic">Military-Grade</h4>
+                <h4 className="text-sm sm:text-lg font-black text-white uppercase tracking-tight">Military-Grade</h4>
               </div>
               <div className="grid grid-cols-2 gap-3 relative z-10">
                 {securityFeatures.map((feature) => (

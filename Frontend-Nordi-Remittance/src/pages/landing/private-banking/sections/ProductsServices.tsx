@@ -179,7 +179,7 @@ const ProductsServices: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full -mr-32 -mt-32 blur-[80px]" />
           
           <div className="text-center mb-10 sm:mb-16 relative z-10">
-            <h3 className="text-2xl sm:text-4xl font-black mb-3 sm:mb-4 uppercase tracking-tighter italic">Premium Lifestyle Services</h3>
+            <h3 className="text-2xl sm:text-4xl font-black mb-3 sm:mb-4 uppercase tracking-tighter">Premium Lifestyle Services</h3>
             <p className="text-sm sm:text-lg text-neutral-400 font-medium">Global concierge and exclusive privileges for legacy members</p>
           </div>
 

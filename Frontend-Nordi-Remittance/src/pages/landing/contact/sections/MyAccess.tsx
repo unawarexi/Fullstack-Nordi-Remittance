@@ -113,7 +113,7 @@ const MyAccess: React.FC = () => {
                   ? React.cloneElement(platform.icon as React.ReactElement, { className: "w-8 h-8 sm:w-10 sm:h-10" })
                   : platform.icon}
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">{platform.name}</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight">{platform.name}</h3>
               <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed mb-8">{platform.description}</p>
               
               <ul className="space-y-4">

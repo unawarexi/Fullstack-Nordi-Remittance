@@ -131,7 +131,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     </div>
 
     {/* Content */}
-    <h3 className="text-base sm:text-xl font-black text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors uppercase tracking-tight italic">
+    <h3 className="text-base sm:text-xl font-black text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
       {product.title}
     </h3>
     <p className="mt-2 text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold opacity-80 leading-relaxed">{product.description}</p>

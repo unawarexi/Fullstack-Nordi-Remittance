@@ -99,7 +99,7 @@ const ATMServices: React.FC = () => {
               key={stat.label}
               className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all"
             >
-              <p className="text-2xl sm:text-4xl font-black text-purple-600 dark:text-purple-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-2xl sm:text-4xl font-black text-purple-600 dark:text-purple-400 tabular-nums tracking-tighter">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-2">{stat.label}</p>
             </div>
           ))}
@@ -200,7 +200,7 @@ const ATMServices: React.FC = () => {
               <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
             </div>
             <div>
-              <h4 className="text-xl sm:text-2xl font-black mb-4 uppercase tracking-tighter italic">ATM Security Integrity</h4>
+              <h4 className="text-xl sm:text-2xl font-black mb-4 uppercase tracking-tighter">ATM Security Integrity</h4>
               <ul className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-[13px] sm:text-sm text-neutral-400 font-medium">
                 {[
                   "Shield your PIN with tactical focus",

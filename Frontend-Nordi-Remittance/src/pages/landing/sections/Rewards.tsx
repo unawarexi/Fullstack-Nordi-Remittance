@@ -96,7 +96,7 @@ const RewardCard: React.FC<RewardCardProps> = ({ reward, index }) => (
         ? React.cloneElement(reward.icon as React.ReactElement, { className: "w-6 h-6" })
         : reward.icon}
     </div>
-    <span className="text-2xl sm:text-4xl font-black text-indigo-600 italic tabular-nums tracking-tighter">{reward.cashback}</span>
+    <span className="text-2xl sm:text-4xl font-black text-indigo-600 tabular-nums tracking-tighter">{reward.cashback}</span>
     <span className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-widest text-center mt-2 opacity-80">
       {reward.category}
     </span>

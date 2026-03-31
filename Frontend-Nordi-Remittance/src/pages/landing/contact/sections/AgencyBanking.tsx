@@ -96,7 +96,7 @@ const AgencyBanking: React.FC = () => {
         >
           {agentStats.map((stat) => (
             <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-sm hover:shadow-xl transition-all">
-              <p className="text-xl sm:text-3xl font-black text-orange-600 dark:text-orange-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-xl sm:text-3xl font-black text-orange-600 dark:text-orange-400 tabular-nums tracking-tighter">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-black uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
@@ -111,7 +111,7 @@ const AgencyBanking: React.FC = () => {
             viewport={{ once: true }}
             className="p-6 sm:p-10 rounded-[2.5rem] bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 shadow-xl"
           >
-            <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-8 uppercase tracking-tight italic">Nexus Services</h3>
+            <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-8 uppercase tracking-tight">Nexus Services</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {agentServices.map((service) => (
                 <div

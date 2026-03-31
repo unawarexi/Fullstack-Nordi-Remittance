@@ -250,7 +250,7 @@ const MegaNavbar: React.FC = () => {
           >
             {/* Left - Navigation Links */}
             <div className="col-span-12 lg:col-span-3 border-r border-neutral-100 dark:border-neutral-800 p-6 lg:p-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-6 italic">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500 mb-6">
                 {activeContent.leftHeader}
               </p>
               <ul className="space-y-1">
@@ -279,7 +279,7 @@ const MegaNavbar: React.FC = () => {
 
             {/* Center - Title & Description */}
             <div className="col-span-12 lg:col-span-5 flex flex-col justify-center p-8 lg:px-12 lg:py-10">
-              <h2 className="text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white leading-tight uppercase tracking-tighter italic">
+              <h2 className="text-3xl lg:text-4xl font-black text-neutral-900 dark:text-white leading-tight uppercase tracking-tighter">
                 {activeContent.rightHeader}
               </h2>
               <p className="mt-4 text-neutral-500 dark:text-neutral-400 text-sm font-bold leading-relaxed max-w-md opacity-80">

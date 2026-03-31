@@ -202,7 +202,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
               {item.icon && (
                 <span className="text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">{item.icon}</span>
               )}
-              <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight italic">
+              <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight">
                 {item.label}
               </span>
             </span>
@@ -223,7 +223,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item, index }) => {
             className="flex w-full items-center gap-2.5 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-4"
           >
             {item.icon && <span className="text-blue-600 dark:text-blue-400">{item.icon}</span>}
-            <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight italic">
+            <span className="text-[13px] sm:text-base font-black text-neutral-900 dark:text-white uppercase tracking-tight">
               {item.label}
             </span>
           </Link>

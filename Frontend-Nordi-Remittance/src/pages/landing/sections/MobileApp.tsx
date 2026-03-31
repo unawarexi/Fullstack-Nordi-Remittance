@@ -53,9 +53,9 @@ const MobileApp: React.FC = () => {
               Mobile Banking
             </span>
 
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-6 leading-[1.1]">
               Banking at Your Fingertips
-            </h2>
+            </h1>
 
             <p className="mt-2 sm:mt-3 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed">
               Download our award-winning mobile app and manage your finances anytime,
@@ -74,7 +74,7 @@ const MobileApp: React.FC = () => {
                       ? React.cloneElement(feature.icon as React.ReactElement, { className: "w-5 h-5" })
                       : feature.icon}
                   </div>
-                  <span className="text-[11px] sm:text-sm text-neutral-900 dark:text-white font-black uppercase tracking-tight italic">{feature.text}</span>
+                  <span className="text-[11px] sm:text-sm text-neutral-900 dark:text-white font-black uppercase tracking-tight">{feature.text}</span>
                 </div>
               ))}
             </div>

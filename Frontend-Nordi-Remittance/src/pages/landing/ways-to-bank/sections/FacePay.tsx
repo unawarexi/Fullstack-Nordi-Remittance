@@ -210,7 +210,7 @@ const FacePay: React.FC = () => {
             <Shield className="w-8 h-8 sm:w-9 sm:h-9 text-violet-600 group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-center sm:text-left">
-            <h5 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight italic">Privacy Protocol X-10</h5>
+            <h5 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white mb-3 uppercase tracking-tight">Privacy Protocol X-10</h5>
             <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold leading-relaxed max-w-2xl">
               Your facial data is encrypted via military-grade RSA-4096 and remains strictly localized on your secure element. 
               FacePay uses advanced liveness detection to neutralize spoofing threats. Your biometric hash is <span className="text-violet-600">never transmitted</span> to external servers.

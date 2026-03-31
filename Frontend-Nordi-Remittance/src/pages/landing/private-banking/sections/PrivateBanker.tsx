@@ -143,7 +143,7 @@ const PrivateBanker: React.FC = () => {
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center shadow-lg">
                   <Award className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight italic">Private Difference</h3>
+                <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight">Private Difference</h3>
               </div>
 
               <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">

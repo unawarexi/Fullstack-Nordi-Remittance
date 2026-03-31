@@ -92,7 +92,7 @@ const StatCard: React.FC<StatCardProps> = ({ stat, index }) => {
           {stat.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-2xl sm:text-4xl font-black text-neutral-900 dark:text-white tracking-tighter italic uppercase">
+          <div className="text-2xl sm:text-4xl font-black text-neutral-900 dark:text-white tracking-tighter uppercase">
             {stat.value}
           </div>
           <div className="text-[11px] sm:text-sm font-black text-neutral-500 uppercase tracking-widest mt-1">

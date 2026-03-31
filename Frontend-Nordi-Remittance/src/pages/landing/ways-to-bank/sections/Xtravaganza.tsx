@@ -152,7 +152,7 @@ const Xtravaganza: React.FC = () => {
             { value: "10K+", label: "Winners" },
           ].map((stat) => (
             <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 shadow-2xl">
-              <p className="text-xl sm:text-3xl font-black text-white tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-xl sm:text-3xl font-black text-white tabular-nums tracking-tighter">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-purple-200 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
@@ -186,7 +186,7 @@ const Xtravaganza: React.FC = () => {
               </div>
 
               <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-3xl font-black text-white italic tracking-tighter">
+                <span className="text-3xl font-black text-white tracking-tighter">
                   {tier.pointsRequired === "0" ? "FREE" : tier.pointsRequired}
                 </span>
                 <span className="text-[10px] text-white/50 font-bold uppercase tracking-widest">Points Threshold</span>
@@ -288,7 +288,7 @@ const Xtravaganza: React.FC = () => {
               ))}
             </div>
             <div className="text-center sm:text-left">
-              <p className="text-lg sm:text-xl font-black text-white uppercase tracking-tighter italic">Join 2M+ Legacy Earners</p>
+              <p className="text-lg sm:text-xl font-black text-white uppercase tracking-tighter">Join 2M+ Legacy Earners</p>
               <p className="text-xs sm:text-sm text-purple-200 font-bold uppercase tracking-widest">Your first 1,000 points await your command!</p>
             </div>
             <Button variant="secondary" size="lg" className="w-full sm:w-auto bg-white text-purple-900 font-black py-4 px-10 rounded-2xl shadow-2xl hover:scale-105 transition-transform uppercase tracking-widest text-xs">

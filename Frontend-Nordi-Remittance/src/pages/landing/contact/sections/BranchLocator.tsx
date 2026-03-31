@@ -142,7 +142,7 @@ const BranchLocator: React.FC = () => {
           {stats.map((stat) => (
             <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-teal-50 dark:bg-teal-900/10 border border-teal-100 dark:border-teal-800/30 shadow-sm hover:shadow-xl transition-all group">
               <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-teal-600 dark:text-teal-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-              <p className="text-xl sm:text-3xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-xl sm:text-3xl font-black text-neutral-900 dark:text-white tabular-nums tracking-tighter">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}

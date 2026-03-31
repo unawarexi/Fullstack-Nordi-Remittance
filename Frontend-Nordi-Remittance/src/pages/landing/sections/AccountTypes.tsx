@@ -113,10 +113,10 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, index }) => (
     {/* Header */}
     <div className="p-6 sm:p-8 pb-4 sm:pb-6">
       <div className={cn("inline-block w-12 sm:w-16 h-1.5 rounded-full mb-4 sm:mb-6 shadow-sm", account.color)} />
-      <h3 className="text-lg sm:text-2xl font-black text-neutral-900 dark:text-neutral-100 uppercase tracking-tight italic">{account.name}</h3>
+      <h3 className="text-lg sm:text-2xl font-black text-neutral-900 dark:text-neutral-100 uppercase tracking-tight">{account.name}</h3>
       <p className="text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400 font-bold opacity-80 mt-1">{account.tagline}</p>
       <div className="mt-6 sm:mt-8">
-        <span className="text-3xl sm:text-5xl font-black text-neutral-900 dark:text-neutral-100 tracking-tighter italic">{account.monthlyFee}</span>
+        <span className="text-3xl sm:text-5xl font-black text-neutral-900 dark:text-neutral-100 tracking-tighter">{account.monthlyFee}</span>
         <span className="text-[10px] sm:text-sm text-neutral-400 font-black uppercase tracking-widest ml-1">/mo</span>
       </div>
     </div>

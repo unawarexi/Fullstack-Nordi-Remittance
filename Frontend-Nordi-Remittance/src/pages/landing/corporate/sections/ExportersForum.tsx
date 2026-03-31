@@ -218,7 +218,7 @@ const ExportersForum: React.FC = () => {
                 </div>
               ))}
             </div>
-            <p className="text-[10px] sm:text-xs text-neutral-400 dark:text-neutral-500 mt-6 sm:mt-8 font-medium italic">
+            <p className="text-[10px] sm:text-xs text-neutral-400 dark:text-neutral-500 mt-6 sm:mt-8 font-medium">
               * Based on 2024 export finance volume
             </p>
           </motion.div>

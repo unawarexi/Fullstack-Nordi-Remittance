@@ -231,7 +231,7 @@ const FXProducts: React.FC = () => {
                 </div>
 
                 <div className="mt-8 sm:mt-10 pt-8 sm:pt-10 border-t border-white/10">
-                  <p className="text-[11px] sm:text-[13px] text-slate-400 mb-6 leading-relaxed font-bold italic">
+                  <p className="text-[11px] sm:text-[13px] text-slate-400 mb-6 leading-relaxed font-bold">
                     * Rates are indicative only. Contact our professional traders for live market quotes and best spreads.
                   </p>
                   <Button variant="primary" size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-base py-4 font-bold shadow-xl shadow-blue-500/20">

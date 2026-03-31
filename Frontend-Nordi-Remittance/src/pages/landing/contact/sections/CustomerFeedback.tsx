@@ -99,7 +99,7 @@ const CustomerFeedback: React.FC = () => {
         >
           {feedbackStats.map((stat) => (
             <div key={stat.label} className="text-center p-4 sm:p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 shadow-sm hover:shadow-xl transition-all">
-              <p className="text-xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tabular-nums tracking-tighter italic">{stat.value}</p>
+              <p className="text-xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 tabular-nums tracking-tighter">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{stat.label}</p>
             </div>
           ))}
@@ -239,7 +239,7 @@ const CustomerFeedback: React.FC = () => {
                 className="flex items-center gap-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200"
               >
                 <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                <span className="text-neutral-700 dark:text-neutral-200">{improvement}</span>
+                We Value <span className="text-blue-600 dark:text-blue-500">Your Feedback</span>.
               </div>
             ))}
           </div>

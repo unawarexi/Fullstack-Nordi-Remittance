@@ -72,10 +72,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
         )}
       >
         <span className="text-base">{selectedCountry.flag}</span>
-        {!compact && <span className="hidden sm:inline truncate">{selectedCountry.name}</span>}
-        <span className={cn("font-semibold text-neutral-600 dark:text-neutral-400", compact ? "inline" : "sm:hidden")}>
-          {selectedCountry.code}
-        </span>
+        <span className="truncate max-w-[120px] sm:max-w-none">{selectedCountry.name}</span>
         <ChevronDown
           size={14}
           className={cn(
