@@ -11,11 +11,7 @@ interface ProtectedRouteProps {
 
 /**
  * ProtectedRoute component - Guards routes based on authentication and roles
- * As a senior engineer, this component handles:
- * 1. Authentication check
- * 2. Role-based unauthorized access
- * 3. Loading states to prevent flicker
- * 4. Storing attempted URL for post-login redirect
+ * Storing attempted URL for post-login redirect
  */
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
@@ -25,7 +21,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, user, isInitialized } = useAuthStore();
   const location = useLocation();
 
-  // Show loader while checking auth state on mount
   if (!isInitialized) {
     return <PageLoader />;
   }
@@ -38,9 +33,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // authenticated but role not allowed? Redirect to previous or home
   if (allowedRoles && user && user.role && !allowedRoles.includes(user.role)) {
     // If user is trying to access admin but is not admin, or vice versa
-    const fallbackPath =
-      user.role === "admin" ? "/admin/dashboard" : "/customer/dashboard";
-    
+    const fallbackPath = user.role === "admin" ? "/admin/dashboard" : "/customer/dashboard";
+
     // Prevent infinite redirect loop: only redirect if going to a DIFFERENT path
     if (fallbackPath !== location.pathname) {
       return <Navigate to={fallbackPath} replace />;

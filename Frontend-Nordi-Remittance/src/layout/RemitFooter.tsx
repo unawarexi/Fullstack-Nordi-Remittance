@@ -127,17 +127,19 @@ const RemitFooter: React.FC = () => {
   const { isMdUp, isLgUp } = useBreakpoint();
 
   return (
-    <footer className="relative">
-      {/* Background Image - Hidden on mobile */}
-      {isLgUp && (
-        <div className="pointer-events-none absolute bottom-0 right-0 opacity-30">
-          <img src={Images.FooterImg} alt="footer decoration" className="h-auto w-[300px] lg:w-[400px] xl:w-[500px]" />
-        </div>
-      )}
-
+    <footer className="relative overflow-hidden">
       {/* Main Footer */}
       <section className="relative z-10 bg-slate-800/95 backdrop-blur-sm transition-colors duration-300 dark:bg-neutral-900/95">
-        <Container>
+        {/* Background Image - Now visible on all screens */}
+        <div className="pointer-events-none absolute bottom-0 right-0 z-0 opacity-80">
+          <img
+            src={Images.FooterImg}
+            alt="footer decoration"
+            className="h-auto w-[250px] opacity-100 dark:opacity-80 sm:w-[300px] lg:w-[400px] xl:w-[500px]"
+          />
+        </div>
+
+        <Container className="relative z-10">
           <div className="py-12 sm:py-16 md:py-20 lg:py-24">
             {/* Footer Grid */}
             <div className={cn("grid gap-8", "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5")}>

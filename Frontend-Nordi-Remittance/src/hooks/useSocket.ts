@@ -17,16 +17,8 @@ import { WS, type WSEventName } from "../core/events/ws-events";
 /**
  * Subscribe to a single WebSocket event. Handler is stable-referenced via
  * useRef so re-renders don't cause resubscriptions.
- *
- * @example
- * useSocketEvent(WS.TRANSACTION.RECEIVED, (data) => {
- *   console.log('Got money!', data);
- * });
  */
-export function useSocketEvent<T = unknown>(
-  event: WSEventName | string,
-  handler: (data: T) => void,
-) {
+export function useSocketEvent<T = unknown>(event: WSEventName | string, handler: (data: T) => void) {
   const handlerRef = useRef(handler);
   handlerRef.current = handler;
   const isConnected = useSocketStore((s) => s.isConnected);
@@ -196,13 +188,10 @@ export function useRealtimeNotifications() {
   const queryClient = useQueryClient();
   const showToast = useToastStore((s) => s.showToast);
 
-  useSocketEvent<{ title?: string; message?: string }>(
-    WS.NOTIFICATION.NEW,
-    (data) => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      showToast(data.message || data.title || "New notification", "info");
-    },
-  );
+  useSocketEvent<{ title?: string; message?: string }>(WS.NOTIFICATION.NEW, (data) => {
+    queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    showToast(data.message || data.title || "New notification", "info");
+  });
 
   // Multi-device sync: another tab marked all read
   useSocketEvent(WS.NOTIFICATION.ALL_READ, () => {
@@ -257,14 +246,11 @@ export function useAdminRealtimeEvents() {
   const showToast = useToastStore((s) => s.showToast);
 
   // User management
-  useSocketEvent<{ userId?: string; status?: string }>(
-    WS.ADMIN.USER_STATUS_CHANGED,
-    (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      showToast(`User status changed to ${data.status || "updated"}`, "info");
-    },
-  );
+  useSocketEvent<{ userId?: string; status?: string }>(WS.ADMIN.USER_STATUS_CHANGED, (data) => {
+    queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+    queryClient.invalidateQueries({ queryKey: ["users"] });
+    showToast(`User status changed to ${data.status || "updated"}`, "info");
+  });
 
   // System settings broadcast
   useSocketEvent(WS.ADMIN.SETTING_UPDATED, () => {
@@ -272,17 +258,11 @@ export function useAdminRealtimeEvents() {
   });
 
   // KYC document uploads — admin needs to review
-  useSocketEvent<{ userId?: string; documentType?: string }>(
-    WS.KYC.DOCUMENT_UPLOADED,
-    (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "kyc"] });
-      queryClient.invalidateQueries({ queryKey: ["attachments"] });
-      showToast(
-        `New KYC document uploaded${data.documentType ? `: ${data.documentType}` : ""}`,
-        "info",
-      );
-    },
-  );
+  useSocketEvent<{ userId?: string; documentType?: string }>(WS.KYC.DOCUMENT_UPLOADED, (data) => {
+    queryClient.invalidateQueries({ queryKey: ["admin", "kyc"] });
+    queryClient.invalidateQueries({ queryKey: ["attachments"] });
+    showToast(`New KYC document uploaded${data.documentType ? `: ${data.documentType}` : ""}`, "info");
+  });
 
   // Fraud signals
   useSocketEvent(WS.FRAUD.CASE_CREATED, () => {
@@ -332,31 +312,25 @@ export function useUserRealtimeEvents() {
   const updateUser = useAuthStore((s) => s.updateUser);
 
   // Admin funded the user's wallet
-  useSocketEvent<{ walletId?: string; amount?: number; currency?: string }>(
-    WS.ADMIN.WALLET_FUND,
-    (data) => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      showToast(
-        data.amount
-          ? `Your account has been credited ${data.currency || ""} ${data.amount}`
-          : "Your account has been funded",
-        "success",
-      );
-    },
-  );
+  useSocketEvent<{ walletId?: string; amount?: number; currency?: string }>(WS.ADMIN.WALLET_FUND, (data) => {
+    queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    showToast(
+      data.amount
+        ? `Your account has been credited ${data.currency || ""} ${data.amount}`
+        : "Your account has been funded",
+      "success",
+    );
+  });
 
   // Admin changed user status (suspended / activated)
-  useSocketEvent<{ status?: string }>(
-    WS.ADMIN.USER_STATUS_CHANGED,
-    (data) => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      if (data.status === "suspended") {
-        showToast("Your account has been suspended. Contact support.", "error");
-      } else if (data.status === "active") {
-        showToast("Your account is now active!", "success");
-      }
-    },
-  );
+  useSocketEvent<{ status?: string }>(WS.ADMIN.USER_STATUS_CHANGED, (data) => {
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    if (data.status === "suspended") {
+      showToast("Your account has been suspended. Contact support.", "error");
+    } else if (data.status === "active") {
+      showToast("Your account is now active!", "success");
+    }
+  });
 
   // KYC reviewed by admin
   useSocketEvent<{ status?: string }>(WS.KYC.STATUS_UPDATED, (data) => {
@@ -366,9 +340,7 @@ export function useUserRealtimeEvents() {
       updateUser({ kycStatus: data.status });
     }
     showToast(
-      data.status === "verified"
-        ? "Your identity has been verified!"
-        : `KYC status updated: ${data.status}`,
+      data.status === "verified" ? "Your identity has been verified!" : `KYC status updated: ${data.status}`,
       data.status === "verified" ? "success" : "info",
     );
   });

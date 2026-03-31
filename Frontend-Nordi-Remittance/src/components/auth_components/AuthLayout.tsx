@@ -97,7 +97,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         className="flex w-full flex-col justify-center bg-slate-50 p-6 transition-colors duration-300 dark:bg-neutral-900 md:w-1/2 md:p-10 lg:w-[55%] lg:p-16"
       >
         {/* Header */}
-        <div className="mb-6 flex w-full items-center justify-between">
+        <div className="mb-6 flex w-full items-center justify-between pt-6 md:pt-0">
           <Link to="/" className="group flex items-center gap-3">
             <Logo size="sm" className="md:hidden" />
             <Logo size="md" className="hidden md:flex" />
