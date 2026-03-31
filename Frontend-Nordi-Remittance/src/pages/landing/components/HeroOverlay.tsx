@@ -23,29 +23,29 @@ interface HeroOverlayProps {
 
 const HeroOverlay: React.FC<HeroOverlayProps> = ({ slideIndex }) => {
   return (
-    <div className="absolute right-0 top-0 bottom-0 z-10 hidden md:block pointer-events-none">
+    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
       {/* Right column - stacked stat cards */}
-      <div className="absolute right-4 lg:right-10 xl:right-16 top-1/2 -translate-y-1/2 flex flex-col gap-3 lg:gap-4">
+      <div className="absolute right-3 sm:right-4 lg:right-10 xl:right-16 top-1/4 sm:top-1/2 -translate-y-1/4 sm:-translate-y-1/2 flex flex-col gap-2 sm:gap-3 lg:gap-4 items-end">
         {/* Portfolio Growth */}
         <motion.div
           key={`growth-${slideIndex}`}
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 lg:p-4 border border-white/15 w-48 lg:w-56"
+          className="bg-white/10 backdrop-blur-md rounded-lg sm:rounded-xl p-2 sm:p-3.5 lg:p-4 border border-white/15 w-[140px] sm:w-48 lg:w-56"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" />
+          <div className="flex items-center gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-md sm:rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-emerald-400" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/50 uppercase tracking-wider">Portfolio Growth</p>
-              <p className="text-base lg:text-lg font-bold text-white">+24.8%</p>
+              <p className="text-[7.5px] sm:text-[10px] text-white/50 uppercase tracking-wider">Portfolio Growth</p>
+              <p className="text-xs sm:text-base lg:text-lg font-bold text-white">+24.8%</p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-            <span className="text-[11px] text-emerald-400">+3.2% this week</span>
+          <div className="flex items-center gap-0.5 sm:gap-1">
+            <ArrowUpRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
+            <span className="text-[8.5px] sm:text-[11px] text-emerald-400">+3.2% this week</span>
           </div>
         </motion.div>
 
@@ -55,11 +55,11 @@ const HeroOverlay: React.FC<HeroOverlayProps> = ({ slideIndex }) => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 lg:p-4 border border-white/15 w-48 lg:w-56"
+          className="bg-white/10 backdrop-blur-md rounded-lg sm:rounded-xl p-2 sm:p-3.5 lg:p-4 border border-white/15 w-[140px] sm:w-48 lg:w-56 hidden sm:block"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-              <Globe className="w-4 h-4 lg:w-5 lg:h-5 text-amber-400" />
+          <div className="flex items-center gap-1.5 sm:gap-3 mb-1 sm:mb-2">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-md sm:rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-amber-400" />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] text-white/50 uppercase tracking-wider">Global Transfers</p>
@@ -80,18 +80,18 @@ const HeroOverlay: React.FC<HeroOverlayProps> = ({ slideIndex }) => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.7 }}
-          className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 lg:p-4 border border-white/15 w-48 lg:w-56"
+          className="bg-white/10 backdrop-blur-md rounded-lg sm:rounded-xl p-2 sm:p-3.5 lg:p-4 border border-white/15 w-[140px] sm:w-48 lg:w-56"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-              <Shield className="w-4 h-4 lg:w-5 lg:h-5 text-violet-400" />
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-md sm:rounded-lg bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-violet-400" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/50 uppercase tracking-wider">Security Level</p>
-              <p className="text-base lg:text-lg font-bold text-white">Bank-Grade</p>
+              <p className="text-[7.5px] sm:text-[10px] text-white/50 uppercase tracking-wider">Security Level</p>
+              <p className="text-xs sm:text-base lg:text-lg font-bold text-white">Bank-Grade</p>
             </div>
           </div>
-          <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="mt-1.5 sm:mt-2 h-1 sm:h-1.5 rounded-full bg-white/10 overflow-hidden">
             <motion.div
               initial={{ width: '0%' }}
               animate={{ width: '95%' }}
@@ -107,11 +107,11 @@ const HeroOverlay: React.FC<HeroOverlayProps> = ({ slideIndex }) => {
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.9 }}
-          className="bg-white/10 backdrop-blur-md rounded-xl p-3.5 lg:p-4 border border-white/15 w-48 lg:w-56"
+          className="bg-white/10 backdrop-blur-md rounded-lg sm:rounded-xl p-2 sm:p-3.5 lg:p-4 border border-white/15 w-[140px] sm:w-48 lg:w-56 hidden sm:block"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-lg bg-sky-500/20 flex items-center justify-center flex-shrink-0">
-              <Users className="w-4 h-4 lg:w-5 lg:h-5 text-sky-400" />
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-md sm:rounded-lg bg-sky-500/20 flex items-center justify-center flex-shrink-0">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-sky-400" />
             </div>
             <div className="min-w-0">
               <p className="text-[10px] text-white/50 uppercase tracking-wider">Active Users</p>

@@ -110,7 +110,7 @@ const Banner: React.FC = () => {
   const { isMdUp } = useBreakpoint();
 
   return (
-    <Section className="relative py-12 sm:py-16 md:py-24 overflow-hidden">
+    <Section className="relative py-8 sm:py-12 md:py-16 lg:py-24 overflow-hidden">
       <Container>
         {/* Section Header */}
         <motion.div
@@ -118,15 +118,15 @@ const Banner: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-10 sm:mb-16 md:mb-20 text-center"
+          className="mb-8 sm:mb-12 md:mb-16 lg:mb-20 text-center"
         >
-          <span className="text-xs sm:text-sm font-semibold tracking-wider text-indigo-500 uppercase">
+          <span className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider text-indigo-500 uppercase">
             Driving Growth & Sustainability
           </span>
-          <h2 className="mt-2 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
+          <h2 className="mt-2 text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
             Empowering Businesses with Smart Financial Solutions
           </h2>
-          <p className="mt-3 sm:mt-4 mx-auto max-w-2xl text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed px-4">
+          <p className="mt-2 sm:mt-4 mx-auto max-w-2xl text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed px-2 sm:px-4">
             Whether you're scaling your business or seeking sustainable banking
             practices, we offer tailor-made solutions to meet your unique needs.
           </p>
@@ -165,10 +165,10 @@ const Banner: React.FC = () => {
         {/* Service Cards - Responsive positioning */}
         <div className={cn(
           "relative",
-          isMdUp ? "-mt-16 sm:-mt-20 md:-mt-28 lg:-mt-32" : "mt-8"
+          isMdUp ? "-mt-16 sm:-mt-20 md:-mt-28 lg:-mt-32" : "mt-6 sm:mt-8"
         )}>
           <div className={cn(
-            "rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8",
+            "rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-8",
             "bg-amber-50 dark:bg-amber-900/20 backdrop-blur-md",
             "border border-amber-200/30 dark:border-amber-700/30"
           )}>

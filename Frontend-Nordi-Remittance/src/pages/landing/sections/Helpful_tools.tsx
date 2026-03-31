@@ -31,32 +31,32 @@ interface ToolItem {
 const HelpfulData: ToolItem[] = [
   { 
     title: '*901# Banking', 
-    icon: <Smartphone className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Smartphone className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: 'Quick USSD banking'
   },
   { 
     title: 'ATM & Branch Locator', 
-    icon: <MapPin className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <MapPin className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: 'Find nearest branch'
   },
   { 
     title: 'HELP', 
-    icon: <HelpCircle className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <HelpCircle className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: '24/7 customer support'
   },
   { 
     title: 'More Xtravaganza', 
-    icon: <Gift className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Gift className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: 'Rewards & benefits'
   },
   { 
     title: 'Instant Savings', 
-    icon: <PiggyBank className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <PiggyBank className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: 'Open account instantly'
   },
   { 
     title: 'Whistle Blower', 
-    icon: <Flag className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Flag className="w-5 h-5 sm:w-7 sm:h-7" />,
     description: 'Report issues safely'
   },
 ];
@@ -79,7 +79,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => {
       whileHover={{ scale: 1.05, y: -5 }}
       className={cn(
         "flex flex-col items-center justify-center",
-        "h-28 sm:h-32 md:h-36 lg:h-40 p-3 sm:p-4",
+        "h-24 sm:h-32 md:h-36 lg:h-40 p-2 sm:p-4",
         "bg-white dark:bg-neutral-900",
         "rounded-xl sm:rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-neutral-900/50",
         "border border-neutral-100 dark:border-neutral-800",
@@ -89,7 +89,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => {
       )}
     >
       <div className={cn(
-        "p-2.5 sm:p-3 rounded-full mb-2 sm:mb-3",
+        "p-2 sm:p-3 rounded-full mb-1.5 sm:mb-3",
         "bg-primary-50 dark:bg-primary-900/20",
         "text-primary-600 dark:text-primary-400",
         "group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40",
@@ -142,10 +142,10 @@ const Helpful_tools: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-6 sm:mb-8"
         >
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
+          <h3 className="text-base sm:text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
             Helpful <span className="text-primary-600 dark:text-primary-400">Tools</span>
           </h3>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+          <p className="text-[10px] sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             Quick access to our most popular services
           </p>
         </motion.div>

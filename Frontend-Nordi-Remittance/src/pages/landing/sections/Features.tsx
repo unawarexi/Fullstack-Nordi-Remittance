@@ -21,8 +21,8 @@ function Features() {
 
         <section className="container relative z-10 mt-4 flex h-auto flex-col items-center gap-6 px-6 sm:gap-8 md:flex-row md:gap-4 lg:px-10 xl:m-auto xl:gap-0 xl:overflow-hidden">
           {/* Text and glassmorphism effect */}
-          <div className="bg-white dark:bg-neutral-800 rounded-lg bg-opacity-30 p-6 text-center shadow-lg shadow-blue-600 backdrop-blur-lg sm:w-full md:w-1/2 md:text-left">
-            <h1 className="text-3xl font-semibold text-blue-500 sm:text-4xl md:text-5xl">
+          <div className="bg-white dark:bg-neutral-800 rounded-lg bg-opacity-30 p-4 sm:p-6 text-center shadow-lg shadow-blue-600 backdrop-blur-lg sm:w-full md:w-1/2 md:text-left">
+            <h1 className="text-2xl font-semibold text-blue-500 sm:text-4xl md:text-5xl">
               <span className="text-amber-500">Receive payments</span> the smart
               way
             </h1>
@@ -63,7 +63,7 @@ function Features() {
           className="container relative z-10 flex flex-col gap-8 px-6 pt-8 lg:px-10 xl:m-auto xl:pt-16"
         >
           <article className="text-gray-400 dark:text-neutral-500 m-auto w-[25ch] text-center md:m-0 md:w-full">
-            <h2 className="text-gray-700 dark:text-neutral-200 mb-3 text-3xl font-semibold">
+            <h2 className="text-gray-700 dark:text-neutral-200 mb-2 sm:mb-3 text-xl sm:text-3xl font-semibold">
               Make every penny count
             </h2>
             <p className="text-sm">
@@ -76,8 +76,8 @@ function Features() {
 
           <article className="flex w-full flex-col gap-6 overflow-hidden xl:h-96 xl:flex-row">
             <div className="flex flex-col rounded-2xl bg-slate-100 dark:bg-neutral-700 px-4 sm:px-0 md:flex-row md:gap-6 xl:w-2/3">
-              <div className="mt-8 flex flex-col justify-center gap-4 text-center sm:mx-8 md:mx-0 md:ml-8 md:w-1/2 md:text-left">
-                <h2 className="text-gray-700 dark:text-neutral-200 m-auto text-center text-2xl font-semibold sm:w-[16ch] md:m-0 md:text-left">
+              <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:gap-4 text-center sm:mx-8 md:mx-0 md:ml-8 md:w-1/2 md:text-left">
+                <h2 className="text-gray-700 dark:text-neutral-200 m-auto text-center text-lg sm:text-2xl font-semibold sm:w-[16ch] md:m-0 md:text-left">
                   Receive Pay with{" "}
                   <span className="text-lime-500">Nordea Remittance,</span>{" "}
                   quick, simple and easy
@@ -94,11 +94,11 @@ function Features() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center gap-4 rounded-2xl bg-slate-200 p-8 xl:w-1/3">
-              <div className="w-fit rounded-full bg-slate-300 dark:bg-neutral-600 p-4">
-                <img src={ShieldCheck} alt="Shield Check" />
+            <div className="flex flex-col justify-center gap-3 sm:gap-4 rounded-2xl bg-slate-200 p-5 sm:p-8 xl:w-1/3">
+              <div className="w-fit rounded-full bg-slate-300 dark:bg-neutral-600 p-3 sm:p-4">
+                <img src={ShieldCheck} alt="Shield Check" className="w-8 h-8 sm:w-auto sm:h-auto" />
               </div>
-              <h2 className="text-gray-700 dark:text-neutral-200 text-2xl font-semibold">
+              <h2 className="text-gray-700 dark:text-neutral-200 text-lg sm:text-2xl font-semibold">
                 Bank-level security
               </h2>
               <p className="text-gray-500 dark:text-neutral-400 text-sm">
@@ -109,11 +109,11 @@ function Features() {
           </article>
 
           <article className="flex w-full flex-col gap-6 xl:h-96 xl:flex-row">
-            <div className="flex flex-col justify-center gap-4 rounded-2xl  bg-slate-200 p-8 xl:w-1/3">
-              <div className="w-fit rounded-full bg-slate-300 dark:bg-neutral-600 p-4">
-                <img src={Coins} alt="Coins" />
+            <div className="flex flex-col justify-center gap-3 sm:gap-4 rounded-2xl  bg-slate-200 p-5 sm:p-8 xl:w-1/3">
+              <div className="w-fit rounded-full bg-slate-300 dark:bg-neutral-600 p-3 sm:p-4">
+                <img src={Coins} alt="Coins" className="w-8 h-8 sm:w-auto sm:h-auto" />
               </div>
-              <h2 className="text-gray-700 dark:text-neutral-200 text-2xl font-semibold">
+              <h2 className="text-gray-700 dark:text-neutral-200 text-lg sm:text-2xl font-semibold">
                 Cost reduction
               </h2>
               <p className="text-gray-500 dark:text-neutral-400 text-sm">
@@ -123,8 +123,8 @@ function Features() {
             </div>
 
             <div className="flex flex-col gap-6 overflow-hidden rounded-2xl bg-slate-100 dark:bg-neutral-700 px-4 sm:px-0 md:flex-row md:gap-6 xl:w-2/3">
-              <div className="mt-8 flex flex-col justify-center gap-4 text-center sm:mx-8 md:mx-0 md:ml-8 md:mt-0 md:w-1/2 md:text-left">
-                <h2 className="text-gray-700 dark:text-neutral-200 m-auto text-center text-2xl font-semibold sm:w-[16ch] md:m-0 md:text-left">
+              <div className="mt-6 sm:mt-8 flex flex-col justify-center gap-3 sm:gap-4 text-center sm:mx-8 md:mx-0 md:ml-8 md:mt-0 md:w-1/2 md:text-left">
+                <h2 className="text-gray-700 dark:text-neutral-200 m-auto text-center text-lg sm:text-2xl font-semibold sm:w-[16ch] md:m-0 md:text-left">
                   Send, <span className="text-blue-500">receive,</span> and
                   exchange money
                 </h2>

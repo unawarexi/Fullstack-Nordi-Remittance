@@ -115,7 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.06 }}
     className={cn(
-      "group relative p-5 rounded-xl",
+      "group relative p-4 sm:p-5 rounded-xl",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-200 dark:border-neutral-700 transition-all duration-300"
     )}
@@ -123,18 +123,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
     {/* Icon */}
     <div
       className={cn(
-        "inline-flex p-3 rounded-lg text-white mb-4",
+        "inline-flex p-2.5 sm:p-3 rounded-lg text-white mb-3 sm:mb-4",
         product.color
       )}
     >
-      {product.icon}
+      {React.cloneElement(product.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
     </div>
 
     {/* Content */}
-    <h3 className="font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+    <h3 className="font-semibold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
       {product.title}
     </h3>
-    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{product.description}</p>
+    <p className="mt-1 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">{product.description}</p>
 
     {/* Features */}
     <ul className="mt-4 space-y-1.5">
@@ -165,7 +165,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => (
 // ========================
 const Products: React.FC = () => {
   return (
-    <Section background="light" className="py-12 lg:py-16">
+    <Section background="light" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
         <motion.div
@@ -174,13 +174,13 @@ const Products: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-10"
         >
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+          <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
             Products & Services
           </span>
-          <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
             Everything You Need in One Place
           </h2>
-          <p className="mt-2 text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
             From everyday banking to long-term investments, we have the right solutions for every stage of life.
           </p>
         </motion.div>

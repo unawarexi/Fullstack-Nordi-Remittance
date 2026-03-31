@@ -118,7 +118,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
     viewport={{ once: true }}
     transition={{ duration: 0.4, delay: index * 0.1 }}
     className={cn(
-      "relative p-6 rounded-xl h-full",
+      "relative p-4 sm:p-5 md:p-6 rounded-xl h-full",
       "bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700",
       "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-shadow duration-300"
     )}
@@ -163,22 +163,22 @@ const Testimonials: React.FC = () => {
   );
 
   return (
-    <Section background="white" className="py-12 lg:py-16">
+    <Section background="white" className="py-8 sm:py-12 lg:py-16">
       <Container size="xl">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-10">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8 sm:mb-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-3">
+            <span className="inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-full mb-2 sm:mb-3">
               Testimonials
             </span>
-            <h2 className="text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
               What Our Customers Say
             </h2>
-            <p className="mt-2 text-neutral-600 dark:text-neutral-300 max-w-xl">
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 max-w-xl">
               Real stories from real customers who trust us with their financial journey.
             </p>
           </motion.div>

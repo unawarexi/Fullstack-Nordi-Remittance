@@ -87,17 +87,17 @@ const CtaCard: React.FC<CtaCardProps> = ({ item, index }) => {
         "group-hover:bg-transparent",
         "transition-all duration-500"
       )}>
-        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mb-3 sm:mb-4">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 mb-2 sm:mb-4">
           <img
             src={item.icon}
             alt={item.title}
             className="w-full h-full object-contain"
           />
         </div>
-        <h3 className="text-sm sm:text-base md:text-lg font-bold text-white">
+        <h3 className="text-xs sm:text-sm md:text-lg font-bold text-white leading-tight">
           {item.title}
         </h3>
-        <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-white/80 hidden sm:block">
+        <p className="mt-1 sm:mt-2 text-[10px] sm:text-sm text-white/80 hidden sm:block">
           {item.description}
         </p>
       </div>
@@ -144,19 +144,19 @@ const CtaSection: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <Section className="relative z-10 py-16 sm:py-20 md:py-28 lg:py-32">
+      <Section className="relative z-10 py-10 sm:py-16 md:py-20 lg:py-32">
         <Container>
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-8 sm:mb-12 md:mb-16"
+            className="text-center mb-6 sm:mb-10 md:mb-16"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
               <span className="text-amber-500">Nordea more</span> ways to bank.
             </h2>
-            <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base text-neutral-600 dark:text-neutral-400 px-4">
+            <p className="mt-2 sm:mt-4 max-w-xl mx-auto text-xs sm:text-sm md:text-base text-neutral-600 dark:text-neutral-400 px-2 sm:px-4">
               The less time you spend in a bank, the more time you have for yourself. 
               Choose from a variety of easy and secure ways to manage your money.
             </p>

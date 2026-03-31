@@ -136,18 +136,18 @@ const HeroCarousel: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
                   className={cn(
-                    "max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl",
-                    "p-4 sm:p-6 md:p-8 lg:p-10",
-                    "bg-white/5 backdrop-blur-sm",
-                    "border border-white/10 rounded-xl sm:rounded-2xl"
+                    "max-w-[90%] sm:max-w-xl md:max-w-2xl lg:max-w-3xl",
+                    "p-3 sm:p-6 md:p-8 lg:p-10",
+                    "bg-white/5 sm:bg-white/10 backdrop-blur-[2px] sm:backdrop-blur-md",
+                    "border border-white/10 rounded-lg sm:rounded-2xl"
                   )}
                 >
                   {/* Heading */}
                   <h1
                     className={cn(
                       "font-bold text-white leading-tight",
-                      "text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl",
-                      "mb-3 sm:mb-4 md:mb-6"
+                      "text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl",
+                      "mb-2 sm:mb-4 md:mb-6"
                     )}
                   >
                     {slides[currentIndex].heading}
@@ -156,10 +156,10 @@ const HeroCarousel: React.FC = () => {
                   {/* Description */}
                   <p
                     className={cn(
-                      "text-neutral-300 leading-relaxed",
-                      "text-sm sm:text-base md:text-lg",
-                      "mb-4 sm:mb-6 md:mb-8",
-                      "line-clamp-3 sm:line-clamp-none"
+                      "text-neutral-300 leading-relaxed sm:leading-relaxed",
+                      "text-xs sm:text-base md:text-lg",
+                      "mb-3 sm:mb-6 md:mb-8",
+                      "line-clamp-3 sm:line-clamp-none max-w-[85%] sm:max-w-full"
                     )}
                   >
                     {slides[currentIndex].description}
@@ -168,10 +168,10 @@ const HeroCarousel: React.FC = () => {
                   {/* CTA Button */}
                   <Button
                     size={isMobile ? "sm" : "md"}
-                    className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500 text-white"
+                    className="bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500 text-white text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4"
                   >
                     Nordea Access
-                    <ArrowRight className="ml-2 w-4 h-4" />
+                    <ArrowRight className="ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </motion.div>
               </div>
