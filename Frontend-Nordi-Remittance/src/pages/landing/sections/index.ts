@@ -8,7 +8,7 @@ export { default as Contents } from './Contents';
 export { default as Services } from './Services';
 export { default as Banner } from './Banner';
 export { default as HelpfulTools } from './Helpful_tools';
-export { default as FAQ } from './FAQ';
+// FAQ section placeholder - to be implemented
 export { default as Features } from './Features';
 export { default as Team } from './Team';
 export { default as Cta } from './Cta';

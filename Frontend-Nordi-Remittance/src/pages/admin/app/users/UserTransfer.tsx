@@ -463,7 +463,7 @@ const UserTransfer = () => {
                 key={card.id}
                 
                 size="md"
-                isHoverable
+                hoverable
                 className={`${
                   card.status === 'blocked' ? (isDarkMode ? 'border-red-800' : 'border-red-200') : 
                   card.status === 'expired' ? borderColorAlt : ''
@@ -597,7 +597,7 @@ const UserTransfer = () => {
                 key={account.id}
                 
                 size="md"
-                isHoverable
+                hoverable
                 className={`${
                   account.status === 'blocked' ? (isDarkMode ? 'border-red-800' : 'border-red-200') : 
                   account.status === 'suspended' ? (isDarkMode ? 'border-orange-800' : 'border-orange-200') : ''
@@ -707,7 +707,7 @@ const UserTransfer = () => {
                 key={loan.id}
                 
                 size="md"
-                isHoverable
+                hoverable
                 className={`${
                   loan.status === 'defaulted' ? (isDarkMode ? 'border-red-800' : 'border-red-200') : 
                   loan.status === 'paused' ? (isDarkMode ? 'border-orange-800' : 'border-orange-200') : 
@@ -799,7 +799,7 @@ const UserTransfer = () => {
                 key={investment.id}
                 
                 size="md"
-                isHoverable
+                hoverable
                 className={`${
                   investment.status === 'withdrawn' ? borderColorAlt : 
                   investment.status === 'matured' ? (isDarkMode ? 'border-purple-800' : 'border-purple-200') : ''
@@ -898,7 +898,7 @@ const UserTransfer = () => {
                 key={wallet.id}
                 
                 size="md"
-                isHoverable
+                hoverable
                 className={`${
                   wallet.status === 'blocked' ? (isDarkMode ? 'border-red-800' : 'border-red-200') : ''
                 }`}

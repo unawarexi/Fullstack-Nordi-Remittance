@@ -34,9 +34,6 @@ import BusinessBanking from "@pages/landing/sections/BusinessBanking";
 import CompareCards from "@pages/landing/sections/CompareCards";
 
 // Lazy load non-critical routes
-const ConfirmID = lazy(
-  () => import("@pages/landing/sections/confirmation/ConfirmID"),
-);
 const Auth = lazy(() => import("@pages/auth/ExportAuth"));
 
 // Landing Page Routes - Lazy loaded
@@ -101,7 +98,6 @@ export const LandingRoutes = () => {
       <Route path="/ways-to-bank/*" element={<WaysToBankPage />} />
       <Route path="/contact/*" element={<ContactPage />} />
       <Route path="/auth/:page" element={<Auth />} />
-      <Route path="/verification" element={<ConfirmID />} />
     </Routes>
   );
 };

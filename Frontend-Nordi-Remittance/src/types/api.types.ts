@@ -344,6 +344,7 @@ declare global {
   }
 
   interface TransactionFilters {
+    [key: string]: unknown;
     type?: TransactionType | TransactionType[];
     status?: TransactionStatus | TransactionStatus[];
     currency?: Currency;

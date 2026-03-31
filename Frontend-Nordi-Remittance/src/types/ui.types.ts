@@ -74,15 +74,15 @@ declare global {
   // CARD TYPES
   // ============================================================================
 
-  type CardVariant = "elevated" | "outline" | "filled" | "ghost";
-  type CardSize = "sm" | "md" | "lg";
+  type CardVariant = "default" | "elevated" | "outlined" | "filled" | "glass";
+  type CardSize = "sm" | "md" | "lg" | "xl";
 
   interface CardProps extends BaseProps {
     variant?: CardVariant;
     size?: CardSize;
-    isHoverable?: boolean;
-    isClickable?: boolean;
-    isPressable?: boolean;
+    hoverable?: boolean;
+    clickable?: boolean;
+    noPadding?: boolean;
     children: ReactNode;
     onClick?: () => void;
   }

@@ -195,29 +195,24 @@ const InvestmentManagement: React.FC = () => {
                   </div>
                 </div>
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  {assetClasses.reduce((acc, asset, i) => {
-                    const prev = i === 0 ? 0 : acc;
+                  {assetClasses.map((asset, i) => {
+                    const offset = assetClasses.slice(0, i).reduce((sum, a) => sum + parseInt(a.allocation), 0);
                     const value = parseInt(asset.allocation);
-                    const strokeDasharray = `${value} ${100 - value}`;
-                    const strokeDashoffset = -prev;
                     return (
-                      <>
-                        <circle
-                          key={asset.name}
-                          cx="50"
-                          cy="50"
-                          r="40"
-                          fill="transparent"
-                          stroke="currentColor"
-                          className={asset.color.replace('bg-', 'text-')}
-                          strokeWidth="20"
-                          strokeDasharray={strokeDasharray}
-                          strokeDashoffset={strokeDashoffset}
-                        />
-                        {prev + value}
-                      </>
+                      <circle
+                        key={asset.name}
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="transparent"
+                        stroke="currentColor"
+                        className={asset.color.replace('bg-', 'text-')}
+                        strokeWidth="20"
+                        strokeDasharray={`${value} ${100 - value}`}
+                        strokeDashoffset={-offset}
+                      />
                     );
-                  }, 0)}
+                  })}
                 </svg>
               </div>
             </div>

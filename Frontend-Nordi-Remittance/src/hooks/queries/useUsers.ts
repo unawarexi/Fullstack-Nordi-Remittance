@@ -405,24 +405,7 @@ export const useUpdateUserNotificationPreferences = () => {
   const { showToast } = useToastStore();
 
   return useMutation({
-    mutationFn: async (data: {
-      email?: {
-        transactions?: boolean;
-        security?: boolean;
-        marketing?: boolean;
-        account?: boolean;
-      };
-      push?: {
-        transactions?: boolean;
-        security?: boolean;
-        marketing?: boolean;
-        account?: boolean;
-      };
-      sms?: {
-        transactions?: boolean;
-        security?: boolean;
-      };
-    }) => {
+    mutationFn: async (data: Partial<NotificationPreferences>) => {
       const response = await usersApi.updateNotificationPreferences(data);
       return response.data;
     },

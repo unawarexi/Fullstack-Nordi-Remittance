@@ -32,28 +32,28 @@ const teamMembers: TeamMember[] = [
   {
     name: 'Sarah Johnson',
     role: 'Chief Executive Officer',
-    image: Images.team1,
+    image: Images.Team1,
     bio: 'Leading Nordea Remit with 15+ years of fintech experience.',
     social: { linkedin: '#', twitter: '#' },
   },
   {
     name: 'Michael Chen',
     role: 'Chief Technology Officer',
-    image: Images.team2,
+    image: Images.Team2,
     bio: 'Building the future of secure money transfers.',
     social: { linkedin: '#', twitter: '#' },
   },
   {
     name: 'Emily Rodriguez',
     role: 'Head of Operations',
-    image: Images.team3,
+    image: Images.Team3,
     bio: 'Ensuring seamless transactions across 150+ countries.',
     social: { linkedin: '#' },
   },
   {
     name: 'David Kim',
     role: 'Head of Security',
-    image: Images.team4,
+    image: Images.Team4,
     bio: 'Protecting your money with world-class security.',
     social: { linkedin: '#', email: '#' },
   },
@@ -163,7 +163,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
 // ========================
 export const TeamSection: React.FC = () => {
   return (
-    <Section id="team" background="muted" size="lg">
+    <Section id="team" background="light" size="lg">
       <Container>
         {/* Section Header */}
         <motion.div
