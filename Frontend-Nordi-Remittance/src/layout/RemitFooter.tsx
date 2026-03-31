@@ -138,7 +138,7 @@ const RemitFooter: React.FC = () => {
       </div>
 
       {/* Main Footer */}
-      <section className="relative z-10 bg-slate-800/40 backdrop-blur-md transition-colors duration-300 dark:bg-neutral-900/40">
+      <section className="relative z-10 bg-slate-800/90 backdrop-blur-md transition-colors duration-300 dark:bg-neutral-900/40">
         <Container>
           <div className="py-12 sm:py-16 md:py-20 lg:py-24">
             {/* Footer Grid */}
