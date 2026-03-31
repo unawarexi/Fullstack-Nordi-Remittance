@@ -1,0 +1,101 @@
+# ============================================================================
+# NORDI REMITTANCE — FULL-STACK DOCKER COMPOSE (Development)
+# Run: docker-compose up --build
+# ============================================================================
+
+version: "3.9"
+
+services:
+  # ── Frontend (Vite Dev Server) ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./Frontend-Nordi-Remittance
+      dockerfile: Dockerfile
+      target: deps
+    container_name: nordi-frontend
+    command: npx vite --host 0.0.0.0
+    volumes:
+      - ./Frontend-Nordi-Remittance:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api/v1
+      - VITE_APP_ENV=development
+    depends_on:
+      - api
+    networks:
+      - nordi-network
+
+  # ── Backend API ────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./Backend-Nordi-remittance
+      dockerfile: Dockerfile.dev
+    container_name: nordi-api
+    restart: unless-stopped
+    volumes:
+      - ./Backend-Nordi-remittance:/app
+      - /app/node_modules
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/remit
+      - REDIS_URL=redis://redis:6379
+    env_file:
+      - ./Backend-Nordi-remittance/.env
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nordi-network
+
+  # ── MongoDB ────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: nordi-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - nordi-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: nordi-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - nordi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  nordi-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+  redis-data:
+    driver: local
