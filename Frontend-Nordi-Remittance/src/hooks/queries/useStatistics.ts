@@ -18,7 +18,7 @@ interface DateRangeParams {
 }
 
 interface StatisticsFilters extends DateRangeParams {
-  accountId?: UUID;
+  accountId?: string;
   currency?: string;
   type?: string;
   [key: string]: any;
@@ -49,7 +49,7 @@ export const useBalanceHistory = (params?: StatisticsFilters) => {
   return useQuery({
     queryKey: [...queryKeys.statistics.all, "balance-history", params],
     queryFn: async () => {
-      const response = await statisticsApi.getBalanceHistory(params);
+      const response = await statisticsApi.getBalanceHistory(params as any);
       return response.data;
     },
   });
@@ -79,7 +79,7 @@ export const useTransactionStats = (params?: StatisticsFilters) => {
   return useQuery({
     queryKey: queryKeys.statistics.transactions(params),
     queryFn: async () => {
-      const response = await statisticsApi.getTransactionStats(params);
+      const response = await statisticsApi.getTransactionStats(params as any);
       return response.data;
     },
   });
@@ -94,7 +94,7 @@ export const useTransactionVolumeChart = (
   return useQuery({
     queryKey: [...queryKeys.statistics.transactions(), "volume-chart", params],
     queryFn: async () => {
-      const response = await statisticsApi.getTransactionVolumeChart(params);
+      const response = await statisticsApi.getTransactionVolumeChart(params as any);
       return response.data;
     },
   });
@@ -242,7 +242,7 @@ export const useRemittanceStats = (params?: DateRangeParams) => {
   return useQuery({
     queryKey: [...queryKeys.statistics.all, "remittance", params],
     queryFn: async () => {
-      const response = await statisticsApi.getRemittanceStats(params);
+      const response = await statisticsApi.getRemittanceStats(params as any);
       return response.data;
     },
   });
@@ -284,7 +284,7 @@ export const useRemittanceByRecipient = (
  * Get card spending statistics
  */
 export const useCardSpendingStats = (
-  cardId?: UUID,
+  cardId?: string,
   params?: DateRangeParams,
 ) => {
   return useQuery({
@@ -300,7 +300,7 @@ export const useCardSpendingStats = (
  * Get card spending by merchant category
  */
 export const useCardSpendingByMerchant = (
-  cardId?: UUID,
+  cardId?: string,
   params?: DateRangeParams,
 ) => {
   return useQuery({
@@ -331,7 +331,7 @@ export const useInvestmentPerformanceStats = (params?: DateRangeParams) => {
   return useQuery({
     queryKey: [...queryKeys.statistics.all, "investment-performance", params],
     queryFn: async () => {
-      const response = await statisticsApi.getInvestmentPerformance(params);
+      const response = await statisticsApi.getInvestmentPerformance(params as any);
       return response.data;
     },
   });
