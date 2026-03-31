@@ -186,8 +186,8 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             className="max-w-xl lg:max-w-2xl"
           >
             {/* Content Card with glassmorphism */}
-            <div className="border border-white/20 bg-white/10 p-6 sm:p-8 lg:rounded-2xl lg:backdrop-blur-md">
-              <h1 className="mb-4 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl xl:text-5xl">
+            <div className="rounded-2xl border border-white/20 bg-white/10 p-6 sm:p-8 lg:backdrop-blur-md">
+              <h1 className="mb-4 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl xl:text-5xl">
                 {currentSlide.heading}
               </h1>
               <p className="mb-6 text-sm leading-relaxed text-white/80 sm:text-base lg:text-lg">

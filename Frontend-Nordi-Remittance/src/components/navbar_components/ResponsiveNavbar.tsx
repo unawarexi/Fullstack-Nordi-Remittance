@@ -72,7 +72,7 @@ const SubNavBar: React.FC = () => {
           {/* Country Selector - Always visible but smaller on mobile */}
           <div className="flex items-center gap-2 z-50">
             <Globe size={16} className="text-foreground-muted hidden sm:block" />
-            <CountrySelect value="US" compact={true} />
+            <CountrySelect compact={true} />
           </div>
         </div>
       </div>

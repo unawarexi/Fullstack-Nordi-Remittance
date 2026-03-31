@@ -59,6 +59,8 @@ declare global {
         handleSidebarMouseLeave: () => void;
         isScrolled: boolean;
         closeAll: () => void;
+        country: { code: string; name: string; flag: string } | null;
+        setCountry: (country: { code: string; name: string; flag: string } | null) => void;
     }
 
     interface NavbarProviderProps {

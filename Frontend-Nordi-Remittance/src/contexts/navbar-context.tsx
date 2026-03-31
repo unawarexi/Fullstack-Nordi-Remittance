@@ -3,6 +3,8 @@
 // ============================================================================
 
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import Countries from '../core/data/Countries';
+import { useGeoLocation } from '../hooks/useGeoLocation';
 
 // ========================
 // CONTEXT CREATION
@@ -27,6 +29,9 @@ export const NavbarProvider: React.FC<NavbarProviderProps> = ({ children }) => {
 
   // Scroll state
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Country state
+  const [country, setCountry] = useState<{ code: string; name: string; flag: string } | null>(null);
 
 
   // SCROLL HANDLER
@@ -157,18 +162,22 @@ export const NavbarProvider: React.FC<NavbarProviderProps> = ({ children }) => {
   }, []);
 
 
-  // CLEANUP TIMEOUTS
+  // COUNTRY AUTO-DETECTION - Using refactored hook
+  const { detectedCountry } = useGeoLocation();
 
   useEffect(() => {
-    return () => {
-      if (megaMenuTimeoutRef.current) {
-        clearTimeout(megaMenuTimeoutRef.current);
-      }
-      if (sidebarTimeoutRef.current) {
-        clearTimeout(sidebarTimeoutRef.current);
-      }
-    };
-  }, []);
+    // If user hasn't manually selected yet, and we have a detection
+    if (!country && detectedCountry) {
+      setCountry({
+        code: detectedCountry.code,
+        name: detectedCountry.name,
+        flag: detectedCountry.flag,
+      });
+    }
+  }, [detectedCountry, country]);
+
+
+  // CLEANUP TIMEOUTS
 
 
   // CONTEXT VALUE
@@ -200,6 +209,10 @@ export const NavbarProvider: React.FC<NavbarProviderProps> = ({ children }) => {
 
     // Scroll
     isScrolled,
+
+    // Country
+    country,
+    setCountry,
 
     // Close all
     closeAll,

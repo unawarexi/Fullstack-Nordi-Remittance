@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Search, Globe, Check } from "lucide-react";
 import { cn } from "@utils/cn";
+import { useNavbar } from "@contexts/navbar-context";
 import Countries from "@core/data/Countries";
 
 interface CountrySelectProps {
@@ -11,7 +12,6 @@ interface CountrySelectProps {
   compact?: boolean;
   position?: "bottom" | "top";
 }
-
 export const CountrySelect: React.FC<CountrySelectProps> = ({
   value = "US",
   onChange,
@@ -19,11 +19,13 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
   compact = false,
   position = "bottom",
 }) => {
+  const { country: globalCountry, setCountry: setGlobalCountry } = useNavbar();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectedCountry = Countries.find((c) => c.code === value) || Countries[0];
+  // If globalCountry is not yet loaded (auto-detection), fallback to value or Countries[0]
+  const selectedCountry = globalCountry || Countries.find((c) => c.code === value) || Countries[0];
 
   const filteredCountries = Countries.filter(
     (c) =>
@@ -45,7 +47,15 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
   }, []);
 
   const handleSelect = (code: string) => {
-    if (onChange) onChange(code);
+    const matched = Countries.find((c) => c.code === code);
+    if (matched) {
+      setGlobalCountry({
+        code: matched.code,
+        name: matched.name,
+        flag: matched.flag,
+      });
+      if (onChange) onChange(code);
+    }
     setIsOpen(false);
     setSearchQuery("");
   };
@@ -62,7 +72,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
         )}
       >
         <span className="text-base">{selectedCountry.flag}</span>
-        {!compact && <span className="hidden sm:inline truncate max-w-[100px]">{selectedCountry.name}</span>}
+        {!compact && <span className="hidden sm:inline truncate">{selectedCountry.name}</span>}
         <span className={cn("font-semibold text-neutral-600 dark:text-neutral-400", compact ? "inline" : "sm:hidden")}>
           {selectedCountry.code}
         </span>
