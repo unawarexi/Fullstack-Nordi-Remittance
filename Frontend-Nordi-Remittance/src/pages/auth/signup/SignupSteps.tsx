@@ -74,7 +74,7 @@ export const PersonalDetailsStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Personal Details
       </h2>
 
@@ -104,7 +104,7 @@ export const PersonalDetailsStep = ({
       />
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
           Date of Birth <span className="text-error-500">*</span>
         </label>
         <DatePicker
@@ -179,7 +179,7 @@ export const IdentityVerificationStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Identity Verification (KYC)
       </h2>
 
@@ -223,7 +223,7 @@ export const IdentityVerificationStep = ({
       />
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700 dark:text-neutral-200">
           ID Expiry Date <span className="text-error-500">*</span>
         </label>
         <DatePicker
@@ -292,7 +292,7 @@ export const ContactInfoStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Contact Information
       </h2>
 
@@ -390,7 +390,7 @@ export const BankingPreferencesStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Banking Preferences
       </h2>
 
@@ -489,10 +489,10 @@ export const BankAccountStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Bank Account Details
       </h2>
-      <p className="mb-4 text-sm text-neutral-500">
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
         Link your existing bank account for transfers and withdrawals.
       </p>
 
@@ -578,10 +578,10 @@ export const SecuritySetupStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Security Setup
       </h2>
-      <p className="mb-4 text-sm text-neutral-500">
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
         Create a strong password and set up additional security measures.
       </p>
 
@@ -623,16 +623,16 @@ export const SecuritySetupStep = ({
         {...register("securityAnswer")}
       />
 
-      <div className="flex items-center gap-3 rounded-lg bg-neutral-50 p-4">
+      <div className="flex items-center gap-3 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800/80 dark:border dark:border-neutral-700/50">
         <input
           type="checkbox"
           id="enableTwoFactor"
           className="h-5 w-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
           {...register("enableTwoFactor")}
         />
-        <label htmlFor="enableTwoFactor" className="text-sm text-neutral-700">
+        <label htmlFor="enableTwoFactor" className="text-sm text-neutral-700 dark:text-neutral-200">
           <span className="font-medium">Enable Two-Factor Authentication</span>
-          <p className="text-neutral-500">Recommended for enhanced security</p>
+          <p className="text-neutral-500 dark:text-neutral-400">Recommended for enhanced security</p>
         </label>
       </div>
 
@@ -665,7 +665,7 @@ export const TermsVerificationStep = ({
 
   return (
     <section className="space-y-4">
-      <h2 className="mb-4 text-xl font-semibold text-gray-900">
+      <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Terms & Verification
       </h2>
 
@@ -704,14 +704,14 @@ export const TermsVerificationStep = ({
 
       {/* Terms Checkboxes */}
       <div className="mt-6 space-y-3">
-        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4">
+        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800/80 dark:border dark:border-neutral-700/50">
           <input
             type="checkbox"
             id="agreeToTerms"
             className="mt-0.5 h-5 w-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
             {...register("agreeToTerms")}
           />
-          <label htmlFor="agreeToTerms" className="text-sm text-neutral-700">
+          <label htmlFor="agreeToTerms" className="text-sm text-neutral-700 dark:text-neutral-200">
             I agree to the{" "}
             <a
               href="/terms"
@@ -729,14 +729,14 @@ export const TermsVerificationStep = ({
           </p>
         )}
 
-        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4">
+        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800/80 dark:border dark:border-neutral-700/50">
           <input
             type="checkbox"
             id="agreeToPrivacy"
             className="mt-0.5 h-5 w-5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
             {...register("agreeToPrivacy")}
           />
-          <label htmlFor="agreeToPrivacy" className="text-sm text-neutral-700">
+          <label htmlFor="agreeToPrivacy" className="text-sm text-neutral-700 dark:text-neutral-200">
             I agree to the{" "}
             <a
               href="/privacy"
@@ -754,7 +754,7 @@ export const TermsVerificationStep = ({
           </p>
         )}
 
-        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4">
+        <div className="flex items-start gap-3 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800/80 dark:border dark:border-neutral-700/50">
           <input
             type="checkbox"
             id="agreeToDataSharing"
@@ -763,7 +763,7 @@ export const TermsVerificationStep = ({
           />
           <label
             htmlFor="agreeToDataSharing"
-            className="text-sm text-neutral-700"
+            className="text-sm text-neutral-700 dark:text-neutral-200"
           >
             I consent to sharing my data with regulatory authorities as required
             by law (optional)

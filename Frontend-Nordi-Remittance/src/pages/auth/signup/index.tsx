@@ -320,16 +320,16 @@ const Signup = () => {
       }}
     >
       <FormContainer step={step} totalSteps={TOTAL_STEPS}>
-        <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-white shadow-sm">
+        <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-white shadow-sm dark:bg-neutral-900 dark:shadow-neutral-900/50 dark:border dark:border-neutral-800">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full rounded-lg bg-white p-4 md:p-6"
+            className="w-full rounded-lg bg-white p-4 md:p-6 dark:bg-neutral-900"
           >
             {/* Step Content */}
             <div className="w-full">{renderStep()}</div>
 
             {/* Navigation Buttons */}
-            <div className="mt-6 flex items-center justify-between gap-4 border-t border-neutral-100 pt-4">
+            <div className="mt-6 flex items-center justify-between gap-4 border-t border-neutral-100 pt-4 dark:border-neutral-800">
               <Button
                 type="button"
                 variant="outline"
@@ -398,7 +398,7 @@ const Signup = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-100">
               <Check className="h-8 w-8 text-success-600" />
             </div>
-            <p className="mb-6 text-neutral-600">
+            <p className="mb-6 text-neutral-600 dark:text-neutral-300">
               Your account has been created successfully. Please check your
               email to verify your account before logging in.
             </p>
@@ -425,7 +425,7 @@ const Signup = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-error-100">
               <span className="text-2xl">❌</span>
             </div>
-            <p className="mb-6 text-neutral-600">
+            <p className="mb-6 text-neutral-600 dark:text-neutral-300">
               We couldn't complete your registration. Please check your
               information and try again.
             </p>

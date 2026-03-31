@@ -80,24 +80,24 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, index }) => {
       className={cn(
         "flex flex-col items-center justify-center",
         "h-28 sm:h-32 md:h-36 lg:h-40 p-3 sm:p-4",
-        "bg-gradient-to-br from-neutral-50 to-neutral-100",
-        "rounded-xl sm:rounded-2xl shadow-md dark:shadow-neutral-900/30",
-        "border border-neutral-200 dark:border-neutral-700/60",
-        "hover:shadow-xl dark:hover:shadow-neutral-900/50 hover:border-amber-300/50",
+        "bg-white dark:bg-neutral-900",
+        "rounded-xl sm:rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:shadow-neutral-900/50",
+        "border border-neutral-100 dark:border-neutral-800",
+        "hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] dark:hover:shadow-neutral-900/80 hover:-translate-y-1 hover:border-primary-200 dark:hover:border-primary-800/50",
         "transition-all duration-300 cursor-pointer",
         "group"
       )}
     >
       <div className={cn(
-        "p-2.5 sm:p-3 rounded-full",
-        "bg-gradient-to-br from-amber-100 to-amber-200",
-        "text-amber-600 mb-2 sm:mb-3",
-        "group-hover:from-amber-200 group-hover:to-amber-300",
-        "transition-all duration-300"
+        "p-2.5 sm:p-3 rounded-full mb-2 sm:mb-3",
+        "bg-primary-50 dark:bg-primary-900/20",
+        "text-primary-600 dark:text-primary-400",
+        "group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40",
+        "transition-colors duration-300"
       )}>
         {tool.icon}
       </div>
-      <p className="text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200 text-center leading-tight">
+      <p className="text-xs sm:text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-100 text-center leading-tight">
         {tool.title}
       </p>
       {tool.description && (
@@ -142,8 +142,8 @@ const Helpful_tools: React.FC = () => {
           viewport={{ once: true }}
           className="text-center mb-6 sm:mb-8"
         >
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-800 dark:text-neutral-100">
-            Helpful <span className="text-amber-500">Tools</span>
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
+            Helpful <span className="text-primary-600 dark:text-primary-400">Tools</span>
           </h3>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             Quick access to our most popular services
@@ -162,9 +162,9 @@ const Helpful_tools: React.FC = () => {
                   "w-8 h-8 sm:w-10 sm:h-10 rounded-full",
                   "bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 hover:shadow-lg dark:hover:shadow-neutral-900/50",
                   "flex items-center justify-center",
-                  "text-neutral-600 dark:text-neutral-300 hover:text-amber-600",
+                  "text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400",
                   "transition-all duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  "focus:outline-none focus:ring-2 focus:ring-primary-400"
                 )}
                 aria-label="Previous tools"
               >
@@ -178,9 +178,9 @@ const Helpful_tools: React.FC = () => {
                   "w-8 h-8 sm:w-10 sm:h-10 rounded-full",
                   "bg-white dark:bg-neutral-800 shadow-md dark:shadow-neutral-900/30 hover:shadow-lg dark:hover:shadow-neutral-900/50",
                   "flex items-center justify-center",
-                  "text-neutral-600 dark:text-neutral-300 hover:text-amber-600",
+                  "text-neutral-600 dark:text-neutral-300 hover:text-primary-600 dark:hover:text-primary-400",
                   "transition-all duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  "focus:outline-none focus:ring-2 focus:ring-primary-400"
                 )}
                 aria-label="Next tools"
               >
@@ -232,8 +232,8 @@ const Helpful_tools: React.FC = () => {
                   className={cn(
                     "h-1.5 sm:h-2 rounded-full transition-all duration-300",
                     currentIndex === index
-                      ? "w-4 sm:w-6 bg-amber-50 dark:bg-amber-900/200"
-                      : "w-1.5 sm:w-2 bg-neutral-300 hover:bg-neutral-400"
+                      ? "w-4 sm:w-6 bg-primary-600 dark:bg-primary-500"
+                      : "w-1.5 sm:w-2 bg-neutral-300 hover:bg-neutral-400 dark:bg-neutral-600 dark:hover:bg-neutral-500"
                   )}
                   aria-label={`Go to slide ${index + 1}`}
                 />

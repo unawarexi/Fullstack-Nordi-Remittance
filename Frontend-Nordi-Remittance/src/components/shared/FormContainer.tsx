@@ -16,7 +16,7 @@ export const FormContainer = ({
         <div className="mb-2 text-sm text-neutral-500 dark:text-neutral-400">
           Step {step} of {totalSteps}
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
           <div
             className="h-full bg-primary-600 transition-all duration-300"
             style={{ width: `${(step / totalSteps) * 100}%` }}
