@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Mail, Lock, Shield, ShieldCheck, Globe, Fingerprint } from "lucide-react";
 import { useSignIn, useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { useToast } from "@store/toast.store";
 
 import { Button, Input, Spinner } from "@components/ui";
 import Images from "@constants/images";
@@ -55,6 +57,33 @@ const AdminLogin = () => {
   const { signIn, isLoaded: isClerkLoaded, setActive } = useSignIn();
   const { getToken, isSignedIn, signOut } = useClerkAuth();
   const [clerkError, setClerkError] = useState<string | null>(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { error: showToastError } = useToast();
+
+  // ──────────────────────────────────────────────────────────────
+  // Handle Browser Back Button & Cancellation Toasts
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    // 1. Reset loading state on mount
+    setGoogleLoading(false);
+
+    // 2. Handle "back" button from cache
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setGoogleLoading(false);
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+
+    // 3. Detect cancellation from Google
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "cancelled") {
+      showToastError("Google sign-in cancelled");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
 
   const {
     register,
@@ -135,6 +164,7 @@ const AdminLogin = () => {
     setClerkError(null);
 
     try {
+      setGoogleLoading(true);
       // If already signed in with Clerk (e.g. incomplete previous flow), sign out first
       if (isSignedIn) {
         await signOut();
@@ -149,11 +179,16 @@ const AdminLogin = () => {
         redirectUrlComplete: "/auth/clerk-admin-callback",
       });
     } catch (err: any) {
+      setGoogleLoading(false);
       setClerkError(err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.");
     }
   };
 
-  const isPending = isSubmitting || loginMutation.isPending || clerkSyncAdminMutation.isPending;
+  const isPending =
+    isSubmitting ||
+    loginMutation.isPending ||
+    clerkSyncAdminMutation.isPending ||
+    googleLoading;
 
   return (
     <section className="relative flex min-h-screen w-full overflow-hidden">
@@ -285,6 +320,7 @@ const AdminLogin = () => {
             variant="outline"
             size="lg"
             fullWidth
+            isLoading={googleLoading}
             disabled={isPending}
             onClick={handleGoogleSignIn}
             className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"

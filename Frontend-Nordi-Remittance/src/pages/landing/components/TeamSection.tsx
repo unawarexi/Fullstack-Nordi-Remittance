@@ -2,13 +2,13 @@
 // TEAM SECTION - Team member display with cards
 // ============================================================================
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Section, Container, Grid } from '@components/layout';
-import { Card } from '@components/ui/Card';
-import { Avatar } from '@components/ui/Avatar';
-import { Linkedin, Twitter, Mail } from 'lucide-react';
-import Images from '@constants/images';
+import React from "react";
+import { motion } from "framer-motion";
+import { Section, Container, Grid } from "@components/layout";
+import { Card } from "@components/ui/Card";
+import { Avatar } from "@components/ui/Avatar";
+import { Linkedin, Twitter, Mail } from "lucide-react";
+import Images from "@constants/images";
 
 // ========================
 // TYPES
@@ -30,32 +30,32 @@ interface TeamMember {
 // ========================
 const teamMembers: TeamMember[] = [
   {
-    name: 'Sarah Johnson',
-    role: 'Chief Executive Officer',
+    name: "Sarah Johnson",
+    role: "Chief Executive Officer",
     image: Images.Team1,
-    bio: 'Leading Nordea Remit with 15+ years of fintech experience.',
-    social: { linkedin: '#', twitter: '#' },
+    bio: "Leading Nordea Remit with 15+ years of fintech experience.",
+    social: { linkedin: "#", twitter: "#" },
   },
   {
-    name: 'Michael Chen',
-    role: 'Chief Technology Officer',
+    name: "Michael Chen",
+    role: "Chief Technology Officer",
     image: Images.Team2,
-    bio: 'Building the future of secure money transfers.',
-    social: { linkedin: '#', twitter: '#' },
+    bio: "Building the future of secure money transfers.",
+    social: { linkedin: "#", twitter: "#" },
   },
   {
-    name: 'Emily Rodriguez',
-    role: 'Head of Operations',
+    name: "Emily Rodriguez",
+    role: "Head of Operations",
     image: Images.Team3,
-    bio: 'Ensuring seamless transactions across 150+ countries.',
-    social: { linkedin: '#' },
+    bio: "Ensuring seamless transactions across 150+ countries.",
+    social: { linkedin: "#" },
   },
   {
-    name: 'David Kim',
-    role: 'Head of Security',
+    name: "David Kim",
+    role: "Head of Security",
     image: Images.Team4,
-    bio: 'Protecting your money with world-class security.',
-    social: { linkedin: '#', email: '#' },
+    bio: "Protecting your money with world-class security.",
+    social: { linkedin: "#", email: "#" },
   },
 ];
 
@@ -75,7 +75,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
+    transition: { duration: 0.5, ease: "easeOut" },
   },
 };
 
@@ -89,34 +89,17 @@ interface TeamMemberCardProps {
 const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
   return (
     <motion.div variants={itemVariants}>
-      <Card
-        variant="elevated"
-        hoverable
-        className="text-center p-6 h-full"
-      >
+      <Card variant="default" hoverable className="h-full p-6 text-center">
         {/* Avatar */}
-        <div className="flex justify-center mb-4">
-          <Avatar
-            src={member.image}
-            name={member.name}
-            size="xl"
-            className="w-24 h-24 sm:w-28 sm:h-28"
-          />
+        <div className="mb-4 flex justify-center">
+          <Avatar src={member.image} name={member.name} size="xl" className="h-24 w-24 sm:h-28 sm:w-28" />
         </div>
 
         {/* Info */}
-        <h3 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-white mb-1">
-          {member.name}
-        </h3>
-        <p className="text-primary-600 text-sm font-medium mb-3">
-          {member.role}
-        </p>
-        
-        {member.bio && (
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4 line-clamp-2">
-            {member.bio}
-          </p>
-        )}
+        <h3 className="mb-1 text-lg font-semibold text-neutral-900 dark:text-white sm:text-xl">{member.name}</h3>
+        <p className="mb-3 text-sm font-medium text-primary-600">{member.role}</p>
+
+        {member.bio && <p className="mb-4 line-clamp-2 text-sm text-neutral-500 dark:text-neutral-400">{member.bio}</p>}
 
         {/* Social Links */}
         {member.social && (
@@ -126,7 +109,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={member.social.linkedin}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-primary-100 hover:text-primary-600 dark:bg-neutral-700 dark:text-neutral-400"
               >
                 <Linkedin size={16} />
               </motion.a>
@@ -136,7 +119,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={member.social.twitter}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-primary-100 hover:text-primary-600 dark:bg-neutral-700 dark:text-neutral-400"
               >
                 <Twitter size={16} />
               </motion.a>
@@ -146,7 +129,7 @@ const TeamMemberCard: React.FC<TeamMemberCardProps> = ({ member }) => {
                 href={`mailto:${member.social.email}`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-primary-100 hover:text-primary-600 transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-primary-100 hover:text-primary-600 dark:bg-neutral-700 dark:text-neutral-400"
               >
                 <Mail size={16} />
               </motion.a>
@@ -171,17 +154,14 @@ export const TeamSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-16"
+          className="mb-10 text-center sm:mb-16"
         >
-          <span className="text-primary-600 text-sm font-semibold uppercase tracking-wider mb-2 block">
-            Our Team
-          </span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <span className="mb-2 block text-sm font-semibold uppercase tracking-wider text-primary-600">Our Team</span>
+          <h2 className="mb-4 text-2xl font-bold text-neutral-900 dark:text-white sm:text-3xl lg:text-4xl">
             Meet the experts behind Nordea Remit
           </h2>
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm sm:text-base max-w-xl mx-auto">
-            Our dedicated team of professionals works tirelessly to provide you
-            with the best money transfer experience.
+          <p className="mx-auto max-w-xl text-sm text-neutral-500 dark:text-neutral-400 sm:text-base">
+            Our dedicated team of professionals works tirelessly to provide you with the best money transfer experience.
           </p>
         </motion.div>
 
@@ -190,7 +170,7 @@ export const TeamSection: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
+          viewport={{ once: true, margin: "-50px" }}
         >
           <Grid cols={{ xs: 1, sm: 2, lg: 4 }} gap="lg">
             {teamMembers.map((member) => (

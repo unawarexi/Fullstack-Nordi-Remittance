@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, MessageSquare } from "lucide-react";
 import { useSignIn, useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { useToast } from "@store/toast.store";
 
 // Components
 import { Button, Input, Spinner } from "@components/ui";
@@ -40,6 +42,33 @@ const Login = () => {
   const { getToken, isSignedIn, signOut } = useClerkAuth();
   const [clerkLoading, setClerkLoading] = useState(false);
   const [clerkError, setClerkError] = useState<string | null>(null);
+  const { error: showToastError } = useToast();
+
+  // ──────────────────────────────────────────────────────────────
+  // Handle Browser Back Button & Cancellation Toasts
+  // ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    // 1. Reset loading state on mount (covers standard redirect returns and browser back)
+    setClerkLoading(false);
+
+    // 2. Technical: Handle "back" button from cache (Safari/Mobile)
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setClerkLoading(false);
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+
+    // 3. Detect cancellation from Google via SSOCallback redirect
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "cancelled") {
+      showToastError("Google sign-in cancelled");
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
 
   // Form setup with Zod validation
   const {
@@ -261,6 +290,7 @@ const Login = () => {
           variant="outline"
           size="lg"
           fullWidth
+          isLoading={clerkLoading}
           disabled={isPending}
           onClick={handleGoogleSignIn}
           className="border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
