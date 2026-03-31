@@ -1,0 +1,90 @@
+# ============================================================================
+# DEPENDABOT — Automated Dependency Updates
+# Keeps dependencies secure and up-to-date
+# ============================================================================
+
+version: 2
+
+updates:
+  # Backend npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/Backend-Nordi-remittance"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "unawarexi"
+    labels:
+      - "dependencies"
+      - "backend"
+    groups:
+      production-deps:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "vitest*"
+          - "typescript"
+      dev-deps:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "vitest*"
+          - "typescript"
+
+  # Frontend npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/Frontend-Nordi-Remittance"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "unawarexi"
+    labels:
+      - "dependencies"
+      - "frontend"
+    groups:
+      production-deps:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "vitest*"
+          - "typescript"
+          - "prettier*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/Backend-Nordi-remittance"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/Frontend-Nordi-Remittance"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"

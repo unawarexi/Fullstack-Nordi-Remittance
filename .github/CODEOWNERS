@@ -1,0 +1,25 @@
+# ============================================================================
+# CODEOWNERS — Nordi Remittance
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ============================================================================
+
+# Default owners for everything
+*                                       @unawarexi
+
+# Frontend
+/Frontend-Nordi-Remittance/             @unawarexi
+
+# Backend
+/Backend-Nordi-remittance/              @unawarexi
+
+# Infrastructure & DevOps
+/.github/                               @unawarexi
+/docker-compose*.yml                    @unawarexi
+/Backend-Nordi-remittance/Dockerfile*   @unawarexi
+/Backend-Nordi-remittance/k8s/          @unawarexi
+/Backend-Nordi-remittance/terraform/    @unawarexi
+/Frontend-Nordi-Remittance/Dockerfile*  @unawarexi
+
+# Security-critical files (fintech compliance)
+/Backend-Nordi-remittance/middleware/   @unawarexi
+/Backend-Nordi-remittance/config/       @unawarexi
