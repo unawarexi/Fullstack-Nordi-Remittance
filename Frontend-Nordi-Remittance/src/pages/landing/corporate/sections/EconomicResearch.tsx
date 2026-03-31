@@ -16,11 +16,12 @@ import {
   Leaf,
   Users,
   Clock,
+  Mail,
 } from "lucide-react";
 import { cn } from "@utils/cn";
 import { Section } from "@components/layout/Section";
 import { Container } from "@components/layout/Container";
-import { Button } from "@components/ui/Button";
+import { Button, IconButton } from "@components/ui/Button";
 
 // ========================
 // RESEARCH REPORTS
@@ -113,23 +114,23 @@ const typeBadgeColors = {
 // ========================
 const EconomicResearch: React.FC = () => {
   return (
-    <Section id="economic-research" className="py-16 lg:py-24">
+    <Section id="economic-research" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-sm font-medium mb-4">
-            <BarChart3 className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Economic Research
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Insights That Drive Decisions
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Expert economic analysis and market research to help you navigate 
             complex business environments and make informed strategic decisions.
           </p>
@@ -140,22 +141,22 @@ const EconomicResearch: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-12"
         >
           {researchThemes.map((theme) => (
             <div
               key={theme.name}
               className={cn(
-                "flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer"
+                "flex items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer group"
               )}
             >
-              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center">
-                <theme.icon className="w-5 h-5" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <theme.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white text-sm">{theme.name}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{theme.count} reports</p>
+                <p className="font-bold text-neutral-900 dark:text-white text-[11px] sm:text-sm leading-tight">{theme.name}</p>
+                <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 leading-tight">{theme.count} reports</p>
               </div>
             </div>
           ))}
@@ -173,7 +174,7 @@ const EconomicResearch: React.FC = () => {
               </Button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {researchReports.map((report, index) => (
                 <motion.div
                   key={report.id}
@@ -182,66 +183,70 @@ const EconomicResearch: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   className={cn(
-                    "group flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800 border",
-                    report.featured ? "border-indigo-300 bg-indigo-50 dark:bg-indigo-900/30/50" : "border-neutral-200 dark:border-neutral-700",
+                    "group flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white dark:bg-neutral-800 border",
+                    report.featured ? "border-indigo-300 bg-indigo-50/50 dark:bg-indigo-900/10" : "border-neutral-200 dark:border-neutral-700",
                     "hover:shadow-md transition-all cursor-pointer"
                   )}
                 >
                   <div className={cn(
-                    "w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0",
+                    "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0",
                     report.featured ? "bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600" : "bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400"
                   )}>
-                    <FileText className="w-6 h-6" />
+                    <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", typeBadgeColors[report.type])}>
+                  <div className="flex-1 min-w-0 font-medium">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5">
+                      <span className={cn("px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider", typeBadgeColors[report.type])}>
                         {report.type}
                       </span>
-                      <span className="text-xs text-neutral-400">{report.category}</span>
+                      <span className="text-[10px] sm:text-xs text-neutral-400">{report.category}</span>
                     </div>
-                    <h4 className="font-semibold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                    <h4 className="text-[13px] sm:text-base font-bold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors leading-tight">
                       {report.title}
                     </h4>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-2 mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">
                       <Calendar className="w-3.5 h-3.5" />
                       {report.date}
                     </div>
                   </div>
 
-                  <Button
+                  <IconButton
                     variant="ghost"
-                    className="p-2 h-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Download className="w-4 h-4 text-indigo-600" />
-                  </Button>
+                    size="sm"
+                    icon={<Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600" />}
+                    className="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Download report"
+                  />
                 </motion.div>
               ))}
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 sm:space-y-8">
             {/* Subscribe */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="p-6 rounded-xl bg-indigo-600 text-white"
+              className="p-5 sm:p-6 rounded-2xl bg-indigo-600 text-white"
             >
-              <h4 className="font-semibold mb-2">Subscribe to Research</h4>
-              <p className="text-sm text-indigo-100 mb-4">
-                Get weekly economic insights and reports delivered to your inbox.
+              <Mail className="w-6 h-6 sm:w-8 sm:h-8 mb-3 sm:mb-4" />
+              <h4 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2 leading-tight">Expert Analysis to Your Inbox</h4>
+              <p className="text-[13px] sm:text-sm text-indigo-100 mb-5 sm:mb-6 leading-relaxed">
+                Subscribe to our weekly economic briefing and never miss a market move.
               </p>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-2.5 rounded-lg bg-white/20 border border-white/20 text-white placeholder:text-indigo-200 text-sm mb-3"
-              />
-              <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-indigo-600 hover:bg-indigo-50 dark:bg-indigo-900/30">
-                Subscribe
-              </Button>
+              <div className="space-y-2.5 sm:space-y-3">
+                <input
+                  type="email"
+                  placeholder="Official Email"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 text-sm"
+                />
+                <Button className="w-full bg-white text-indigo-600 hover:bg-indigo-50 font-bold text-sm py-2.5">
+                  Subscribe Now
+                </Button>
+              </div>
             </motion.div>
 
             {/* Our Economists */}
@@ -250,19 +255,21 @@ const EconomicResearch: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="p-6 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+              className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
             >
-              <h4 className="font-semibold text-neutral-900 dark:text-white mb-4">Our Economists</h4>
-              <div className="space-y-4">
+              <h4 className="font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6 text-sm sm:text-base uppercase tracking-wider">Our Lead Economists</h4>
+              <div className="space-y-4 sm:space-y-6">
                 {economists.map((economist) => (
-                  <div key={economist.name} className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/30 text-indigo-600 flex items-center justify-center font-semibold text-sm">
-                      {economist.name.split(' ').map(n => n[0]).join('')}
+                  <div key={economist.name} className="flex items-center gap-3 sm:gap-4 group cursor-pointer">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-neutral-100 dark:bg-neutral-700 overflow-hidden border-2 border-transparent group-hover:border-indigo-500 transition-all">
+                      <div className="w-full h-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                        {economist.name.split(' ').map(n => n[0]).join('')}
+                      </div>
                     </div>
                     <div>
-                      <p className="font-medium text-neutral-900 dark:text-white text-sm">{economist.name}</p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">{economist.role}</p>
-                      <p className="text-xs text-indigo-600">{economist.specialty}</p>
+                      <p className="text-[13px] sm:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors leading-tight">{economist.name}</p>
+                      <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 leading-tight">{economist.role}</p>
+                      <p className="text-[10px] sm:text-xs text-indigo-500 font-semibold mt-0.5 uppercase tracking-wider">{economist.specialty}</p>
                     </div>
                   </div>
                 ))}
@@ -275,22 +282,19 @@ const EconomicResearch: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="p-6 rounded-xl bg-slate-900 text-white"
+              className="p-5 sm:p-6 rounded-2xl bg-neutral-900 text-white border border-neutral-800"
             >
-              <div className="flex items-center gap-2 text-amber-400 mb-3">
-                <Users className="w-4 h-4" />
-                <span className="text-xs font-medium">Upcoming Webinar</span>
+              <div className="flex items-center gap-2 text-indigo-400 mb-3 sm:mb-4">
+                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Upcoming Webinar</span>
               </div>
-              <h4 className="font-semibold mb-2">2025 Economic Outlook</h4>
-              <p className="text-sm text-slate-300 mb-4">
-                Join our chief economist for insights on what to expect in the coming year.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-slate-400 mb-4">
-                <Clock className="w-4 h-4" />
-                <span>Jan 15, 2025 • 2:00 PM WAT</span>
+              <h4 className="text-sm sm:text-base font-bold mb-3 sm:mb-4 leading-tight">Q2 2024 Macroeconomic Outlook: Navigating Volatility</h4>
+              <div className="flex items-center gap-3 mb-5 sm:mb-6 text-[10px] sm:text-xs text-neutral-400 font-medium">
+                <Calendar className="w-3.5 h-3.5" />
+                Nov 15, 2024 • 10:00 AM WAT
               </div>
-              <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10 text-sm">
-                Register Now
+              <Button variant="outline" className="w-full border-neutral-700 text-white hover:bg-neutral-800 text-xs py-2">
+                Register for Free
               </Button>
             </motion.div>
           </div>

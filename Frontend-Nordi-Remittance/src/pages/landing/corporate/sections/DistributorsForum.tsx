@@ -211,52 +211,52 @@ const DistributorsForum: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="p-8 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white"
+          className="p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white"
         >
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Join the Forum</h3>
-              <p className="text-orange-100 mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight">Join the Forum</h3>
+              <p className="text-sm sm:text-lg text-orange-100 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 If you're an authorized distributor of any of our principal partners, 
                 you're eligible to join the Distributors Forum and access exclusive benefits.
               </p>
 
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
                 {[
                   { icon: Shield, text: "Principal verification & endorsement" },
                   { icon: Clock, text: "Quick 48-hour facility approval" },
                   { icon: BadgePercent, text: "Preferential rates & terms" },
                 ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                      <item.icon className="w-4 h-4" />
+                  <div key={item.text} className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <span className="text-sm">{item.text}</span>
+                    <span className="text-[13px] sm:text-base font-medium">{item.text}</span>
                   </div>
                 ))}
               </div>
 
-              <Button variant="primary" className="bg-white dark:bg-neutral-800 text-orange-600 hover:bg-orange-50">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto bg-white dark:bg-neutral-800 text-orange-600 hover:bg-orange-50 text-sm py-2.5 sm:py-3 px-8">
                 Apply for Membership
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Button>
             </div>
 
-            <div className="hidden lg:block">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                <h4 className="font-semibold mb-4">Quick Eligibility Check</h4>
-                <ul className="space-y-3">
+            <div className="block lg:block">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-white/20">
+                <h4 className="font-bold mb-4 text-sm sm:text-base uppercase tracking-wider">Quick Eligibility Check</h4>
+                <ul className="space-y-3 sm:space-y-4">
                   {[
                     "Valid distributor agreement",
                     "Minimum 1 year in distribution",
                     "Good credit history",
                     "Principal recommendation",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-400 text-white flex items-center justify-center text-xs">
+                    <li key={i} className="flex items-center gap-3 sm:gap-4">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-400 text-white flex items-center justify-center text-[10px] sm:text-xs font-bold shrink-0 shadow-lg">
                         {i + 1}
                       </div>
-                      <span className="text-sm">{item}</span>
+                      <span className="text-[13px] sm:text-sm font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>

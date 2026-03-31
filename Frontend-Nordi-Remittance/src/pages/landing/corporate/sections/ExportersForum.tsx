@@ -194,23 +194,23 @@ const ExportersForum: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+            className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 h-full"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <MapPin className="w-5 h-5 text-cyan-600" />
-              <h4 className="font-semibold text-neutral-900 dark:text-white">Export Destinations</h4>
+            <div className="flex items-center gap-2.5 sm:gap-3 mb-6 sm:mb-8">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600" />
+              <h4 className="font-bold text-neural-900 dark:text-white text-sm sm:text-base uppercase tracking-wider">Export Destinations</h4>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5 sm:space-y-6">
               {exportDestinations.map((dest) => (
                 <div key={dest.region} className="flex items-center gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">{dest.region}</span>
-                      <span className="text-sm text-cyan-600 dark:text-cyan-400">{dest.share}</span>
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <span className="text-[13px] sm:text-sm font-bold text-neutral-700 dark:text-neutral-200">{dest.region}</span>
+                      <span className="text-[13px] sm:text-sm font-bold text-cyan-600 dark:text-cyan-400">{dest.share}</span>
                     </div>
-                    <div className="h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
+                    <div className="h-1.5 sm:h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-cyan-500 rounded-full transition-all"
+                        className="h-full bg-cyan-500 rounded-full transition-all duration-1000"
                         style={{ width: dest.share }}
                       />
                     </div>
@@ -218,8 +218,8 @@ const ExportersForum: React.FC = () => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-4">
-              Based on 2024 export finance volume
+            <p className="text-[10px] sm:text-xs text-neutral-400 dark:text-neutral-500 mt-6 sm:mt-8 font-medium italic">
+              * Based on 2024 export finance volume
             </p>
           </motion.div>
 
