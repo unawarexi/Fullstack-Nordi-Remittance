@@ -165,41 +165,43 @@ const CorporateSector: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300"
+                "group relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-neutral-300 transition-all duration-300 flex flex-col"
               )}
             >
               {/* Icon */}
-              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-4", sector.bgColor, sector.color)}>
-                {sector.icon}
+              <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 sm:mb-4", sector.bgColor, sector.color)}>
+                {React.isValidElement(sector.icon) 
+                  ? React.cloneElement(sector.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                  : sector.icon}
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{sector.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{sector.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{sector.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-4 sm:mb-5 leading-relaxed">{sector.description}</p>
 
               {/* Solutions */}
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-1.5 sm:space-y-2 mb-6 sm:mb-8 flex-1">
                 {sector.solutions.map((solution) => (
-                  <li key={solution} className="flex items-center gap-2">
-                    <Check className={cn("w-4 h-4", sector.color)} />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{solution}</span>
+                  <li key={solution} className="flex items-start gap-2">
+                    <Check className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 shrink-0", sector.color)} />
+                    <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{solution}</span>
                   </li>
                 ))}
               </ul>
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700">
-                <div className="flex items-center gap-2 text-xs text-neutral-400">
-                  <TrendingUp className="w-4 h-4" />
+              <div className="flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-700 mt-auto">
+                <div className="flex items-center gap-2 text-[10px] sm:text-xs text-neutral-400 font-medium uppercase tracking-wider">
+                  <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
                   {sector.clients}+ clients
                 </div>
                 <Button
                   variant="ghost"
-                  className={cn("text-sm p-0 h-auto font-medium", sector.color, "hover:opacity-80")}
+                  className={cn("text-sm p-0 h-auto font-bold", sector.color, "hover:opacity-80")}
                 >
                   Learn More
-                  <ArrowRight className="w-4 h-4 ml-1" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1" />
                 </Button>
               </div>
             </motion.div>

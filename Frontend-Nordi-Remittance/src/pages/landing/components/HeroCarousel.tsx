@@ -2,13 +2,13 @@
 // HERO CAROUSEL - Refactored landing page hero section
 // ============================================================================
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@utils/cn';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@components/ui/Button';
-import Images from '@constants/images';
-import HeroOverlay from './HeroOverlay';
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@utils/cn";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@components/ui/Button";
+import Images from "@constants/images";
+import HeroOverlay from "./HeroOverlay";
 
 // ========================
 // SLIDE DATA
@@ -25,37 +25,43 @@ const defaultSlides: HeroSlide[] = [
   {
     image: Images.carousel6,
     heading: "Invest globally to unlock unlimited opportunities for a prosperous and financially secure future.",
-    description: "Expand your horizons with Nordea Remit's global investment options. Designed to secure your financial future, our investment solutions provide you with access to global markets.",
+    description:
+      "Expand your horizons with Nordea Remit's global investment options. Designed to secure your financial future, our investment solutions provide you with access to global markets.",
     ctaText: "Start Investing",
   },
   {
     image: Images.carousel4,
     heading: "Elevate your lifestyle with exclusive rewards and unmatched banking services.",
-    description: "Experience premium banking services designed for individuals who value sophistication. From concierge services to rewards, enjoy tailored solutions to elevate your financial lifestyle.",
+    description:
+      "Experience premium banking services designed for individuals who value sophistication. From concierge services to rewards, enjoy tailored solutions to elevate your financial lifestyle.",
     ctaText: "Learn More",
   },
   {
     image: Images.carousel1,
     heading: "Stay protected with cutting-edge security and theft protection for your peace of mind.",
-    description: "Prioritize your financial security with top-tier security and theft protection features. Our robust solutions ensure that your accounts and transactions remain safe.",
+    description:
+      "Prioritize your financial security with top-tier security and theft protection features. Our robust solutions ensure that your accounts and transactions remain safe.",
     ctaText: "Explore Security",
   },
   {
     image: Images.carousel2,
     heading: "Tailored banking solutions for businesses, empowering growth and innovation.",
-    description: "We understand the unique challenges businesses face, which is why we offer industry-specific banking solutions. From startups to large corporations, our tailored services help businesses thrive.",
+    description:
+      "We understand the unique challenges businesses face, which is why we offer industry-specific banking solutions. From startups to large corporations, our tailored services help businesses thrive.",
     ctaText: "Business Banking",
   },
   {
     image: Images.carousel3,
     heading: "Empower your business with flexible loan options for growth and financial stability.",
-    description: "We believe in supporting businesses at every stage of their journey. Our flexible loan options provide the financial backing your business needs for expansion or stability.",
+    description:
+      "We believe in supporting businesses at every stage of their journey. Our flexible loan options provide the financial backing your business needs for expansion or stability.",
     ctaText: "Apply for Loan",
   },
   {
     image: Images.carousel5,
     heading: "Unlock a world of convenience and rewards with our global partner card.",
-    description: "Our card offers a world of benefits, providing seamless transactions and exclusive rewards. With worldwide acceptance, it's your perfect companion for personal and business finances.",
+    description:
+      "Our card offers a world of benefits, providing seamless transactions and exclusive rewards. With worldwide acceptance, it's your perfect companion for personal and business finances.",
     ctaText: "Get Your Card",
   },
 ];
@@ -65,7 +71,7 @@ const defaultSlides: HeroSlide[] = [
 // ========================
 const slideVariants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? '100%' : '-100%',
+    x: direction > 0 ? "100%" : "-100%",
     opacity: 0,
   }),
   center: {
@@ -74,7 +80,7 @@ const slideVariants = {
     transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] },
   },
   exit: (direction: number) => ({
-    x: direction < 0 ? '100%' : '-100%',
+    x: direction < 0 ? "100%" : "-100%",
     opacity: 0,
     transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] },
   }),
@@ -85,7 +91,7 @@ const contentVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: 0.2, ease: 'easeOut' },
+    transition: { duration: 0.5, delay: 0.2, ease: "easeOut" },
   },
 };
 
@@ -110,16 +116,19 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   const [[currentIndex, direction], setSlide] = useState([0, 0]);
   const [isPaused, setIsPaused] = useState(false);
 
-  const paginate = useCallback((newDirection: number) => {
-    const newIndex = currentIndex + newDirection;
-    if (newIndex < 0) {
-      setSlide([slides.length - 1, newDirection]);
-    } else if (newIndex >= slides.length) {
-      setSlide([0, newDirection]);
-    } else {
-      setSlide([newIndex, newDirection]);
-    }
-  }, [currentIndex, slides.length]);
+  const paginate = useCallback(
+    (newDirection: number) => {
+      const newIndex = currentIndex + newDirection;
+      if (newIndex < 0) {
+        setSlide([slides.length - 1, newDirection]);
+      } else if (newIndex >= slides.length) {
+        setSlide([0, newDirection]);
+      } else {
+        setSlide([newIndex, newDirection]);
+      }
+    },
+    [currentIndex, slides.length],
+  );
 
   const goToSlide = (index: number) => {
     const newDirection = index > currentIndex ? 1 : -1;
@@ -129,7 +138,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
   // Auto-play
   useEffect(() => {
     if (isPaused || autoPlayInterval <= 0) return;
-    
+
     const timer = setInterval(() => {
       paginate(1);
     }, autoPlayInterval);
@@ -141,7 +150,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
 
   return (
     <section
-      className={cn('relative w-full h-[85vh] min-h-[500px] max-h-[900px] overflow-hidden', className)}
+      className={cn("relative h-[85vh] max-h-[900px] min-h-[500px] w-full overflow-hidden", className)}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -156,11 +165,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
           exit="exit"
           className="absolute inset-0"
         >
-          <img
-            src={currentSlide.image}
-            alt={currentSlide.heading}
-            className="w-full h-full object-cover"
-          />
+          <img src={currentSlide.image} alt={currentSlide.heading} className="h-full w-full object-cover" />
           {/* Gradient overlay - stronger multi-layer */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -171,7 +176,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
       <HeroOverlay slideIndex={currentIndex} />
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
+      <div className="relative z-10 flex h-full items-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             key={`content-${currentIndex}`}
@@ -181,20 +186,16 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             className="max-w-xl lg:max-w-2xl"
           >
             {/* Content Card with glassmorphism */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-white/20">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight mb-4">
+            <div className="border border-white/20 bg-white/10 p-6 sm:p-8 lg:rounded-2xl lg:backdrop-blur-md">
+              <h1 className="mb-4 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl xl:text-5xl">
                 {currentSlide.heading}
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-white/80 leading-relaxed mb-6">
+              <p className="mb-6 text-sm leading-relaxed text-white/80 sm:text-base lg:text-lg">
                 {currentSlide.description}
               </p>
-              
+
               {currentSlide.ctaText && (
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="bg-amber-500 hover:bg-amber-600 text-black"
-                >
+                <Button variant="primary" size="lg" className="bg-amber-500 text-black hover:bg-amber-600">
                   {currentSlide.ctaText}
                 </Button>
               )}
@@ -210,36 +211,34 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => paginate(-1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            className="absolute left-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 sm:h-12 sm:w-12"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => paginate(1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            className="absolute right-4 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30 sm:h-12 sm:w-12"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </motion.button>
         </>
       )}
 
       {/* Pagination Dots */}
       {showPagination && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
           {slides.map((_, index) => (
             <motion.button
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                'w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300',
-                index === currentIndex 
-                  ? 'bg-amber-500 w-6 sm:w-8' 
-                  : 'bg-white/50 hover:bg-white/70'
+                "h-2 w-2 rounded-full transition-all duration-300 sm:h-3 sm:w-3",
+                index === currentIndex ? "w-6 bg-amber-500 sm:w-8" : "bg-white/50 hover:bg-white/70",
               )}
               whileTap={{ scale: 0.9 }}
               aria-label={`Go to slide ${index + 1}`}
@@ -253,9 +252,9 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
         <motion.div
           key={currentIndex}
           className="h-full bg-amber-500"
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: autoPlayInterval / 1000, ease: 'linear' }}
+          initial={{ width: "0%" }}
+          animate={{ width: "100%" }}
+          transition={{ duration: autoPlayInterval / 1000, ease: "linear" }}
         />
       </div>
     </section>

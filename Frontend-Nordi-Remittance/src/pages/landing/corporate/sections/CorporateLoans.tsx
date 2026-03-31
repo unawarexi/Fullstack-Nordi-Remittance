@@ -151,46 +151,48 @@ const CorporateLoans: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "group relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
                 "hover:shadow-lg dark:hover:shadow-neutral-900/50 transition-all duration-300"
               )}
             >
-              <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4", product.color)}>
-                {product.icon}
+              <div className={cn("w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4", product.color)}>
+                {React.isValidElement(product.icon) 
+                  ? React.cloneElement(product.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })
+                  : product.icon}
               </div>
 
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{product.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{product.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{product.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-3 sm:mb-4 leading-relaxed">{product.description}</p>
 
               {/* Key Metrics */}
-              <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 mb-4">
+              <div className="grid grid-cols-3 gap-1 sm:gap-3 p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-neutral-900 mb-4 border border-slate-100 dark:border-neutral-700 shadow-inner">
                 <div className="text-center">
-                  <p className="text-xs text-neutral-400 mb-1">Amount</p>
-                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.amount}</p>
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-medium mb-1">Amount</p>
+                  <p className="text-[11px] sm:text-sm font-bold text-neutral-900 dark:text-white leading-tight">{product.amount}</p>
                 </div>
-                <div className="text-center border-x border-slate-200">
-                  <p className="text-xs text-neutral-400 mb-1">Tenor</p>
-                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.tenor}</p>
+                <div className="text-center border-x border-slate-200 dark:border-neutral-700 px-1">
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-medium mb-1">Tenor</p>
+                  <p className="text-[11px] sm:text-sm font-bold text-neutral-900 dark:text-white leading-tight">{product.tenor}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-neutral-400 mb-1">Rate</p>
-                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">{product.rate}</p>
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-wider font-medium mb-1">Rate</p>
+                  <p className="text-[11px] sm:text-sm font-bold text-neutral-900 dark:text-white leading-tight">{product.rate}</p>
                 </div>
               </div>
 
               {/* Features */}
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-1.5 sm:space-y-2 mb-5 sm:mb-6 flex-1">
                 {product.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
+                  <li key={feature} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 shrink-0" />
+                    <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full text-sm py-2">
                 Request Quote
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
               </Button>
             </motion.div>
           ))}

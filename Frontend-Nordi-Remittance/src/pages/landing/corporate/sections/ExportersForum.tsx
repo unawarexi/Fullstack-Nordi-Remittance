@@ -109,23 +109,23 @@ const successMetrics = [
 // ========================
 const ExportersForum: React.FC = () => {
   return (
-    <Section id="exporters-forum" className="py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-neutral-900 dark:to-neutral-900">
+    <Section id="exporters-forum" className="py-10 sm:py-16 lg:py-24 bg-gradient-to-b from-slate-50 to-white dark:from-neutral-900 dark:to-neutral-900">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-medium mb-4">
-            <Ship className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <Ship className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Exporters Forum
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Powering Nigerian Exports
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Comprehensive trade finance and support services for exporters, 
             helping you expand into global markets with confidence.
           </p>
@@ -136,15 +136,15 @@ const ExportersForum: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-12"
         >
           {successMetrics.map((metric) => (
             <div
               key={metric.label}
-              className="text-center p-4 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/30"
+              className="text-center p-3 sm:p-4 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-100 dark:border-cyan-800/30"
             >
-              <p className="text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-cyan-400">{metric.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{metric.label}</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-cyan-600 dark:text-cyan-400 leading-none">{metric.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 uppercase tracking-wider font-medium">{metric.label}</p>
             </div>
           ))}
         </motion.div>
@@ -159,29 +159,29 @@ const ExportersForum: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-cyan-300 transition-all duration-300"
+                "group relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-cyan-300 transition-all duration-300 flex flex-col"
               )}
             >
-              <div className="w-14 h-14 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4">
-                {solution.icon}
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-3 sm:mb-4 shrink-0">
+                {React.cloneElement(solution.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{solution.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{solution.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{solution.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-4 sm:mb-5 leading-relaxed">{solution.description}</p>
               
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-1.5 sm:space-y-2 mb-6 sm:mb-8 flex-1">
                 {solution.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-cyan-500" />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
+                  <li key={feature} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-500 mt-0.5 shrink-0" />
+                    <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
                   </li>
                 ))}
               </ul>
-
-              <Button variant="outline" className="w-full group-hover:border-cyan-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
+ 
+              <Button variant="outline" className="w-full text-sm py-2 group-hover:border-cyan-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400">
                 Learn More
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
               </Button>
             </motion.div>
           ))}
@@ -228,13 +228,13 @@ const ExportersForum: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="p-6 rounded-2xl bg-cyan-600 text-white"
+            className="p-6 sm:p-8 rounded-2xl bg-cyan-600 text-white"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <Award className="w-5 h-5" />
-              <h4 className="font-semibold">Forum Member Benefits</h4>
+            <div className="flex items-center gap-2.5 sm:gap-3 mb-6 sm:mb-8">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+              <h4 className="font-bold text-sm sm:text-base uppercase tracking-wider">Forum Member Benefits</h4>
             </div>
-            <ul className="space-y-4 mb-6">
+            <ul className="space-y-4 sm:space-y-5 mb-8 sm:mb-10">
               {[
                 { icon: Shield, text: "Priority processing for trade finance" },
                 { icon: DollarSign, text: "Preferential FX rates on export proceeds" },
@@ -242,17 +242,17 @@ const ExportersForum: React.FC = () => {
                 { icon: Briefcase, text: "Trade missions & buyer connections" },
                 { icon: Globe, text: "Market intelligence & advisory" },
               ].map((item) => (
-                <li key={item.text} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-4 h-4" />
+                <li key={item.text} className="flex items-start gap-3 sm:gap-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <span className="text-sm">{item.text}</span>
+                  <span className="text-[13px] sm:text-sm font-medium mt-1.5 sm:mt-2.5 leading-tight">{item.text}</span>
                 </li>
               ))}
             </ul>
-            <Button variant="primary" className="w-full bg-white dark:bg-neutral-800 text-cyan-600 hover:bg-cyan-50">
+            <Button variant="primary" size="lg" className="w-full bg-white dark:bg-neutral-800 text-cyan-600 hover:bg-cyan-50 text-sm py-2.5 sm:py-3 px-8">
               Join Exporters Forum
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
             </Button>
           </motion.div>
         </div>

@@ -107,23 +107,23 @@ const forumStats = [
 // ========================
 const DistributorsForum: React.FC = () => {
   return (
-    <Section id="distributors-forum" className="py-16 lg:py-24">
+    <Section id="distributors-forum" className="py-10 sm:py-16 lg:py-24">
       <Container>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-12"
+          className="text-center max-w-3xl mx-auto mb-8 sm:mb-12"
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-sm font-medium mb-4">
-            <Users className="w-4 h-4" />
+          <span className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] sm:text-xs font-medium mb-3 sm:mb-4 uppercase tracking-wider">
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             Distributors Forum
           </span>
-          <h2 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-2 sm:mb-4 leading-tight">
             Empowering Distribution Networks
           </h2>
-          <p className="text-lg text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm sm:text-lg text-neutral-600 dark:text-neutral-300 px-4">
             Exclusive financing and support programs for authorized distributors 
             of our principal partners, designed to grow your business.
           </p>
@@ -134,15 +134,15 @@ const DistributorsForum: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12"
         >
           {forumStats.map((stat) => (
             <div
               key={stat.label}
-              className="text-center p-4 rounded-xl bg-orange-50 border border-orange-100"
+              className="text-center p-3 sm:p-4 rounded-xl bg-orange-50 dark:bg-neutral-900 border border-orange-100 dark:border-neutral-800"
             >
-              <p className="text-2xl lg:text-3xl font-bold text-orange-600">{stat.value}</p>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-1">{stat.label}</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600">{stat.value}</p>
+              <p className="text-[10px] sm:text-xs text-neutral-600 dark:text-neutral-400 mt-1 uppercase tracking-wider font-medium">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -157,22 +157,22 @@ const DistributorsForum: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className={cn(
-                "relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
-                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-orange-300 transition-all duration-300"
+                "relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700",
+                "hover:shadow-lg dark:hover:shadow-neutral-900/50 hover:border-orange-300 transition-all duration-300 flex flex-col"
               )}
             >
-              <div className="w-14 h-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
-                {benefit.icon}
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-3 sm:mb-4 shrink-0">
+                {React.cloneElement(benefit.icon as React.ReactElement, { className: "w-5 h-5 sm:w-6 sm:h-6" })}
               </div>
               
-              <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">{benefit.name}</h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">{benefit.description}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white mb-1.5 sm:mb-2 leading-tight">{benefit.name}</h3>
+              <p className="text-[13px] sm:text-sm text-neutral-500 dark:text-neutral-400 mb-4 sm:mb-5 leading-relaxed">{benefit.description}</p>
               
-              <ul className="space-y-2">
+              <ul className="space-y-1.5 sm:space-y-2 mt-auto">
                 {benefit.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-orange-500" />
-                    <span className="text-sm text-neutral-600 dark:text-neutral-300">{feature}</span>
+                  <li key={feature} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 mt-0.5 shrink-0" />
+                    <span className="text-[13px] sm:text-sm text-neutral-600 dark:text-neutral-300 leading-tight">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -185,22 +185,22 @@ const DistributorsForum: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="p-6 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 mb-12"
+          className="p-5 sm:p-8 rounded-2xl bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 mb-8 sm:mb-12"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <Building2 className="w-5 h-5 text-slate-500" />
-            <h4 className="font-semibold text-neutral-900 dark:text-white">Principal Partners</h4>
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-6">
+            <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+            <h4 className="font-bold text-neutral-900 dark:text-white text-sm sm:text-base">Principal Partners</h4>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {principalPartners.map((partner) => (
               <span
                 key={partner}
-                className="px-4 py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 text-sm text-neutral-700 dark:text-neutral-200"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-[11px] sm:text-sm text-neutral-700 dark:text-neutral-200 font-medium"
               >
                 {partner}
               </span>
             ))}
-            <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-700 text-sm font-medium">
+            <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-[11px] sm:text-sm font-bold">
               +40 more
             </span>
           </div>
