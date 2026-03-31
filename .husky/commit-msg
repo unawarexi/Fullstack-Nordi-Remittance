@@ -1,0 +1,28 @@
+#!/bin/sh
+# ============================================================================
+# COMMIT-MSG HOOK — Nordi Remittance Fintech Platform
+# Enforces conventional commit messages for audit trail compliance
+# ============================================================================
+
+echo "📝 Validating commit message..."
+
+npx --no -- commitlint --edit "$1"
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Commit message does not follow conventional commits format."
+  echo ""
+  echo "   Expected format: <type>(<scope>): <subject>"
+  echo ""
+  echo "   Types: feat, fix, docs, style, refactor, perf, test,"
+  echo "          build, ci, chore, revert, security, hotfix, release"
+  echo ""
+  echo "   Examples:"
+  echo "     feat(auth): add biometric authentication flow"
+  echo "     fix(payments): resolve decimal precision in transfers"
+  echo "     security(kyc): patch identity verification bypass"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Commit message validated!"

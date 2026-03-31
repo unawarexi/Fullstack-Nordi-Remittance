@@ -1,0 +1,17 @@
+#!/bin/sh
+# ============================================================================
+# PRE-COMMIT HOOK — Nordi Remittance Fintech Platform
+# Runs lint-staged on all staged files across the monorepo
+# ============================================================================
+
+echo "🔍 Running pre-commit checks..."
+
+npx lint-staged --concurrent false
+
+if [ $? -ne 0 ]; then
+  echo "❌ Pre-commit checks failed. Commit aborted."
+  echo "   Fix the issues above and try again."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"

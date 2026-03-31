@@ -1,0 +1,43 @@
+#!/bin/sh
+# ============================================================================
+# PRE-PUSH HOOK — Nordi Remittance Fintech Platform
+# Runs type-checking across both projects before allowing push
+# ============================================================================
+
+echo "🚀 Running pre-push checks..."
+
+# ── Frontend Type Check ──────────────────────────────────────────────────────
+echo "📝 [Frontend] Type checking..."
+(cd Frontend-Nordi-Remittance && npx tsc --noEmit) 2>/dev/null
+FRONTEND_EXIT=$?
+
+if [ $FRONTEND_EXIT -ne 0 ]; then
+  echo "❌ [Frontend] Type check failed. Push aborted."
+  exit 1
+fi
+echo "✅ [Frontend] Type check passed."
+
+# ── Backend Type Check ───────────────────────────────────────────────────────
+echo "📝 [Backend] Type checking..."
+(cd Backend-Nordi-remittance && npm run typecheck)
+BACKEND_EXIT=$?
+
+if [ $BACKEND_EXIT -ne 0 ]; then
+  echo "❌ [Backend] Type check failed. Push aborted."
+  exit 1
+fi
+echo "✅ [Backend] Type check passed."
+
+# ── Backend Lint ─────────────────────────────────────────────────────────────
+echo "🔍 [Backend] Linting..."
+(cd Backend-Nordi-remittance && npm run lint)
+LINT_EXIT=$?
+
+if [ $LINT_EXIT -ne 0 ]; then
+  echo "❌ [Backend] Lint check failed. Push aborted."
+  exit 1
+fi
+echo "✅ [Backend] Lint passed."
+
+echo ""
+echo "✅ All pre-push checks passed! Pushing to remote..."

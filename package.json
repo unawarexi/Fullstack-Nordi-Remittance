@@ -1,0 +1,50 @@
+{
+  "name": "nordi-remittance-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nordi Remittance - Full-Stack Fintech Banking Platform",
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "cd Frontend-Nordi-Remittance && npm run lint",
+    "lint:backend": "cd Backend-Nordi-remittance && npm run lint",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "typecheck:frontend": "cd Frontend-Nordi-Remittance && npm run typecheck",
+    "typecheck:backend": "cd Backend-Nordi-remittance && npm run typecheck",
+    "typecheck": "npm run typecheck:frontend && npm run typecheck:backend",
+    "test:frontend": "cd Frontend-Nordi-Remittance && npm run test",
+    "test:backend": "cd Backend-Nordi-remittance && npm run test",
+    "test": "npm run test:frontend && npm run test:backend",
+    "build:frontend": "cd Frontend-Nordi-Remittance && npm run build",
+    "build:backend": "cd Backend-Nordi-remittance && npm run build",
+    "build": "npm run build:frontend && npm run build:backend",
+    "dev:frontend": "cd Frontend-Nordi-Remittance && npm run dev",
+    "dev:backend": "cd Backend-Nordi-remittance && npm run dev",
+    "docker:dev": "docker-compose -f docker-compose.yml up --build",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d --build",
+    "docker:down": "docker-compose down",
+    "validate": "npm run typecheck && npm run lint && npm run test"
+  },
+  "lint-staged": {
+    "Frontend-Nordi-Remittance/**/*.{ts,tsx}": [
+      "eslint --fix --config Frontend-Nordi-Remittance/.eslintrc.cjs",
+      "prettier --write"
+    ],
+    "Backend-Nordi-remittance/**/*.{ts}": [
+      "eslint --fix --config Backend-Nordi-remittance/eslint.config.ts"
+    ],
+    "*.{json,yml,yaml,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.5.3"
+  }
+}
