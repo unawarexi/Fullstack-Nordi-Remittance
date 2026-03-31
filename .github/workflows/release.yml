@@ -1,0 +1,188 @@
+# ============================================================================
+# NORDI REMITTANCE — RELEASE PIPELINE
+# Automated release management with changelog generation
+# ============================================================================
+
+name: "🏷️ Release"
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 1.2.0)"
+        required: true
+        type: string
+      prerelease:
+        description: "Pre-release?"
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: "20"
+  REGISTRY: ghcr.io
+
+jobs:
+  # ══════════════════════════════════════════════════════════════════════════
+  # VALIDATE
+  # ══════════════════════════════════════════════════════════════════════════
+  validate:
+    name: "✅ Validate Release"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Validate Backend
+      - name: Install backend dependencies
+        working-directory: Backend-Nordi-remittance
+        run: npm ci
+
+      - name: Backend type check
+        working-directory: Backend-Nordi-remittance
+        run: npm run typecheck
+
+      - name: Backend lint
+        working-directory: Backend-Nordi-remittance
+        run: npm run lint
+
+      - name: Backend build
+        working-directory: Backend-Nordi-remittance
+        run: npm run build
+
+      # Validate Frontend
+      - name: Install frontend dependencies
+        working-directory: Frontend-Nordi-Remittance
+        run: npm ci
+
+      - name: Frontend type check
+        working-directory: Frontend-Nordi-Remittance
+        run: npm run typecheck
+
+      - name: Frontend build
+        working-directory: Frontend-Nordi-Remittance
+        run: npm run build
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # CREATE RELEASE
+  # ══════════════════════════════════════════════════════════════════════════
+  release:
+    name: "🏷️ Create Release"
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 10
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges ${PREV_TAG}..HEAD)
+          fi
+
+          # Categorize commits
+          echo "## What's Changed" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🚀 Features" >> RELEASE_NOTES.md
+          echo "$CHANGELOG" | grep -i "^- feat" >> RELEASE_NOTES.md || echo "- No new features" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🐛 Bug Fixes" >> RELEASE_NOTES.md
+          echo "$CHANGELOG" | grep -i "^- fix" >> RELEASE_NOTES.md || echo "- No bug fixes" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🛡️ Security" >> RELEASE_NOTES.md
+          echo "$CHANGELOG" | grep -i "^- security" >> RELEASE_NOTES.md || echo "- No security updates" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
+          echo "### 🔧 Other Changes" >> RELEASE_NOTES.md
+          echo "$CHANGELOG" | grep -iv "^- feat\|^- fix\|^- security" >> RELEASE_NOTES.md || echo "- No other changes" >> RELEASE_NOTES.md
+
+          cat RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: ${{ inputs.prerelease || false }}
+          generate_release_notes: true
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # BUILD RELEASE IMAGES
+  # ══════════════════════════════════════════════════════════════════════════
+  docker-release:
+    name: "🐳 Release Images"
+    runs-on: ubuntu-latest
+    needs: release
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        include:
+          - name: api
+            context: ./Backend-Nordi-remittance
+            dockerfile: ./Backend-Nordi-remittance/Dockerfile
+          - name: frontend
+            context: ./Frontend-Nordi-Remittance
+            dockerfile: ./Frontend-Nordi-Remittance/Dockerfile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/nordi-${{ matrix.name }}:${{ steps.version.outputs.version }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/nordi-${{ matrix.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
