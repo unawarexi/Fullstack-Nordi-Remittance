@@ -24,7 +24,7 @@ import {
 import { Logo } from "@components/shared/Logo";
 import { Button } from "@components/ui/Button";
 import { ThemeToggle } from "@components/shared/ThemeToggle";
-import Countries from "@core/data/Countries";
+import { CountrySelect } from "@components/shared/CountrySelect";
 
 // ========================
 // NAV DATA - Synced with MegaNavbar routes
@@ -279,18 +279,19 @@ export const MobileNavbar: React.FC = () => {
   return (
     <AnimatePresence>
       {isMobileMenuOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
+        <motion.div
+            key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeMobileMenu}
             className="fixed inset-0 z-[100] bg-[#000000]/50 backdrop-blur-sm"
           />
+      )}
 
-          {/* Menu Panel */}
+      {isMobileMenuOpen && (
           <motion.div
+            key="panel"
             variants={menuVariants}
             initial="closed"
             animate="open"
@@ -347,18 +348,12 @@ export const MobileNavbar: React.FC = () => {
 
             {/* Country Selector */}
             <div className="border-t border-neutral-200 p-4 dark:border-neutral-800">
-              <div className="mb-4 flex items-center gap-2">
+              <div className="mb-4 flex items-center gap-2 relative z-50">
                 <Globe
                   size={18}
                   className="text-neutral-500 dark:text-neutral-400"
                 />
-                <select className="flex-1 rounded-lg border-none bg-neutral-100 px-3 py-2 text-sm text-neutral-900 outline-none dark:bg-neutral-800 dark:text-white">
-                  {Countries.slice(0, 10).map((country, index) => (
-                    <option key={index} value={country.code}>
-                      {country.flag} {country.name}
-                    </option>
-                  ))}
-                </select>
+                <CountrySelect className="flex-1 w-full" value="US" />
               </div>
 
               {/* CTA Buttons */}
@@ -377,7 +372,6 @@ export const MobileNavbar: React.FC = () => {
               </div>
             </div>
           </motion.div>
-        </>
       )}
     </AnimatePresence>
   );

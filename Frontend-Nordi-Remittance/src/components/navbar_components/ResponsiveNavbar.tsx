@@ -14,7 +14,7 @@ import MobileNavbar from "./MobileNavbar";
 import MegaNavbar from "./MegaNavbar";
 import InternetBankingSideBar from "./InternetBankingSideBar";
 import { ThemeToggle } from "@components/shared/ThemeToggle";
-import Countries from "@core/data/Countries";
+import { CountrySelect } from "@components/shared/CountrySelect";
 import Images from '@constants/images';
 
 // ========================
@@ -70,15 +70,9 @@ const SubNavBar: React.FC = () => {
           </div>
 
           {/* Country Selector - Always visible but smaller on mobile */}
-          <div className="flex items-center gap-2">
-            <Globe size={16} className="text-foreground-muted" />
-            <select className="rounded-md border border-border-primary bg-surface-primary px-2 py-1 text-xs text-foreground-primary outline-none focus:ring-2 focus:ring-primary-500 dark:bg-neutral-800 sm:text-sm">
-              {Countries.slice(0, 10).map((country, index) => (
-                <option key={index} value={country.code}>
-                  {country.flag} {country.name}
-                </option>
-              ))}
-            </select>
+          <div className="flex items-center gap-2 z-50">
+            <Globe size={16} className="text-foreground-muted hidden sm:block" />
+            <CountrySelect value="US" compact={true} />
           </div>
         </div>
       </div>

@@ -56,8 +56,6 @@ const InternetBankingSideBar: React.FC = () => {
   return (
     <AnimatePresence>
       {isSidebarOpen && (
-        <>
-          {/* Backdrop Overlay */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -66,8 +64,9 @@ const InternetBankingSideBar: React.FC = () => {
             className="fixed inset-0 z-[99] bg-black/40 backdrop-blur-sm"
             onClick={closeSidebar}
           />
+      )}
 
-          {/* Sidebar */}
+      {isSidebarOpen && (
           <motion.div
             key="sidebar"
             variants={sidebarVariants}
@@ -196,7 +195,6 @@ const InternetBankingSideBar: React.FC = () => {
               </p>
             </div>
           </motion.div>
-        </>
       )}
     </AnimatePresence>
   );
