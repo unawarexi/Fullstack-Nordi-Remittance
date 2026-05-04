@@ -6,7 +6,7 @@
 
 .PHONY: help dev start clean install lint lint-fix typecheck validate \
         test test-run test-watch test-coverage test-ui \
-        db-seed db-indexes db-status db-shell \
+        db-seed db-indexes db-status db-shell db-drop-stale-index \
         docker-up docker-down docker-rebuild docker-logs docker-ps \
         docker-up-infra docker-clean docker-shell \
         redis-cli redis-flush redis-monitor redis-info redis-keys \
@@ -150,6 +150,9 @@ mongo-restore: ## Restore latest dump (usage: make mongo-restore dump=backups/du
 	docker compose exec $(MONGO_CONTAINER) mongorestore \
 		--db $(MONGO_DB) --drop /tmp/restore
 	@echo "$(YELLOW)⚠ Restore requires: docker cp <dump> container:/tmp/restore first$(RESET)"
+
+db-drop-stale-index: ## Drop the stale eventId_1 index from securityevents (run once if seeing E11000 errors)
+	npx tsx scripts/drop-stale-index.ts
 
 # ============================================================================
 #  DOCKER COMPOSE

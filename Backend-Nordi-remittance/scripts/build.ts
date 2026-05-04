@@ -1,28 +1,32 @@
-import logger from 'jet-logger';
-import { copy, copyFilesRec, exec, remove } from './common/utils';
+import logger from "jet-logger";
+import { exec, remove } from "./common/utils.js";
 
-/******************************************************************************
-                                  Run
-******************************************************************************/
+// ============================================================================
+// BUILD SCRIPT — Nordi Remittance Backend
+// Compiles TypeScript with tsconfig.prod.json → dist/
+// ============================================================================
 
-/**
- * Start
- */
 (async () => {
   try {
-    // Remove current build
-    await remove('./dist/');
-    await exec('npm run lint', '../');
-    await exec('tsc --project tsconfig.prod.json', '../');
-    // Copy
-    await copyFilesRec('./src', './dist', ['.ts']);
-    await copy('./temp/config.js', './config.js');
-    await copy('./temp/src', './dist');
-    await remove('./temp/');
+    logger.info("🧹 Removing previous build artifacts...");
+    await remove("./dist/");
+    await remove("./temp/");
+
+    logger.info("🔨 Compiling TypeScript (tsconfig.prod.json)...");
+    // exec() resolves loc relative to the calling script (scripts/build.ts),
+    // so "../" points to the project root where tsconfig.prod.json lives.
+    await exec("tsc --project tsconfig.prod.json", "../");
+
+    // tsconfig.prod.json outDir is ./temp — rename it to ./dist
+    logger.info("📦 Moving temp → dist...");
+    await exec("mv temp dist", "../");
+
+    logger.info("✅ Build complete → dist/");
   } catch (err) {
     logger.err(err);
-    // eslint-disable-next-line n/no-process-exit
     process.exit(1);
   }
 })();
+
+
 
