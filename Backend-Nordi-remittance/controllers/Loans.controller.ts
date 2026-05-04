@@ -27,7 +27,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -365,7 +365,7 @@ export async function applyForLoan(
       term: termMonths,
     });
 
-    sendTemplatedMail((user as any).email, emailContent).catch(console.error);
+    queueTemplatedMail((user as any).email, emailContent).catch(console.error);
 
     emitToUser(req.user!.userId, WS.LOAN.APPLICATION_SUBMITTED, {
       applicationId: application.applicationId || application._id,
@@ -838,7 +838,7 @@ export async function reviewApplication(
         term: application.term,
       });
 
-      sendTemplatedMail(user.email, approvalEmailContent).catch(console.error);
+      queueTemplatedMail(user.email, approvalEmailContent).catch(console.error);
     } else if (decision === "reject") {
       application.status = "rejected";
       application.rejectionReason = reason;
@@ -858,7 +858,7 @@ export async function reviewApplication(
         term: application.term,
       });
 
-      sendTemplatedMail(user.email, rejectionEmailContent).catch(console.error);
+      queueTemplatedMail(user.email, rejectionEmailContent).catch(console.error);
     }
 
     await application.save({ session });
@@ -977,7 +977,7 @@ export async function disburseLoan(
         monthlyPayment: String(loan.monthlyPayment),
       });
 
-      sendTemplatedMail((user as any).email, disbursementEmailContent).catch(
+      queueTemplatedMail((user as any).email, disbursementEmailContent).catch(
         console.error,
       );
     }

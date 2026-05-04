@@ -5,7 +5,7 @@
 # Run 'make help' for available commands
 # ============================================================================
 
-.PHONY: help install dev start build test lint clean docker db all
+.PHONY: help install dev start build test lint clean docker db all kafka queue
 
 # Colors for terminal output
 CYAN := \033[36m
@@ -243,6 +243,70 @@ precommit: lint-fix typecheck test-quick ## Pre-commit checks
 
 prepush: validate ## Pre-push checks (full validation)
 	@echo "$(GREEN)✅ Pre-push checks passed!$(RESET)"
+
+# ============================================================================
+# KAFKA
+# ============================================================================
+
+KAFKA_CONTAINER ?= nordi-kafka
+
+kafka-start: ## Start Kafka broker via docker-compose
+	@echo "$(CYAN)🚀 Starting Kafka broker...$(RESET)"
+	docker-compose up -d kafka zookeeper
+	@echo "$(GREEN)✅ Kafka started$(RESET)"
+
+kafka-stop: ## Stop Kafka broker
+	@echo "$(YELLOW)🛑 Stopping Kafka broker...$(RESET)"
+	docker-compose stop kafka zookeeper
+
+kafka-status: ## Check Kafka broker status
+	@echo "$(CYAN)📊 Kafka status:$(RESET)"
+	@docker-compose ps kafka zookeeper 2>/dev/null || echo "$(YELLOW)Kafka not running$(RESET)"
+
+kafka-topics: ## List all Kafka topics
+	@echo "$(CYAN)📋 Kafka topics:$(RESET)"
+	docker exec $(KAFKA_CONTAINER) kafka-topics.sh --bootstrap-server localhost:9092 --list 2>/dev/null || \
+		echo "$(RED)❌ Kafka not accessible$(RESET)"
+
+kafka-init: ## Create all application Kafka topics
+	@echo "$(CYAN)🔧 Creating Kafka topics...$(RESET)"
+	@for topic in \
+		nordi.transaction.initiated nordi.transaction.processed nordi.transaction.completed nordi.transaction.failed \
+		nordi.kyc.submitted nordi.kyc.verified nordi.kyc.rejected \
+		nordi.security.fraud_alert \
+		nordi.user.registered nordi.user.login nordi.user.deleted \
+		nordi.notifications.push nordi.notifications.email nordi.notifications.sms \
+		nordi.dlq; do \
+		docker exec $(KAFKA_CONTAINER) kafka-topics.sh \
+			--bootstrap-server localhost:9092 \
+			--create --if-not-exists --topic $$topic \
+			--replication-factor 1 --partitions 3 2>/dev/null && echo "  ✓ $$topic"; \
+	done
+	@echo "$(GREEN)✅ Kafka topics created$(RESET)"
+
+kafka-console: ## Open Kafka consumer console (usage: make kafka-console TOPIC=nordi.user.registered)
+	@echo "$(CYAN)📡 Listening on topic: $(TOPIC)$(RESET)"
+	docker exec -it $(KAFKA_CONTAINER) kafka-console-consumer.sh \
+		--bootstrap-server localhost:9092 \
+		--topic $(TOPIC) --from-beginning
+
+kafka-logs: ## Tail Kafka broker logs
+	@docker-compose logs -f kafka 2>/dev/null
+
+# ============================================================================
+# BULLMQ / QUEUE
+# ============================================================================
+
+queue-status: ## Check BullMQ queue status (requires Redis)
+	@echo "$(CYAN)📊 BullMQ queue counts:$(RESET)"
+	@redis-cli -u $${REDIS_URL:-redis://localhost:6379} keys "nordi-*" 2>/dev/null | sort || \
+		echo "$(YELLOW)Redis not accessible$(RESET)"
+
+queue-flush: ## Flush all BullMQ queues (CAUTION: deletes jobs)
+	@echo "$(RED)⚠️  Flushing BullMQ queues...$(RESET)"
+	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 0
+	@redis-cli -u $${REDIS_URL:-redis://localhost:6379} keys "nordi-*" | xargs -r redis-cli del
+	@echo "$(GREEN)✅ Queues flushed$(RESET)"
 
 # ============================================================================
 # QUICK SHORTCUTS

@@ -30,7 +30,7 @@ import {
   ForbiddenError,
   InsufficientBalanceError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -190,7 +190,7 @@ async function sendVerificationCodeEmail(
       "This is an automated security notification from Nordea Remittance.",
   };
 
-  await sendTemplatedMail(String(user.email), emailContent as any);
+  await queueTemplatedMail(String(user.email), emailContent as any);
 }
 
 // ============================================================================

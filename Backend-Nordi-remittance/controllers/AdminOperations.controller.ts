@@ -40,7 +40,7 @@ import {
   ForbiddenError,
   InsufficientBalanceError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -415,7 +415,7 @@ export async function creditUserWallet(
     // Send email notification (using generic notification)
     // Email is optional - log error but don't fail
     try {
-      await sendTemplatedMail(String(user.email), {
+      await queueTemplatedMail(String(user.email), {
         EMAIL_TITLE: "Wallet Credited",
         GREETING: `Hello ${user.firstName},`,
         MAIN_CONTENT: `
@@ -630,7 +630,7 @@ export async function debitUserWallet(
 
     // Send email notification (optional)
     try {
-      await sendTemplatedMail(String(user.email), {
+      await queueTemplatedMail(String(user.email), {
         EMAIL_TITLE: "Wallet Debited",
         GREETING: `Hello ${user.firstName},`,
         MAIN_CONTENT: `
@@ -1035,7 +1035,7 @@ export async function approveLoan(
 
       // Send email notification
       try {
-        await sendTemplatedMail(String(user.email), {
+        await queueTemplatedMail(String(user.email), {
           EMAIL_TITLE: "Loan Application Approved",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `
@@ -1152,7 +1152,7 @@ export async function rejectLoan(
 
       // Send email notification
       try {
-        await sendTemplatedMail(String(user.email), {
+        await queueTemplatedMail(String(user.email), {
           EMAIL_TITLE: "Loan Application Update",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `
@@ -1447,7 +1447,7 @@ export async function approveCard(
 
       // Send email
       try {
-        await sendTemplatedMail(String(user.email), {
+        await queueTemplatedMail(String(user.email), {
           EMAIL_TITLE: "Card Application Approved",
           GREETING: `Hello ${user.firstName},`,
           MAIN_CONTENT: `

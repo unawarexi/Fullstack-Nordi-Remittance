@@ -36,7 +36,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
 import { emitToUser } from "../services/websocket.service.js";
@@ -278,7 +278,7 @@ export async function createVirtualCard(
       cardId: card.cardId || card._id.toString(),
     });
 
-    sendTemplatedMail((user as any).email, emailContent).catch(console.error);
+    queueTemplatedMail((user as any).email, emailContent).catch(console.error);
 
     emitToUser(req.user!.userId, WS.CARD.CREATED, {
       cardId: card.cardId || card._id,
@@ -608,7 +608,7 @@ export async function blockCard(
         blockedBy: "user",
       });
 
-      sendTemplatedMail((user as any).email, emailContent).catch(console.error);
+      queueTemplatedMail((user as any).email, emailContent).catch(console.error);
     }
 
     emitToUser(req.user!.userId, WS.CARD.BLOCKED, {
@@ -721,7 +721,7 @@ export async function reportLostStolen(
         reportedAt: new Date().toISOString(),
       });
 
-      sendTemplatedMail((user as any).email, emailContent).catch(console.error);
+      queueTemplatedMail((user as any).email, emailContent).catch(console.error);
     }
 
     emitToUser(req.user!.userId, WS.CARD.REPORTED, {

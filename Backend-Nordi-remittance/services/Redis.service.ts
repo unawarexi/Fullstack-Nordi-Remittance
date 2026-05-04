@@ -8,6 +8,7 @@ import { createClient, RedisClientType } from 'redis';
 import { env } from '../config/env.config.js';
 import Logger from '../logs/logger.js';
 
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -205,7 +206,6 @@ export const CACHE_KEYS = {
 // ============================================================================
 // TTL CONSTANTS (in seconds)
 // ============================================================================
-
 export const CACHE_TTL = {
   USER_PROFILE: 300,        // 5 minutes
   USER_WALLETS: 60,         // 1 minute (balance changes frequently)
@@ -227,7 +227,8 @@ export const CACHE_TTL = {
   LOANS: 300,               // 5 minutes
   INVESTMENTS: 300,         // 5 minutes
   KYC: 600,                 // 10 minutes
-};
+}
+
 
 // ============================================================================
 // CORE CACHE OPERATIONS

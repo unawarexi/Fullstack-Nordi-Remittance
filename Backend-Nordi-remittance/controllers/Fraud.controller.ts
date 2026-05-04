@@ -28,7 +28,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -367,7 +367,7 @@ export async function updateFraudCase(
                 "Our investigation has been completed and no issues were found.",
             });
 
-            sendTemplatedMail(String(user.email), emailContent).catch(
+            queueTemplatedMail(String(user.email), emailContent).catch(
               console.error,
             );
           } else if (resolution === "confirmed_fraud") {

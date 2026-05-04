@@ -27,7 +27,7 @@ import {
   verify2FACode as redisVerify2FACode,
   cacheGet,
 } from "../services/redis.service.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { createClerkClient } from "@clerk/express";
 import { Webhook } from "svix";
@@ -176,7 +176,7 @@ export async function clerkSync(
         userId: user._id.toString(),
       });
 
-      sendTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
+      queueTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
         console.error("Failed to send OTP email:", err),
       );
 
@@ -275,7 +275,7 @@ export async function clerkSyncAdmin(
         userId: userId,
       });
 
-      sendTemplatedMail(email, otpTemplateData).catch((err) =>
+      queueTemplatedMail(email, otpTemplateData).catch((err) =>
         console.error("Failed to send admin OTP email:", err),
       );
 
@@ -487,7 +487,7 @@ export async function resendClerkOtp(
       userId: user._id.toString(),
     });
 
-    sendTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
+    queueTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
       console.error("Failed to send OTP email:", err),
     );
 

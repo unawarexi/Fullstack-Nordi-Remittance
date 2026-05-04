@@ -16,7 +16,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -300,7 +300,7 @@ export async function verify2FASetup(
       userId: String(user._id),
     });
 
-    sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+    queueTemplatedMail(String(user.email), emailContent).catch(console.error);
 
     emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_ENABLED, {
       step: "confirmed",
@@ -384,7 +384,7 @@ export async function disable2FA(
       userId: String(user._id),
     });
 
-    sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+    queueTemplatedMail(String(user.email), emailContent).catch(console.error);
 
     emitToUser(req.user!.userId, WS.SECURITY.TWO_FA_DISABLED, {
       timestamp: new Date().toISOString(),

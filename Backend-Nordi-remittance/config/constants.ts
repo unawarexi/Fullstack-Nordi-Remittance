@@ -12,7 +12,6 @@
  */
 
 export { HttpStatus, constants } from "./env.config";
-export { CACHE_TTL } from "../services/redis.service";
 export { WS as SocketEvents } from "../core/constants/ws-events";
 export { KycStatus, TransactionType, TransactionStatus, UserRole } from "../types/index";
 
@@ -48,4 +47,19 @@ export const RateLimits = {
   PAYMENT: { windowMs: 10 * 60 * 1000, max: 5 },
   DRIVER_LOCATION: { windowMs: 1 * 60 * 1000, max: 60 },
   UPLOAD: { windowMs: 30 * 60 * 1000, max: 10 },
+} as const;
+
+
+// ============================================================================
+// BULLMQ QUEUES
+// ============================================================================
+
+export const BullQueues = {
+  EMAIL: "nordi-email",
+  NOTIFICATION: "nordi-notification",
+  TRANSACTION: "nordi-transaction",
+  KYC: "nordi-kyc",
+  FRAUD: "nordi-fraud",
+  AUDIT: "nordi-audit",
+  CLEANUP: "nordi-cleanup",
 } as const;

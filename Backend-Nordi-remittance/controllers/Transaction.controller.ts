@@ -31,7 +31,7 @@ import {
 } from "../core/errors/AppError.js";
 import { constants, HttpStatus } from "../config/env.config.js";
 import { validateUserEligibility } from "../core/guards/user-eligibility.guard.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser, broadcast } from "../services/websocket.service.js";
 import {
@@ -347,7 +347,7 @@ export async function internalTransfer(
         };
         const senderEmailContent =
           emailGenerator.transactionNotification(senderEmailData);
-        await sendTemplatedMail(String(sender.email), senderEmailContent);
+        await queueTemplatedMail(String(sender.email), senderEmailContent);
       })(),
       // Email to recipient using template
       (async () => {
@@ -365,7 +365,7 @@ export async function internalTransfer(
         };
         const recipientEmailContent =
           emailGenerator.transactionNotification(recipientEmailData);
-        await sendTemplatedMail(String(recipient.email), recipientEmailContent);
+        await queueTemplatedMail(String(recipient.email), recipientEmailContent);
       })(),
       // Create notifications
       Notifications.insertMany([
@@ -616,7 +616,7 @@ export async function deposit(
         };
         const depositEmailContent =
           emailGenerator.transactionNotification(depositEmailData);
-        await sendTemplatedMail(String(user.email), depositEmailContent);
+        await queueTemplatedMail(String(user.email), depositEmailContent);
       })(),
       Notifications.create({
         userId: user._id,
@@ -832,7 +832,7 @@ export async function withdraw(
         };
         const withdrawalEmailContent =
           emailGenerator.transactionNotification(withdrawalEmailData);
-        await sendTemplatedMail(String(user.email), withdrawalEmailContent);
+        await queueTemplatedMail(String(user.email), withdrawalEmailContent);
       })(),
       Notifications.create({
         userId: user._id,

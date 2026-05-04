@@ -25,7 +25,7 @@ import {
   ValidationError,
   NotFoundError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -416,7 +416,7 @@ export async function createDisputeClaim(
         submittedAt: new Date().toISOString(),
       });
 
-      sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+      queueTemplatedMail(String(user.email), emailContent).catch(console.error);
     }
 
     emitToUser(req.user!.userId, WS.DISPUTE.CREATED, {
@@ -604,7 +604,7 @@ export async function updateDisputeClaim(
         updatedAt: new Date().toISOString(),
       });
 
-      sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+      queueTemplatedMail(String(user.email), emailContent).catch(console.error);
     }
 
     emitToUser(String(claim.user), WS.DISPUTE.STATUS_UPDATED, {

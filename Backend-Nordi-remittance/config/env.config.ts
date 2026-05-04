@@ -34,6 +34,7 @@ interface EnvConfig {
   REDIS_PORT: number;
   REDIS_PASSWORD: string;
   REDIS_DB: string;
+  BULLMQ_REDIS_URL: string;
 
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: string;
@@ -151,7 +152,7 @@ export const env: EnvConfig = {
   REDIS_PORT: getEnvNumber("REDIS_PORT", 6379),
   REDIS_PASSWORD: getEnvString("REDIS_PASSWORD", ""),
   REDIS_DB: getEnvString("REDIS_DB", "0"),
-
+  BULLMQ_REDIS_URL: getEnvString("BULLMQ_REDIS_URL", ""),
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: getEnvString("CLOUDINARY_CLOUD_NAME", ""),
   CLOUDINARY_API_KEY: getEnvString("CLOUDINARY_API_KEY", ""),

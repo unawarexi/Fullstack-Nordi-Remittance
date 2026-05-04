@@ -29,7 +29,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -898,7 +898,7 @@ export async function submitVerification(
         "Your KYC documents have been submitted for review. We will notify you once the review is complete.",
       userId: req.user.userId,
     });
-    await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
+    await queueTemplatedMail(user.email as string, emailContent).catch(() => {});
 
     // Emit WS event
     emitToUser(req.user.userId, WS.KYC.STATUS_UPDATED, {
@@ -1072,7 +1072,7 @@ export async function requestReverification(
         "Your re-verification request has been accepted. Please upload updated documents.",
       userId: req.user.userId,
     });
-    await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
+    await queueTemplatedMail(user.email as string, emailContent).catch(() => {});
 
     emitToUser(req.user.userId, WS.KYC.STATUS_UPDATED, {
       status: "pending",
@@ -1411,7 +1411,7 @@ export async function adminReviewKyc(
             : undefined,
       userId: userIdStr,
     });
-    await sendTemplatedMail(user.email as string, emailContent).catch(() => {});
+    await queueTemplatedMail(user.email as string, emailContent).catch(() => {});
 
     // Emit WebSocket event to the user
     emitToUser(userIdStr, WS.KYC.STATUS_UPDATED, {

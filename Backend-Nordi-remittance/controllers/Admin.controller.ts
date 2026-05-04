@@ -33,7 +33,7 @@ import {
   ForbiddenError,
 } from "../core/errors/AppError.js";
 import { generateAuthTokens } from "../core/helpers/token.helper.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { emitToUser, broadcast } from "../services/websocket.service.js";
 import { WS } from "../core/constants/ws-events.js";
@@ -266,7 +266,7 @@ export async function createAdminUser(
     };
 
     const emailContent = emailGenerator.adminAccountCreatedEmail(emailData);
-    sendTemplatedMail(email, emailContent).catch(console.error);
+    queueTemplatedMail(email, emailContent).catch(console.error);
 
     sendCreated(
       res,
@@ -767,7 +767,7 @@ export async function updateUserStatus(
       userId: (user._id as any).toString(),
     });
 
-    sendTemplatedMail(String((user as any).email), emailContent).catch(console.error);
+    queueTemplatedMail(String((user as any).email), emailContent).catch(console.error);
 
     emitToUser((user._id as any).toString(), WS.ADMIN.USER_STATUS_CHANGED, {
       userId: (user._id as any).toString(),
@@ -822,7 +822,7 @@ export async function resetUserPassword(
       userId: (user._id as any).toString(),
     });
 
-    sendTemplatedMail(String(user.email), emailContent).catch(console.error);
+    queueTemplatedMail(String(user.email), emailContent).catch(console.error);
 
     emitToUser((user._id as any).toString(), WS.ADMIN.USER_PASSWORD_RESET, {
       userId: (user._id as any).toString(),
@@ -1034,7 +1034,7 @@ export async function requestOtp(
       expiresIn: "10 minutes",
     });
 
-    await sendTemplatedMail(admin.email, emailContent);
+    await queueTemplatedMail(admin.email, emailContent);
 
     // Log action
     await AdminActionLogs.create({
@@ -1187,7 +1187,7 @@ export async function changeAdminPassword(
       email: admin.email,
       changedAt: new Date().toISOString(),
     });
-    sendTemplatedMail(admin.email, emailContent).catch(console.error);
+    queueTemplatedMail(admin.email, emailContent).catch(console.error);
 
     sendSuccess(res, null, "Password changed successfully");
   } catch (error) {
@@ -1272,8 +1272,8 @@ export async function changeAdminEmail(
         FOOTER_TEXT:
           "This is an automated security notification from Nordea Remittance.",
       };
-      sendTemplatedMail(oldEmail, emailContent as any).catch(console.error);
-      sendTemplatedMail(newEmail, emailContent as any).catch(console.error);
+      queueTemplatedMail(oldEmail, emailContent as any).catch(console.error);
+      queueTemplatedMail(newEmail, emailContent as any).catch(console.error);
     } catch (emailError) {
       console.error("Failed to send email change notification:", emailError);
     }
@@ -1544,7 +1544,7 @@ export async function updateAdminPermissions(
         FOOTER_TEXT:
           "This is an automated notification from Nordea Remittance.",
       };
-      sendTemplatedMail(targetAdmin.email, emailContent as any).catch(
+      queueTemplatedMail(targetAdmin.email, emailContent as any).catch(
         console.error,
       );
     } catch (emailError) {
@@ -1865,7 +1865,7 @@ export async function revokeAllPermissions(
         FOOTER_TEXT:
           "This is an automated notification from Nordea Remittance.",
       };
-      sendTemplatedMail(targetAdmin.email, emailContent as any).catch(
+      queueTemplatedMail(targetAdmin.email, emailContent as any).catch(
         console.error,
       );
     } catch (emailError) {

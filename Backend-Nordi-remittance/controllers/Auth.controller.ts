@@ -50,7 +50,7 @@ import {
   UserAlreadyExistsError,
 } from "../core/errors/AppError.js";
 import { constants, HttpStatus, env } from "../config/env.config.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import mongoose from "mongoose";
 import { emitToUser, broadcast } from "../services/websocket.service.js";
@@ -194,7 +194,7 @@ export async function register(
 
     // Send verification email (non-blocking)
     const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/verify-email?token=${verificationToken}`;
-    sendTemplatedMail(
+    queueTemplatedMail(
       user.email as string,
       emailGenerator.emailVerificationEmail({
         firstName: user.firstName as string,
@@ -518,7 +518,7 @@ export async function registerFullKyc(
 
     // Send verification email (non-blocking)
     const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/verify-email?token=${verificationToken}`;
-    sendTemplatedMail(
+    queueTemplatedMail(
       user.email as string,
       emailGenerator.accountCreatedEmail({
         firstName: user.firstName as string,
@@ -1289,7 +1289,7 @@ export async function resendVerificationEmail(
 
     // Send email
     const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/verify-email?token=${verificationToken}`;
-    await sendTemplatedMail(
+    await queueTemplatedMail(
       user.email as string,
       emailGenerator.emailVerificationEmail({
         firstName: user.firstName as string,
@@ -1358,7 +1358,7 @@ export async function forgotPassword(
 
     // Send email
     const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/auth/reset-password?token=${resetToken}`;
-    await sendTemplatedMail(
+    await queueTemplatedMail(
       user.email as string,
       emailGenerator.passwordResetEmail({
         firstName: user.firstName as string,
@@ -1459,7 +1459,7 @@ export async function resetPassword(
     });
 
     // Send confirmation email
-    await sendTemplatedMail(
+    await queueTemplatedMail(
       user.email as string,
       emailGenerator.passwordChangedEmail({
         firstName: user.firstName as string,
@@ -1569,7 +1569,7 @@ export async function changePassword(
     });
 
     // Send confirmation email
-    await sendTemplatedMail(
+    await queueTemplatedMail(
       user.email as string,
       emailGenerator.passwordChangedEmail({
         firstName: user.firstName as string,

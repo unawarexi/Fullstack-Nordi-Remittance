@@ -37,7 +37,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../core/errors/AppError.js";
-import { sendTemplatedMail } from "../services/mailer.service.js";
+import { queueTemplatedMail } from "../services/workers.js";
 import EmailContentGenerator from "../core/mail/Mail-content.js";
 import { env } from "../config/env.config.js";
 import { emitToUser, broadcast } from "../services/websocket.service.js";
@@ -333,7 +333,7 @@ export async function updateEmail(
       userId: String(user._id),
     });
 
-    await sendTemplatedMail(newEmail, emailContent);
+    await queueTemplatedMail(newEmail, emailContent);
 
     sendSuccess(res, null, "Verification code sent to new email");
   } catch (error) {
@@ -784,7 +784,7 @@ export async function disable2FA(
       userId: String(user._id),
     });
 
-    await sendTemplatedMail(user.email as string, emailContent);
+    await queueTemplatedMail(user.email as string, emailContent);
 
     // Invalidate Redis cache
     await invalidateUserCache(req.user.userId);
@@ -1085,7 +1085,7 @@ export async function requestAccountDeletion(
       userId: String(user._id),
     });
 
-    await sendTemplatedMail(user.email as string, emailContent);
+    await queueTemplatedMail(user.email as string, emailContent);
 
     sendSuccess(res, null, "Account deletion confirmation sent to your email");
   } catch (error) {
@@ -1433,7 +1433,7 @@ export async function updateUserKyc(
       userId: id as string,
     });
 
-    await sendTemplatedMail(user.email as string, emailContent);
+    await queueTemplatedMail(user.email as string, emailContent);
 
     // Invalidate user and KYC cache
     await Promise.all([

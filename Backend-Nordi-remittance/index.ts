@@ -53,6 +53,8 @@ import AiAgentRoutes from "./routes/AiAgent.routes.js";
 // Services
 import { initializeWebSocket } from "./services/websocket.service.js";
 import { getRedisClient } from "./services/redis.service.js";
+import { startWorkers } from "./services/workers.js";
+import { initializeKafka, getKafkaService } from "./services/kafka.service.js";
 
 // Seeders
 import { runSeeders } from "./scripts/seedAdmin.js";
@@ -293,6 +295,16 @@ async function startServer(): Promise<void> {
     // Connect to Redis
     await getRedisClient();
 
+    // Initialize Kafka (producer + ensure topics)
+    if (env.KAFKA_BROKERS) {
+      await initializeKafka();
+    } else {
+      Logger.warn("[Kafka] KAFKA_BROKERS not set — Kafka disabled");
+    }
+
+    // Start BullMQ workers (queues + processors)
+    startWorkers();
+
     // Start HTTP server
     const PORT = env.PORT || 5000;
 
@@ -338,6 +350,24 @@ async function gracefulShutdown(signal: string): Promise<void> {
     await disconnectRedis();
   } catch (error) {
     Logger.error("Error during Redis disconnect", { error });
+  }
+
+  // Disconnect BullMQ
+  try {
+    const { disconnectBullMQ } = await import("./services/bullmq.service.js");
+    await disconnectBullMQ();
+    Logger.info("BullMQ disconnected");
+  } catch (error) {
+    Logger.error("Error during BullMQ disconnect", { error });
+  }
+
+  // Disconnect Kafka
+  try {
+    const kafkaService = getKafkaService();
+    await kafkaService.disconnect();
+    Logger.info("Kafka disconnected");
+  } catch (error) {
+    Logger.error("Error during Kafka disconnect", { error });
   }
 
   // Exit process
