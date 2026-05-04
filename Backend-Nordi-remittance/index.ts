@@ -51,7 +51,7 @@ import KycRoutes from "./routes/Kyc.routes.js";
 import AiAgentRoutes from "./routes/AiAgent.routes.js";
 
 // Services
-import { initializeWebSocket } from "./services/websocket.service.js";
+import { initializeWebSocket, disconnectWebSocket } from "./services/websocket.service.js";
 import { getRedisClient } from "./services/redis.service.js";
 import { startWorkers } from "./services/workers.js";
 import { initializeKafka, getKafkaService } from "./services/kafka.service.js";
@@ -335,6 +335,13 @@ async function gracefulShutdown(signal: string): Promise<void> {
   server.close(() => {
     Logger.info("HTTP server closed");
   });
+
+  // Disconnect WebSocket
+  try {
+    await disconnectWebSocket();
+  } catch (error) {
+    Logger.error("Error during WebSocket disconnect", { error });
+  }
 
   // Close database connection
   try {

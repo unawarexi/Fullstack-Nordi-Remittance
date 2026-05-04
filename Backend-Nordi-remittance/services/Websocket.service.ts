@@ -1,5 +1,6 @@
 import { Server as HttpServer } from "http";
 import { Socket, Server as SocketIOServer } from "socket.io";
+import Logger from "../logs/logger.js";
 
 // interface SocketEvents {
 //   connection: (socket: Socket) => void;
@@ -29,16 +30,16 @@ class SocketManager {
 
   private setupConnection(): void {
     this.io.on("connection", (socket: Socket) => {
-      console.log(`✅ Connected: ${socket.id}`);
+      Logger.info(`[WebSocket] Client connected: ${socket.id}`);
       this.connectedUsers.set(socket.id, socket);
 
       socket.on("disconnect", (reason: string) => {
-        console.log(`❌ Disconnected: ${socket.id} - ${reason}`);
+        Logger.info(`[WebSocket] Client disconnected: ${socket.id} — ${reason}`);
         this.connectedUsers.delete(socket.id);
       });
 
       socket.on("error", (error: Error) => {
-        console.error(`🔥 Socket error ${socket.id}:`, error);
+        Logger.error(`[WebSocket] Socket error ${socket.id}`, { error });
       });
 
       this.registerEvents(socket);
@@ -150,9 +151,8 @@ export const initializeWebSocket = (httpServer: HttpServer, corsOrigin?: string 
     const userId = (socket as any).userId;
     
     if (userId) {
-      // Join user's personal room
       socket.join(`user:${userId}`);
-      console.log(`User ${userId} joined their room`);
+      Logger.info(`[WebSocket] User ${userId} joined their room`);
       
       socket.on("disconnect", () => {
         socket.leave(`user:${userId}`);
@@ -168,8 +168,17 @@ export const initializeWebSocket = (httpServer: HttpServer, corsOrigin?: string 
       }
     });
   });
-  
+
+  Logger.info("[WebSocket] ✅ Server initialized and listening for connections");
   return manager;
+};
+
+export const disconnectWebSocket = async (): Promise<void> => {
+  const manager = getSocketManager();
+  if (manager) {
+    await new Promise<void>((resolve) => manager.getIO().close(() => resolve()));
+    Logger.info("[WebSocket] Server closed");
+  }
 };
 
 // Helper function to emit to a specific user
