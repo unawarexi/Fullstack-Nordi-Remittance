@@ -24,7 +24,7 @@ process.env.CLOUDINARY_API_SECRET = 'test-api-secret';
 process.env.SMTP_HOST = 'smtp.test.com';
 process.env.SMTP_PORT = '587';
 process.env.SMTP_USER = 'test@test.com';
-process.env.SMTP_PASSWORD = 'test-password';
+process.env.SMTP_PASS = 'test-password';
 process.env.SMTP_FROM_NAME = 'Test';
 process.env.SMTP_FROM_EMAIL = 'noreply@test.com';
 

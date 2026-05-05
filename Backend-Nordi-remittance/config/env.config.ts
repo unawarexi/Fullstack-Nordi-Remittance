@@ -19,9 +19,11 @@ interface EnvConfig {
   HOST: string;
   API_VERSION: string;
   BASE_URL: string;
+  FRONTEND_URL: string;
 
   // Database
   MONGODB_URI: string;
+  MONGOOSE_DEBUG?: boolean;
 
   // JWT
   JWT_SECRET: string;
@@ -44,10 +46,12 @@ interface EnvConfig {
   // Mail
   SMTP_HOST: string;
   SMTP_PORT: number;
+  SMTP_SECURE: boolean;
   SMTP_USER: string;
-  SMTP_PASSWORD: string;
+  SMTP_PASS: string;
   SMTP_FROM_NAME: string;
   SMTP_FROM_EMAIL: string;
+  SUPPORT_EMAIL: string;
 
   // Security
   BCRYPT_ROUNDS: number;
@@ -74,6 +78,14 @@ interface EnvConfig {
 
   // Monitoring
   SENTRY_DSN?: string;
+
+  // Elasticsearch / ELK Stack
+  ELASTICSEARCH_URL?: string;
+  ELASTICSEARCH_USERNAME?: string;
+  ELASTICSEARCH_PASSWORD?: string;
+  ELASTICSEARCH_INDEX: string;
+  LOGSTASH_HOST?: string;
+  LOGSTASH_PORT?: number;
 
   // Clerk Authentication
   CLERK_SECRET_KEY: string;
@@ -134,9 +146,11 @@ export const env: EnvConfig = {
   HOST: getEnvString("HOST", "0.0.0.0"),
   API_VERSION: getEnvString("API_VERSION", "v1"),
   BASE_URL: getEnvString("BASE_URL", "http://localhost:3000"),
+  FRONTEND_URL: getEnvString("FRONTEND_URL", "http://localhost:5173"),
 
   // Database
   MONGODB_URI: getEnvString("MONGODB_URI"),
+  MONGOOSE_DEBUG: getEnvBoolean("MONGOOSE_DEBUG", false),
 
   // JWT
   JWT_SECRET: getEnvString(
@@ -161,10 +175,12 @@ export const env: EnvConfig = {
   // Mail
   SMTP_HOST: getEnvString("SMTP_HOST", "smtp.gmail.com"),
   SMTP_PORT: getEnvNumber("SMTP_PORT", 587),
-  SMTP_USER: getEnvString("SMTP_USER_EMAIL", ""),
-  SMTP_PASSWORD: getEnvString("SMTP_USER_PASSWORD", ""),
-  SMTP_FROM_NAME: getEnvString("SMTP_FROM_NAME", "Nordea Remittance"),
-  SMTP_FROM_EMAIL: getEnvString("MAIL_FROM", "noreply@nordea.com"),
+  SMTP_SECURE: getEnvBoolean("SMTP_SECURE", false),
+  SMTP_USER: getEnvString("SMTP_USER", ""),
+  SMTP_PASS: getEnvString("SMTP_PASS", ""),
+  SMTP_FROM_NAME: getEnvString("SMTP_FROM_NAME", "Nordi Remittance"),
+  SMTP_FROM_EMAIL: getEnvString("SMTP_FROM_EMAIL", "noreply@nordi-remittance.com"),
+  SUPPORT_EMAIL: getEnvString("SUPPORT_EMAIL", "support@nordi-remittance.com"),
 
   // Security
   BCRYPT_ROUNDS: getEnvNumber("BCRYPT_ROUNDS", 12),
@@ -194,6 +210,14 @@ export const env: EnvConfig = {
 
   // Monitoring
   SENTRY_DSN: process.env.SENTRY_DSN,
+
+  // Elasticsearch / ELK Stack
+  ELASTICSEARCH_URL: process.env.ELASTICSEARCH_URL,
+  ELASTICSEARCH_USERNAME: process.env.ELASTICSEARCH_USERNAME,
+  ELASTICSEARCH_PASSWORD: process.env.ELASTICSEARCH_PASSWORD,
+  ELASTICSEARCH_INDEX: getEnvString("ELASTICSEARCH_INDEX", "nordi-logs"),
+  LOGSTASH_HOST: process.env.LOGSTASH_HOST,
+  LOGSTASH_PORT: process.env.LOGSTASH_PORT ? parseInt(process.env.LOGSTASH_PORT, 10) : undefined,
 
   // Clerk Authentication
   CLERK_SECRET_KEY: getEnvString("CLERK_SECRET_KEY", ""),

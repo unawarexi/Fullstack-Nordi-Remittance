@@ -3,7 +3,6 @@
 // ============================================================================
 
 import express, { Express, Request, Response } from "express";
-import mongoose from "mongoose";
 import http from "http";
 import cookieParser from "cookie-parser";
 import compression from "compression";
@@ -59,6 +58,12 @@ import { initializeKafka, getKafkaService } from "./services/kafka.service.js";
 // Seeders
 import { runSeeders } from "./scripts/seedAdmin.js";
 
+// Observability
+import { metricsMiddleware, metricsEndpoint } from "./logs/prometheus.logs.js";
+import { healthCheckEndpoint, livenessProbe, readinessProbe } from "./logs/grafana.logs.js";
+import { initializeSentry, setupSentryExpress } from "./logs/sentry.logs.js";
+import { initializeElk } from "./logs/elkstack.logs.js";
+
 // ============================================================================
 // EXPRESS APPLICATION SETUP
 // ============================================================================
@@ -105,15 +110,15 @@ if (env.NODE_ENV !== "test") {
   app.use(requestLoggingMiddleware);
 }
 
+// Prometheus HTTP metrics (applied globally before routes)
+app.use(metricsMiddleware);
+
 // ============================================================================
-// HEALTH CHECK ENDPOINTS
+// HEALTH & OBSERVABILITY ENDPOINTS
 // ============================================================================
 
-/**
- * Basic health check
- * GET /health
- */
-app.get("/health", (req: Request, res: Response) => {
+/** Basic liveness — fast check for load-balancer health sweeps */
+app.get("/health", (_req: Request, res: Response) => {
   res.status(HttpStatus.OK).json({
     status: "healthy",
     timestamp: new Date().toISOString(),
@@ -122,45 +127,17 @@ app.get("/health", (req: Request, res: Response) => {
   });
 });
 
-/**
- * Detailed health check
- * GET /health/detailed
- */
-app.get("/health/detailed", async (req: Request, res: Response) => {
-  const mongoStatus =
-    mongoose.connection.readyState === 1 ? "connected" : "disconnected";
-  let redisStatus = "disconnected";
-  try {
-    const { isRedisConnected } = await import("./services/redis.service.js");
-    redisStatus = isRedisConnected() ? "connected" : "disconnected";
-  } catch (err) {
-    redisStatus = "error";
-  }
+/** K8s liveness probe — is the process alive? */
+app.get("/health/live", livenessProbe);
 
-  res.status(HttpStatus.OK).json({
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: env.NODE_ENV,
-    version: process.env.npm_package_version || "1.0.0",
-    services: {
-      database: {
-        status: mongoStatus,
-        name: "MongoDB",
-      },
-      redis: {
-        status: redisStatus,
-        name: "Redis",
-      },
-    },
-    memory: {
-      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + "MB",
-      heapTotal:
-        Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + "MB",
-      rss: Math.round(process.memoryUsage().rss / 1024 / 1024) + "MB",
-    },
-  });
-});
+/** K8s readiness probe — can it serve traffic? (Redis + MongoDB) */
+app.get("/health/ready", readinessProbe);
+
+/** Detailed health check for Grafana / ops dashboards */
+app.get("/health/detailed", healthCheckEndpoint);
+
+/** Prometheus scrape endpoint — scraped by prometheus.yml targets */
+app.get("/metrics", metricsEndpoint);
 
 // ============================================================================
 // API ROUTES
@@ -269,6 +246,9 @@ app.get(`${API_PREFIX}`, (req: Request, res: Response) => {
 // 404 HANDLER (Must be after all routes)
 // ============================================================================
 
+// Sentry error handler must be registered before the custom error handler
+setupSentryExpress(app);
+
 app.use(notFoundHandler);
 
 // ============================================================================
@@ -283,8 +263,14 @@ app.use(errorHandler);
 
 async function startServer(): Promise<void> {
   try {
+    // Initialize Sentry first so any startup errors are captured
+    initializeSentry();
+
     // Connect to database
     await connectDB();
+
+    // Initialize ELK transport (non-fatal — app starts even if ES is down)
+    await initializeElk();
 
     // Run database seeders (seeds super admin from .env)
     await runSeeders();
