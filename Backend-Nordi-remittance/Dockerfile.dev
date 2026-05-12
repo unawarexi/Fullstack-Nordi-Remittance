@@ -3,7 +3,7 @@
 # Hot reload and debugging support
 # ============================================================================
 
-FROM node:20-alpine
+FROM node:26-alpine
 
 # Install build dependencies
 RUN apk add --no-cache libc6-compat python3 make g++
