@@ -44,7 +44,7 @@ RUN npm run build
 # ============================================================================
 # STAGE 3: Production Runner (Nginx)
 # ============================================================================
-FROM nginx:1.27-alpine AS runner
+FROM nginx:1.31-alpine AS runner
 
 # Install curl for health checks
 RUN apk add --no-cache curl
