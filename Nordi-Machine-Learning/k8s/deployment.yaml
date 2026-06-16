@@ -1,0 +1,161 @@
+# ============================================================================
+# NORDI ML SERVICE — KUBERNETES DEPLOYMENT
+# FastAPI ML microservice: fraud detection, risk scoring, anomaly detection
+# ============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nordi-ml
+  namespace: nordi
+  labels:
+    app: nordi-ml
+    version: v1
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: nordi-ml
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: nordi-ml
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: nordi-ml
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+
+      imagePullSecrets:
+        - name: nordi-registry-secret
+
+      containers:
+        - name: nordi-ml
+          image: ghcr.io/your-org/nordi-ml:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          # Non-sensitive config from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: nordi-ml-config
+
+          # Sensitive config from Secrets
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: nordi-ml-secrets
+                  key: MONGODB_URI
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nordi-ml-secrets
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nordi-ml-secrets
+                  key: JWT_SECRET
+
+          # Resource limits (ML inference is CPU/memory intensive)
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Startup probe (model loading can be slow)
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+
+          # Security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false   # ML needs to write model cache
+            capabilities:
+              drop:
+                - ALL
+
+          # Volume mounts
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: model-cache
+              mountPath: /app/models/saved
+
+      # Volumes
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: model-cache
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
+
+      # Pod anti-affinity for HA
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: nordi-ml
+                topologyKey: kubernetes.io/hostname
+
+---
+# ============================================================================
+# NORDI ML — SERVICE ACCOUNT
+# ============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nordi-ml
+  namespace: nordi
+  labels:
+    app: nordi-ml

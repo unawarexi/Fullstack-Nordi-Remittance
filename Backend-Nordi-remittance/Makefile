@@ -158,11 +158,19 @@ db-drop-stale-index: ## Drop the stale eventId_1 index from securityevents (run 
 #  DOCKER COMPOSE
 # ============================================================================
 
-docker-up: ## Start all services (app + infra) in detached mode
+docker-up: ## Start all services (app + infra + kafka) in detached mode
 	docker compose up -d
 
-docker-up-infra: ## Start only Docker infrastructure (mongo, redis)
-	docker compose up -d mongo redis
+# Quick start URL summary after docker-up
+	@echo ""
+	@echo "$(GREEN)✓ Stack running:$(RESET)"
+	@echo "  API:       http://localhost:$(PORT)"
+	@echo "  Kafka UI:  http://localhost:8090"
+	@echo "  Mongo UI:  http://localhost:8081"
+
+docker-up-infra: ## Start only infrastructure (mongo, redis, kafka) — no app
+	docker compose up -d mongo redis kafka kafka-ui
+	@echo "$(GREEN)✓ Infrastructure ready (mongo, redis, kafka + Kafka UI on :8090)$(RESET)"
 
 docker-down: ## Stop all running services
 	docker compose down
@@ -183,13 +191,20 @@ docker-ps: ## List running containers with status
 	docker compose ps
 
 docker-shell: ## Open a shell inside the running app container
-	docker compose exec app sh
+	docker compose exec api sh
 
 docker-clean: ## Stop everything, remove volumes (destructive)
 	docker compose down -v --remove-orphans
 	@echo "$(YELLOW)⚠ Volumes removed — data is gone$(RESET)"
 
 docker-restart: docker-down docker-up ## Restart all services
+
+docker-prod: ## Start production stack (from repo root compose.prod)
+	cd ../.. && docker compose -f docker-compose.prod.yml up -d --build
+	@echo "$(GREEN)✓ Production stack started$(RESET)"
+
+docker-prod-down: ## Stop production stack
+	cd ../.. && docker compose -f docker-compose.prod.yml down
 
 # ============================================================================
 #  REDIS
@@ -212,10 +227,19 @@ redis-keys: ## List all keys in Redis (dev only)
 	docker compose exec redis redis-cli KEYS '*'
 
 # ============================================================================
-#  KAFKA (4.2.0 KRaft — no Zookeeper)
-#  Local: Kafka installed at /usr/local/kafka (on PATH via .zshrc)
-#  Production: Set KAFKA_BROKERS, KAFKA_SSL, KAFKA_SASL_* in .env
+#  KAFKA (Docker-based — KRaft mode, running in container)
+#  Broker: kafka:9092 (inside Docker) | localhost:9092 (from host)
+#  UI: http://localhost:8090
+#  For native binary usage, install Kafka locally and set KAFKA_BROKERS=localhost:9092
 # ============================================================================
+
+kafka-ui: ## Open Kafka UI in browser (http://localhost:8090)
+	@echo "$(CYAN)Opening Kafka UI at http://localhost:8090$(RESET)"
+	@open http://localhost:8090 2>/dev/null || xdg-open http://localhost:8090 2>/dev/null || echo "Visit http://localhost:8090"
+
+kafka-topics-docker: ## List all topics via Docker container
+	docker compose exec kafka /opt/kafka/bin/kafka-topics.sh \
+		--bootstrap-server localhost:9092 --list
 
 KAFKA_CONFIG     := /usr/local/kafka/config/server.properties
 KAFKA_LOG_DIR    := /tmp/kraft-combined-logs
@@ -439,6 +463,29 @@ ports: ## Check what's running on key ports
 
 kill-port: ## Kill process on the API port
 	@lsof -ti:$(PORT) | xargs kill -9 2>/dev/null && echo "$(GREEN)\u2713 Killed process on port $(PORT)$(RESET)" || echo "$(GREEN)No process on port $(PORT)$(RESET)"
+
+# ============================================================================
+#  ML SERVICE
+# ============================================================================
+
+ml-start: ## Start the ML service (via root docker-compose)
+	@echo "$(CYAN)Starting ML service...$(RESET)"
+	cd ../.. && docker compose up -d ml
+	@echo "$(GREEN)✓ ML service running at http://localhost:8000$(RESET)"
+
+ml-stop: ## Stop the ML service
+	cd ../.. && docker compose stop ml
+	@echo "$(GREEN)✓ ML service stopped$(RESET)"
+
+ml-logs: ## Tail ML service logs
+	cd ../.. && docker compose logs -f --tail=100 ml
+
+ml-health: ## Check ML service health endpoint
+	@curl -sf http://localhost:8000/health | node -e "process.stdin.on('data',d=>console.log(JSON.stringify(JSON.parse(d),null,2)))" 2>/dev/null \
+		|| echo "$(RED)✗ ML service not reachable at :8000$(RESET)"
+
+ml-shell: ## Open a shell inside the ML container
+	cd ../.. && docker compose exec ml bash
 
 # ============================================================================
 #  BULLMQ / QUEUE

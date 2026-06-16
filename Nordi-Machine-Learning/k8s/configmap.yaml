@@ -1,0 +1,19 @@
+# ============================================================================
+# NORDI ML SERVICE — KUBERNETES CONFIGMAP
+# Non-sensitive configuration
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nordi-ml-config
+  namespace: nordi
+  labels:
+    app: nordi-ml
+data:
+  ML_SERVICE_HOST: "0.0.0.0"
+  ML_SERVICE_PORT: "8000"
+  LOG_LEVEL: "INFO"
+  # Backend API URL (internal cluster DNS)
+  BACKEND_API_URL: "http://nordi-api:3000/api/v1"
+  # Model storage directory
+  MODEL_DIR: "./models/saved"

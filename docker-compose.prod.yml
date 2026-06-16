@@ -1,12 +1,13 @@
 # ============================================================================
 # NORDI REMITTANCE — FULL-STACK DOCKER COMPOSE (Production)
-# Run: docker-compose -f docker-compose.prod.yml up -d --build
+# Run: docker compose -f docker-compose.prod.yml up -d --build
+# Services: Frontend, API, ML, MongoDB, Redis, Kafka (KRaft), Kafka UI, Nginx
 # ============================================================================
 
 version: "3.9"
 
 services:
-  # ── Frontend (Nginx) ──────────────────────────────────────────────────────
+  # ── Frontend (Nginx static) ───────────────────────────────────────────────
   frontend:
     build:
       context: ./Frontend-Nordi-Remittance
@@ -22,7 +23,7 @@ services:
     networks:
       - nordi-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -55,7 +56,15 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/remit}
-      - REDIS_URL=${REDIS_URL:-redis://:${REDIS_PASSWORD:-redispassword}@redis:6379}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BULLMQ_REDIS_URL=redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_CLIENT_ID=nordi-remit-api
+      - KAFKA_GROUP_ID=nordi-remit-group
+      - KAFKA_SSL=false
+      - ML_SERVICE_URL=http://ml:8000
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
@@ -67,11 +76,15 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_FROM=${SMTP_FROM}
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3001}
+      - FRONTEND_URL=${FRONTEND_URL:-https://nordi-remittance.com}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     depends_on:
       mongo:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - nordi-network
@@ -94,6 +107,53 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+
+  # ── Machine Learning Service ───────────────────────────────────────────────
+  ml:
+    build:
+      context: ./Nordi-Machine-Learning
+      dockerfile: Dockerfile
+      target: runner
+    container_name: nordi-ml-prod
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ML_SERVICE_HOST=0.0.0.0
+      - ML_SERVICE_PORT=8000
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/remit}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+      - BACKEND_API_URL=http://api:3000/api/v1
+      - JWT_SECRET=${JWT_SECRET}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    networks:
+      - nordi-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ── MongoDB ────────────────────────────────────────────────────────────────
   mongo:
@@ -167,6 +227,87 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # ── Kafka (KRaft — no Zookeeper) ──────────────────────────────────────────
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: nordi-kafka-prod
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      CLUSTER_ID: "nordi-kafka-cluster-prod-001"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - nordi-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # ── Kafka UI (with basic auth for prod) ───────────────────────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: nordi-kafka-ui-prod
+    restart: unless-stopped
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: nordi-production
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_READONLY: "true"
+      AUTH_TYPE: "LOGIN_FORM"
+      SPRING_SECURITY_USER_NAME: ${KAFKA_UI_USER:-admin}
+      SPRING_SECURITY_USER_PASSWORD: ${KAFKA_UI_PASSWORD:-kafkaadmin}
+      DYNAMIC_CONFIG_ENABLED: "false"
+      LOGGING_LEVEL_ROOT: WARN
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - nordi-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
   # ── Nginx Reverse Proxy ────────────────────────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
@@ -177,6 +318,7 @@ services:
       - "443:443"
     volumes:
       - ./Backend-Nordi-remittance/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./Backend-Nordi-remittance/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - api
       - frontend
@@ -203,4 +345,6 @@ volumes:
   mongo-config:
     driver: local
   redis-data:
+    driver: local
+  kafka-data:
     driver: local

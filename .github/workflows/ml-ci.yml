@@ -1,0 +1,313 @@
+# ============================================================================
+# NORDI REMITTANCE — ML CI/CD PIPELINE
+# Python lint, type-check, tests, Docker build & push, deploy
+# ============================================================================
+
+name: "🤖 ML Service CI/CD"
+
+on:
+  push:
+    branches: [main, develop, "release/**", "hotfix/**"]
+    paths:
+      - "Nordi-Machine-Learning/**"
+      - ".github/workflows/ml-ci.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "Nordi-Machine-Learning/**"
+
+defaults:
+  run:
+    working-directory: Nordi-Machine-Learning
+
+env:
+  PYTHON_VERSION: "3.11"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/nordi-ml
+
+concurrency:
+  group: ml-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# ============================================================================
+jobs:
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 1: LINT & TYPE CHECK
+  # ══════════════════════════════════════════════════════════════════════════
+  lint:
+    name: "🔍 Lint & Type Check"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+          cache-dependency-path: Nordi-Machine-Learning/requirements.txt
+
+      - name: Install lint dependencies
+        run: pip install ruff mypy
+
+      - name: Run ruff lint
+        run: ruff check .
+
+      - name: Run ruff format check
+        run: ruff format --check .
+
+      - name: Run mypy type check
+        run: mypy app/ main.py --ignore-missing-imports
+        continue-on-error: true    # mypy warnings shouldn't fail CI
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 2: TESTS
+  # ══════════════════════════════════════════════════════════════════════════
+  test:
+    name: "🧪 Tests (Python ${{ matrix.python-version }})"
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: Nordi-Machine-Learning/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio httpx
+
+      - name: Run tests with coverage
+        run: pytest tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
+        env:
+          MONGODB_URI: mongodb://localhost:27017/remit_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret-key-for-ci-testing-minimum-32-chars
+          BACKEND_API_URL: http://localhost:3000/api/v1
+          ML_SERVICE_HOST: 0.0.0.0
+          ML_SERVICE_PORT: 8000
+          LOG_LEVEL: WARNING
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: Nordi-Machine-Learning/coverage.xml
+          flags: ml-service
+          name: ml-coverage
+          fail_ci_if_error: false
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 3: SECURITY SCAN
+  # ══════════════════════════════════════════════════════════════════════════
+  security:
+    name: "🛡️ Security Scan"
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install safety and bandit
+        run: pip install safety bandit
+
+      - name: Check Python dependency vulnerabilities
+        run: |
+          pip install -r requirements.txt
+          safety check -r requirements.txt
+        continue-on-error: true
+
+      - name: Run bandit security linter
+        run: bandit -r app/ -ll
+        continue-on-error: true
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 4: BUILD & PUSH DOCKER IMAGE
+  # ══════════════════════════════════════════════════════════════════════════
+  build:
+    name: "🐳 Build & Push Docker"
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build-push.outputs.digest }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Docker image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Nordi-Machine-Learning
+          file: ./Nordi-Machine-Learning/Dockerfile
+          target: runner
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}
+          format: "sarif"
+          output: "trivy-ml-results.sarif"
+          severity: "CRITICAL,HIGH"
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-ml-results.sarif"
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 5: DEPLOY STAGING
+  # ══════════════════════════════════════════════════════════════════════════
+  deploy-staging:
+    name: "🚀 Deploy ML Staging"
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    timeout-minutes: 15
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_ML_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy ML to staging
+        run: |
+          echo "🚀 Deploying ML service to staging..."
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }}"
+          # kubectl set image deployment/nordi-ml nordi-ml=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} -n nordi
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # STAGE 6: DEPLOY PRODUCTION
+  # ══════════════════════════════════════════════════════════════════════════
+  deploy-production:
+    name: "🏭 Deploy ML Production"
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_ML_URL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy ML to production
+        run: |
+          echo "🏭 Deploying ML service to production..."
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }}"
+          # kubectl set image deployment/nordi-ml nordi-ml=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build.outputs.image-digest }} -n nordi
+
+      - name: Verify deployment health
+        run: |
+          echo "Verifying ML service health..."
+          # curl -f ${{ vars.PRODUCTION_ML_URL }}/health || exit 1
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # NOTIFICATION
+  # ══════════════════════════════════════════════════════════════════════════
+  notify:
+    name: "📢 Notify"
+    runs-on: ubuntu-latest
+    needs: [lint, test, build]
+    if: always() && github.event_name == 'push'
+    timeout-minutes: 5
+
+    steps:
+      - name: Pipeline status
+        run: |
+          if [ "${{ needs.test.result }}" == "failure" ] || [ "${{ needs.build.result }}" == "failure" ]; then
+            echo "❌ ML CI/CD pipeline FAILED"
+            exit 1
+          else
+            echo "✅ ML CI/CD pipeline PASSED"
+          fi

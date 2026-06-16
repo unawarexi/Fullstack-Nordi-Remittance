@@ -1,0 +1,42 @@
+# ============================================================================
+# NORDI ML SERVICE — DEVELOPMENT DOCKERFILE
+# Hot reload via uvicorn --reload, source mounted as volume
+# ============================================================================
+
+FROM python:3.11-slim
+
+# Install dependencies including dev tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy and install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install dev dependencies
+RUN pip install --no-cache-dir \
+    watchfiles \
+    httpx
+
+# Copy source (will be overridden by volume mount in dev)
+COPY . .
+
+# Create model directory
+RUN mkdir -p /app/models/saved
+
+# Environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    ML_SERVICE_HOST=0.0.0.0 \
+    ML_SERVICE_PORT=8000
+
+EXPOSE 8000
+
+# Start with hot reload for development
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

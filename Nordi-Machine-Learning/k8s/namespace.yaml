@@ -1,0 +1,10 @@
+# ============================================================================
+# NORDI ML — KUBERNETES NAMESPACE
+# ============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nordi
+  labels:
+    name: nordi
+    project: nordi-remittance
