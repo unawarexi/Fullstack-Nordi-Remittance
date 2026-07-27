@@ -1,23 +1,28 @@
 // ============================================================================
-// REMIT BACKEND - MAIN ENTRY POINT
+// Nordi-Remittance — Main Entry Point
+// ============================================================================
+// This file is deliberately minimal.  It wires together:
+//   1. Express middleware pipeline
+//   2. Health & observability endpoints
+//   3. Module registry (route loader)
+//   4. Server lifecycle (init-setup.ts)
 // ============================================================================
 
-import express, { Express, Request, Response } from "express";
-import http from "http";
-import cookieParser from "cookie-parser";
-import compression from "compression";
+import express, { type Express, type Request, type Response } from 'express';
+import http from 'http';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
 
 // Configuration
-import { env, constants, HttpStatus } from "./config/env.config.js";
-import { connectDB, disconnectDB } from "./config/dbconfig.js";
-import Logger from "./logs/logger.js";
+import { env, HttpStatus } from './config/env.config.js';
+import Logger from './logs/logger.js';
 
 // Middleware
 import {
   corsMiddleware,
   helmetMiddleware,
   ipBlockingMiddleware,
-} from "./middleware/security.middleware.js";
+} from './middleware/security.middleware.js';
 import {
   requestIdMiddleware,
   clientIpMiddleware,
@@ -25,71 +30,52 @@ import {
   requestLoggingMiddleware,
   errorHandler,
   notFoundHandler,
-} from "./middleware/core.middleware.js";
-
-// Routes
-import AuthRoutes from "./routes/Auth.routes.js";
-import UserRoutes from "./routes/User.routes.js";
-import AccountRoutes from "./routes/Account.routes.js";
-import TransactionRoutes from "./routes/Transaction.routes.js";
-import CardRoutes from "./routes/Card.routes.js";
-import LoanRoutes from "./routes/Loan.routes.js";
-import InvestmentRoutes from "./routes/Investment.routes.js";
-import AdminRoutes from "./routes/Admin.routes.js";
-import AdminOperationsRoutes from "./routes/AdminOperations.routes.js";
-import FraudRoutes from "./routes/Fraud.routes.js";
-import StatisticsRoutes from "./routes/Statistics.routes.js";
-// import PermissionRoutes from './routes/Permission.routes.js';
-import NotificationRoutes from "./routes/Notification.routes.js";
-import AttachmentRoutes from "./routes/Attachment.routes.js";
-import LegalRoutes from "./routes/Legal.routes.js";
-import IntegrationRoutes from "./routes/Integrations.routes.js";
-import SecurityRoutes from "./routes/Security.routes.js";
-import TransferVerificationRoutes from "./routes/TransferVerification.routes.js";
-import KycRoutes from "./routes/Kyc.routes.js";
-import AiAgentRoutes from "./routes/AiAgent.routes.js";
-
-// Services
-import { initializeWebSocket, disconnectWebSocket } from "./services/websocket.service.js";
-import { getRedisClient } from "./services/redis.service.js";
-import { startWorkers } from "./services/workers.js";
-import { initializeKafka, getKafkaService } from "./services/kafka.service.js";
-
-// Seeders
-import { runSeeders } from "./scripts/seedAdmin.js";
+} from './middleware/core.middleware.js';
 
 // Observability
-import { metricsMiddleware, metricsEndpoint } from "./logs/prometheus.logs.js";
-import { healthCheckEndpoint, livenessProbe, readinessProbe } from "./logs/grafana.logs.js";
-import { initializeSentry, setupSentryExpress } from "./logs/sentry.logs.js";
-import { initializeElk } from "./logs/elkstack.logs.js";
+import { metricsMiddleware, metricsEndpoint } from './logs/prometheus.logs.js';
+import { healthCheckEndpoint, livenessProbe, readinessProbe } from './logs/grafana.logs.js';
+import { setupSentryExpress } from './logs/sentry.logs.js';
+
+// Module Registry & Lifecycle
+import { registerModules, buildEndpointMap } from './module-registry.js';
+import {
+  bootstrapServices,
+  registerProcessHandlers,
+  printStartupBanner,
+  serviceStatus,
+} from './init-setup.js';
 
 // ============================================================================
-// EXPRESS APPLICATION SETUP
+// EXPRESS APP & HTTP SERVER
 // ============================================================================
 
 const app: Express = express();
 const server = http.createServer(app);
 
 // ============================================================================
-// TRUST PROXY (For reverse proxies like nginx, load balancers)
+// CONSTANTS
 // ============================================================================
 
-app.set("trust proxy", 1);
+const API_PREFIX = '/api/v1';
+const PORT = env.PORT || 5000;
 
 // ============================================================================
-// GLOBAL MIDDLEWARE
+// MIDDLEWARE PIPELINE
 // ============================================================================
 
-// Security headers (configured in security.middleware.ts)
+// Trust proxy (nginx, ALB, etc.)
+app.set('trust proxy', 1);
+
+// Security headers
 app.use(helmetMiddleware);
 
 // CORS
 app.use(corsMiddleware);
 
 // Body parsing
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cookie parsing
 app.use(cookieParser(env.JWT_SECRET));
@@ -97,300 +83,90 @@ app.use(cookieParser(env.JWT_SECRET));
 // Compression
 app.use(compression());
 
-// Request tracking middleware
+// Request tracking
 app.use(requestIdMiddleware);
 app.use(clientIpMiddleware);
 app.use(deviceInfoMiddleware);
 
-// IP blocking (check for blocked IPs)
+// IP blocking
 app.use(ipBlockingMiddleware);
 
-// Request logging
-if (env.NODE_ENV !== "test") {
+// Request logging (skip during tests)
+if (env.NODE_ENV !== 'test') {
   app.use(requestLoggingMiddleware);
 }
 
-// Prometheus HTTP metrics (applied globally before routes)
+// Prometheus HTTP metrics
 app.use(metricsMiddleware);
 
 // ============================================================================
 // HEALTH & OBSERVABILITY ENDPOINTS
 // ============================================================================
 
-/** Basic liveness — fast check for load-balancer health sweeps */
-app.get("/health", (_req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.status(HttpStatus.OK).json({
-    status: "healthy",
+    status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: env.NODE_ENV,
+    services: serviceStatus,
   });
 });
 
-/** K8s liveness probe — is the process alive? */
-app.get("/health/live", livenessProbe);
-
-/** K8s readiness probe — can it serve traffic? (Redis + MongoDB) */
-app.get("/health/ready", readinessProbe);
-
-/** Detailed health check for Grafana / ops dashboards */
-app.get("/health/detailed", healthCheckEndpoint);
-
-/** Prometheus scrape endpoint — scraped by prometheus.yml targets */
-app.get("/metrics", metricsEndpoint);
-
-// ============================================================================
-// API ROUTES
-// ============================================================================
-
-const API_PREFIX = "/api/v1";
-
-// Auth routes
-app.use(`${API_PREFIX}/auth`, AuthRoutes);
-
-// User routes
-app.use(`${API_PREFIX}/users`, UserRoutes);
-
-// Account/Wallet routes
-app.use(`${API_PREFIX}/accounts`, AccountRoutes);
-
-// Transaction routes
-app.use(`${API_PREFIX}/transactions`, TransactionRoutes);
-
-// Card routes
-app.use(`${API_PREFIX}/cards`, CardRoutes);
-
-// Loan routes
-app.use(`${API_PREFIX}/loans`, LoanRoutes);
-
-// Investment routes
-app.use(`${API_PREFIX}/investments`, InvestmentRoutes);
-
-// Admin routes
-app.use(`${API_PREFIX}/admin`, AdminRoutes);
-
-// Admin Operations routes (financial operations, approvals)
-app.use(`${API_PREFIX}/admin/operations`, AdminOperationsRoutes);
-
-// Fraud/Security routes
-app.use(`${API_PREFIX}/fraud`, FraudRoutes);
-
-// Statistics routes
-app.use(`${API_PREFIX}/statistics`, StatisticsRoutes);
-
-// Permission routes
-// app.use(`${API_PREFIX}/permissions`, PermissionRoutes);
-
-// Notification routes
-app.use(`${API_PREFIX}/notifications`, NotificationRoutes);
-
-// Attachment routes
-app.use(`${API_PREFIX}/attachments`, AttachmentRoutes);
-
-// Legal routes
-app.use(`${API_PREFIX}/legal`, LegalRoutes);
-
-// Integration routes
-app.use(`${API_PREFIX}/integrations`, IntegrationRoutes);
-
-// Security routes
-app.use(`${API_PREFIX}/security`, SecurityRoutes);
-
-// KYC routes (Know Your Customer verification)
-app.use(`${API_PREFIX}/kyc`, KycRoutes);
-
-// Secure Transfer Verification routes (3-step verification for transfers/withdrawals)
-app.use(
-  `${API_PREFIX}/transactions/secure-transfer`,
-  TransferVerificationRoutes,
-);
-
-// AI Agent routes
-app.use(`${API_PREFIX}/ai`, AiAgentRoutes);
-
-// ============================================================================
-// API DOCUMENTATION ENDPOINT
-// ============================================================================
-
-app.get(`${API_PREFIX}`, (req: Request, res: Response) => {
-  res.status(HttpStatus.OK).json({
-    name: "Remit Remittance API",
-    version: "1.0.0",
-    description: "Online Banking and Remittance Platform API",
-    documentation: `${process.env.FRONTEND_URL}/docs`,
-    endpoints: {
-      auth: `${API_PREFIX}/auth`,
-      users: `${API_PREFIX}/users`,
-      accounts: `${API_PREFIX}/accounts`,
-      transactions: `${API_PREFIX}/transactions`,
-      secureTransfer: `${API_PREFIX}/transactions/secure-transfer`,
-      cards: `${API_PREFIX}/cards`,
-      loans: `${API_PREFIX}/loans`,
-      investments: `${API_PREFIX}/investments`,
-      admin: `${API_PREFIX}/admin`,
-      fraud: `${API_PREFIX}/fraud`,
-      statistics: `${API_PREFIX}/statistics`,
-      // permissions: `${API_PREFIX}/permissions`,
-      notifications: `${API_PREFIX}/notifications`,
-      attachments: `${API_PREFIX}/attachments`,
-      legal: `${API_PREFIX}/legal`,
-      integrations: `${API_PREFIX}/integrations`,
-      security: `${API_PREFIX}/security`,
-      kyc: `${API_PREFIX}/kyc`,
-    },
-    healthCheck: "/health",
-  });
-});
-
-// ============================================================================
-// 404 HANDLER (Must be after all routes)
-// ============================================================================
-
-// Sentry error handler must be registered before the custom error handler
-setupSentryExpress(app);
-
-app.use(notFoundHandler);
-
-// ============================================================================
-// GLOBAL ERROR HANDLER (Must be last)
-// ============================================================================
-
-app.use(errorHandler);
+app.get('/health/live', livenessProbe);
+app.get('/health/ready', readinessProbe);
+app.get('/health/detailed', healthCheckEndpoint);
+app.get('/metrics', metricsEndpoint);
 
 // ============================================================================
 // SERVER STARTUP
 // ============================================================================
 
 async function startServer(): Promise<void> {
-  try {
-    // Initialize Sentry first so any startup errors are captured
-    initializeSentry();
+  // 1. Bootstrap infrastructure services (DB, Redis, Kafka, etc.)
+  await bootstrapServices(server);
 
-    // Connect to database
-    await connectDB();
+  // 2. Register all API route modules
+  const registered = await registerModules(app, API_PREFIX);
 
-    // Initialize ELK transport (non-fatal — app starts even if ES is down)
-    await initializeElk();
+  // 3. API index / documentation endpoint (built from registered modules)
+  const endpointMap = buildEndpointMap(API_PREFIX, registered);
 
-    // Run database seeders (seeds super admin from .env)
-    await runSeeders();
-
-    // Initialize WebSocket
-    initializeWebSocket(server);
-
-    // Connect to Redis
-    await getRedisClient();
-
-    // Initialize Kafka (producer + ensure topics)
-    if (env.KAFKA_BROKERS) {
-      await initializeKafka();
-    } else {
-      Logger.warn("[Kafka] KAFKA_BROKERS not set — Kafka disabled");
-    }
-
-    // Start BullMQ workers (queues + processors)
-    startWorkers();
-
-    // Start HTTP server
-    const PORT = env.PORT || 5000;
-
-    server.listen(PORT, () => {
-      Logger.info("=".repeat(60));
-      Logger.info(`  REMIT BACKEND SERVER (NORDI-REMITTANCE)`);
-      Logger.info("=".repeat(60));
-      Logger.info(`  Environment: ${env.NODE_ENV}`);
-      Logger.info(`  Port: ${PORT}`);
-      Logger.info(`  API Base: ${API_PREFIX}`);
-      Logger.info(`  Health Check: http://localhost:${PORT}/health`);
-      Logger.info("=".repeat(60));
+  app.get(API_PREFIX, (_req: Request, res: Response) => {
+    res.status(HttpStatus.OK).json({
+      name: 'Nordi Remittance API',
+      version: '1.0.0',
+      description: 'Online Banking and Remittance Platform API',
+      documentation: `${env.FRONTEND_URL}/docs`,
+      endpoints: endpointMap,
+      healthCheck: '/health',
     });
-  } catch (error) {
-    Logger.error("Failed to start server", { error });
-    process.exit(1);
-  }
-}
-
-// ============================================================================
-// GRACEFUL SHUTDOWN
-// ============================================================================
-
-async function gracefulShutdown(signal: string): Promise<void> {
-  Logger.info(`${signal} received. Starting graceful shutdown...`);
-
-  // Stop accepting new connections
-  server.close(() => {
-    Logger.info("HTTP server closed");
   });
 
-  // Disconnect WebSocket
-  try {
-    await disconnectWebSocket();
-  } catch (error) {
-    Logger.error("Error during WebSocket disconnect", { error });
-  }
+  // 4. Sentry error handler (must be before custom error handler)
+  setupSentryExpress(app);
 
-  // Close database connection
-  try {
-    await disconnectDB();
-    Logger.info("Database connection closed");
-  } catch (error) {
-    Logger.error("Error during database disconnect", { error });
-  }
+  // 5. 404 + global error handler (must be last)
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
-  // Disconnect Redis
-  try {
-    const { disconnectRedis } = await import("./services/redis.service.js");
-    await disconnectRedis();
-  } catch (error) {
-    Logger.error("Error during Redis disconnect", { error });
-  }
+  // 6. Wire process-level signal and crash handlers
+  registerProcessHandlers(server);
 
-  // Disconnect BullMQ
-  try {
-    const { disconnectBullMQ } = await import("./services/bullmq.service.js");
-    await disconnectBullMQ();
-    Logger.info("BullMQ disconnected");
-  } catch (error) {
-    Logger.error("Error during BullMQ disconnect", { error });
-  }
-
-  // Disconnect Kafka
-  try {
-    const kafkaService = getKafkaService();
-    await kafkaService.disconnect();
-    Logger.info("Kafka disconnected");
-  } catch (error) {
-    Logger.error("Error during Kafka disconnect", { error });
-  }
-
-  // Exit process
-  Logger.info("Graceful shutdown completed");
-  process.exit(0);
+  // 7. Start listening
+  server.listen(PORT, () => {
+    printStartupBanner(PORT, API_PREFIX);
+  });
 }
 
-// Handle shutdown signals
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-
-// Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
-  gracefulShutdown("uncaughtException");
-});
-
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
-});
-
 // ============================================================================
-// START THE SERVER
+// LAUNCH
 // ============================================================================
 
 startServer();
 
 // ============================================================================
-// EXPORT FOR TESTING
+// EXPORTS (testing)
 // ============================================================================
 
 export { app, server };
