@@ -136,7 +136,7 @@ services:
     container_name: nordi-kafka
     restart: unless-stopped
     ports:
-      - "9092:9092"
+      - "29092:9092"
       - "9093:9093"    # Controller port
     environment:
       # KRaft settings

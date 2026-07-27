@@ -233,7 +233,7 @@ services:
     container_name: nordi-kafka-prod
     restart: unless-stopped
     ports:
-      - "9092:9092"
+      - "29092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
