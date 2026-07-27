@@ -6,8 +6,8 @@
 import { Queue, Worker, type Processor, type WorkerOptions, type JobsOptions } from "bullmq";
 import { env } from "../config/env.config";
 import { BullQueues } from "../config/constants";
+import { createIoredisClient } from "../config/redis.config";
 import { createLogger } from "../logs/logger";
-import { createRetryStrategy } from "../core/network/retry";
 
 const log = createLogger("BullMQ");
 
@@ -18,39 +18,34 @@ const workers: Partial<Record<QueueName, Worker>> = {};
 
 // ============================================================================
 // REDIS CONNECTION FOR BULLMQ
-// BullMQ requires ioredis-style connection config (not the redis package)
+// Uses shared buildRedisOptions from redis.config.ts
+// BullMQ requires maxRetriesPerRequest: null (ioredis-style config)
 // ============================================================================
 
+let sharedBullConnection: any = null;
+
 function getConnection() {
-  if (env.BULLMQ_REDIS_URL) {
-    const url = new URL(env.BULLMQ_REDIS_URL);
-    return {
-      host: url.hostname,
-      port: parseInt(url.port, 10) || 6379,
-      password: url.password || undefined,
-      username: url.username || undefined,
-      maxRetriesPerRequest: null as null,
-      retryStrategy: createRetryStrategy({
-        maxRetries: 10,
-        baseDelay: 500,
-        maxDelay: 5000,
-        label: "BullMQ Redis",
-      }),
-    };
-  }
-  return {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-    password: env.REDIS_PASSWORD || undefined,
-    db: parseInt(env.REDIS_DB, 10) || 0,
-    maxRetriesPerRequest: null as null,
-    retryStrategy: createRetryStrategy({
-      maxRetries: 10,
-      baseDelay: 500,
-      maxDelay: 5000,
-      label: "BullMQ Redis",
-    }),
-  };
+  if (sharedBullConnection) return sharedBullConnection;
+
+  sharedBullConnection = createIoredisClient(
+    env.BULLMQ_REDIS_URL
+      ? env.BULLMQ_REDIS_URL
+      : {
+          host: env.REDIS_HOST,
+          port: env.REDIS_PORT,
+          password: env.REDIS_PASSWORD,
+          db: env.REDIS_DB,
+        },
+    "BullMQ",
+    {
+      maxRetriesPerRequest: null as any, // REQUIRED BY BULLMQ FOR BLOCKING JOBS
+      keepAlive: 10000,                  // Prevents Redis Cloud proxy from killing idle job sockets
+      family: 4,                         // Forces IPv4 to avoid DNS fallback timeouts
+      enableReadyCheck: false,           // Prevents command blocking issues during job polling
+    },
+  );
+
+  return sharedBullConnection;
 }
 
 // ============================================================================
@@ -172,6 +167,10 @@ export async function disconnectBullMQ(): Promise<void> {
   }
   for (const queue of Object.values(queues) as Queue[]) {
     await queue.close();
+  }
+  if (sharedBullConnection) {
+    await sharedBullConnection.quit().catch(() => {});
+    sharedBullConnection = null;
   }
   log.info("BullMQ disconnected");
 }

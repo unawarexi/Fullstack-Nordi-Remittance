@@ -29,16 +29,19 @@ const TTL = {
 } as const;
 
 // ============================================================================
-// GENERIC CACHE OPERATIONS
+// GENERIC CACHE OPERATIONS WITH STAMPEDE PROTECTION
 // ============================================================================
 
+// Request Coalescing / Single-Flight Pattern map: deduplicates concurrent DB queries
+const inFlightQueries = new Map<string, Promise<unknown>>();
+
 /**
- * Get cached data or execute query and cache the result.
- * This is the primary function for read-through caching.
+ * Get cached data or execute query with single-flight request coalescing and TTL jitter.
+ * Protects MongoDB against cache stampede / thundering herd under concurrency.
  *
  * @param cacheKey - Unique cache key
  * @param queryFn - Async function that executes the MongoDB query
- * @param ttl - Time to live in seconds (default: 30)
+ * @param ttl - Base time to live in seconds (default: 30)
  * @returns Cached or freshly queried data
  */
 export async function cacheQuery<T>(
@@ -49,29 +52,49 @@ export async function cacheQuery<T>(
   try {
     const redis = await getRedisClient();
     if (!redis) {
-      // Redis unavailable — fall through to DB
+      // Redis unavailable — fall through to DB directly
       return await queryFn();
     }
 
-    // Try cache first
+    // 1. Try Redis cache first
     const cached = await redis.get(cacheKey);
     if (cached) {
       return JSON.parse(cached as string) as T;
     }
 
-    // Execute query
-    const result = await queryFn();
+    // 2. Request Coalescing: if an identical query is currently in-flight, attach to its promise
+    // instead of spawning a duplicate MongoDB connection under concurrent traffic
+    if (inFlightQueries.has(cacheKey)) {
+      return (await inFlightQueries.get(cacheKey)) as T;
+    }
 
-    // Cache the result (non-blocking)
-    redis
-      .setEx(cacheKey, ttl, JSON.stringify(result))
-      .catch((err: Error) =>
-        console.error("Redis cache write error:", err.message),
-      );
+    // 3. Execute DB query and register promise as in-flight
+    const queryPromise = (async () => {
+      try {
+        const result = await queryFn();
+        
+        // 4. TTL Jitter: Apply ±15% randomization to prevent synchronized expiration storms
+        const jitteredTtl = Math.max(1, Math.floor(ttl * (0.85 + Math.random() * 0.3)));
+        
+        // Cache result asynchronously (non-blocking)
+        redis
+          .setEx(cacheKey, jitteredTtl, JSON.stringify(result))
+          .catch((err: Error) =>
+            console.error("Redis cache write error:", err.message),
+          );
 
-    return result;
+        return result;
+      } finally {
+        // Ensure in-flight tracking is removed upon query completion or failure
+        inFlightQueries.delete(cacheKey);
+      }
+    })();
+
+    inFlightQueries.set(cacheKey, queryPromise);
+    return (await queryPromise) as T;
   } catch {
-    // On any Redis error, fall through to DB
+    // On any Redis error or failure, safely degrade by calling queryFn directly
+    inFlightQueries.delete(cacheKey);
     return await queryFn();
   }
 }

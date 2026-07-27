@@ -1,5 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+import mongoose, { Schema } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create schema
 const UserSchema: Schema = new Schema({
@@ -56,7 +56,7 @@ const UserSchema: Schema = new Schema({
       validator: function (this: any, value?: string): boolean {
         return !!this.routingNumber || !!value;
       },
-      message: "Either ibanNumber or routingNumber must be provided.",
+      message: 'Either ibanNumber or routingNumber must be provided.',
     },
   },
   routingNumber: {
@@ -65,7 +65,7 @@ const UserSchema: Schema = new Schema({
       validator: function (this: any, value?: string): boolean {
         return !!this.ibanNumber || !!value;
       },
-      message: "Either routingNumber or ibanNumber must be provided.",
+      message: 'Either routingNumber or ibanNumber must be provided.',
     },
   },
   swiftBic: { type: String, required: true },
@@ -87,20 +87,20 @@ const UserSchema: Schema = new Schema({
   inviteCode: { type: String },
 
   // Additional fields from controller
-  role: { type: String, enum: ["user", "admin", "support"], default: "user" },
+  role: { type: String, enum: ['user', 'admin', 'support'], default: 'user' },
   accountNumber: { type: String, unique: true, sparse: true },
   emailVerified: { type: Boolean, default: false },
   phoneVerified: { type: Boolean, default: false },
-  status: { type: String, enum: ["active", "inactive", "suspended", "banned"], default: "active" },
+  status: { type: String, enum: ['active', 'inactive', 'suspended', 'banned'], default: 'active' },
 
   // Clerk Integration
   clerkUserId: { type: String, unique: true, sparse: true },
-  authProvider: { type: String, enum: ["local", "clerk", "google"], default: "local" },
+  authProvider: { type: String, enum: ['local', 'clerk', 'google'], default: 'local' },
   lastOtpVerifiedAt: { type: Date },
   knownDeviceFingerprints: [{ type: String }],
   activationToken: { type: String },
   isActive: { type: Boolean, default: false },
-  kycStatus: { type: String, default: "pending" },
+  kycStatus: { type: String, default: 'pending' },
   kycNotes: { type: String },
   lastLogin: { type: Date },
   resetPasswordToken: { type: String },
@@ -168,18 +168,18 @@ const UserSchema: Schema = new Schema({
   // Account status
   accountStatus: {
     type: String,
-    enum: ["active", "suspended", "banned", "restricted"],
-    default: "active",
+    enum: ['active', 'suspended', 'banned', 'restricted'],
+    default: 'active',
   },
 });
 
 // pre-save hook to validate that either iban or routing is provided.
-UserSchema.pre("save", function () {
+UserSchema.pre('save', function () {
   if (!this._id) {
     this._id = uuidv4();
   }
   if (!this.ibanNumber && !this.routingNumber) {
-    throw new Error("Either ibanNumber or routingNumber must be provided.");
+    throw new Error('Either ibanNumber or routingNumber must be provided.');
   }
 });
 
@@ -198,10 +198,13 @@ UserSchema.index({ isActive: 1 });
 
 // Text index for admin user search (replaces unanchored regex scans)
 UserSchema.index(
-  { email: "text", firstName: "text", lastName: "text", mobileNumber: "text" },
-  { name: "idx_users_text_search", weights: { email: 10, firstName: 5, lastName: 5, mobileNumber: 3 } },
+  { email: 'text', firstName: 'text', lastName: 'text', mobileNumber: 'text' },
+  {
+    name: 'idx_users_text_search',
+    weights: { email: 10, firstName: 5, lastName: 5, mobileNumber: 3 },
+  },
 );
 
 // Create and export model
-const Users = mongoose.model("Users", UserSchema);
+const Users = mongoose.model('Users', UserSchema);
 export default Users;

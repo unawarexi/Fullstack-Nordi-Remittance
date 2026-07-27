@@ -9,21 +9,21 @@
 // Index pattern: nordi-logs-YYYY.MM.DD  (daily rotation, matches standard ELK)
 // ============================================================================
 
-import axios, { AxiosInstance } from "axios";
-import Transport from "winston-transport";
-import winston from "winston";
-import { env } from "../config/env.config.js";
-import { addElkTransport } from "./logger.js";
-import { createLogger } from "./logger.js";
+import axios, { AxiosInstance } from 'axios';
+import Transport from 'winston-transport';
+import winston from 'winston';
+import { env } from '../config/env.config.js';
+import { addElkTransport } from './logger.js';
+import { createLogger } from './logger.js';
 
-const log = createLogger("ELK");
+const log = createLogger('ELK');
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export interface ElkLogDocument {
-  "@timestamp": string;
+  '@timestamp': string;
   service: string;
   environment: string;
   level: string;
@@ -63,7 +63,7 @@ export interface FraudSignalData {
   fraudCaseId?: string;
   transactionId?: string;
   userId?: string;
-  severity: "low" | "medium" | "high" | "critical";
+  severity: 'low' | 'medium' | 'high' | 'critical';
   signalType: string;
   score?: number;
   flags?: string[];
@@ -74,13 +74,7 @@ export interface FraudSignalData {
 export interface KycEventData {
   kycId?: string;
   userId: string;
-  event:
-    | "submitted"
-    | "under_review"
-    | "approved"
-    | "rejected"
-    | "expired"
-    | "document_uploaded";
+  event: 'submitted' | 'under_review' | 'approved' | 'rejected' | 'expired' | 'document_uploaded';
   tier?: number;
   provider?: string;
   country?: string;
@@ -94,7 +88,7 @@ export interface SecurityEventData {
   ipAddress?: string;
   userAgent?: string;
   requestId?: string;
-  severity?: "info" | "warn" | "critical";
+  severity?: 'info' | 'warn' | 'critical';
   meta?: Record<string, unknown>;
 }
 
@@ -105,8 +99,8 @@ export interface SecurityEventData {
 function dailyIndex(): string {
   const now = new Date();
   const yyyy = now.getUTCFullYear();
-  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(now.getUTCDate()).padStart(2, "0");
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
   return `${env.ELASTICSEARCH_INDEX}-${yyyy}.${mm}.${dd}`;
 }
 
@@ -132,7 +126,7 @@ class ElkClient {
     this.client = axios.create({
       baseURL: env.ELASTICSEARCH_URL,
       timeout: 5000,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
       auth,
     });
   }
@@ -140,9 +134,9 @@ class ElkClient {
   async connect(): Promise<boolean> {
     if (!this.client) return false;
     try {
-      const res = await this.client.get("/_cluster/health");
-      const status: string = res.data?.status ?? "red";
-      this.connected = status === "green" || status === "yellow";
+      const res = await this.client.get('/_cluster/health');
+      const status: string = res.data?.status ?? 'red';
+      this.connected = status === 'green' || status === 'yellow';
       return this.connected;
     } catch {
       this.connected = false;
@@ -162,12 +156,9 @@ class ElkClient {
   async bulkIndex(docs: ElkLogDocument[]): Promise<void> {
     if (!this.client || !this.connected || docs.length === 0) return;
     try {
-      const body = docs.flatMap((doc) => [
-        { index: { _index: dailyIndex() } },
-        doc,
-      ]);
-      await this.client.post("/_bulk", body.map((l) => JSON.stringify(l)).join("\n") + "\n", {
-        headers: { "Content-Type": "application/x-ndjson" },
+      const body = docs.flatMap((doc) => [{ index: { _index: dailyIndex() } }, doc]);
+      await this.client.post('/_bulk', body.map((l) => JSON.stringify(l)).join('\n') + '\n', {
+        headers: { 'Content-Type': 'application/x-ndjson' },
       });
     } catch {
       // Fire-and-forget
@@ -177,7 +168,7 @@ class ElkClient {
   async clusterHealth(): Promise<Record<string, unknown> | null> {
     if (!this.client) return null;
     try {
-      const res = await this.client.get("/_cluster/health");
+      const res = await this.client.get('/_cluster/health');
       return res.data as Record<string, unknown>;
     } catch {
       return null;
@@ -186,7 +177,7 @@ class ElkClient {
 
   async ensureIndexTemplate(): Promise<void> {
     if (!this.client || !this.connected) return;
-    const templateName = "nordi-logs-template";
+    const templateName = 'nordi-logs-template';
     try {
       // Only create if it doesn't exist
       await this.client.get(`/_index_template/${templateName}`);
@@ -199,27 +190,27 @@ class ElkClient {
             settings: {
               number_of_shards: 1,
               number_of_replicas: 1,
-              "index.lifecycle.name": "nordi-logs-policy",
+              'index.lifecycle.name': 'nordi-logs-policy',
             },
             mappings: {
               properties: {
-                "@timestamp": { type: "date" },
-                service: { type: "keyword" },
-                environment: { type: "keyword" },
-                level: { type: "keyword" },
-                message: { type: "text", fields: { keyword: { type: "keyword" } } },
-                context: { type: "keyword" },
-                requestId: { type: "keyword" },
-                userId: { type: "keyword" },
-                transactionId: { type: "keyword" },
-                walletId: { type: "keyword" },
-                fraudCaseId: { type: "keyword" },
-                kycId: { type: "keyword" },
-                ipAddress: { type: "ip", ignore_malformed: true },
-                meta: { type: "object", enabled: false },
-                "error.message": { type: "text" },
-                "error.stack": { type: "text", index: false },
-                "error.code": { type: "keyword" },
+                '@timestamp': { type: 'date' },
+                service: { type: 'keyword' },
+                environment: { type: 'keyword' },
+                level: { type: 'keyword' },
+                message: { type: 'text', fields: { keyword: { type: 'keyword' } } },
+                context: { type: 'keyword' },
+                requestId: { type: 'keyword' },
+                userId: { type: 'keyword' },
+                transactionId: { type: 'keyword' },
+                walletId: { type: 'keyword' },
+                fraudCaseId: { type: 'keyword' },
+                kycId: { type: 'keyword' },
+                ipAddress: { type: 'ip', ignore_malformed: true },
+                meta: { type: 'object', enabled: false },
+                'error.message': { type: 'text' },
+                'error.stack': { type: 'text', index: false },
+                'error.code': { type: 'keyword' },
               },
             },
           },
@@ -260,13 +251,13 @@ class NordiElkTransport extends Transport {
   }
 
   log(info: winston.Logform.TransformableInfo, callback: () => void): void {
-    setImmediate(() => this.emit("logged", info));
+    setImmediate(() => this.emit('logged', info));
 
     const meta = (info.meta as Record<string, unknown>) ?? {};
     const doc: ElkLogDocument = {
-      "@timestamp": new Date().toISOString(),
-      service: "nordi-remittance-api",
-      environment: process.env.NODE_ENV ?? "development",
+      '@timestamp': new Date().toISOString(),
+      service: 'nordi-remittance-api',
+      environment: process.env.NODE_ENV ?? 'development',
       level: info.level as string,
       message: info.message as string,
       context: meta.context as string | undefined,
@@ -280,8 +271,8 @@ class NordiElkTransport extends Transport {
       meta: Object.keys(meta).length > 0 ? meta : undefined,
     };
 
-    if (info.level === "error" && info[Symbol.for("splat")]) {
-      const splat = info[Symbol.for("splat")] as unknown[];
+    if (info.level === 'error' && info[Symbol.for('splat')]) {
+      const splat = info[Symbol.for('splat')] as unknown[];
       const err = splat?.[0];
       if (err instanceof Error) {
         doc.error = {
@@ -328,8 +319,8 @@ class NordiElkTransport extends Transport {
 export async function initializeElk(): Promise<void> {
   if (!env.ELASTICSEARCH_URL) {
     log.info(
-      "ELASTICSEARCH_URL not set — ELK transport disabled. " +
-        "JSON logs are still written to logs/all.log for Filebeat.",
+      'ELASTICSEARCH_URL not set — ELK transport disabled. ' +
+        'JSON logs are still written to logs/all.log for Filebeat.',
     );
     return;
   }
@@ -338,7 +329,7 @@ export async function initializeElk(): Promise<void> {
   const reachable = await elkClient.connect();
 
   if (!reachable) {
-    log.warn("Elasticsearch not reachable at startup — ELK transport disabled.", {
+    log.warn('Elasticsearch not reachable at startup — ELK transport disabled.', {
       url: env.ELASTICSEARCH_URL,
     });
     return;
@@ -346,10 +337,10 @@ export async function initializeElk(): Promise<void> {
 
   await elkClient.ensureIndexTemplate();
 
-  const transport = new NordiElkTransport({ level: "info" });
+  const transport = new NordiElkTransport({ level: 'info' });
   addElkTransport(transport);
 
-  log.info("ELK transport connected.", {
+  log.info('ELK transport connected.', {
     url: env.ELASTICSEARCH_URL,
     index: dailyIndex(),
   });
@@ -386,10 +377,10 @@ export async function checkElkHealth(): Promise<{
 
 export async function logTransaction(data: TransactionLogData): Promise<void> {
   await elkClient.index({
-    "@timestamp": new Date().toISOString(),
-    service: "nordi-remittance-api",
-    environment: process.env.NODE_ENV ?? "development",
-    level: "info",
+    '@timestamp': new Date().toISOString(),
+    service: 'nordi-remittance-api',
+    environment: process.env.NODE_ENV ?? 'development',
+    level: 'info',
     message: `Transaction ${data.status}: ${data.type} ${data.amount} ${data.currency}`,
     transactionId: data.transactionId,
     walletId: data.walletId,
@@ -400,10 +391,10 @@ export async function logTransaction(data: TransactionLogData): Promise<void> {
 
 export async function logFraudSignal(signal: FraudSignalData): Promise<void> {
   await elkClient.index({
-    "@timestamp": new Date().toISOString(),
-    service: "nordi-remittance-api",
-    environment: process.env.NODE_ENV ?? "development",
-    level: signal.severity === "critical" || signal.severity === "high" ? "error" : "warn",
+    '@timestamp': new Date().toISOString(),
+    service: 'nordi-remittance-api',
+    environment: process.env.NODE_ENV ?? 'development',
+    level: signal.severity === 'critical' || signal.severity === 'high' ? 'error' : 'warn',
     message: `Fraud signal [${signal.severity}]: ${signal.signalType}`,
     transactionId: signal.transactionId,
     fraudCaseId: signal.fraudCaseId,
@@ -414,10 +405,10 @@ export async function logFraudSignal(signal: FraudSignalData): Promise<void> {
 
 export async function logKycEvent(data: KycEventData): Promise<void> {
   await elkClient.index({
-    "@timestamp": new Date().toISOString(),
-    service: "nordi-remittance-api",
-    environment: process.env.NODE_ENV ?? "development",
-    level: "info",
+    '@timestamp': new Date().toISOString(),
+    service: 'nordi-remittance-api',
+    environment: process.env.NODE_ENV ?? 'development',
+    level: 'info',
     message: `KYC ${data.event} for user ${data.userId}`,
     kycId: data.kycId,
     userId: data.userId,
@@ -427,10 +418,10 @@ export async function logKycEvent(data: KycEventData): Promise<void> {
 
 export async function logSecurityEvent(data: SecurityEventData): Promise<void> {
   await elkClient.index({
-    "@timestamp": new Date().toISOString(),
-    service: "nordi-remittance-api",
-    environment: process.env.NODE_ENV ?? "development",
-    level: data.severity === "critical" ? "error" : data.severity ?? "info",
+    '@timestamp': new Date().toISOString(),
+    service: 'nordi-remittance-api',
+    environment: process.env.NODE_ENV ?? 'development',
+    level: data.severity === 'critical' ? 'error' : (data.severity ?? 'info'),
     message: `Security event: ${data.event}`,
     userId: data.userId,
     requestId: data.requestId,
@@ -450,10 +441,10 @@ export async function logError(
   } = {},
 ): Promise<void> {
   await elkClient.index({
-    "@timestamp": new Date().toISOString(),
-    service: "nordi-remittance-api",
-    environment: process.env.NODE_ENV ?? "development",
-    level: "error",
+    '@timestamp': new Date().toISOString(),
+    service: 'nordi-remittance-api',
+    environment: process.env.NODE_ENV ?? 'development',
+    level: 'error',
     message: error.message,
     requestId: context.requestId,
     userId: context.userId,
@@ -466,4 +457,3 @@ export async function logError(
     },
   });
 }
-

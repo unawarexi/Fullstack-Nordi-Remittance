@@ -6,6 +6,7 @@
 
 import { createClient, RedisClientType } from 'redis';
 import { env } from '../config/env.config.js';
+import { buildRedisOptions, type RedisConnectionOptions } from '../config/redis.config.js';
 import Logger from '../logs/logger.js';
 
 
@@ -52,26 +53,41 @@ export async function getRedisClient(): Promise<RedisClientType> {
 }
 
 /**
- * Initialize Redis connection
+ * Initialize Redis connection using shared buildRedisOptions config
  */
 async function initializeRedis(): Promise<void> {
   try {
-    // Redis Cloud configuration
-    redisClient = createClient({
-      username: 'default',
+    // Build connection options from shared config
+    const opts = buildRedisOptions({
+      host: env.REDIS_HOST,
+      port: env.REDIS_PORT,
       password: env.REDIS_PASSWORD,
-      socket: {
-        host: env.REDIS_HOST,
-        port: env.REDIS_PORT,
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            Logger.error('[Redis] Max reconnection attempts reached');
-            return new Error('Max reconnection attempts reached');
-          }
-          return Math.min(retries * 100, 3000);
-        },
-      },
+      db: env.REDIS_DB,
     });
+
+    // buildRedisOptions returns either a string URL or a flat options object
+    // node-redis's createClient expects { socket: { host, port }, password }
+    const socketConfig =
+      typeof opts === 'string'
+        ? { url: opts }
+        : {
+            username: (opts as RedisConnectionOptions).username || 'default',
+            password: (opts as RedisConnectionOptions).password || undefined,
+            database: (opts as RedisConnectionOptions).db,
+            socket: {
+              host: (opts as RedisConnectionOptions).host || 'localhost',
+              port: (opts as RedisConnectionOptions).port || 6379,
+              reconnectStrategy: (retries: number) => {
+                if (retries > 10) {
+                  Logger.error('[Redis] Max reconnection attempts reached');
+                  return new Error('Max reconnection attempts reached');
+                }
+                return Math.min(retries * 100, 3000);
+              },
+            },
+          };
+
+    redisClient = createClient(socketConfig);
 
     redisClient.on('error', (err) => {
       Logger.error(`[Redis] Client Error: ${err.message}`);
