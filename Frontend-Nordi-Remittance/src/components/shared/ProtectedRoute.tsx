@@ -33,7 +33,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // authenticated but role not allowed? Redirect to previous or home
   if (allowedRoles && user && user.role && !allowedRoles.includes(user.role)) {
     // If user is trying to access admin but is not admin, or vice versa
-    const fallbackPath = user.role === "admin" ? "/admin/dashboard" : "/customer/dashboard";
+    const ADMIN_ROLES = ["super_admin", "admin", "compliance_officer", "support_agent", "analyst"];
+    const fallbackPath = ADMIN_ROLES.includes(user.role) ? "/admin/dashboard" : "/customer/dashboard";
 
     // Prevent infinite redirect loop: only redirect if going to a DIFFERENT path
     if (fallbackPath !== location.pathname) {

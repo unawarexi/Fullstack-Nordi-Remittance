@@ -18,6 +18,7 @@ import AuthLayout from "@components/auth_components/AuthLayout";
 // Auth hooks and store
 import { useLogin, useClerkSync } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 // Validation
 import {
@@ -59,10 +60,13 @@ const Login = () => {
     };
     window.addEventListener("pageshow", handlePageShow);
 
-    // 3. Detect cancellation from Google via SSOCallback redirect
+    // 3. Detect errors or cancellation from OAuth / Callback redirects
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "cancelled") {
-      showToastError("Google sign-in cancelled");
+    const errParam = params.get("error");
+    if (errParam) {
+      const displayMsg = errParam === "cancelled" ? "Google sign-in cancelled" : errParam;
+      showToastError(displayMsg);
+      setClerkError(displayMsg);
       // Clean up the URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -91,38 +95,7 @@ const Login = () => {
     if (!token) throw new Error("Failed to obtain session token");
 
     const response = await clerkSyncMutation.mutateAsync(token);
-
-    if (response.requiresOtp) {
-      navigate("/auth/verify-otp", {
-        state: {
-          otpSessionToken: response.otpSessionToken,
-          email: response.email,
-          isAdmin: false,
-        },
-      });
-      return;
-    }
-
-    // No OTP needed — user is fully authenticated
-    if (response.user) {
-      setAuthenticated({
-        id: response.user.id || (response.user as any)._id,
-        email: response.user.email,
-        firstName: response.user.firstName,
-        lastName: response.user.lastName,
-        avatar: response.user.avatar,
-        role: response.user.role,
-        kycStatus: response.user.kycStatus || "pending",
-        isEmailVerified: response.user.emailVerified || false,
-        isPhoneVerified: response.user.phoneVerified || false,
-      });
-
-      navigate(
-        response.user.role === "admin"
-          ? "/admin/dashboard"
-          : "/customer/dashboard",
-      );
-    }
+    processAuthSyncResponse(response, navigate, setAuthenticated);
   };
 
   // ──────────────────────────────────────────────────────────────

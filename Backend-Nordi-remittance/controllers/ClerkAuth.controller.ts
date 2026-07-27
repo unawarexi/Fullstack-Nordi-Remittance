@@ -112,60 +112,195 @@ export async function clerkSync(
       throw new ValidationError("No email associated with your account");
     }
 
+    const cleanEmail = email.trim();
+    const emailRegex = new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+
     const firstName = clerkUser.firstName || "User";
     const lastName = clerkUser.lastName || "";
     const avatar = clerkUser.imageUrl || null;
 
-    // Find by clerkUserId first, then by email (link existing accounts)
+    // 1. Check if user exists in normal database (Users or AdminUsers)
+    // Login is STRICTLY for registered users/admins only!
+    let admin: any = await AdminUsers.findOne({
+      $or: [{ clerkUserId }, { email: emailRegex }],
+    });
 
+    if (admin) {
+      if (!admin.isActive) {
+        sendUnauthorized(res, "Your admin account is disabled or inactive.");
+        return;
+      }
+
+      // Reconcile our normal database with Clerk ID
+      if (!admin.clerkUserId || admin.clerkUserId !== clerkUserId) {
+        admin.clerkUserId = clerkUserId;
+        await admin.save();
+      }
+
+      // Reconcile Clerk user metadata with local normal database ID and role
+      try {
+        await client.users.updateUserMetadata(clerkUserId, {
+          publicMetadata: {
+            localId: admin._id.toString(),
+            role: admin.role || "admin",
+            kycStatus: "verified",
+          },
+        });
+      } catch (err) {
+        console.warn("Notice: Failed to reconcile Clerk user metadata for admin:", err);
+      }
+
+      // OTP check for admin
+      const deviceFingerprint = buildDeviceFingerprint(req);
+      if (isOtpRequired(admin, deviceFingerprint)) {
+        const otpCode = generateAlphanumericOTP(6);
+        const adminId = admin._id.toString();
+        await store2FACode(adminId, otpCode);
+
+        const emailGenerator = new EmailContentGenerator();
+        const otpTemplateData = emailGenerator.otpEmail({
+          firstName: admin.firstName || "Admin",
+          email: cleanEmail,
+          otpCode,
+          purpose: "Admin Sign-in Verification",
+          expiresIn: "5 minutes",
+          userId: adminId,
+        });
+
+        queueTemplatedMail(cleanEmail, otpTemplateData).catch((err) =>
+          console.error("Failed to send admin OTP email:", err),
+        );
+
+        const otpSessionToken = generateSecureToken(32);
+        await store2FACode(`otp_session:${otpSessionToken}`, adminId);
+
+        sendSuccess(
+          res,
+          {
+            requiresOtp: true,
+            otpSessionToken,
+            email: cleanEmail,
+            isAdmin: true,
+            reason: "device_verification",
+          },
+          "Admin OTP verification required.",
+        );
+        return;
+      }
+
+      // Issue admin tokens and respond with both admin & user payload for seamless routing
+      const sessionId = generateSecureToken(16);
+      const tokens = generateAuthTokens(
+        admin._id.toString(),
+        cleanEmail,
+        admin.role || "admin",
+        sessionId,
+      );
+
+      res.cookie("accessToken", tokens.accessToken, getAccessTokenCookieOptions());
+      res.cookie("refreshToken", tokens.refreshToken, getRefreshTokenCookieOptions());
+
+      sendSuccess(
+        res,
+        {
+          admin: {
+            id: admin._id,
+            email: admin.email,
+            firstName: admin.firstName,
+            lastName: admin.lastName,
+            role: admin.role || "admin",
+          },
+          user: {
+            id: admin._id,
+            email: admin.email,
+            firstName: admin.firstName,
+            lastName: admin.lastName,
+            role: admin.role || "admin",
+            kycStatus: "verified",
+            emailVerified: true,
+          },
+          tokens: {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresIn: Number(constants.ACCESS_TOKEN_EXPIRY_SECONDS),
+          },
+        },
+        "Admin login successful",
+      );
+      return;
+    }
+
+    // 2. Check regular Users database table
     let user: any = await Users.findOne({
-      $or: [{ clerkUserId }, { email: email.toLowerCase() }],
+      $or: [{ clerkUserId }, { email: emailRegex }],
     });
 
     if (!user) {
-      // User must register first — Clerk login is not for signup
+      // STRICT REQUIREMENT: If the user does not exist in our database, they must manually sign up first!
+      // Login via Clerk / Google Auth is strictly restricted to already registered users.
       sendError(
         res,
-        "Account not found. Please sign up first before using Google sign-in.",
-        "USER_NOT_FOUND",
+        "Account not found in our database. Please complete manual registration first before attempting to log in.",
+        "ACCOUNT_NOT_FOUND",
         404,
       );
       return;
     }
 
-    if (!user.clerkUserId) {
-      // EXISTING USER found by email — link Clerk ID
-
+    // Reconcile our normal database with Clerk OAuth information
+    let hasChanges = false;
+    if (!user.clerkUserId || user.clerkUserId !== clerkUserId) {
       user.clerkUserId = clerkUserId;
-      user.authProvider = clerkUser.externalAccounts?.length
-        ? "google"
-        : "clerk";
+      hasChanges = true;
+    }
+    if (clerkUser.externalAccounts?.length && user.authProvider !== "google") {
+      user.authProvider = "google";
+      hasChanges = true;
+    } else if (!clerkUser.externalAccounts?.length && user.authProvider === "local") {
+      user.authProvider = "clerk";
+      hasChanges = true;
+    }
+    if (!user.emailVerified) {
       user.emailVerified = true;
-      if (avatar && !user.profilePicture) user.profilePicture = avatar;
+      hasChanges = true;
+    }
+    if (avatar && !user.profilePicture) {
+      user.profilePicture = avatar;
+      hasChanges = true;
+    }
+    if (hasChanges) {
       await user.save();
     }
 
-    // Check if account is locked / suspended
+    // Reconcile Clerk metadata with local normal DB ID, role, and KYC status
+    try {
+      await client.users.updateUserMetadata(clerkUserId, {
+        publicMetadata: {
+          localId: user._id.toString(),
+          role: user.role || "user",
+          kycStatus: user.kycStatus || "pending",
+        },
+      });
+    } catch (err) {
+      console.warn("Notice: Failed to reconcile Clerk user metadata:", err);
+    }
+
+    // Check if account is suspended/banned
     if (user.status === "suspended" || user.status === "banned") {
       sendUnauthorized(
         res,
-        "Your account has been suspended. Contact support.",
+        "Your account has been suspended or banned. Please contact support.",
       );
       return;
     }
 
-    // OTP STEP-UP CHECK
-
+    // OTP Step-Up check
     const deviceFingerprint = buildDeviceFingerprint(req);
 
     if (isOtpRequired(user, deviceFingerprint)) {
-      // Generate OTP
       const otpCode = generateAlphanumericOTP(6);
-
-      // Store in Redis (5 min TTL)
       await store2FACode(user._id.toString(), otpCode);
 
-      // Send OTP email using template
       const emailGenerator = new EmailContentGenerator();
       const otpTemplateData = emailGenerator.otpEmail({
         firstName: user.firstName,
@@ -180,7 +315,6 @@ export async function clerkSync(
         console.error("Failed to send OTP email:", err),
       );
 
-      // Generate a temp token for OTP verification
       const otpSessionToken = generateSecureToken(32);
       await store2FACode(`otp_session:${otpSessionToken}`, user._id.toString());
 
@@ -201,8 +335,7 @@ export async function clerkSync(
       return;
     }
 
-    // No OTP needed — issue JWT tokens
-
+    // No OTP needed — issue JWT tokens and respond
     await issueTokensAndRespond(req, res, user, deviceFingerprint);
   } catch (error) {
     next(error);
@@ -210,133 +343,14 @@ export async function clerkSync(
 }
 
 // POST /auth/clerk-sync/admin
-// Admin variant — verifies the Clerk user has an admin record
+// Admin variant — delegates to our robust unified reconciliation logic
 export async function clerkSyncAdmin(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  try {
-    const clerkUserId: string = (req as any).clerkUserId;
-    if (!clerkUserId) {
-      throw new UnauthorizedError("Clerk authentication required");
-    }
-
-    const client = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
-    const clerkUser = await client.users.getUser(clerkUserId);
-
-    if (!clerkUser) {
-      throw new UnauthorizedError("Clerk user not found");
-    }
-
-    const email = clerkUser.emailAddresses?.[0]?.emailAddress;
-    if (!email) {
-      throw new ValidationError("No email associated with your account");
-    }
-
-    // Look for admin by email
-    let admin: any = await AdminUsers.findOne({ email: email.toLowerCase() });
-
-    if (!admin) {
-      sendUnauthorized(
-        res,
-        "No admin account found for this email. Access denied.",
-      );
-      return;
-    }
-
-    if (!admin.isActive) {
-      sendUnauthorized(res, "Admin account is not active.");
-      return;
-    }
-
-    // Link Clerk ID if needed
-    if (!admin.clerkUserId) {
-      admin.clerkUserId = clerkUserId;
-      await admin.save();
-    }
-
-    // OTP check for admin too
-    const deviceFingerprint = buildDeviceFingerprint(req);
-    const adminUser: any = await Users.findOne({ email: email.toLowerCase() });
-
-    if (adminUser && isOtpRequired(adminUser, deviceFingerprint)) {
-      const otpCode = generateAlphanumericOTP(6);
-      const userId = adminUser._id.toString();
-      await store2FACode(userId, otpCode);
-
-      const emailGenerator = new EmailContentGenerator();
-      const otpTemplateData = emailGenerator.otpEmail({
-        firstName: admin.firstName || "Admin",
-        email,
-        otpCode,
-        purpose: "Admin Console Verification",
-        expiresIn: "5 minutes",
-        userId: userId,
-      });
-
-      queueTemplatedMail(email, otpTemplateData).catch((err) =>
-        console.error("Failed to send admin OTP email:", err),
-      );
-
-      const otpSessionToken = generateSecureToken(32);
-      await store2FACode(`otp_session:${otpSessionToken}`, userId);
-
-      sendSuccess(
-        res,
-        {
-          requiresOtp: true,
-          otpSessionToken,
-          email,
-          isAdmin: true,
-          reason: "admin_verification",
-        },
-        "Admin OTP verification required.",
-      );
-      return;
-    }
-
-    // Issue admin tokens
-    const sessionId = generateSecureToken(16);
-    const tokens = generateAuthTokens(
-      admin._id.toString(),
-      email,
-      "admin",
-      sessionId,
-    );
-
-    res.cookie(
-      "accessToken",
-      tokens.accessToken,
-      getAccessTokenCookieOptions(),
-    );
-    res.cookie(
-      "refreshToken",
-      tokens.refreshToken,
-      getRefreshTokenCookieOptions(),
-    );
-
-    sendSuccess(
-      res,
-      {
-        admin: {
-          id: admin._id,
-          email: admin.email,
-          firstName: admin.firstName,
-          lastName: admin.lastName,
-          role: "admin",
-        },
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresIn: Number(constants.ACCESS_TOKEN_EXPIRY_SECONDS),
-        },
-      },
-      "Admin login successful",
-    );
-  } catch (error) {
-    next(error);
-  }
+  // Delegate to clerkSync which checks both AdminUsers and Users seamlessly
+  return clerkSync(req, res, next);
 }
 
 // POST /auth/verify-clerk-otp
@@ -369,36 +383,52 @@ export async function verifyClerkOtp(
       throw new UnauthorizedError("Invalid or expired verification code");
     }
 
-    // Find the user
-    const user: any = await Users.findById(storedUserId);
-    if (!user) {
-      throw new UnauthorizedError("User not found");
+    // Check in AdminUsers or Users collection
+    let admin: any = null;
+    let user: any = null;
+
+    if (isAdmin) {
+      admin = await AdminUsers.findById(storedUserId);
+      if (!admin) {
+        // Fallback check if email was stored under user ID
+        user = await Users.findById(storedUserId);
+        if (user) {
+          admin = await AdminUsers.findOne({ email: { $regex: new RegExp(`^${user.email}$`, "i") } });
+        }
+      }
+    } else {
+      user = await Users.findById(storedUserId);
+      if (!user) {
+        admin = await AdminUsers.findById(storedUserId);
+      }
+    }
+
+    const account = admin || user;
+    if (!account) {
+      throw new UnauthorizedError("User or Admin account not found for this OTP session");
     }
 
     // Mark OTP as verified and add device fingerprint
     const deviceFingerprint = buildDeviceFingerprint(req);
-    const knownDevices: string[] = user.knownDeviceFingerprints || [];
+    const knownDevices: string[] = account.knownDeviceFingerprints || [];
     if (!knownDevices.includes(deviceFingerprint)) {
       knownDevices.push(deviceFingerprint);
     }
 
-    user.lastOtpVerifiedAt = new Date();
-    user.knownDeviceFingerprints = knownDevices;
-    user.lastLogin = new Date();
-    await user.save();
+    account.lastOtpVerifiedAt = new Date();
+    account.knownDeviceFingerprints = knownDevices;
+    if ("lastLogin" in account || !admin) {
+      account.lastLogin = new Date();
+    }
+    await account.save();
 
     // If admin flow
-    if (isAdmin) {
-      const admin: any = await AdminUsers.findOne({ email: user.email });
-      if (!admin) {
-        throw new UnauthorizedError("Admin account not found");
-      }
-
+    if (admin) {
       const sessionId = generateSecureToken(16);
       const tokens = generateAuthTokens(
         admin._id.toString(),
-        user.email,
-        "admin",
+        admin.email,
+        admin.role || "admin",
         sessionId,
       );
 
@@ -413,16 +443,26 @@ export async function verifyClerkOtp(
         getRefreshTokenCookieOptions(),
       );
 
+      const ADMIN_ROLES = ["super_admin", "admin", "compliance_officer", "support_agent", "analyst"];
+      const adminRole = ADMIN_ROLES.includes(admin.role || "") ? admin.role : "admin";
+
+      const adminProfile = {
+        id: admin._id,
+        email: admin.email,
+        firstName: admin.firstName || "Admin",
+        lastName: admin.lastName || "",
+        role: adminRole,
+        kycStatus: "verified",
+        emailVerified: true,
+        phoneVerified: true,
+      };
+
       sendSuccess(
         res,
         {
-          admin: {
-            id: admin._id,
-            email: admin.email,
-            firstName: admin.firstName || user.firstName,
-            lastName: admin.lastName || user.lastName,
-            role: "admin",
-          },
+          isAdmin: true,
+          admin: adminProfile,
+          user: adminProfile,
           tokens: {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
@@ -464,30 +504,35 @@ export async function resendClerkOtp(
       throw new UnauthorizedError("Invalid or expired OTP session");
     }
 
-    const user: any = await Users.findById(storedUserId);
-    if (!user) {
-      throw new UnauthorizedError("User not found");
+    let account: any = await Users.findById(storedUserId);
+    let isResendAdmin = false;
+    if (!account) {
+      account = await AdminUsers.findById(storedUserId);
+      isResendAdmin = true;
+    }
+    if (!account) {
+      throw new UnauthorizedError("User account not found");
     }
 
     // Generate new OTP
     const otpCode = generateAlphanumericOTP(6);
-    await store2FACode(user._id.toString(), otpCode);
+    await store2FACode(account._id.toString(), otpCode);
 
     // Re-store the session token mapping
-    await store2FACode(`otp_session:${otpSessionToken}`, user._id.toString());
+    await store2FACode(`otp_session:${otpSessionToken}`, account._id.toString());
 
     // Send email using template
     const emailGenerator = new EmailContentGenerator();
     const otpTemplateData = emailGenerator.otpEmail({
-      firstName: user.firstName,
-      email: user.email as string,
+      firstName: account.firstName || (isResendAdmin ? "Admin" : "User"),
+      email: account.email as string,
       otpCode,
-      purpose: "Sign-in Verification (Resend)",
+      purpose: isResendAdmin ? "Admin Sign-in Verification (Resend)" : "Sign-in Verification (Resend)",
       expiresIn: "5 minutes",
-      userId: user._id.toString(),
+      userId: account._id.toString(),
     });
 
-    queueTemplatedMail(user.email as string, otpTemplateData).catch((err) =>
+    queueTemplatedMail(account.email as string, otpTemplateData).catch((err) =>
       console.error("Failed to send OTP email:", err),
     );
 
@@ -624,10 +669,11 @@ async function issueTokensAndRespond(
 
   // Generate JWT tokens
   const sessionId = generateSecureToken(16);
+  const userRole = user.role || "user";
   const tokens = generateAuthTokens(
     user._id.toString(),
     user.email as string,
-    user.role as string,
+    userRole,
     sessionId,
   );
 
@@ -644,6 +690,8 @@ async function issueTokensAndRespond(
     isPrimary: true,
   }).select("walletNumber balances");
 
+  const isAdminRole = ["super_admin", "admin", "compliance_officer", "support_agent", "analyst"].includes(userRole);
+
   sendSuccess(
     res,
     {
@@ -653,13 +701,22 @@ async function issueTokensAndRespond(
         firstName: user.firstName,
         lastName: user.lastName,
         accountNumber: user.accountNumber,
-        role: user.role || "user",
+        role: userRole,
         status: user.status,
-        kycStatus: user.kycStatus,
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
+        kycStatus: user.kycStatus || "pending",
+        emailVerified: user.emailVerified ?? true,
+        phoneVerified: user.phoneVerified ?? false,
         avatar: user.profilePicture,
       },
+      admin: isAdminRole
+        ? {
+            id: user._id,
+            email: user.email,
+            firstName: user.firstName || "Admin",
+            lastName: user.lastName || "",
+            role: userRole,
+          }
+        : undefined,
       wallet: wallet
         ? {
             id: wallet._id,

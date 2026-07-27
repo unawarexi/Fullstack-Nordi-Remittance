@@ -135,6 +135,7 @@ declare global {
     requiresOtp: boolean;
     otpSessionToken?: string;
     email?: string;
+    isAdmin?: boolean;
     user?: User;
     admin?: {
       id: string;
@@ -142,6 +143,11 @@ declare global {
       firstName: string;
       lastName: string;
       role: string;
+      avatar?: string;
+      profilePicture?: string;
+      kycStatus?: string;
+      emailVerified?: boolean;
+      phoneVerified?: boolean;
     };
     tokens?: {
       accessToken: string;

@@ -14,6 +14,7 @@ import AuthLayout from "@components/auth_components/AuthLayout";
 // Auth hooks and store
 import { useVerifyClerkOtp, useResendClerkOtp } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 // ============================================================================
 // CONSTANTS
@@ -82,26 +83,7 @@ const ClerkOtpVerification = () => {
           isAdmin,
         });
 
-        if (response.user) {
-          setAuthenticated({
-            id: response.user.id || (response.user as any)._id,
-            email: response.user.email,
-            firstName: response.user.firstName,
-            lastName: response.user.lastName,
-            avatar: response.user.avatar,
-            role: response.user.role,
-            kycStatus: response.user.kycStatus || "pending",
-            isEmailVerified: response.user.emailVerified || false,
-            isPhoneVerified: response.user.phoneVerified || false,
-          });
-
-          navigate(
-            response.user.role === "admin"
-              ? "/admin/dashboard"
-              : "/customer/dashboard",
-            { replace: true },
-          );
-        }
+        processAuthSyncResponse(response, navigate, setAuthenticated, email);
       } catch {
         // Error shown via mutation toast — reset inputs
         setOtp(Array(OTP_LENGTH).fill(""));

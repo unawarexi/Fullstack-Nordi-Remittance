@@ -2,10 +2,9 @@
 // CLERK AUTHENTICATION MIDDLEWARE
 // ============================================================================
 
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { verifyToken } from "@clerk/express";
 import type { AuthenticatedRequest } from "../types/index.js";
-import Users from "../models/UserModel.js";
 import { UnauthorizedError } from "../core/errors/AppError.js";
 import { env } from "../config/env.config.js";
 
@@ -15,7 +14,7 @@ import { env } from "../config/env.config.js";
 
 /**
  * Verify Clerk session token from Authorization header.
- * Attaches the Clerk userId and resolved local user to req.
+ * Attaches the Clerk userId and session Id to req without duplicating DB queries.
  */
 export async function verifyClerkToken(
   req: AuthenticatedRequest,
@@ -39,22 +38,8 @@ export async function verifyClerkToken(
       throw new UnauthorizedError("Invalid Clerk session token");
     }
 
-    const clerkUserId = verifiedToken.sub;
-
-    // Look up local user by clerkUserId
-    const user: any = await Users.findOne({ clerkUserId }).lean();
-
-    if (user) {
-      req.user = {
-        userId: user._id,
-        email: user.email,
-        role: user.role || "user",
-        sessionId: verifiedToken.sid || "",
-      };
-    }
-
-    // Attach Clerk-specific data for downstream handlers
-    (req as any).clerkUserId = clerkUserId;
+    // Attach Clerk-specific data for downstream controllers to perform DB reconciliation
+    (req as any).clerkUserId = verifiedToken.sub;
     (req as any).clerkSessionId = verifiedToken.sid;
 
     next();

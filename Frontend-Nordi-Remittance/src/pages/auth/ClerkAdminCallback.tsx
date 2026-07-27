@@ -8,13 +8,16 @@ import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { PageLoader } from "@components/ui/Spinner";
 import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { useToast } from "@store/toast.store";
+import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 const ClerkAdminCallback = () => {
   const navigate = useNavigate();
-  const { getToken, isSignedIn, isLoaded } = useClerkAuth();
+  const { getToken, isSignedIn, isLoaded, signOut } = useClerkAuth();
   const { user: clerkUser } = useUser();
   const clerkSyncAdminMutation = useClerkSyncAdmin();
   const { setAuthenticated } = useAuthStore();
+  const { error: showToastError } = useToast();
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -27,40 +30,20 @@ const ClerkAdminCallback = () => {
     const sync = async () => {
       try {
         const token = await getToken();
-        if (!token) throw new Error("No token");
+        if (!token) throw new Error("No session token available");
 
         const response = await clerkSyncAdminMutation.mutateAsync(token);
-
-        if (response.requiresOtp) {
-          navigate("/auth/verify-otp", {
-            replace: true,
-            state: {
-              otpSessionToken: response.otpSessionToken,
-              email:
-                response.email ||
-                clerkUser?.primaryEmailAddress?.emailAddress,
-              isAdmin: true,
-            },
-          });
-          return;
+        processAuthSyncResponse(response, navigate, setAuthenticated, clerkUser?.primaryEmailAddress?.emailAddress);
+      } catch (err: any) {
+        if (signOut) {
+          await signOut().catch(() => {});
         }
-
-        // Admin endpoint returns response.admin (not response.user)
-        if (response.admin) {
-          setAuthenticated({
-            id: response.admin.id || (response.admin as any)._id,
-            email: response.admin.email,
-            firstName: response.admin.firstName || "Admin",
-            lastName: response.admin.lastName || "",
-            role: "admin",
-            kycStatus: "verified",
-            isEmailVerified: true,
-            isPhoneVerified: true,
-          });
-          navigate("/admin/dashboard", { replace: true });
-        }
-      } catch {
-        navigate("/admin", { replace: true });
+        const errorMsg =
+          err?.response?.data?.message ||
+          err?.message ||
+          "No active admin account found in our database.";
+        showToastError(errorMsg);
+        navigate(`/admin?error=${encodeURIComponent(errorMsg)}`, { replace: true });
       }
     };
 

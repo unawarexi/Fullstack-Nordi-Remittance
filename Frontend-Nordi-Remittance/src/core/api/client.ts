@@ -112,6 +112,20 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
+    const requestUrl = originalRequest?.url || "";
+    const isAuthEndpoint =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/verify") ||
+      requestUrl.includes("/auth/resend") ||
+      requestUrl.includes("/auth/clerk") ||
+      requestUrl.includes("/auth/register") ||
+      requestUrl.includes("/auth/refresh");
+
+    if (error.response?.status === 401 && isAuthEndpoint) {
+      // Do NOT force logout or redirect to login on OTP/verification failures.
+      return Promise.reject(error);
+    }
+
     // Handle 401 Unauthorized - attempt token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {

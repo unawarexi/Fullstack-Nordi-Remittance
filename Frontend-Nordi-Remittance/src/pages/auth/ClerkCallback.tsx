@@ -8,13 +8,16 @@ import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { PageLoader } from "@components/ui/Spinner";
 import { useClerkSync } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { useToast } from "@store/toast.store";
+import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 const ClerkCallback = () => {
   const navigate = useNavigate();
-  const { getToken, isSignedIn, isLoaded } = useClerkAuth();
+  const { getToken, isSignedIn, isLoaded, signOut } = useClerkAuth();
   const { user: clerkUser } = useUser();
   const clerkSyncMutation = useClerkSync();
   const { setAuthenticated } = useAuthStore();
+  const { error: showToastError } = useToast();
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -27,44 +30,20 @@ const ClerkCallback = () => {
     const sync = async () => {
       try {
         const token = await getToken();
-        if (!token) throw new Error("No token");
+        if (!token) throw new Error("No session token available");
 
         const response = await clerkSyncMutation.mutateAsync(token);
-
-        if (response.requiresOtp) {
-          navigate("/auth/verify-otp", {
-            replace: true,
-            state: {
-              otpSessionToken: response.otpSessionToken,
-              email: response.email || clerkUser?.primaryEmailAddress?.emailAddress,
-              isAdmin: false,
-            },
-          });
-          return;
+        processAuthSyncResponse(response, navigate, setAuthenticated, clerkUser?.primaryEmailAddress?.emailAddress);
+      } catch (err: any) {
+        if (signOut) {
+          await signOut().catch(() => {});
         }
-
-        if (response.user) {
-          setAuthenticated({
-            id: response.user.id || (response.user as any)._id,
-            email: response.user.email,
-            firstName: response.user.firstName,
-            lastName: response.user.lastName,
-            avatar: response.user.avatar,
-            role: response.user.role,
-            kycStatus: response.user.kycStatus || "pending",
-            isEmailVerified: response.user.emailVerified || false,
-            isPhoneVerified: response.user.phoneVerified || false,
-          });
-
-          navigate(
-            response.user.role === "admin"
-              ? "/admin/dashboard"
-              : "/customer/dashboard",
-            { replace: true },
-          );
-        }
-      } catch {
-        navigate("/auth/login", { replace: true });
+        const errorMsg =
+          err?.response?.data?.message ||
+          err?.message ||
+          "Account not found in our database. Please complete registration before attempting to log in.";
+        showToastError(errorMsg);
+        navigate(`/auth/login?error=${encodeURIComponent(errorMsg)}`, { replace: true });
       }
     };
 

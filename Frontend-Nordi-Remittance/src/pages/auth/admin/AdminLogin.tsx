@@ -15,6 +15,7 @@ import GetLocation from "@utils/GetLocation";
 import { useAdminLogin } from "@hooks/queries/useAdmin";
 import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { processAuthSyncResponse } from "../../../core/auth/clerkSync.helper";
 import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
 import { Logo } from "@components/shared";
 
@@ -75,10 +76,13 @@ const AdminLogin = () => {
     };
     window.addEventListener("pageshow", handlePageShow);
 
-    // 3. Detect cancellation from Google
+    // 3. Detect errors or cancellation from OAuth / Callback redirects
     const params = new URLSearchParams(window.location.search);
-    if (params.get("error") === "cancelled") {
-      showToastError("Google sign-in cancelled");
+    const errParam = params.get("error");
+    if (errParam) {
+      const displayMsg = errParam === "cancelled" ? "Google sign-in cancelled" : errParam;
+      showToastError(displayMsg);
+      setClerkError(displayMsg);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
@@ -100,31 +104,7 @@ const AdminLogin = () => {
     if (!token) throw new Error("Failed to obtain session token");
 
     const response = await clerkSyncAdminMutation.mutateAsync(token);
-
-    if (response.requiresOtp) {
-      navigate("/auth/verify-otp", {
-        state: {
-          otpSessionToken: response.otpSessionToken,
-          email: response.email,
-          isAdmin: true,
-        },
-      });
-      return;
-    }
-
-    if (response.user) {
-      setAuthenticated({
-        id: response.user.id || (response.user as any)._id,
-        email: response.user.email,
-        firstName: response.user.firstName || "Admin",
-        lastName: response.user.lastName || "",
-        role: "admin",
-        kycStatus: "verified",
-        isEmailVerified: true,
-        isPhoneVerified: true,
-      });
-      navigate("/admin/dashboard");
-    }
+    processAuthSyncResponse(response, navigate, setAuthenticated);
   };
 
   const onSubmit = async (data: LoginFormData) => {
