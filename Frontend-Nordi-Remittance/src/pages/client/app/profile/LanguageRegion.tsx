@@ -6,17 +6,24 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  Globe, FileText, Eye, Shield,
-  Clock, CheckCircle2,
-  Image, Camera, PenTool, ScanFace, Download, ExternalLink,
+  Globe,
+  FileText,
+  Eye,
+  Shield,
+  Clock,
+  CheckCircle2,
+  Image,
+  Camera,
+  PenTool,
+  ScanFace,
+  Download,
+  ExternalLink,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
-import {
-  PageContainer, DashCard,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import { useToastStore } from "@store/toast.store";
-import { useClientProfile } from "../../domain/useProfileDomain";
+import { useClientProfile } from "../../client-usecase/useprofile-client-usecase";
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors";
@@ -68,21 +75,21 @@ const LanguageRegion: React.FC = () => {
         {/* Language */}
         <motion.div variants={dashboardItemVariants}>
           <DashCard>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="rounded-lg bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                 <Globe size={16} />
               </div>
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Language</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Language</h3>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {languages.map((l) => (
                 <button
                   key={l.code}
                   onClick={() => setLang(l.code)}
-                  className={`flex items-center gap-2 p-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 rounded-xl p-2.5 text-xs font-medium transition-all sm:text-sm ${
                     lang === l.code
                       ? "bg-indigo-600 text-white"
-                      : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      : "border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                   }`}
                 >
                   <span className="text-lg">{l.flag}</span> {l.name}
@@ -95,15 +102,15 @@ const LanguageRegion: React.FC = () => {
         {/* Regional Settings */}
         <motion.div variants={dashboardItemVariants}>
           <DashCard>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="rounded-lg bg-emerald-50 p-2 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
                 <Globe size={16} />
               </div>
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Regional Settings</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Regional Settings</h3>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400 sm:text-xs">
                   Region
                 </label>
                 <select value={region} onChange={(e) => setRegion(e.target.value)} className={inputCls}>
@@ -120,7 +127,7 @@ const LanguageRegion: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400 sm:text-xs">
                   Timezone
                 </label>
                 <select value={timezone} onChange={(e) => setTimezone(e.target.value)} className={inputCls}>
@@ -139,7 +146,7 @@ const LanguageRegion: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400 sm:text-xs">
                   Date Format
                 </label>
                 <select value={dateFormat} onChange={(e) => setDateFormat(e.target.value)} className={inputCls}>
@@ -150,7 +157,7 @@ const LanguageRegion: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5">
+                <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400 sm:text-xs">
                   Currency Display
                 </label>
                 <select value={currency} onChange={(e) => setCurrency(e.target.value)} className={inputCls}>
@@ -173,7 +180,7 @@ const LanguageRegion: React.FC = () => {
         <motion.div variants={dashboardItemVariants}>
           <motion.button
             onClick={save}
-            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium"
+            className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-xs font-medium text-white sm:text-sm"
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
           >
@@ -221,9 +228,7 @@ const ProfileDocCard: React.FC<{
   const likelyPdf = isPdfUrl(url);
 
   // For Cloudinary raw URLs, try converting to image URL for preview
-  const imagePreviewUrl = url.includes("/raw/upload/")
-    ? url.replace("/raw/upload/", "/image/upload/")
-    : url;
+  const imagePreviewUrl = url.includes("/raw/upload/") ? url.replace("/raw/upload/", "/image/upload/") : url;
 
   const handleImgLoad = useCallback(() => setImgLoaded(true), []);
   const handleImgError = useCallback(() => setImgFailed(true), []);
@@ -233,17 +238,17 @@ const ProfileDocCard: React.FC<{
 
   return (
     <motion.div
-      className="group relative rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors bg-white dark:bg-gray-900"
+      className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-colors hover:border-indigo-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-indigo-700"
       whileHover={{ y: -2 }}
     >
       {/* ── Preview area ── */}
-      <div className="relative h-44 bg-gray-50 dark:bg-gray-800 overflow-hidden">
+      <div className="relative h-44 overflow-hidden bg-gray-50 dark:bg-gray-800">
         {/* Try image rendering */}
         {(likelyImage || !likelyPdf) && !imgFailed && (
           <img
             src={imagePreviewUrl}
             alt={label}
-            className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-105 ${
+            className={`h-full w-full object-cover transition-all duration-300 group-hover:scale-105 ${
               imgLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={handleImgLoad}
@@ -260,25 +265,23 @@ const ProfileDocCard: React.FC<{
         {/* Document / PDF placeholder (when image fails or file is a document) */}
         {(imgFailed || likelyPdf || (!likelyImage && !imgLoaded)) && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4">
-            <div className={`p-4 rounded-2xl ${iconBg}`}>
-              {likelyPdf ? <FileText size={32} /> : icon}
-            </div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 text-center">
+            <div className={`rounded-2xl p-4 ${iconBg}`}>{likelyPdf ? <FileText size={32} /> : icon}</div>
+            <span className="text-center text-xs font-medium text-gray-600 dark:text-gray-400">
               {likelyPdf ? "PDF Document" : "Document File"}
             </span>
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center max-w-[90%] truncate">
+            <span className="max-w-[90%] truncate text-center text-[10px] text-gray-400 dark:text-gray-500">
               {url.split("/").pop()?.split("?")[0] || label}
             </span>
           </div>
         )}
 
         {/* Hover overlay with actions */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
+        <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 bg-white dark:bg-gray-900 rounded-lg px-3 py-2 shadow-lg text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-lg transition-colors hover:bg-indigo-50 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-indigo-950/50"
           >
             <Eye size={14} /> View
           </a>
@@ -287,7 +290,7 @@ const ProfileDocCard: React.FC<{
             download
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 bg-indigo-600 rounded-lg px-3 py-2 shadow-lg text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white shadow-lg transition-colors hover:bg-indigo-700"
           >
             <Download size={14} /> Download
           </a>
@@ -295,31 +298,19 @@ const ProfileDocCard: React.FC<{
       </div>
 
       {/* ── Info footer ── */}
-      <div className="p-3 border-t border-gray-100 dark:border-gray-800">
+      <div className="border-t border-gray-100 p-3 dark:border-gray-800">
         <div className="flex items-center gap-2">
-          <div className={`p-1.5 rounded-lg ${iconBg} flex-shrink-0`}>
-            {icon}
-          </div>
+          <div className={`rounded-lg p-1.5 ${iconBg} flex-shrink-0`}>{icon}</div>
           <div className="min-w-0 flex-1">
-            <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
-              {label}
-            </h4>
-            {detail && (
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">
-                {detail}
-              </p>
-            )}
-            {expiry && (
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                Expires {expiry}
-              </p>
-            )}
+            <h4 className="truncate text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{label}</h4>
+            {detail && <p className="truncate text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">{detail}</p>}
+            {expiry && <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">Expires {expiry}</p>}
           </div>
           <a
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors flex-shrink-0"
+            className="flex-shrink-0 rounded-lg bg-gray-100 p-1.5 text-gray-500 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-indigo-950/50 dark:hover:text-indigo-400"
             title="Open in new tab"
           >
             <ExternalLink size={14} />

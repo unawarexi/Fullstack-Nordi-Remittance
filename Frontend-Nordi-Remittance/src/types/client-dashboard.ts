@@ -240,6 +240,18 @@ declare global {
     isNotificationsLoading: boolean;
     isInsightsLoading: boolean;
     isSecurityLoading: boolean;
+
+    // Per-section error flags (for QuerySection isolation)
+    isAccountError: boolean;
+    isTransactionsError: boolean;
+    isBudgetsError: boolean;
+    isInvestmentsError: boolean;
+    isLoansError: boolean;
+    isCardsError: boolean;
+    isSavingsError: boolean;
+    isNotificationsError: boolean;
+    isInsightsError: boolean;
+    isSecurityError: boolean;
   }
 }
 

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@components/shared/DashboardPrimitives";
 import { dashboardContainerVariants, dashboardItemVariants } from "@core/animation/Animation";
 import { FullPageSkeleton } from "@components/skeletons/Skeletons";
-import { useAdminDashboard } from "../../domain/useAdminDashboard";
+import { useAdminDashboard } from "../../admin-usecase/useAdminDashboard";
 import DashboardStats from "./DashboardStats";
 import DashboardMain from "./DashboardMain";
 import DashboardSidebar from "./DashboardSidebar";
@@ -66,7 +66,7 @@ const NordeaBankingAdmin: React.FC = () => {
         </motion.div>
 
         {/* Main Charts + Sidebar */}
-        <motion.div variants={dashboardItemVariants} className="flex flex-col lg:flex-row gap-6">
+        <motion.div variants={dashboardItemVariants} className="flex flex-col gap-6 lg:flex-row">
           <DashboardMain
             revenueData={revenueData}
             weeklyTransactions={weeklyTransactions}
@@ -83,13 +83,13 @@ const NordeaBankingAdmin: React.FC = () => {
         </motion.div>
 
         {/* Loans & Investments Row */}
-        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <DashboardLoans loansData={loansData} isLoading={isLoansLoading} />
           <DashboardInvestments investmentsData={investmentsData} isLoading={isInvestmentsLoading} />
         </motion.div>
 
         {/* Cards & Fraud Row */}
-        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <DashboardCards cardsData={cardsData} isLoading={isCardsLoading} />
           <DashboardFraud fraudData={fraudData} isLoading={isFraudLoading} />
         </motion.div>

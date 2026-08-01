@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { dashboardContainerVariants, dashboardItemVariants } from "@core/animation/Animation";
 import { PageContainer } from "@components/shared/DashboardPrimitives";
 import { FullPageSkeleton } from "@components/skeletons/Skeletons";
-import { useClientDashboard } from "../../domain/useClientDashboard";
-import { useClientSpending } from "../../domain/useClientSpending";
+import { useClientDashboard } from "../../client-usecase/usedashboard-client-usecase";
+import { useClientSpending } from "../../client-usecase/usespending-client-usecase";
 import AccountSummaryPanel from "./AccountSummary";
 import DashboardMain from "./DashbaordMain";
 import DashboardSidebar from "./DashBoardSideBar";
@@ -37,7 +37,7 @@ const UserDashboardOverview: React.FC = () => {
         </motion.div>
 
         {/* Main Dashboard + Sidebar */}
-        <motion.div variants={dashboardItemVariants} className="flex flex-col lg:flex-row items-start gap-5">
+        <motion.div variants={dashboardItemVariants} className="flex flex-col items-start gap-5 lg:flex-row">
           <DashboardMain
             transactions={dashboard.recentTransactions}
             spending={spending}
@@ -62,12 +62,9 @@ const UserDashboardOverview: React.FC = () => {
         </motion.div>
 
         {/* Loans & Investments Row */}
-        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-5">
+        <motion.div variants={dashboardItemVariants} className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-2">
           <div className="flex">
-            <ClientLoansPanel
-              loansData={dashboard.loansDetail}
-              isLoading={dashboard.isLoansLoading}
-            />
+            <ClientLoansPanel loansData={dashboard.loansDetail} isLoading={dashboard.isLoansLoading} />
           </div>
           <div className="flex">
             <ClientInvestmentsPanel

@@ -6,30 +6,31 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  PiggyBank, Building2, Lock, Download, FileText,
-  TrendingUp, Percent, Shield, Plus,
-} from "@constants/icons";
+import { PiggyBank, Building2, Lock, Download, FileText, TrendingUp, Percent, Shield, Plus } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
-  PageContainer, DashCard, StatCard, StatsGrid, SectionHeader, StatusBadge,
+  PageContainer,
+  DashCard,
+  StatCard,
+  StatsGrid,
+  SectionHeader,
+  StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientWallets } from "../../domain/useAccountsDomain";
+import { useClientWallets } from "../../client-usecase/useaccounts-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
 
-
 const CurrentAccount: React.FC = () => {
   const navigate = useNavigate();
   const show = useUIStore((s) => s.preferences.showBalances);
   const { wallets: allWallets, isLoading } = useClientWallets();
-  const wallets = allWallets.filter(
-    (w: any) => ["current", "checking"].includes((w.type || w.accountType || "").toLowerCase())
+  const wallets = allWallets.filter((w: any) =>
+    ["current", "checking"].includes((w.type || w.accountType || "").toLowerCase()),
   );
 
   return (
@@ -50,9 +51,24 @@ const CurrentAccount: React.FC = () => {
         <StatsGridSkeleton count={3} />
       ) : (
         <StatsGrid cols={3}>
-          <StatCard label="Current Balance" value={show ? fmt(wallets.reduce((a: number, w: any) => a + (w.balance || 0), 0)) : "••••••"} icon={<Building2 size={20} />} iconColor="from-indigo-500 to-purple-500" />
-          <StatCard label="Monthly Turnover" value={show ? fmt(wallets.reduce((a: number, w: any) => a + (w.monthlyTurnover || 0), 0)) : "••••••"} icon={<TrendingUp size={20} />} iconColor="from-blue-500 to-cyan-500" />
-          <StatCard label="Accounts" value={String(wallets.length)} icon={<Building2 size={20} />} iconColor="from-amber-500 to-orange-500" />
+          <StatCard
+            label="Current Balance"
+            value={show ? fmt(wallets.reduce((a: number, w: any) => a + (w.balance || 0), 0)) : "••••••"}
+            icon={<Building2 size={20} />}
+            iconColor="from-indigo-500 to-purple-500"
+          />
+          <StatCard
+            label="Monthly Turnover"
+            value={show ? fmt(wallets.reduce((a: number, w: any) => a + (w.monthlyTurnover || 0), 0)) : "••••••"}
+            icon={<TrendingUp size={20} />}
+            iconColor="from-blue-500 to-cyan-500"
+          />
+          <StatCard
+            label="Accounts"
+            value={String(wallets.length)}
+            icon={<Building2 size={20} />}
+            iconColor="from-amber-500 to-orange-500"
+          />
         </StatsGrid>
       )}
 
@@ -64,24 +80,29 @@ const CurrentAccount: React.FC = () => {
         />
       ) : (
         <DashCard padding="none" className="mt-6">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Current Accounts</h3>
+          <div className="border-b border-gray-200 p-4 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Current Accounts</h3>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {wallets.map((w: any, i: number) => (
-              <div key={i} className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                  <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                     <Building2 size={18} />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{w.name || "Current Account"}</h4>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                    <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
+                      {w.name || "Current Account"}
+                    </h4>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                       {w.accountNumber ? `•••• ${w.accountNumber.slice(-4)}` : w.currency || "USD"}
                     </p>
                   </div>
                 </div>
-                <p className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">
+                <p className="text-sm font-bold text-gray-900 dark:text-white sm:text-lg">
                   {show ? fmt(w.balance || 0) : "••••••"}
                 </p>
               </div>

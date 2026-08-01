@@ -5,20 +5,14 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Users, UserPlus, FolderOpen, Search, Trash2, Star,
-  Building2, User, Globe, Phone,
-} from "@constants/icons";
+import { Users, UserPlus, FolderOpen, Search, Trash2, Star, Building2, User, Globe, Phone } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAddBeneficiary } from "../../domain/useAccountsDomain";
+import { useAddBeneficiary } from "../../client-usecase/useaccounts-client-usecase";
 import { useToastStore } from "@store/toast.store";
-
 
 const AddBeneficiary: React.FC = () => {
   const addMutation = useAddBeneficiary();
@@ -76,10 +70,10 @@ const AddBeneficiary: React.FC = () => {
                     key={opt.v}
                     type="button"
                     onClick={() => setForm((p) => ({ ...p, type: opt.v }))}
-                    className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-medium transition-all sm:px-4 sm:text-sm ${
                       form.type === opt.v
                         ? "bg-indigo-600 text-white"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                        : "border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                     }`}
                   >
                     <opt.icon size={14} /> {opt.label}
@@ -93,12 +87,24 @@ const AddBeneficiary: React.FC = () => {
             </div>
             <div>
               <label className={labelCls}>Account Number</label>
-              <input type="text" value={form.accountNumber} onChange={set("accountNumber")} placeholder="Enter account number" className={inputCls} />
+              <input
+                type="text"
+                value={form.accountNumber}
+                onChange={set("accountNumber")}
+                placeholder="Enter account number"
+                className={inputCls}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Bank Name</label>
-                <input type="text" value={form.bankName} onChange={set("bankName")} placeholder="Bank name" className={inputCls} />
+                <input
+                  type="text"
+                  value={form.bankName}
+                  onChange={set("bankName")}
+                  placeholder="Bank name"
+                  className={inputCls}
+                />
               </div>
               <div>
                 <label className={labelCls}>IFSC / SWIFT Code</label>
@@ -108,11 +114,17 @@ const AddBeneficiary: React.FC = () => {
             <motion.button
               type="submit"
               disabled={addMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium disabled:opacity-50 mt-2"
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-xs font-medium text-white disabled:opacity-50 sm:text-sm"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
-              {addMutation.isPending ? "Adding…" : <><UserPlus size={16} /> Add Beneficiary</>}
+              {addMutation.isPending ? (
+                "Adding…"
+              ) : (
+                <>
+                  <UserPlus size={16} /> Add Beneficiary
+                </>
+              )}
             </motion.button>
           </form>
         </DashCard>

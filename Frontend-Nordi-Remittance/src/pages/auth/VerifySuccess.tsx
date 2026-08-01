@@ -11,7 +11,7 @@ import { Button, Spinner } from "@components/ui";
 import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useVerifyEmail } from "@hooks/queries/useAuth";
+import { useVerifyEmail } from "@hooks/api-queries/useAuth";
 
 const VerifySuccess = () => {
   const navigate = useNavigate();
@@ -42,26 +42,17 @@ const VerifySuccess = () => {
   }, [token]);
 
   // Derived status and message
-  const status = verifyEmailMutation.isPending
-    ? "loading"
-    : verifyEmailMutation.isSuccess
-      ? "success"
-      : "error";
+  const status = verifyEmailMutation.isPending ? "loading" : verifyEmailMutation.isSuccess ? "success" : "error";
   const message = verifyEmailMutation.isPending
     ? "Verifying your email address..."
     : verifyEmailMutation.isSuccess
       ? "Your email has been successfully verified! You can now access all features of your account."
-      : verifyEmailMutation.error?.message ||
-        "Verification failed. The link may be expired or invalid.";
+      : verifyEmailMutation.error?.message || "Verification failed. The link may be expired or invalid.";
 
   return (
     <AuthLayout
       title="Email Verification"
-      subtitle={
-        status === "loading"
-          ? "Please wait while we verify your email address..."
-          : "Verification Status"
-      }
+      subtitle={status === "loading" ? "Please wait while we verify your email address..." : "Verification Status"}
       variant="login"
     >
       <div className="flex flex-col items-center justify-center space-y-6 py-6 pt-4 text-center">
@@ -86,9 +77,7 @@ const VerifySuccess = () => {
 
         {/* Message */}
         <div className="space-y-4">
-          <p
-            className={`text-sm ${status === "error" ? "font-medium text-error-600" : "text-neutral-600"}`}
-          >
+          <p className={`text-sm ${status === "error" ? "font-medium text-error-600" : "text-neutral-600"}`}>
             {message}
           </p>
         </div>
@@ -100,9 +89,7 @@ const VerifySuccess = () => {
               variant={status === "success" ? "primary" : "outline"}
               fullWidth
               onClick={() => navigate("/auth/login")}
-              className={
-                status === "success" ? "bg-blue-600 hover:bg-blue-700" : ""
-              }
+              className={status === "success" ? "bg-blue-600 hover:bg-blue-700" : ""}
             >
               Return to Login
             </Button>

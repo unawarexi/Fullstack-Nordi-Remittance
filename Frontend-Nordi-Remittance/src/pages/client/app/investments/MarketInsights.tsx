@@ -30,27 +30,17 @@ import {
   CalendarDays,
 } from "@constants/icons";
 
-import {
-  PageContainer,
-  DashCard,
-  StatCard,
-  StatsGrid,
-  StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import PageHeader from "@components/shared/PageHeader";
 import EmptyState from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-  ChartSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton, ChartSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
   useClientInvestments,
   useClientInvestmentProducts,
   useClientPortfolio,
   useClientInvestmentPerformance,
-} from "../../domain/useInvestmentsDomain";
+} from "../../client-usecase/useinvestments-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -70,7 +60,6 @@ const fmtCompact = (n: number) =>
   }).format(n);
 
 const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
-
 
 const MarketInsights: React.FC = () => {
   const { products: productsData, isLoading } = useClientInvestmentProducts();
@@ -135,11 +124,8 @@ const MarketInsights: React.FC = () => {
   }, [insights]);
 
   const filtered = useMemo(
-    () =>
-      selectedCategory === "all"
-        ? insights
-        : insights.filter((a) => a.category === selectedCategory),
-    [insights, selectedCategory]
+    () => (selectedCategory === "all" ? insights : insights.filter((a) => a.category === selectedCategory)),
+    [insights, selectedCategory],
   );
 
   const categoryColors: Record<string, string> = {
@@ -182,24 +168,19 @@ const MarketInsights: React.FC = () => {
           <TableSkeleton rows={4} />
         </>
       ) : (
-        <motion.div
-          variants={dashboardItemVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-6"
-        >
+        <motion.div variants={dashboardItemVariants} initial="hidden" animate="visible" className="space-y-6">
           {/* ── Category Filter ────────────────────────────────────── */}
           <DashCard>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               <Tag size={14} className="text-gray-400 dark:text-gray-500" />
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-medium capitalize transition-colors ${
+                  className={`rounded-xl px-3 py-1.5 text-[10px] font-medium capitalize transition-colors sm:text-xs ${
                     selectedCategory === cat
-                      ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
                   }`}
                 >
                   {cat === "all" ? "All Topics" : cat}
@@ -216,43 +197,41 @@ const MarketInsights: React.FC = () => {
               description="Check back later for the latest market analysis."
             />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((article, i) => (
                 <DashCard key={i} hover>
-                  <div className="flex flex-col h-full">
+                  <div className="flex h-full flex-col">
                     {/* Category Badge + Date */}
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="mb-3 flex items-center justify-between">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium sm:text-xs ${
                           categoryColors[article.category] ??
-                          "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                          "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                         }`}
                       >
                         {article.category}
                       </span>
-                      <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500 sm:text-xs">
                         <CalendarDays size={10} />
                         {formatDate(article.date)}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                    <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
                       {article.title}
                     </h3>
 
                     {/* Summary */}
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-3 flex-1">
+                    <p className="mb-4 line-clamp-3 flex-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                       {article.summary}
                     </p>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
-                      <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">
-                        {article.source}
-                      </span>
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+                      <span className="text-[10px] text-gray-400 dark:text-gray-500 sm:text-xs">{article.source}</span>
                       <motion.button
-                        className="flex items-center gap-1 text-[10px] sm:text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                        className="flex items-center gap-1 text-[10px] font-medium text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 sm:text-xs"
                         whileHover={{ x: 2 }}
                       >
                         Read More <ChevronRight size={12} />

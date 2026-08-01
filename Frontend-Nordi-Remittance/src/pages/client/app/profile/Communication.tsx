@@ -6,17 +6,14 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  Bell, Mail, Phone, Smartphone, Shield, CreditCard,
-  TrendingUp, User, Loader2, Check,
-} from "@constants/icons";
+import { Bell, Mail, Phone, Smartphone, Shield, CreditCard, TrendingUp, User, Loader2, Check } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
   useClientNotificationPreferences,
   useUpdateUserNotificationPreferences,
-} from "../../domain/useProfileDomain";
+} from "../../client-usecase/useprofile-client-usecase";
 
 /* ── Types ───────────────────────────────────────────────────────────── */
 interface ChannelPrefs {
@@ -88,12 +85,12 @@ const Toggle: React.FC<{ on: boolean; onChange: () => void }> = ({ on, onChange 
   <button
     type="button"
     onClick={onChange}
-    className={`relative inline-flex w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
+    className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full transition-colors ${
       on ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-700"
     }`}
   >
     <span
-      className={`inline-block w-5 h-5 mt-0.5 ml-0.5 rounded-full bg-white transition-transform ${
+      className={`ml-0.5 mt-0.5 inline-block h-5 w-5 rounded-full bg-white transition-transform ${
         on ? "translate-x-5" : "translate-x-0"
       }`}
     />
@@ -137,10 +134,8 @@ const Communication: React.FC = () => {
   };
 
   /* Channel summary counts */
-  const channelEnabled = (ch: "email" | "push" | "sms") =>
-    Object.values(prefs[ch]).filter(Boolean).length;
-  const channelTotal = (ch: "email" | "push" | "sms") =>
-    Object.values(prefs[ch]).length;
+  const channelEnabled = (ch: "email" | "push" | "sms") => Object.values(prefs[ch]).filter(Boolean).length;
+  const channelTotal = (ch: "email" | "push" | "sms") => Object.values(prefs[ch]).length;
 
   return (
     <PageContainer>
@@ -158,7 +153,7 @@ const Communication: React.FC = () => {
             <motion.button
               onClick={save}
               disabled={!dirty || updatePrefs.isPending}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+              className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 sm:text-sm"
               whileHover={{ scale: dirty ? 1.02 : 1 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -173,11 +168,14 @@ const Communication: React.FC = () => {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-              <div className="h-5 w-40 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
+            <div
+              key={i}
+              className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
+            >
+              <div className="mb-4 h-5 w-40 rounded bg-gray-200 dark:bg-gray-800" />
               <div className="space-y-3">
-                <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded-xl" />
-                <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded-xl" />
+                <div className="h-10 rounded-xl bg-gray-100 dark:bg-gray-800" />
+                <div className="h-10 rounded-xl bg-gray-100 dark:bg-gray-800" />
               </div>
             </div>
           ))}
@@ -186,23 +184,23 @@ const Communication: React.FC = () => {
         <>
           {/* ── Channel Overview Cards ── */}
           <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {(["email", "push", "sms"] as const).map((ch) => (
                 <DashCard key={ch}>
                   <div className="flex items-center gap-3">
-                    <div className={`p-2.5 rounded-xl ${
-                      ch === "email"
-                        ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400"
-                        : ch === "push"
-                        ? "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400"
-                        : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
-                    }`}>
+                    <div
+                      className={`rounded-xl p-2.5 ${
+                        ch === "email"
+                          ? "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
+                          : ch === "push"
+                            ? "bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400"
+                            : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
+                      }`}
+                    >
                       {channelMeta[ch].icon}
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {channelMeta[ch].label}
-                      </h4>
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{channelMeta[ch].label}</h4>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {channelEnabled(ch)} of {channelTotal(ch)} enabled
                       </p>
@@ -218,32 +216,23 @@ const Communication: React.FC = () => {
             {categories.map((cat) => (
               <motion.div key={cat.key} variants={dashboardItemVariants}>
                 <DashCard>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     {/* Category info */}
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className={`p-2.5 rounded-xl flex-shrink-0 ${cat.iconBg}`}>
-                        {cat.icon}
-                      </div>
+                    <div className="flex min-w-0 flex-1 items-start gap-3">
+                      <div className={`flex-shrink-0 rounded-xl p-2.5 ${cat.iconBg}`}>{cat.icon}</div>
                       <div className="min-w-0">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {cat.label}
-                        </h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {cat.description}
-                        </p>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{cat.label}</h4>
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{cat.description}</p>
                       </div>
                     </div>
                     {/* Channel toggles */}
-                    <div className="flex items-center gap-4 sm:gap-6 pl-12 sm:pl-0">
+                    <div className="flex items-center gap-4 pl-12 sm:gap-6 sm:pl-0">
                       {cat.channels.map((ch) => (
                         <div key={ch} className="flex flex-col items-center gap-1.5">
-                          <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase">
+                          <span className="text-[10px] font-medium uppercase text-gray-500 dark:text-gray-400">
                             {channelMeta[ch].label}
                           </span>
-                          <Toggle
-                            on={(prefs[ch] as any)[cat.key] ?? false}
-                            onChange={() => toggle(ch, cat.key)}
-                          />
+                          <Toggle on={(prefs[ch] as any)[cat.key] ?? false} onChange={() => toggle(ch, cat.key)} />
                         </div>
                       ))}
                     </div>
@@ -256,13 +245,13 @@ const Communication: React.FC = () => {
           {/* ── Quick Actions ── */}
           <motion.div variants={dashboardItemVariants} className="mt-4 sm:mt-6">
             <DashCard>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="rounded-lg bg-gray-100 p-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
                   <Bell size={14} />
                 </div>
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Actions</h4>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <button
                   onClick={() => {
                     setPrefs({
@@ -272,7 +261,7 @@ const Communication: React.FC = () => {
                     });
                     setDirty(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   Enable All
                 </button>
@@ -285,7 +274,7 @@ const Communication: React.FC = () => {
                     });
                     setDirty(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
                   Essential Only
                 </button>
@@ -298,7 +287,7 @@ const Communication: React.FC = () => {
                     });
                     setDirty(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  className="rounded-xl border border-gray-200 px-4 py-2.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-gray-700 dark:text-red-400 dark:hover:bg-red-950/30"
                 >
                   Disable All
                 </button>
@@ -307,8 +296,9 @@ const Communication: React.FC = () => {
           </motion.div>
 
           {/* ── Privacy Note ── */}
-          <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 text-center mt-4">
-            We respect your privacy. Security alerts for critical account events may still be sent regardless of your preferences.
+          <p className="mt-4 text-center text-[10px] text-gray-400 dark:text-gray-500 sm:text-xs">
+            We respect your privacy. Security alerts for critical account events may still be sent regardless of your
+            preferences.
           </p>
         </>
       )}

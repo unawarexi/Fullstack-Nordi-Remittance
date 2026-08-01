@@ -12,8 +12,8 @@ import { useToast } from "@store/toast.store";
 import { Button, Input, Spinner } from "@components/ui";
 import Images from "@constants/images";
 import GetLocation from "@utils/GetLocation";
-import { useAdminLogin } from "@hooks/queries/useAdmin";
-import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
+import { useAdminLogin } from "@hooks/api-queries/useAdmin";
+import { useClerkSyncAdmin } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { processAuthSyncResponse } from "../../../core/auth/clerkSync.helper";
 import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
@@ -164,11 +164,7 @@ const AdminLogin = () => {
     }
   };
 
-  const isPending =
-    isSubmitting ||
-    loginMutation.isPending ||
-    clerkSyncAdminMutation.isPending ||
-    googleLoading;
+  const isPending = isSubmitting || loginMutation.isPending || clerkSyncAdminMutation.isPending || googleLoading;
 
   return (
     <section className="relative flex min-h-screen w-full overflow-hidden">

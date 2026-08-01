@@ -26,22 +26,12 @@ import {
   Banknote,
 } from "@constants/icons";
 
-import {
-  PageContainer,
-  DashCard,
-  StatCard,
-  StatsGrid,
-  StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import PageHeader from "@components/shared/PageHeader";
 import EmptyState from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-  FormSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientLoans, useClientLoanProducts } from "../../domain/useLoansDomain";
+import { useClientLoans, useClientLoanProducts } from "../../client-usecase/useloans-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -141,7 +131,6 @@ const improvementTips = [
   },
 ];
 
-
 const CreditScore: React.FC = () => {
   const sidebarCollapsed = useUIStore((s) => s.sidebar.isCollapsed);
 
@@ -155,11 +144,9 @@ const CreditScore: React.FC = () => {
   const dashOffset = circumference * (1 - normalised * 0.75); // 270° arc
 
   const impactIcon = (impact: string) => {
-    if (impact === "positive")
-      return <TrendingUp className="w-4 h-4 text-green-500 dark:text-green-400" />;
-    if (impact === "negative")
-      return <TrendingDown className="w-4 h-4 text-red-500 dark:text-red-400" />;
-    return <Info className="w-4 h-4 text-gray-400 dark:text-gray-500" />;
+    if (impact === "positive") return <TrendingUp className="h-4 w-4 text-green-500 dark:text-green-400" />;
+    if (impact === "negative") return <TrendingDown className="h-4 w-4 text-red-500 dark:text-red-400" />;
+    return <Info className="h-4 w-4 text-gray-400 dark:text-gray-500" />;
   };
 
   return (
@@ -180,16 +167,11 @@ const CreditScore: React.FC = () => {
         className="space-y-4 sm:space-y-6"
       >
         {/* Score Ring + Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
           {/* SVG Ring */}
           <DashCard>
             <div className="flex flex-col items-center justify-center py-4">
-              <svg
-                width="200"
-                height="200"
-                viewBox="0 0 200 200"
-                className="transform -rotate-[135deg]"
-              >
+              <svg width="200" height="200" viewBox="0 0 200 200" className="-rotate-[135deg] transform">
                 {/* Background arc */}
                 <circle
                   cx="100"
@@ -218,13 +200,13 @@ const CreditScore: React.FC = () => {
               </svg>
 
               {/* Centered text */}
-              <div className="-mt-[130px] text-center mb-8">
+              <div className="-mt-[130px] mb-8 text-center">
                 <p className="text-4xl font-bold text-gray-900 dark:text-white">{score}</p>
                 <p className={`text-sm font-medium ${scoreInfo.text}`}>{scoreInfo.label}</p>
               </div>
 
               {/* Range labels */}
-              <div className="flex items-center justify-between w-full px-4 mt-2">
+              <div className="mt-2 flex w-full items-center justify-between px-4">
                 <span className="text-xs text-gray-400 dark:text-gray-500">{SCORE_MIN}</span>
                 <span className="text-xs text-gray-400 dark:text-gray-500">{SCORE_MAX}</span>
               </div>
@@ -234,36 +216,23 @@ const CreditScore: React.FC = () => {
           {/* Score Factors */}
           <div className="lg:col-span-2">
             <DashCard padding="none">
-              <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 dark:border-gray-800">
-                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                  Score Factors
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-800 sm:px-6 sm:py-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Score Factors</h3>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                   Key factors affecting your credit score
                 </p>
               </div>
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {defaultFactors.map((factor, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 px-4 py-3 sm:px-6 sm:py-4"
-                  >
+                  <div key={idx} className="flex items-start gap-3 px-4 py-3 sm:px-6 sm:py-4">
                     <div className="mt-0.5">{impactIcon(factor.impact)}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                        {factor.label}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {factor.description}
-                      </p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{factor.label}</p>
+                      <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{factor.description}</p>
                     </div>
                     <StatusBadge
                       status={
-                        factor.impact === "positive"
-                          ? "Good"
-                          : factor.impact === "negative"
-                          ? "Needs Work"
-                          : "Neutral"
+                        factor.impact === "positive" ? "Good" : factor.impact === "negative" ? "Needs Work" : "Neutral"
                       }
                     />
                   </div>
@@ -275,30 +244,26 @@ const CreditScore: React.FC = () => {
 
         {/* Improvement Tips */}
         <DashCard>
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="w-5 h-5 text-amber-500 dark:text-amber-400" />
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+          <div className="mb-4 flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-amber-500 dark:text-amber-400" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
               Tips to Improve Your Score
             </h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {improvementTips.map((tip, idx) => {
               const TipIcon = tip.icon;
               return (
                 <div
                   key={idx}
-                  className="flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900"
+                  className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900"
                 >
-                  <div className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                    <TipIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <div className="rounded-lg border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-gray-800">
+                    <TipIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                      {tip.title}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
-                      {tip.description}
-                    </p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{tip.title}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-500 dark:text-gray-400">{tip.description}</p>
                   </div>
                 </div>
               );
@@ -308,10 +273,8 @@ const CreditScore: React.FC = () => {
 
         {/* Score Scale Reference */}
         <DashCard>
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
-            Credit Score Ranges
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Credit Score Ranges</h3>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { range: "300–649", label: "Poor", color: "bg-red-500 dark:bg-red-400" },
               { range: "650–699", label: "Fair", color: "bg-amber-500 dark:bg-amber-400" },
@@ -320,13 +283,11 @@ const CreditScore: React.FC = () => {
             ].map((band, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-800"
+                className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-800"
               >
-                <div className={`w-3 h-3 rounded-full ${band.color}`} />
+                <div className={`h-3 w-3 rounded-full ${band.color}`} />
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                    {band.label}
-                  </p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{band.label}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{band.range}</p>
                 </div>
               </div>

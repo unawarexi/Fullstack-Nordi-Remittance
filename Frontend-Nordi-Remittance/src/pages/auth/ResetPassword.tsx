@@ -14,7 +14,7 @@ import { Button, Input, Spinner } from "@components/ui";
 import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useResetPassword } from "@hooks/queries/useAuth";
+import { useResetPassword } from "@hooks/api-queries/useAuth";
 
 // Validation
 const resetPasswordSchema = z
@@ -25,10 +25,7 @@ const resetPasswordSchema = z
       .regex(/[a-z]/, "Password must contain at least one lowercase letter")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
       .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[^a-zA-Z0-9]/,
-        "Password must contain at least one special character",
-      ),
+      .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -93,9 +90,7 @@ const ResetPassword = () => {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-neutral-600">
-              You can now login using your new password.
-            </p>
+            <p className="text-sm text-neutral-600">You can now login using your new password.</p>
           </div>
 
           <div className="w-full pt-6">
@@ -154,8 +149,7 @@ const ResetPassword = () => {
         {/* API Error Display */}
         {resetPasswordMutation.error && (
           <div className="mt-2 rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-600">
-            {resetPasswordMutation.error.message ||
-              "Failed to reset password. The link may have expired."}
+            {resetPasswordMutation.error.message || "Failed to reset password. The link may have expired."}
           </div>
         )}
 

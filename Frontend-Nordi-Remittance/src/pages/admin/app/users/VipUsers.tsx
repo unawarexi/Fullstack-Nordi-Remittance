@@ -1,35 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  Shield,
-  UserPlus,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-} from "lucide-react";
-import {
-  PageContainer,
-  DashCard,
-  FilterBar,
-  StatusBadge,
-  ActionButton,
-} from "@components/shared/DashboardPrimitives";
+import { Shield, UserPlus, Eye, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { PageContainer, DashCard, FilterBar, StatusBadge, ActionButton } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAdminTeam } from "../../domain/useAdminTeam";
+import { useAdminTeam } from "../../admin-usecase/useAdminTeam";
 
 const AdminUsers: React.FC = () => {
-  const {
-    admins,
-    pagination,
-    search,
-    isLoading,
-    setPage,
-    setSearch,
-    refetch,
-  } = useAdminTeam();
+  const { admins, pagination, search, isLoading, setPage, setSearch, refetch } = useAdminTeam();
 
   return (
     <PageContainer className="[&>div]:max-w-full">
@@ -55,11 +34,7 @@ const AdminUsers: React.FC = () => {
       />
 
       {/* Filters */}
-      <FilterBar
-        searchValue={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search admin users..."
-      />
+      <FilterBar searchValue={search} onSearchChange={setSearch} searchPlaceholder="Search admin users..." />
 
       {/* Table */}
       <motion.div variants={dashboardItemVariants}>
@@ -77,7 +52,7 @@ const AdminUsers: React.FC = () => {
                       {["Name", "Email", "Role", "Status", "Last Login", "Created"].map((h) => (
                         <th
                           key={h}
-                          className="px-4 py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
+                          className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs"
                         >
                           {h}
                         </th>
@@ -89,42 +64,39 @@ const AdminUsers: React.FC = () => {
                       admins.map((admin, i) => (
                         <motion.tr
                           key={admin.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.03, duration: 0.25 }}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold">
-                                {admin.firstName?.[0]}{admin.lastName?.[0]}
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-[10px] font-bold text-white">
+                                {admin.firstName?.[0]}
+                                {admin.lastName?.[0]}
                               </div>
-                              <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                              <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                                 {admin.firstName} {admin.lastName}
                               </p>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {admin.email}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 capitalize">
+                          <td className="whitespace-nowrap px-4 py-3">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium capitalize text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-400 sm:text-xs">
                               <Shield size={10} />
                               {admin.role}
                             </span>
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={admin.status} />
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {admin.lastLogin
-                              ? new Date(admin.lastLogin).toLocaleDateString()
-                              : "Never"}
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                            {admin.lastLogin ? new Date(admin.lastLogin).toLocaleDateString() : "Never"}
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {admin.createdAt
-                              ? new Date(admin.createdAt).toLocaleDateString()
-                              : "—"}
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                            {admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : "—"}
                           </td>
                         </motion.tr>
                       ))
@@ -132,9 +104,7 @@ const AdminUsers: React.FC = () => {
                       <tr>
                         <td colSpan={6} className="px-4 py-12 text-center">
                           <Shield size={32} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            No admin users found.
-                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">No admin users found.</p>
                         </td>
                       </tr>
                     )}
@@ -144,13 +114,13 @@ const AdminUsers: React.FC = () => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-800">
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                     Page {pagination.page} of {pagination.totalPages}
                   </p>
                   <div className="flex items-center gap-1">
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page - 1)}
@@ -167,10 +137,10 @@ const AdminUsers: React.FC = () => {
                       return (
                         <motion.button
                           key={pageNum}
-                          className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors sm:h-8 sm:w-8 ${
                             pagination.page === pageNum
-                              ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                              : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                              : "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                           }`}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -181,7 +151,7 @@ const AdminUsers: React.FC = () => {
                       );
                     })}
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page + 1)}

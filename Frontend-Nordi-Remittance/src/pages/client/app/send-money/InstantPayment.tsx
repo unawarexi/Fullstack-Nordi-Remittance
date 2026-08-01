@@ -5,21 +5,9 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-  Zap,
-  User,
-  Building,
-  DollarSign,
-  Shield,
-  Lock,
-  Info,
-  Clock,
-} from "@constants/icons";
-import { useClientWallets } from "../../domain/useAccountsDomain";
-import {
-  useTransfer,
-  useClientRecentRecipients,
-} from "../../domain/useTransactionsDomain";
+import { Zap, User, Building, DollarSign, Shield, Lock, Info, Clock } from "@constants/icons";
+import { useClientWallets } from "../../client-usecase/useaccounts-client-usecase";
+import { useTransfer, useClientRecentRecipients } from "../../client-usecase/usetransaction-client-usecase";
 import {
   TransferLayout,
   StepIndicator,
@@ -102,10 +90,7 @@ const InstantPayment: React.FC = () => {
           onSuccess: (data: any) => {
             setResult({
               success: true,
-              reference:
-                data?.referenceNumber ||
-                data?.id ||
-                `TXN${Date.now().toString().slice(-9)}`,
+              reference: data?.referenceNumber || data?.id || `TXN${Date.now().toString().slice(-9)}`,
             });
           },
           onError: () => {
@@ -116,16 +101,7 @@ const InstantPayment: React.FC = () => {
     },
   });
 
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setTouched,
-  } = formik;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur, handleSubmit, setTouched } = formik;
 
   const goNext = async () => {
     const fieldsByStep: Record<number, string[]> = {
@@ -146,21 +122,9 @@ const InstantPayment: React.FC = () => {
 
   // ─── Fill from recent recipient ─────────────────────────────────────
   const selectRecent = (r: any) => {
-    setFieldValue(
-      "recipientName",
-      `${r.firstName || ""} ${r.lastName || ""}`.trim() || r.name || "",
-    );
-    setFieldValue(
-      "accountNumber",
-      (r.bankAccount?.accountNumber || r.accountNumber || "").replace(
-        /\*+/g,
-        "",
-      ),
-    );
-    setFieldValue(
-      "bankName",
-      r.bankAccount?.bankName || r.bankName || "",
-    );
+    setFieldValue("recipientName", `${r.firstName || ""} ${r.lastName || ""}`.trim() || r.name || "");
+    setFieldValue("accountNumber", (r.bankAccount?.accountNumber || r.accountNumber || "").replace(/\*+/g, ""));
+    setFieldValue("bankName", r.bankAccount?.bankName || r.bankName || "");
   };
 
   // ─── Result Screen ──────────────────────────────────────────────────
@@ -202,16 +166,12 @@ const InstantPayment: React.FC = () => {
   return (
     <TransferLayout>
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
           <Zap size={20} className="text-amber-500" />
         </div>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Instant Payment
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Send money instantly with zero fees.
-          </p>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Instant Payment</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Send money instantly with zero fees.</p>
         </div>
       </div>
 
@@ -225,24 +185,19 @@ const InstantPayment: React.FC = () => {
           <div className="space-y-6">
             {/* Recent recipients */}
             {recentRecipients.length > 0 && (
-              <TCard
-                title="Recent Recipients"
-                subtitle="Tap to auto-fill"
-              >
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+              <TCard title="Recent Recipients" subtitle="Tap to auto-fill">
+                <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
                   {recentRecipients.slice(0, 6).map((r: any) => (
                     <button
                       key={r.id}
                       type="button"
                       onClick={() => selectRecent(r)}
-                      className="flex flex-col items-center gap-1.5 min-w-[72px] p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors"
+                      className="flex min-w-[72px] flex-col items-center gap-1.5 rounded-lg border border-gray-200 p-2 transition-colors hover:border-indigo-400 dark:border-gray-700 dark:hover:border-indigo-600"
                     >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-xs font-bold text-white">
-                        {(r.firstName || r.name || "?")
-                          .charAt(0)
-                          .toUpperCase()}
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 text-xs font-bold text-white">
+                        {(r.firstName || r.name || "?").charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300 truncate max-w-[68px]">
+                      <span className="max-w-[68px] truncate text-[11px] font-medium text-gray-700 dark:text-gray-300">
                         {r.firstName || r.name || "—"}
                       </span>
                     </button>
@@ -321,9 +276,7 @@ const InstantPayment: React.FC = () => {
                 loading={walletsLoading}
               />
               {errors.fromAccount && touched.fromAccount && (
-                <p className="text-xs text-red-500 mt-2">
-                  {errors.fromAccount}
-                </p>
+                <p className="mt-2 text-xs text-red-500">{errors.fromAccount}</p>
               )}
             </TCard>
 
@@ -363,14 +316,10 @@ const InstantPayment: React.FC = () => {
               ].map((l) => (
                 <div
                   key={l.label}
-                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center"
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-center dark:border-gray-800 dark:bg-gray-900"
                 >
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {l.label}
-                  </p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
-                    {l.value}
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{l.label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{l.value}</p>
                 </div>
               ))}
             </div>
@@ -381,53 +330,23 @@ const InstantPayment: React.FC = () => {
         {step === 1 && (
           <div className="space-y-6">
             <ReviewSection title="Payment Details" icon={<Zap size={16} />}>
-              <ReviewRow
-                label="Amount"
-                value={formatCurrency(values.amount)}
-                highlight
-              />
+              <ReviewRow label="Amount" value={formatCurrency(values.amount)} highlight />
               <ReviewRow label="Fee" value="$0.00 (Instant)" />
-              <ReviewRow
-                label="Total"
-                value={formatCurrency(values.amount)}
-                highlight
-              />
-              {values.description && (
-                <ReviewRow
-                  label="Description"
-                  value={values.description}
-                />
-              )}
+              <ReviewRow label="Total" value={formatCurrency(values.amount)} highlight />
+              {values.description && <ReviewRow label="Description" value={values.description} />}
             </ReviewSection>
 
             <ReviewSection title="Recipient" icon={<User size={16} />}>
               <ReviewRow label="Name" value={values.recipientName} />
-              <ReviewRow
-                label="Account"
-                value={`••••${values.accountNumber.slice(-4)}`}
-              />
+              <ReviewRow label="Account" value={`••••${values.accountNumber.slice(-4)}`} />
               <ReviewRow label="Bank" value={values.bankName} />
             </ReviewSection>
 
-            <ReviewSection
-              title="Payment Source"
-              icon={<Building size={16} />}
-            >
-              <ReviewRow
-                label="Account"
-                value={
-                  selectedAccount?.name ||
-                  selectedAccount?.walletType ||
-                  "—"
-                }
-              />
+            <ReviewSection title="Payment Source" icon={<Building size={16} />}>
+              <ReviewRow label="Account" value={selectedAccount?.name || selectedAccount?.walletType || "—"} />
               <ReviewRow
                 label="Balance"
-                value={
-                  typeof selectedAccount?.balance === "number"
-                    ? formatCurrency(selectedAccount.balance)
-                    : "—"
-                }
+                value={typeof selectedAccount?.balance === "number" ? formatCurrency(selectedAccount.balance) : "—"}
               />
             </ReviewSection>
 
@@ -449,14 +368,10 @@ const InstantPayment: React.FC = () => {
               />
             </TCard>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40">
-              <Clock
-                size={16}
-                className="text-emerald-500 mt-0.5 flex-shrink-0"
-              />
+            <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800/40 dark:bg-emerald-950/20">
+              <Clock size={16} className="mt-0.5 flex-shrink-0 text-emerald-500" />
               <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                Instant payments are processed immediately. The recipient will
-                receive the funds within seconds.
+                Instant payments are processed immediately. The recipient will receive the funds within seconds.
               </p>
             </div>
           </div>
@@ -471,11 +386,9 @@ const InstantPayment: React.FC = () => {
         loading={transfer.isPending}
       />
 
-      <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 justify-center pb-4">
+      <div className="flex items-center justify-center gap-2 pb-4 text-xs text-gray-400 dark:text-gray-500">
         <Info size={12} />
-        <span>
-          Instant payments are free and protected by end-to-end encryption.
-        </span>
+        <span>Instant payments are free and protected by end-to-end encryption.</span>
       </div>
     </TransferLayout>
   );

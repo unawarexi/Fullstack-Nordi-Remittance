@@ -45,8 +45,9 @@ import MutualFunds from "./app/investments/MutualFunds";
 import Bonds from "./app/investments/Bonds";
 import Equity from "./app/investments/Equity";
 
-// Accounts
+// Accounts & Cards
 import AccountsManagement from "./app/accounts/AccountsManagement";
+import AdminCards from "./app/cards/AdminCards";
 import SavingsAccounts from "./app/accounts/SavingsAccounts";
 import CurrentAccounts from "./app/accounts/CurrentAccounts";
 import FixedDepositAccounts from "./app/accounts/FixedDepositAccounts";
@@ -138,8 +139,10 @@ export default function AdminRoutes() {
       <Route path="investments/mutual-funds" element={<MutualFunds />} />
       <Route path="investments/bonds" element={<Bonds />} />
       <Route path="investments/equity" element={<Equity />} />
-      {/* Bank Accounts */}
+      {/* Bank Accounts & Cards */}
       <Route path="accounts" element={<AccountsManagement />} />
+      <Route path="cards" element={<AdminCards />} />
+      <Route path="cards/*" element={<AdminCards />} />
       <Route path="accounts/savings" element={<SavingsAccounts />} />
       <Route path="accounts/current" element={<CurrentAccounts />} />
       <Route path="accounts/fixed-deposits" element={<FixedDepositAccounts />} />

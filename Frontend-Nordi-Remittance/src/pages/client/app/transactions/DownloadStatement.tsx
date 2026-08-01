@@ -6,18 +6,35 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  ArrowUpRight, ArrowDownLeft, Clock, Download, Search, Filter,
-  ChevronDown, Calendar, FileText, TrendingUp, TrendingDown,
-  CheckCircle2, XCircle, Timer, AlertTriangle,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Clock,
+  Download,
+  Search,
+  Filter,
+  ChevronDown,
+  Calendar,
+  FileText,
+  TrendingUp,
+  TrendingDown,
+  CheckCircle2,
+  XCircle,
+  Timer,
+  AlertTriangle,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import {
-  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge, SectionHeader,
+  PageContainer,
+  DashCard,
+  StatCard,
+  StatsGrid,
+  StatusBadge,
+  SectionHeader,
 } from "@components/shared/DashboardPrimitives";
 import { TransactionListSkeleton, StatsGridSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientTransactions } from "../../domain/useTransactionsDomain";
+import { useClientTransactions } from "../../client-usecase/usetransaction-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 const fmt = (n: number) =>
@@ -25,8 +42,7 @@ const fmt = (n: number) =>
 
 const txnIcon = (type: string) => {
   const t = (type || "").toLowerCase();
-  if (t.includes("debit") || t.includes("send") || t.includes("out"))
-    return <ArrowUpRight size={16} />;
+  if (t.includes("debit") || t.includes("send") || t.includes("out")) return <ArrowUpRight size={16} />;
   return <ArrowDownLeft size={16} />;
 };
 
@@ -39,10 +55,15 @@ const txnColor = (type: string) => {
 
 const statusIcon = (s: string) => {
   switch ((s || "").toLowerCase()) {
-    case "completed": case "success": return <CheckCircle2 size={14} className="text-emerald-500" />;
-    case "failed": return <XCircle size={14} className="text-red-500" />;
-    case "pending": return <Timer size={14} className="text-amber-500" />;
-    default: return <AlertTriangle size={14} className="text-gray-400" />;
+    case "completed":
+    case "success":
+      return <CheckCircle2 size={14} className="text-emerald-500" />;
+    case "failed":
+      return <XCircle size={14} className="text-red-500" />;
+    case "pending":
+      return <Timer size={14} className="text-amber-500" />;
+    default:
+      return <AlertTriangle size={14} className="text-gray-400" />;
   }
 };
 
@@ -52,30 +73,34 @@ interface TransactionRowProps {
 }
 
 const TransactionRow: React.FC<TransactionRowProps> = ({ tx, show }) => (
-  <div className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+  <div className="flex items-center justify-between p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:p-4">
     <div className="flex items-center gap-3">
-      <div className={`p-2 rounded-xl ${txnColor(tx.type)}`}>{txnIcon(tx.type)}</div>
+      <div className={`rounded-xl p-2 ${txnColor(tx.type)}`}>{txnIcon(tx.type)}</div>
       <div>
-        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+        <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
           {tx.description || tx.name || "Transaction"}
         </h4>
         <div className="flex items-center gap-2">
-          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-            {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
+            {tx.date
+              ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+              : "—"}
           </p>
           {tx.status && <span className="flex items-center gap-1">{statusIcon(tx.status)}</span>}
         </div>
       </div>
     </div>
-    <p className={`text-xs sm:text-sm font-bold ${
-      (tx.type || "").toLowerCase().includes("credit") || (tx.type || "").toLowerCase().includes("in")
-        ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-    }`}>
+    <p
+      className={`text-xs font-bold sm:text-sm ${
+        (tx.type || "").toLowerCase().includes("credit") || (tx.type || "").toLowerCase().includes("in")
+          ? "text-emerald-600 dark:text-emerald-400"
+          : "text-red-600 dark:text-red-400"
+      }`}
+    >
       {show ? ((tx.type || "").toLowerCase().includes("credit") ? "+" : "-") + fmt(Math.abs(tx.amount || 0)) : "••••••"}
     </p>
   </div>
 );
-
 
 const DownloadStatement: React.FC = () => {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
@@ -101,18 +126,28 @@ const DownloadStatement: React.FC = () => {
 
       <div className="max-w-2xl">
         <DashCard>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-6">
+          <h3 className="mb-6 text-base font-semibold text-gray-900 dark:text-white sm:text-lg">
             Generate Transaction Statement
           </h3>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>From Date</label>
-                <input type="date" value={dateRange.from} onChange={(e) => setDateRange((p) => ({ ...p, from: e.target.value }))} className={inputCls} />
+                <input
+                  type="date"
+                  value={dateRange.from}
+                  onChange={(e) => setDateRange((p) => ({ ...p, from: e.target.value }))}
+                  className={inputCls}
+                />
               </div>
               <div>
                 <label className={labelCls}>To Date</label>
-                <input type="date" value={dateRange.to} onChange={(e) => setDateRange((p) => ({ ...p, to: e.target.value }))} className={inputCls} />
+                <input
+                  type="date"
+                  value={dateRange.to}
+                  onChange={(e) => setDateRange((p) => ({ ...p, to: e.target.value }))}
+                  className={inputCls}
+                />
               </div>
             </div>
             <div>
@@ -122,10 +157,10 @@ const DownloadStatement: React.FC = () => {
                   <button
                     key={f}
                     onClick={() => setFormat(f)}
-                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                    className={`rounded-xl px-4 py-2 text-xs font-medium transition-all sm:text-sm ${
                       format === f
                         ? "bg-indigo-600 text-white"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                        : "border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                     }`}
                   >
                     {f.toUpperCase()}
@@ -134,7 +169,7 @@ const DownloadStatement: React.FC = () => {
               </div>
             </div>
             <motion.button
-              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium mt-4"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-xs font-medium text-white sm:text-sm"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
@@ -144,19 +179,20 @@ const DownloadStatement: React.FC = () => {
         </DashCard>
 
         <DashCard className="mt-6">
-          <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white mb-4">
-            Previous Downloads
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Previous Downloads</h3>
           <div className="space-y-2">
             {["March 2025 Statement", "February 2025 Statement", "January 2025 Statement"].map((item) => (
-              <div key={item} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer">
+              <div
+                key={item}
+                className="flex cursor-pointer items-center justify-between rounded-xl p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
+                  <div className="rounded-xl bg-purple-50 p-2 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
                     <FileText size={16} />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{item}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">PDF • 245 KB</p>
+                    <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{item}</p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">PDF • 245 KB</p>
                   </div>
                 </div>
                 <Download size={16} className="text-indigo-500 dark:text-indigo-400" />

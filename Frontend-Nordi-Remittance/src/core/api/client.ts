@@ -2,16 +2,12 @@
 // API CLIENT - Axios instance with interceptors for authentication
 // ============================================================================
 
-import axios, {
-  AxiosError,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { sessionManager } from "../auth/session.manager";
+import { networkDetector } from "@core/network/network";
 
 // API Base URL - configured via environment variable
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = "remit_access_token";
@@ -75,6 +71,9 @@ apiClient.interceptors.request.use(
     // Add request ID for tracking
     config.headers["X-Request-ID"] = crypto.randomUUID();
 
+    // Stamp request start time for latency tracking
+    (config as any).__requestStartTime = Date.now();
+
     return config;
   },
   (error: AxiosError) => {
@@ -105,6 +104,12 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
+    // Report latency to NetworkDetector
+    const startTime = (response.config as any).__requestStartTime;
+    if (startTime) {
+      networkDetector.reportLatency(Date.now() - startTime);
+    }
+    networkDetector.reportRequestSuccess();
     return response;
   },
   async (error: AxiosError) => {
@@ -156,8 +161,7 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
 
-        const { accessToken, refreshToken: newRefreshToken } =
-          response.data.data;
+        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
         TokenManager.setTokens(accessToken, newRefreshToken);
 
         processQueue(null, accessToken);
@@ -174,6 +178,11 @@ apiClient.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // Report network-level failures to the detector (no response = network error)
+    if (!error.response && error.code !== 'ERR_CANCELED') {
+      networkDetector.reportNetworkError();
     }
 
     return Promise.reject(error);
@@ -229,9 +238,7 @@ export const getErrorMessage = (error: unknown): string => {
       if (backendError.details) {
         // Handle array format (e.g. from validators)
         if (Array.isArray(backendError.details)) {
-          const detailMessages = backendError.details
-            .map((err: any) => err.message)
-            .filter(Boolean);
+          const detailMessages = backendError.details.map((err: any) => err.message).filter(Boolean);
 
           if (detailMessages.length > 0) {
             return detailMessages.join(", ");
@@ -252,11 +259,7 @@ export const getErrorMessage = (error: unknown): string => {
       return backendError.message || "An unexpected error occurred";
     }
 
-    return (
-      responseData?.message ||
-      axiosError.message ||
-      "An unexpected error occurred"
-    );
+    return responseData?.message || axiosError.message || "An unexpected error occurred";
   }
 
   if (error instanceof Error) {

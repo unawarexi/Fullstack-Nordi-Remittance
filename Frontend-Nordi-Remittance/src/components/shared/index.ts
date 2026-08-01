@@ -10,6 +10,13 @@ export type { EmptyStateProps, LoadingStateProps, EmptyStateVariant } from './Em
 export { ErrorBoundary, ErrorFallback, NotFound } from './ErrorBoundary';
 export type { ErrorBoundaryProps, ErrorFallbackProps, NotFoundProps } from './ErrorBoundary';
 
+// Query Section (section-level error isolation)
+export { QuerySection } from './QuerySection';
+export type { QuerySectionProps } from './QuerySection';
+
+// Network Status Banner
+export { NetworkStatusBanner } from './NetworkStatusBanner';
+
 // Page Header
 export { PageHeader, SectionTitle } from './PageHeader';
 export type { PageHeaderProps, SectionTitleProps, Breadcrumb } from './PageHeader';

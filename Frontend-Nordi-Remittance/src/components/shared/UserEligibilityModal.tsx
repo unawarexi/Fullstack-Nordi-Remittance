@@ -6,21 +6,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  ShieldAlert,
-  UserX,
-  Lock,
-  CheckCircle,
-  Unlock,
-  UserCheck,
-  X,
-  AlertTriangle,
-} from "lucide-react";
+import { ShieldAlert, UserX, Lock, CheckCircle, Unlock, UserCheck, X, AlertTriangle } from "lucide-react";
 import { Modal } from "@components/ui";
-import {
-  useUpdateUserStatus,
-  useAdminReviewKyc,
-} from "@hooks/queries";
+import { useUpdateUserStatus, useAdminReviewKyc } from "@hooks/api-queries";
 
 // ============================================================================
 // TYPES
@@ -65,7 +53,9 @@ const ERROR_CODE_MAP: Record<string, EligibilityBlockType> = {
  * Returns null if the error is not an eligibility error.
  */
 export function parseEligibilityError(error: unknown): EligibilityErrorDetails | null {
-  const axiosErr = error as { response?: { data?: { error?: { code?: string; message?: string; details?: Record<string, unknown> } } } };
+  const axiosErr = error as {
+    response?: { data?: { error?: { code?: string; message?: string; details?: Record<string, unknown> } } };
+  };
   const apiError = axiosErr?.response?.data?.error;
   if (!apiError?.code || !apiError.details) return null;
 
@@ -154,12 +144,7 @@ const BLOCK_CONFIG: Record<
 // COMPONENT
 // ============================================================================
 
-export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({
-  isOpen,
-  onClose,
-  error,
-  onResolved,
-}) => {
+export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({ isOpen, onClose, error, onResolved }) => {
   const updateStatus = useUpdateUserStatus();
   const reviewKyc = useAdminReviewKyc();
 
@@ -203,36 +188,30 @@ export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm" title="">
-      <div className="flex flex-col items-center text-center gap-4 py-2">
+      <div className="flex flex-col items-center gap-4 py-2 text-center">
         {/* Icon */}
-        <div
-          className={`flex items-center justify-center w-14 h-14 rounded-full ${config.bgColor} ${config.color}`}
-        >
+        <div className={`flex h-14 w-14 items-center justify-center rounded-full ${config.bgColor} ${config.color}`}>
           {config.icon}
         </div>
 
         {/* Title & Description */}
         <div>
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-            {config.title}
-          </h3>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 dark:text-neutral-500 leading-relaxed">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">{config.title}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-400 dark:text-neutral-500">
             {config.description(error.userName, error.reason)}
           </p>
           {error.email && (
-            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 dark:text-neutral-400">
-              {error.email}
-            </p>
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 dark:text-neutral-400">{error.email}</p>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 w-full mt-2">
+        <div className="mt-2 flex w-full items-center gap-3">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             <X size={16} />
             Dismiss
@@ -243,10 +222,10 @@ export const UserEligibilityModal: React.FC<UserEligibilityModalProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={handleResolve}
             disabled={isPending}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 dark:bg-indigo-50 dark:bg-indigo-900/300 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
+            className="dark:bg-indigo-900/300 flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-50 dark:hover:bg-indigo-600"
           >
             {isPending ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
             ) : (
               config.actionIcon
             )}

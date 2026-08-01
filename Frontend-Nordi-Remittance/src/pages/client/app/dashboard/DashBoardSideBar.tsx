@@ -14,23 +14,11 @@ import {
   Unlock,
 } from "lucide-react";
 import { useInView } from "@hooks/useInView";
-import {
-  SkeletonBlock,
-} from "@components/skeletons/Skeletons";
-import {
-  DashCard,
-  SectionHeader,
-  ProgressBar,
-} from "@components/shared/DashboardPrimitives";
-import {
-  sidebarItemVariants,
-} from "@core/animation/Animation";
+import { SkeletonBlock } from "@components/skeletons/Skeletons";
+import { DashCard, SectionHeader, ProgressBar } from "@components/shared/DashboardPrimitives";
+import { sidebarItemVariants } from "@core/animation/Animation";
 import { formatCurrency } from "@core/algo";
-import {
-  SIDEBAR_TOOLS,
-  NOTIFICATION_TYPE_COLORS,
-  INSIGHT_CONFIG,
-} from "../../domain/constants/dashboard.constants";
+import { SIDEBAR_TOOLS, NOTIFICATION_TYPE_COLORS, INSIGHT_CONFIG } from "../../components/dashboard.constants";
 
 // ========================
 // PROPS INTERFACE
@@ -59,7 +47,7 @@ const SavingsGoalsSection: React.FC<{
   if (isLoading) {
     return (
       <DashCard>
-        <SkeletonBlock className="h-5 w-28 mb-3" />
+        <SkeletonBlock className="mb-3 h-5 w-28" />
         <div className="space-y-2">
           {[1, 2].map((i) => (
             <SkeletonBlock key={i} className="h-14 w-full" />
@@ -77,21 +65,19 @@ const SavingsGoalsSection: React.FC<{
         {goals.map((goal, i) => (
           <motion.div
             key={goal.id || i}
-            className="p-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="cursor-pointer rounded-lg bg-gray-50 p-2.5 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
             variants={sidebarItemVariants}
             whileHover={{ x: 2 }}
             onClick={() => navigate("/customer/savings")}
           >
-            <div className="flex justify-between items-center mb-1">
-              <h3 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                {goal.name}
-              </h3>
-              <span className="text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <div className="mb-1 flex items-center justify-between">
+              <h3 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{goal.name}</h3>
+              <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 sm:text-xs">
                 {goal.percentage.toFixed(0)}%
               </span>
             </div>
             <ProgressBar value={goal.percentage} delay={i * 0.1} />
-            <div className="flex justify-between mt-1 text-[10px] text-gray-500 dark:text-gray-400">
+            <div className="mt-1 flex justify-between text-[10px] text-gray-500 dark:text-gray-400">
               <span>{formatCurrency(goal.currentAmount)} saved</span>
               <span>{formatCurrency(goal.targetAmount)} goal</span>
             </div>
@@ -99,7 +85,7 @@ const SavingsGoalsSection: React.FC<{
         ))}
       </div>
       <motion.button
-        className="w-full mt-2 text-center text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center justify-center"
+        className="mt-2 flex w-full items-center justify-center text-center text-[10px] text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 sm:text-xs"
         whileHover={{ x: 2 }}
         onClick={() => navigate("/customer/savings")}
       >
@@ -121,7 +107,7 @@ const VerificationStatusSection: React.FC<{
   if (isLoading) {
     return (
       <DashCard>
-        <SkeletonBlock className="h-5 w-36 mb-3" />
+        <SkeletonBlock className="mb-3 h-5 w-36" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <SkeletonBlock key={i} className="h-10 w-full" />
@@ -136,91 +122,56 @@ const VerificationStatusSection: React.FC<{
       label: "KYC Status",
       ok: security.kycVerified,
       text: security.kycVerified ? "Verified" : "Pending",
-      icon: security.kycVerified ? (
-        <CheckCircle size={16} />
-      ) : (
-        <AlertTriangle size={16} />
-      ),
-      bg: security.kycVerified
-        ? "bg-green-50 dark:bg-green-950/30"
-        : "bg-amber-50 dark:bg-amber-950/30",
-      fg: security.kycVerified
-        ? "text-green-700 dark:text-green-400"
-        : "text-amber-700 dark:text-amber-400",
-      ic: security.kycVerified
-        ? "text-green-600 dark:text-green-400"
-        : "text-amber-600 dark:text-amber-400",
+      icon: security.kycVerified ? <CheckCircle size={16} /> : <AlertTriangle size={16} />,
+      bg: security.kycVerified ? "bg-green-50 dark:bg-green-950/30" : "bg-amber-50 dark:bg-amber-950/30",
+      fg: security.kycVerified ? "text-green-700 dark:text-green-400" : "text-amber-700 dark:text-amber-400",
+      ic: security.kycVerified ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400",
       route: "/customer/profile/documents",
     },
     {
       label: "Two-Factor Auth",
       ok: security.twoFaEnabled,
       text: security.twoFaEnabled ? "Enabled" : "Disabled",
-      icon: security.twoFaEnabled ? (
-        <Lock size={16} />
-      ) : (
-        <Unlock size={16} />
-      ),
-      bg: security.twoFaEnabled
-        ? "bg-green-50 dark:bg-green-950/30"
-        : "bg-rose-50 dark:bg-rose-950/30",
-      fg: security.twoFaEnabled
-        ? "text-green-700 dark:text-green-400"
-        : "text-rose-700 dark:text-rose-400",
-      ic: security.twoFaEnabled
-        ? "text-green-600 dark:text-green-400"
-        : "text-rose-600 dark:text-rose-400",
+      icon: security.twoFaEnabled ? <Lock size={16} /> : <Unlock size={16} />,
+      bg: security.twoFaEnabled ? "bg-green-50 dark:bg-green-950/30" : "bg-rose-50 dark:bg-rose-950/30",
+      fg: security.twoFaEnabled ? "text-green-700 dark:text-green-400" : "text-rose-700 dark:text-rose-400",
+      ic: security.twoFaEnabled ? "text-green-600 dark:text-green-400" : "text-rose-600 dark:text-rose-400",
       route: "/customer/security/2fa",
     },
   ];
 
   return (
     <DashCard>
-      <SectionHeader
-        title="Security & Verification"
-        icon={<Shield size={16} />}
-      />
+      <SectionHeader title="Security & Verification" icon={<Shield size={16} />} />
       <div className="space-y-2">
         {items.map((item) => (
           <motion.div
             key={item.label}
-            className={`flex items-center justify-between p-2.5 ${item.bg} rounded-lg cursor-pointer`}
+            className={`flex items-center justify-between p-2.5 ${item.bg} cursor-pointer rounded-lg`}
             variants={sidebarItemVariants}
             whileHover={{ x: 2 }}
             onClick={() => navigate(item.route)}
           >
             <div className="flex items-center gap-2">
               <span className={item.ic}>{item.icon}</span>
-              <span
-                className={`text-xs sm:text-sm font-medium ${item.fg}`}
-              >
-                {item.label}
-              </span>
+              <span className={`text-xs font-medium sm:text-sm ${item.fg}`}>{item.label}</span>
             </div>
-            <span className={`text-[10px] sm:text-xs ${item.ic}`}>
-              {item.text}
-            </span>
+            <span className={`text-[10px] sm:text-xs ${item.ic}`}>{item.text}</span>
           </motion.div>
         ))}
         <motion.div
-          className="flex items-center justify-between p-2.5 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg cursor-pointer"
+          className="flex cursor-pointer items-center justify-between rounded-lg bg-indigo-50 p-2.5 dark:bg-indigo-950/30"
           variants={sidebarItemVariants}
           whileHover={{ x: 2 }}
           onClick={() => navigate("/customer/profile/documents")}
         >
           <div className="flex items-center gap-2">
-            <Upload
-              size={16}
-              className="text-indigo-600 dark:text-indigo-400"
-            />
-            <span className="text-xs sm:text-sm font-medium text-indigo-800 dark:text-indigo-300">
+            <Upload size={16} className="text-indigo-600 dark:text-indigo-400" />
+            <span className="text-xs font-medium text-indigo-800 dark:text-indigo-300 sm:text-sm">
               Upload Documents
             </span>
           </div>
-          <ChevronRight
-            size={14}
-            className="text-indigo-600 dark:text-indigo-400"
-          />
+          <ChevronRight size={14} className="text-indigo-600 dark:text-indigo-400" />
         </motion.div>
       </div>
     </DashCard>
@@ -240,7 +191,7 @@ const NotificationsSection: React.FC<{
   if (isLoading) {
     return (
       <DashCard>
-        <SkeletonBlock className="h-5 w-28 mb-3" />
+        <SkeletonBlock className="mb-3 h-5 w-28" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <SkeletonBlock key={i} className="h-10 w-full" />
@@ -257,42 +208,32 @@ const NotificationsSection: React.FC<{
         icon={<Bell size={16} />}
         action={
           typeof unreadCount === "number" && unreadCount > 0 ? (
-            <span className="bg-indigo-600 dark:bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+            <span className="rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] text-white dark:bg-indigo-500">
               {unreadCount}
             </span>
           ) : undefined
         }
       />
       {notifications.length === 0 ? (
-        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 text-center py-3">
-          All caught up!
-        </p>
+        <p className="py-3 text-center text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">All caught up!</p>
       ) : (
         <div className="space-y-1.5">
           {notifications.map((n, i) => {
-            const color =
-              NOTIFICATION_TYPE_COLORS[n.type] ||
-              NOTIFICATION_TYPE_COLORS.info;
+            const color = NOTIFICATION_TYPE_COLORS[n.type] || NOTIFICATION_TYPE_COLORS.info;
             return (
               <motion.div
                 key={n.id || i}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 variants={sidebarItemVariants}
                 whileHover={{ x: 2 }}
-                onClick={() =>
-                  navigate("/customer/mobile/notifications")
-                }
+                onClick={() => navigate("/customer/mobile/notifications")}
               >
-                <div className={`p-1 rounded-full ${color}`}>
+                <div className={`rounded-full p-1 ${color}`}>
                   <Bell size={12} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] sm:text-xs font-medium text-gray-900 dark:text-white truncate">
-                    {n.title}
-                  </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                    {n.date}
-                  </p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[10px] font-medium text-gray-900 dark:text-white sm:text-xs">{n.title}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400">{n.date}</p>
                 </div>
               </motion.div>
             );
@@ -300,7 +241,7 @@ const NotificationsSection: React.FC<{
         </div>
       )}
       <motion.button
-        className="w-full mt-2 text-center text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+        className="mt-2 w-full text-center text-[10px] text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 sm:text-xs"
         whileHover={{ x: 2 }}
         onClick={() => navigate("/customer/mobile/notifications")}
       >
@@ -320,7 +261,7 @@ const SmartInsightsSection: React.FC<{
   if (isLoading) {
     return (
       <DashCard>
-        <SkeletonBlock className="h-5 w-28 mb-3" />
+        <SkeletonBlock className="mb-3 h-5 w-28" />
         <div className="space-y-2">
           {[1, 2].map((i) => (
             <SkeletonBlock key={i} className="h-16 w-full" />
@@ -336,26 +277,19 @@ const SmartInsightsSection: React.FC<{
       <SectionHeader title="Smart Insights" icon={<Lightbulb size={16} />} />
       <div className="space-y-2">
         {insights.map((ins, i) => {
-          const iconInfo =
-            INSIGHT_CONFIG[ins.sentiment] || INSIGHT_CONFIG.info;
+          const iconInfo = INSIGHT_CONFIG[ins.sentiment] || INSIGHT_CONFIG.info;
           return (
             <motion.div
               key={ins.id || i}
-              className="border border-gray-100 dark:border-gray-800 rounded-lg p-2.5 hover:border-gray-200 dark:hover:border-gray-700 transition-colors"
+              className="rounded-lg border border-gray-100 p-2.5 transition-colors hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-700"
               variants={sidebarItemVariants}
             >
               <div className="flex gap-2">
-                <div className={`p-1.5 rounded-lg ${iconInfo.color} h-min`}>
-                  {iconInfo.icon}
-                </div>
+                <div className={`rounded-lg p-1.5 ${iconInfo.color} h-min`}>{iconInfo.icon}</div>
                 <div>
-                  <h3 className="text-[10px] sm:text-xs font-medium text-gray-900 dark:text-white">
-                    {ins.title}
-                  </h3>
+                  <h3 className="text-[10px] font-medium text-gray-900 dark:text-white sm:text-xs">{ins.title}</h3>
                   {ins.description && (
-                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      {ins.description}
-                    </p>
+                    <p className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-400">{ins.description}</p>
                   )}
                 </div>
               </div>
@@ -389,7 +323,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
   const sidebarSkeleton = (
     <DashCard>
-      <SkeletonBlock className="h-5 w-28 mb-3" />
+      <SkeletonBlock className="mb-3 h-5 w-28" />
       <div className="space-y-2">
         {[1, 2].map((i) => (
           <SkeletonBlock key={i} className="h-12 w-full" />
@@ -399,24 +333,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   );
 
   return (
-    <div className="w-full lg:w-80 flex flex-col gap-5">
+    <div className="flex w-full flex-col gap-5 lg:w-80">
       <div ref={goalsRef}>
-        {goalsInView ? (
-          <SavingsGoalsSection
-            goals={savingsGoals}
-            isLoading={isSavingsLoading}
-          />
-        ) : (
-          sidebarSkeleton
-        )}
+        {goalsInView ? <SavingsGoalsSection goals={savingsGoals} isLoading={isSavingsLoading} /> : sidebarSkeleton}
       </div>
 
       <div ref={verifyRef}>
         {verifyInView ? (
-          <VerificationStatusSection
-            security={security}
-            isLoading={isSecurityLoading}
-          />
+          <VerificationStatusSection security={security} isLoading={isSecurityLoading} />
         ) : (
           sidebarSkeleton
         )}
@@ -435,33 +359,22 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </div>
 
       <div ref={insightsRef}>
-        {insightsInView ? (
-          <SmartInsightsSection
-            insights={insights}
-            isLoading={isInsightsLoading}
-          />
-        ) : (
-          sidebarSkeleton
-        )}
+        {insightsInView ? <SmartInsightsSection insights={insights} isLoading={isInsightsLoading} /> : sidebarSkeleton}
       </div>
 
       {/* Quick Tools */}
       <DashCard>
-        <h2 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-2">
-          Tools
-        </h2>
+        <h2 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Tools</h2>
         <div className="grid grid-cols-3 gap-2">
           {SIDEBAR_TOOLS.map((tool) => (
             <motion.div
               key={tool.label}
-              className={`p-2.5 ${tool.color} ${tool.hover} rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors`}
+              className={`p-2.5 ${tool.color} ${tool.hover} flex cursor-pointer flex-col items-center justify-center rounded-lg transition-colors`}
               whileHover={{ y: -2 }}
               onClick={() => navigate(tool.route)}
             >
               {tool.icon}
-              <span className="text-[10px] font-medium mt-0.5">
-                {tool.label}
-              </span>
+              <span className="mt-0.5 text-[10px] font-medium">{tool.label}</span>
             </motion.div>
           ))}
         </div>

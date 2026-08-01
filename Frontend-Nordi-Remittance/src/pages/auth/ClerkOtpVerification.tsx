@@ -12,7 +12,7 @@ import { Button, Spinner } from "@components/ui";
 import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useVerifyClerkOtp, useResendClerkOtp } from "@hooks/queries/useAuth";
+import { useVerifyClerkOtp, useResendClerkOtp } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
@@ -33,11 +33,12 @@ const ClerkOtpVerification = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { otpSessionToken, email, isAdmin } = (location.state as {
-    otpSessionToken: string;
-    email: string;
-    isAdmin?: boolean;
-  }) || {};
+  const { otpSessionToken, email, isAdmin } =
+    (location.state as {
+      otpSessionToken: string;
+      email: string;
+      isAdmin?: boolean;
+    }) || {};
 
   // Redirect if no session token
   useEffect(() => {
@@ -114,10 +115,7 @@ const ClerkOtpVerification = () => {
     }
   };
 
-  const handleKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -166,9 +164,7 @@ const ClerkOtpVerification = () => {
   // Render
   // ──────────────────────────────────────────────────────────────────
 
-  const maskedEmail = email
-    ? `${email.slice(0, 3)}***@${email.split("@")[1]}`
-    : "your email";
+  const maskedEmail = email ? `${email.slice(0, 3)}***@${email.split("@")[1]}` : "your email";
 
   return (
     <AuthLayout
@@ -217,9 +213,9 @@ const ClerkOtpVerification = () => {
                       ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/30"
                       : "border-neutral-300 bg-white dark:border-neutral-600 dark:bg-neutral-800"
                 }
-                focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800
+                text-neutral-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200
                 disabled:cursor-not-allowed disabled:opacity-50
-                text-neutral-900 dark:text-white
+                dark:text-white dark:focus:ring-blue-800
               `}
             />
           ))}
@@ -242,9 +238,7 @@ const ClerkOtpVerification = () => {
           variant="primary"
           size="lg"
           fullWidth
-          disabled={
-            otp.join("").length < OTP_LENGTH || verifyMutation.isPending
-          }
+          disabled={otp.join("").length < OTP_LENGTH || verifyMutation.isPending}
           className="bg-blue-600 hover:bg-blue-700"
         >
           {verifyMutation.isPending ? (
@@ -261,10 +255,7 @@ const ClerkOtpVerification = () => {
         <div className="text-center">
           {cooldown > 0 ? (
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Resend code in{" "}
-              <span className="font-semibold text-neutral-700 dark:text-neutral-200">
-                {cooldown}s
-              </span>
+              Resend code in <span className="font-semibold text-neutral-700 dark:text-neutral-200">{cooldown}s</span>
             </p>
           ) : (
             <button
@@ -273,9 +264,7 @@ const ClerkOtpVerification = () => {
               disabled={resendMutation.isPending}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:underline disabled:opacity-50 dark:text-primary-400"
             >
-              <RotateCw
-                className={`h-4 w-4 ${resendMutation.isPending ? "animate-spin" : ""}`}
-              />
+              <RotateCw className={`h-4 w-4 ${resendMutation.isPending ? "animate-spin" : ""}`} />
               {resendMutation.isPending ? "Sending..." : "Resend code"}
             </button>
           )}

@@ -16,15 +16,12 @@ import { Button, Input, Spinner } from "@components/ui";
 import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useLogin, useClerkSync } from "@hooks/queries/useAuth";
+import { useLogin, useClerkSync } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 // Validation
-import {
-  loginSchema,
-  type LoginFormData,
-} from "@utils/validators/auth.validators";
+import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
 
 // ============================================================================
 // COMPONENT
@@ -158,17 +155,11 @@ const Login = () => {
       });
     } catch (err: any) {
       setClerkLoading(false);
-      setClerkError(
-        err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.",
-      );
+      setClerkError(err?.errors?.[0]?.longMessage || "Google sign-in failed. Try again.");
     }
   };
 
-  const isPending =
-    isSubmitting ||
-    loginMutation.isPending ||
-    clerkSyncMutation.isPending ||
-    clerkLoading;
+  const isPending = isSubmitting || loginMutation.isPending || clerkSyncMutation.isPending || clerkLoading;
 
   return (
     <AuthLayout
@@ -218,10 +209,7 @@ const Login = () => {
 
         {/* Forgot Password Link */}
         <div className="text-right">
-          <Link
-            to="/auth/forgot-password"
-            className="text-sm font-medium text-primary-600 hover:underline"
-          >
+          <Link to="/auth/forgot-password" className="text-sm font-medium text-primary-600 hover:underline">
             Forgot Username or Password?
           </Link>
         </div>
@@ -251,9 +239,7 @@ const Login = () => {
             <div className="w-full border-t border-neutral-300 dark:border-neutral-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-3 text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
-              or
-            </span>
+            <span className="bg-white px-3 text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">or</span>
           </div>
         </div>
 
@@ -314,10 +300,7 @@ const Login = () => {
             <p className="font-medium text-neutral-900">Need help?</p>
             <p className="mt-1 text-sm text-neutral-600">
               Have any problem?{" "}
-              <Link
-                to="/contact"
-                className="font-medium text-primary-600 hover:underline"
-              >
+              <Link to="/contact" className="font-medium text-primary-600 hover:underline">
                 Chat with us
               </Link>
             </p>

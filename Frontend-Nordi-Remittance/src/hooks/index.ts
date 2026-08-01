@@ -3,10 +3,10 @@
 // ============================================================================
 
 // Export all TanStack Query hooks
-export * from './queries';
+export * from "./api-queries";
 
 // Re-export store hooks for convenience
-export { useToast, useAuth, useTheme, useSidebar, useModal, usePreferences, useSocketConnection } from '../store';
+export { useToast, useAuth, useTheme, useSidebar, useModal, usePreferences, useSocketConnection } from "../store";
 
 // WebSocket hooks
 export {
@@ -22,17 +22,17 @@ export {
   useAdminRealtimeEvents,
   useUserRealtimeEvents,
   useRealtimeUpdates,
-} from './useSocket';
+} from "./useSocket";
 
 // IntersectionObserver Hook
-export { useInView } from './useInView';
+export { useInView } from "./useInView";
 
 // Session Management Hook
-export { useSessionManager } from './useSessionManager';
-export type { SessionModalState } from './useSessionManager';
+export { useSessionManager } from "./useSessionManager";
+export type { SessionModalState } from "./useSessionManager";
 
 // Media Query Hook
-export { 
+export {
   useMediaQuery,
   mediaQueries,
   useIsMobile,
@@ -42,17 +42,11 @@ export {
   usePrefersDarkMode,
   usePrefersReducedMotion,
   useIsTouchDevice,
-} from './useMediaQuery';
+} from "./useMediaQuery";
 
 // Breakpoint Hook
-export {
-  useBreakpoint,
-  useResponsiveValue,
-  useBreakpointMatcher,
-  breakpointValues,
-} from './useBreakpoint';
-export type { 
-  Breakpoint, 
-  BreakpointConfig, 
-  BreakpointState 
-} from './useBreakpoint';
+export { useBreakpoint, useResponsiveValue, useBreakpointMatcher, breakpointValues } from "./useBreakpoint";
+export type { Breakpoint, BreakpointConfig, BreakpointState } from "./useBreakpoint";
+
+// Network Status Hook
+export { useNetworkStatus } from "./useNetworkStatus";

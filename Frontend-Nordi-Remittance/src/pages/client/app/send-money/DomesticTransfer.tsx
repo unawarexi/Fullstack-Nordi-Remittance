@@ -18,8 +18,8 @@ import {
   Star,
   Info,
 } from "@constants/icons";
-import { useClientWallets, useClientBeneficiaries } from "../../domain/useAccountsDomain";
-import { useTransfer } from "../../domain/useTransactionsDomain";
+import { useClientWallets, useClientBeneficiaries } from "../../client-usecase/useaccounts-client-usecase";
+import { useTransfer } from "../../client-usecase/usetransaction-client-usecase";
 import {
   TransferLayout,
   StepIndicator,
@@ -38,11 +38,7 @@ import {
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const STEPS: WizardStep[] = [
-  { label: "Account" },
-  { label: "Details" },
-  { label: "Review" },
-];
+const STEPS: WizardStep[] = [{ label: "Account" }, { label: "Details" }, { label: "Review" }];
 
 const TRANSFER_TYPES = [
   { value: "standard", label: "Standard (Free)", fee: 0, eta: "1-3 business days" },
@@ -66,14 +62,12 @@ const schema = Yup.object({
   }),
   accountNumber: Yup.string().when("recipientType", {
     is: "new",
-    then: (s) =>
-      s.required("Account number is required").matches(/^\d{8,17}$/, "8-17 digits"),
+    then: (s) => s.required("Account number is required").matches(/^\d{8,17}$/, "8-17 digits"),
     otherwise: (s) => s.notRequired(),
   }),
   routingNumber: Yup.string().when("recipientType", {
     is: "new",
-    then: (s) =>
-      s.required("Routing number is required").matches(/^\d{9}$/, "Exactly 9 digits"),
+    then: (s) => s.required("Routing number is required").matches(/^\d{9}$/, "Exactly 9 digits"),
     otherwise: (s) => s.notRequired(),
   }),
   bankName: Yup.string().when("recipientType", {
@@ -81,10 +75,7 @@ const schema = Yup.object({
     then: (s) => s.required("Bank name is required"),
     otherwise: (s) => s.notRequired(),
   }),
-  amount: Yup.number()
-    .required("Enter an amount")
-    .positive("Must be positive")
-    .max(10000, "Max $10,000 per transfer"),
+  amount: Yup.number().required("Enter an amount").positive("Must be positive").max(10000, "Max $10,000 per transfer"),
   transferType: Yup.string().required("Select transfer type"),
   transferDate: Yup.string().required("Select a date"),
   reference: Yup.string().max(50),
@@ -114,9 +105,7 @@ const DomesticTransfer: React.FC = () => {
       beneficiarySearch
         ? beneficiaries.filter(
             (b: any) =>
-              (b.name || b.firstName || "")
-                .toLowerCase()
-                .includes(beneficiarySearch.toLowerCase()) ||
+              (b.name || b.firstName || "").toLowerCase().includes(beneficiarySearch.toLowerCase()) ||
               (b.accountNumber || "").includes(beneficiarySearch),
           )
         : beneficiaries,
@@ -146,8 +135,7 @@ const DomesticTransfer: React.FC = () => {
       transfer.mutate(
         {
           sourceAccountId: values.fromAccount as any,
-          destinationAccountId: (values.beneficiaryId ||
-            values.accountNumber) as any,
+          destinationAccountId: (values.beneficiaryId || values.accountNumber) as any,
           amount: Number(values.amount),
           currency: (selectedAccount?.currency || "USD") as any,
           description: values.reference || undefined,
@@ -156,10 +144,7 @@ const DomesticTransfer: React.FC = () => {
           onSuccess: (data: any) => {
             setResult({
               success: true,
-              reference:
-                data?.referenceNumber ||
-                data?.id ||
-                `DOM${Date.now().toString().slice(-7)}`,
+              reference: data?.referenceNumber || data?.id || `DOM${Date.now().toString().slice(-7)}`,
             });
           },
           onError: () => {
@@ -170,16 +155,7 @@ const DomesticTransfer: React.FC = () => {
     },
   });
 
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setTouched,
-  } = formik;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur, handleSubmit, setTouched } = formik;
 
   // Per-step validation
   const goNext = async () => {
@@ -205,12 +181,8 @@ const DomesticTransfer: React.FC = () => {
 
   // Derived
   const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
-  const selectedBeneficiary = beneficiaries.find(
-    (b: any) => b.id === values.beneficiaryId,
-  );
-  const transferTypeInfo = TRANSFER_TYPES.find(
-    (t) => t.value === values.transferType,
-  );
+  const selectedBeneficiary = beneficiaries.find((b: any) => b.id === values.beneficiaryId);
+  const transferTypeInfo = TRANSFER_TYPES.find((t) => t.value === values.transferType);
   const fee = transferTypeInfo?.fee ?? 0;
   const total = (Number(values.amount) || 0) + fee;
 
@@ -223,9 +195,7 @@ const DomesticTransfer: React.FC = () => {
             success={result.success}
             title={result.success ? "Transfer Submitted!" : "Transfer Failed"}
             subtitle={
-              result.success
-                ? "Your domestic transfer is being processed."
-                : "Something went wrong. Please try again."
+              result.success ? "Your domestic transfer is being processed." : "Something went wrong. Please try again."
             }
             reference={result.reference}
             details={
@@ -243,11 +213,7 @@ const DomesticTransfer: React.FC = () => {
                     },
                     {
                       label: "Recipient",
-                      value:
-                        selectedBeneficiary?.name ||
-                        selectedBeneficiary?.firstName ||
-                        values.accountName ||
-                        "—",
+                      value: selectedBeneficiary?.name || selectedBeneficiary?.firstName || values.accountName || "—",
                     },
                   ]
                 : undefined
@@ -268,12 +234,8 @@ const DomesticTransfer: React.FC = () => {
     <TransferLayout>
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          Domestic Transfer
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Send money to any US bank account securely.
-        </p>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Domestic Transfer</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Send money to any US bank account securely.</p>
       </div>
 
       {/* Steps */}
@@ -294,15 +256,13 @@ const DomesticTransfer: React.FC = () => {
                 loading={walletsLoading}
               />
               {errors.fromAccount && touched.fromAccount && (
-                <p className="text-xs text-red-500 mt-2">
-                  {errors.fromAccount}
-                </p>
+                <p className="mt-2 text-xs text-red-500">{errors.fromAccount}</p>
               )}
             </TCard>
 
             <TCard title="Recipient" icon={<User size={18} />}>
               {/* Toggle */}
-              <div className="flex gap-2 mb-4">
+              <div className="mb-4 flex gap-2">
                 {(["existing", "new"] as const).map((t) => (
                   <button
                     key={t}
@@ -311,10 +271,10 @@ const DomesticTransfer: React.FC = () => {
                       setFieldValue("recipientType", t);
                       setFieldValue("beneficiaryId", "");
                     }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                    className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
                       values.recipientType === t
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400"
-                        : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
                     }`}
                   >
                     {t === "existing" ? "Saved Recipient" : "New Recipient"}
@@ -325,81 +285,56 @@ const DomesticTransfer: React.FC = () => {
               {values.recipientType === "existing" ? (
                 <div className="space-y-3">
                   <div className="relative">
-                    <Search
-                      size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       value={beneficiarySearch}
                       onChange={(e) => setBeneficiarySearch(e.target.value)}
                       placeholder="Search recipients…"
-                      className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
                     />
                   </div>
 
                   {beneLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="h-14 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"
-                        />
+                        <div key={i} className="h-14 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
                       ))}
                     </div>
                   ) : filteredBeneficiaries.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
-                      No recipients found
-                    </p>
+                    <p className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">No recipients found</p>
                   ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <div className="max-h-60 space-y-2 overflow-y-auto pr-1">
                       {filteredBeneficiaries.map((b: any) => (
                         <button
                           key={b.id}
                           type="button"
                           onClick={() => setFieldValue("beneficiaryId", b.id)}
-                          className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                          className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all ${
                             values.beneficiaryId === b.id
                               ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
-                              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                           }`}
                         >
-                          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">
-                            {(b.name || b.firstName || "?")
-                              .charAt(0)
-                              .toUpperCase()}
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                            {(b.name || b.firstName || "?").charAt(0).toUpperCase()}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {b.name ||
-                                `${b.firstName || ""} ${b.lastName || ""}`.trim()}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                              {b.name || `${b.firstName || ""} ${b.lastName || ""}`.trim()}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {b.bankAccount?.bankName ||
-                                b.bankName ||
-                                "Bank"}{" "}
-                              ••••
-                              {(
-                                b.bankAccount?.accountNumber ||
-                                b.accountNumber ||
-                                ""
-                              ).slice(-4)}
+                              {b.bankAccount?.bankName || b.bankName || "Bank"} ••••
+                              {(b.bankAccount?.accountNumber || b.accountNumber || "").slice(-4)}
                             </p>
                           </div>
-                          {b.isFavorite && (
-                            <Star
-                              size={14}
-                              className="text-amber-400 flex-shrink-0"
-                            />
-                          )}
+                          {b.isFavorite && <Star size={14} className="flex-shrink-0 text-amber-400" />}
                         </button>
                       ))}
                     </div>
                   )}
                   {errors.beneficiaryId && touched.beneficiaryId && (
-                    <p className="text-xs text-red-500">
-                      {errors.beneficiaryId}
-                    </p>
+                    <p className="text-xs text-red-500">{errors.beneficiaryId}</p>
                   )}
                 </div>
               ) : (
@@ -492,35 +427,27 @@ const DomesticTransfer: React.FC = () => {
 
               {/* Transfer type */}
               <div className="mt-5 space-y-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Transfer Speed
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transfer Speed</label>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {TRANSFER_TYPES.map((t) => (
                     <button
                       key={t.value}
                       type="button"
                       onClick={() => setFieldValue("transferType", t.value)}
-                      className={`p-3 rounded-lg border text-left transition-all ${
+                      className={`rounded-lg border p-3 text-left transition-all ${
                         values.transferType === t.value
-                          ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/50"
-                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                          ? "border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500/50 dark:bg-indigo-950/30"
+                          : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="mb-1 flex items-center gap-2">
                         <Clock size={14} className="text-indigo-500" />
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          {t.value === "standard"
-                            ? "Standard"
-                            : t.value === "same_day"
-                              ? "Same-Day"
-                              : "Wire"}
+                          {t.value === "standard" ? "Standard" : t.value === "same_day" ? "Same-Day" : "Wire"}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {t.eta}
-                      </p>
-                      <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t.eta}</p>
+                      <p className="mt-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                         {t.fee === 0 ? "Free" : `$${t.fee.toFixed(2)}`}
                       </p>
                     </button>
@@ -571,49 +498,19 @@ const DomesticTransfer: React.FC = () => {
         {step === 2 && (
           <div className="space-y-6">
             <ReviewSection title="Transfer Details" icon={<Send size={16} />}>
-              <ReviewRow
-                label="Amount"
-                value={formatCurrency(values.amount)}
-                highlight
-              />
-              <ReviewRow
-                label="Speed"
-                value={transferTypeInfo?.label || "Standard"}
-              />
-              <ReviewRow
-                label="Fee"
-                value={fee === 0 ? "Free" : formatCurrency(fee)}
-              />
-              <ReviewRow
-                label="Total"
-                value={formatCurrency(total)}
-                highlight
-              />
+              <ReviewRow label="Amount" value={formatCurrency(values.amount)} highlight />
+              <ReviewRow label="Speed" value={transferTypeInfo?.label || "Standard"} />
+              <ReviewRow label="Fee" value={fee === 0 ? "Free" : formatCurrency(fee)} />
+              <ReviewRow label="Total" value={formatCurrency(total)} highlight />
               <ReviewRow label="Date" value={values.transferDate} />
-              {values.reference && (
-                <ReviewRow label="Reference" value={values.reference} />
-              )}
+              {values.reference && <ReviewRow label="Reference" value={values.reference} />}
             </ReviewSection>
 
-            <ReviewSection
-              title="From Account"
-              icon={<Building size={16} />}
-            >
-              <ReviewRow
-                label="Account"
-                value={
-                  selectedAccount?.name ||
-                  selectedAccount?.walletType ||
-                  "—"
-                }
-              />
+            <ReviewSection title="From Account" icon={<Building size={16} />}>
+              <ReviewRow label="Account" value={selectedAccount?.name || selectedAccount?.walletType || "—"} />
               <ReviewRow
                 label="Balance"
-                value={
-                  typeof selectedAccount?.balance === "number"
-                    ? formatCurrency(selectedAccount.balance)
-                    : "—"
-                }
+                value={typeof selectedAccount?.balance === "number" ? formatCurrency(selectedAccount.balance) : "—"}
               />
             </ReviewSection>
 
@@ -630,37 +527,23 @@ const DomesticTransfer: React.FC = () => {
                   />
                   <ReviewRow
                     label="Bank"
-                    value={
-                      selectedBeneficiary?.bankAccount?.bankName ||
-                      selectedBeneficiary?.bankName ||
-                      "—"
-                    }
+                    value={selectedBeneficiary?.bankAccount?.bankName || selectedBeneficiary?.bankName || "—"}
                   />
                 </>
               ) : (
                 <>
                   <ReviewRow label="Name" value={values.accountName} />
-                  <ReviewRow
-                    label="Account"
-                    value={`••••${values.accountNumber.slice(-4)}`}
-                  />
-                  <ReviewRow
-                    label="Routing"
-                    value={values.routingNumber}
-                  />
+                  <ReviewRow label="Account" value={`••••${values.accountNumber.slice(-4)}`} />
+                  <ReviewRow label="Routing" value={values.routingNumber} />
                   <ReviewRow label="Bank" value={values.bankName} />
                 </>
               )}
             </ReviewSection>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40">
-              <Shield
-                size={16}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
+            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/40 dark:bg-amber-950/20">
+              <Shield size={16} className="mt-0.5 flex-shrink-0 text-amber-500" />
               <p className="text-xs text-amber-700 dark:text-amber-400">
-                Please verify all details before confirming. This action cannot
-                be reversed once processed.
+                Please verify all details before confirming. This action cannot be reversed once processed.
               </p>
             </div>
 
@@ -686,7 +569,7 @@ const DomesticTransfer: React.FC = () => {
         disabled={step === 2 && !values.agreeTos}
       />
 
-      <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 justify-center pb-4">
+      <div className="flex items-center justify-center gap-2 pb-4 text-xs text-gray-400 dark:text-gray-500">
         <Info size={12} />
         <span>Transfers are encrypted and processed securely.</span>
       </div>

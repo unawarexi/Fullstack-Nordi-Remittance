@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
 import { PageLoader } from "@components/ui/Spinner";
-import { useClerkSyncAdmin } from "@hooks/queries/useAuth";
+import { useClerkSyncAdmin } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
 import { useToast } from "@store/toast.store";
 import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
@@ -39,9 +39,7 @@ const ClerkAdminCallback = () => {
           await signOut().catch(() => {});
         }
         const errorMsg =
-          err?.response?.data?.message ||
-          err?.message ||
-          "No active admin account found in our database.";
+          err?.response?.data?.message || err?.message || "No active admin account found in our database.";
         showToastError(errorMsg);
         navigate(`/admin?error=${encodeURIComponent(errorMsg)}`, { replace: true });
       }

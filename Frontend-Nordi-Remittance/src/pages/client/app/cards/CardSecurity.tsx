@@ -1,83 +1,96 @@
 // ============================================================================
-// CARDS SUB-PAGES — Overview, Transactions, Apply, Security, Virtual
-// Dark mode + DashboardPrimitives + grey borders + responsive typography
+// CARDS SUB-PAGE — Card Security & Controls
+// Strictly consumes domain hook without raw logic in UI component
 // ============================================================================
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import {
-  CreditCard, Eye, EyeOff, Lock, Plus, Shield, Smartphone,
-  ArrowUpRight, ArrowDownLeft, Settings, CheckCircle2, AlertTriangle,
-  Globe, Wifi, ShoppingBag, TrendingUp,
-} from "@constants/icons";
+import { Lock, Shield, Settings, AlertTriangle, Globe, Wifi, DollarSign, CreditCard } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
-import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge,
-} from "@components/shared/DashboardPrimitives";
-import {
-  CreditCardSkeleton, TransactionListSkeleton, FormSkeleton, StatsGridSkeleton,
-} from "@components/skeletons";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
+import { FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientCards } from "../../domain/useCardsDomain";
-import { useUIStore } from "@store/ui.store";
-
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
-
-/* ─── Shared card visual ─── */
-const CardVisual: React.FC<{ card: any; show: boolean; gradient?: string }> = ({
-  card, show, gradient = "from-indigo-600 via-purple-600 to-fuchsia-600",
-}) => (
-  <div className={`relative bg-gradient-to-br ${gradient} rounded-2xl p-5 sm:p-6 text-white overflow-hidden`}>
-    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10" />
-    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-6 -mb-6" />
-    <div className="flex justify-between items-start mb-8">
-      <div>
-        <p className="text-xs text-white/70">{card.type || "Premium"}</p>
-        <p className="text-sm font-medium">{card.name || "Nordi Card"}</p>
-      </div>
-      <Wifi size={24} className="text-white/60" />
-    </div>
-    <p className="text-lg sm:text-xl font-mono tracking-widest mb-4">
-      {show ? (card.number || "•••• •••• •••• ••••") : "•••• •••• •••• ••••"}
-    </p>
-    <div className="flex justify-between items-end">
-      <div>
-        <p className="text-[10px] text-white/60">BALANCE</p>
-        <p className="text-base sm:text-lg font-bold">{show ? fmt(card.balance || card.limit || 0) : "••••••"}</p>
-      </div>
-      <div className="text-right">
-        <p className="text-[10px] text-white/60">EXPIRES</p>
-        <p className="text-sm font-medium">{card.expiry || "12/28"}</p>
-      </div>
-    </div>
-  </div>
-);
-
+import { useCardSecurityDomain } from "../../client-usecase/useCards-client-usecase";
+import { CardStatusPill, isFreezeable } from "@pages/client/components/card-ui-utils";
 
 const CardSecurity: React.FC = () => {
-  const { cards, isLoading } = useClientCards();
+  const {
+    cards,
+    isLoading,
+    activeCard,
+    activeCardId,
+    setActiveCardId,
+    toggles,
+    handleToggleOption,
+    handleQuickAction,
+    isPending,
+  } = useCardSecurityDomain();
 
   const securityOpts = [
-    { label: "Online Transactions", key: "online", desc: "Allow online/e-commerce purchases" },
-    { label: "International Transactions", key: "intl", desc: "Allow transactions abroad" },
-    { label: "Contactless Payments", key: "contactless", desc: "Enable tap-to-pay" },
-    { label: "ATM Withdrawals", key: "atm", desc: "Enable cash withdrawals at ATMs" },
+    {
+      label: "Online Transactions",
+      key: "isOnlineEnabled",
+      icon: Shield,
+      desc: "Allow online and e-commerce transactions across digital merchants",
+    },
+    {
+      label: "International Transactions",
+      key: "isInternationalEnabled",
+      icon: Globe,
+      desc: "Allow card usage in foreign currencies and international terminals",
+    },
+    {
+      label: "Contactless Payments",
+      key: "isContactlessEnabled",
+      icon: Wifi,
+      desc: "Enable NFC tap-to-pay functionality up to designated contactless limit",
+    },
+    ...(activeCard.isPhysical
+      ? [
+          {
+            label: "ATM Withdrawals",
+            key: "isAtmEnabled",
+            icon: DollarSign,
+            desc: "Enable automated teller machine physical cash withdrawals",
+          },
+        ]
+      : []),
   ];
 
-  const [toggles, setToggles] = useState<Record<string, boolean>>({
-    online: true, intl: false, contactless: true, atm: true,
-  });
-
-  const toggle = (key: string) => setToggles((p) => ({ ...p, [key]: !p[key] }));
+  const quickActions = [
+    {
+      label: "Freeze Card",
+      icon: Lock,
+      color:
+        "text-red-500 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/40 border-red-100 dark:border-red-900/30",
+    },
+    {
+      label: "Change PIN",
+      icon: Settings,
+      color:
+        "text-amber-500 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/40 border-amber-100 dark:border-amber-900/30",
+      requiresPhysical: true,
+    },
+    {
+      label: "Report Lost",
+      icon: AlertTriangle,
+      color:
+        "text-orange-500 bg-orange-50 dark:bg-orange-950/50 hover:bg-orange-100 dark:hover:bg-orange-900/40 border-orange-100 dark:border-orange-900/30",
+    },
+    {
+      label: "Set Limits",
+      icon: Shield,
+      color:
+        "text-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border-indigo-100 dark:border-indigo-900/30",
+    },
+  ];
 
   return (
     <PageContainer>
       <motion.div variants={dashboardItemVariants}>
         <PageHeader
-          title="Card Security"
-          subtitle="Manage card locks, limits, and security settings"
+          title="Card Security & Controls"
+          subtitle="Configure real-time security locks, regional permissions, and fraud response controls"
           breadcrumbs={[
             { label: "Dashboard", href: "/customer/dashboard" },
             { label: "Cards", href: "/customer/cards" },
@@ -88,63 +101,150 @@ const CardSecurity: React.FC = () => {
 
       {isLoading ? (
         <FormSkeleton fields={4} />
+      ) : cards.length === 0 ? (
+        <DashCard className="mt-4 border border-gray-100 py-12 text-center dark:border-gray-800">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Apply for a card to configure security controls.</p>
+        </DashCard>
       ) : (
-        <div className="max-w-2xl space-y-6">
-          <DashCard>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Card Controls
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Toggle transaction types for your cards
-            </p>
-            <div className="space-y-4">
-              {securityOpts.map((opt) => (
-                <div key={opt.key} className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800">
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{opt.label}</h4>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{opt.desc}</p>
-                  </div>
-                  <button
-                    onClick={() => toggle(opt.key)}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${
-                      toggles[opt.key] ? "bg-indigo-600" : "bg-gray-300 dark:bg-gray-600"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                        toggles[opt.key] ? "translate-x-5" : ""
-                      }`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </DashCard>
-
-          <DashCard>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Quick Actions
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Freeze Card", icon: Lock, color: "text-red-500 bg-red-50 dark:bg-red-950/50" },
-                { label: "Change PIN", icon: Settings, color: "text-amber-500 bg-amber-50 dark:bg-amber-950/50" },
-                { label: "Report Lost", icon: AlertTriangle, color: "text-orange-500 bg-orange-50 dark:bg-orange-950/50" },
-                { label: "Set Limits", icon: Shield, color: "text-indigo-500 bg-indigo-50 dark:bg-indigo-950/50" },
-              ].map((action) => (
+        <>
+          {/* Card selector — previously this page silently only ever managed cards[0] */}
+          {cards.length > 1 && (
+            <div className="my-4 flex items-center gap-3 overflow-x-auto pb-2">
+              {cards.map((c) => (
                 <button
-                  key={action.label}
-                  className="flex items-center gap-3 p-3 sm:p-4 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
+                  key={c.id}
+                  onClick={() => setActiveCardId(c.id)}
+                  className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
+                    c.id === activeCardId
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "dark:hover:bg-gray-750 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                  }`}
                 >
-                  <div className={`p-2 rounded-xl ${action.color}`}>
-                    <action.icon size={16} />
-                  </div>
-                  <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">{action.label}</span>
+                  <CreditCard size={15} /> {(c.cardType || "card").toUpperCase()} (•••• {c.last4})
                 </button>
               ))}
             </div>
-          </DashCard>
-        </div>
+          )}
+
+          <div className="my-4 flex items-center justify-between">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Managing <span className="font-bold text-gray-700 dark:text-gray-300">•••• {activeCard.last4}</span>
+            </p>
+            <CardStatusPill status={activeCard.status} />
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Transaction Permissions */}
+            <motion.div variants={dashboardItemVariants}>
+              <DashCard className="h-full border border-gray-100 shadow-md dark:border-gray-800/80">
+                <h3 className="mb-1 flex items-center gap-2 text-base font-bold text-gray-900 dark:text-white sm:text-lg">
+                  <Shield size={18} className="text-indigo-600 dark:text-indigo-400" /> Transaction Permissions
+                </h3>
+                <p className="mb-6 text-xs text-gray-500 dark:text-gray-400">
+                  Toggle authorization channels for this card. Changes take effect in real time.
+                </p>
+                <div className="space-y-4">
+                  {securityOpts.map((opt) => (
+                    <div
+                      key={opt.key}
+                      className="flex items-center justify-between rounded-2xl border-2 border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-gray-200 dark:border-gray-700/50 dark:bg-gray-800/40 dark:hover:border-gray-600"
+                    >
+                      <div className="flex items-start gap-4 pr-4">
+                        <div className="rounded-xl bg-gray-50 p-2 text-gray-400 dark:bg-gray-800">
+                          <opt.icon size={20} />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-gray-900 dark:text-white sm:text-sm">{opt.label}</h4>
+                          <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 sm:text-xs">
+                            {opt.desc}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleToggleOption(opt.key)}
+                        className={`relative h-7 w-14 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+                          toggles[opt.key] ? "bg-indigo-600" : "bg-gray-200 dark:bg-gray-700"
+                        }`}
+                      >
+                        <span
+                          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform ${
+                            toggles[opt.key] ? "translate-x-7" : ""
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </DashCard>
+            </motion.div>
+
+            {/* Quick Security Actions */}
+            <motion.div variants={dashboardItemVariants}>
+              <DashCard className="flex h-full flex-col justify-between border border-gray-100 shadow-md dark:border-gray-800/80">
+                <div>
+                  <h3 className="mb-1 text-base font-bold text-gray-900 dark:text-white sm:text-lg">
+                    Emergency & Security Controls
+                  </h3>
+                  <p className="mb-5 text-xs text-gray-500 dark:text-gray-400">
+                    Execute immediate protective actions if you suspect compromise or unauthorized expenditures on this
+                    card.
+                  </p>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {quickActions.map((action) => {
+                      const disabled =
+                        isPending ||
+                        (action.requiresPhysical && !activeCard.isPhysical) ||
+                        (action.label === "Freeze Card" && !isFreezeable(activeCard.status));
+                      return (
+                        <button
+                          key={action.label}
+                          disabled={disabled}
+                          onClick={() => handleQuickAction(action.label)}
+                          className="group flex items-center gap-3.5 rounded-2xl border-2 border-gray-100 bg-white p-4 text-left shadow-sm transition-all hover:border-gray-200 disabled:opacity-50 dark:border-gray-700/50 dark:bg-gray-800/40 dark:hover:border-gray-600"
+                        >
+                          <div
+                            className={`rounded-xl border p-2.5 ${action.color} transition-transform group-hover:scale-105`}
+                          >
+                            <action.icon size={18} />
+                          </div>
+                          <div>
+                            <span className="block text-xs font-bold text-gray-900 dark:text-gray-100 sm:text-sm">
+                              {action.label === "Freeze Card" && activeCard.status === "blocked"
+                                ? "Unfreeze Card"
+                                : action.label}
+                            </span>
+                            <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                              {action.requiresPhysical && !activeCard.isPhysical
+                                ? "Physical cards only"
+                                : "Execute control command"}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-900/10">
+                  <div className="flex gap-3">
+                    <AlertTriangle className="mt-0.5 shrink-0 text-blue-500" size={20} />
+                    <div>
+                      <h4 className="mb-1 text-sm font-bold text-gray-900 dark:text-gray-100">
+                        Fraud Protection Guarantee
+                      </h4>
+                      <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                        You are completely covered by our Zero Liability guarantee. You won't be held responsible for
+                        unauthorized transactions made if you report them promptly.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </DashCard>
+            </motion.div>
+          </div>
+        </>
       )}
     </PageContainer>
   );

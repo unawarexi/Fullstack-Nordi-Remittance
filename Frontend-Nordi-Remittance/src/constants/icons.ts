@@ -13,7 +13,7 @@ export {
   XCircle,
   AlertCircle,
   Sparkles,
-  
+
   // Navigation & Actions
   ChevronDown,
   ChevronUp,
@@ -31,7 +31,7 @@ export {
   Menu,
   MoreHorizontal,
   MoreVertical,
-  
+
   // User & Profile
   User,
   Users,
@@ -39,7 +39,7 @@ export {
   UserMinus,
   UserCheck,
   UserX,
-  
+
   // Finance & Banking
   CreditCard,
   Wallet,
@@ -60,7 +60,7 @@ export {
   Building2,
   Landmark,
   Repeat,
-  
+
   // Security
   Shield,
   ShieldCheck,
@@ -72,7 +72,7 @@ export {
   Eye,
   EyeOff,
   Snowflake,
-  
+
   // Communication
   Mail,
   Phone,
@@ -82,7 +82,7 @@ export {
   BellOff,
   Send,
   Headphones,
-  
+
   // Documents
   FileText,
   FileCheck,
@@ -94,7 +94,7 @@ export {
   Upload,
   Download,
   Paperclip,
-  
+
   // Settings & Tools
   Settings,
   Cog,
@@ -109,14 +109,14 @@ export {
   Zap,
   Lightbulb,
   Gift,
-  
+
   // Time & Calendar
   Calendar,
   CalendarClock,
   CalendarDays,
   Clock,
   Timer,
-  
+
   // Status
   Loader2,
   Loader,
@@ -125,7 +125,7 @@ export {
   Star,
   StarOff,
   Tag,
-  
+
   // Misc
   Home,
   Building,
@@ -143,7 +143,7 @@ export {
   LogIn,
   HelpCircle,
   Wifi,
-  
+
   // Shopping & Rewards
   ShoppingBag,
   Crown,
@@ -177,4 +177,5 @@ export {
   Camera,
   PenTool,
   ScanFace,
-} from 'lucide-react';
+  Sliders,
+} from "lucide-react";

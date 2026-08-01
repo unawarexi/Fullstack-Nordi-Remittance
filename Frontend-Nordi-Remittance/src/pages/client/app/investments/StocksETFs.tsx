@@ -30,27 +30,17 @@ import {
   CalendarDays,
 } from "@constants/icons";
 
-import {
-  PageContainer,
-  DashCard,
-  StatCard,
-  StatsGrid,
-  StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import PageHeader from "@components/shared/PageHeader";
 import EmptyState from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-  ChartSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton, ChartSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
   useClientInvestments,
   useClientInvestmentProducts,
   useClientPortfolio,
   useClientInvestmentPerformance,
-} from "../../domain/useInvestmentsDomain";
+} from "../../client-usecase/useinvestments-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -70,7 +60,6 @@ const fmtCompact = (n: number) =>
   }).format(n);
 
 const pct = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
-
 
 const StocksETFs: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -95,9 +84,9 @@ const StocksETFs: React.FC = () => {
         (s: any) =>
           !search ||
           (s.symbol ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (s.name ?? "").toLowerCase().includes(search.toLowerCase())
+          (s.name ?? "").toLowerCase().includes(search.toLowerCase()),
       ),
-    [stocks, search]
+    [stocks, search],
   );
 
   return (
@@ -118,68 +107,52 @@ const StocksETFs: React.FC = () => {
           <TableSkeleton rows={6} />
         </>
       ) : (
-        <motion.div
-          variants={dashboardItemVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-6"
-        >
+        <motion.div variants={dashboardItemVariants} initial="hidden" animate="visible" className="space-y-6">
           {/* ── Search ─────────────────────────────────────────────── */}
           <DashCard>
             <div className="relative">
-              <Search
-                size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-              />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <input
                 placeholder="Search stocks or ETFs..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-xl text-xs sm:text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:focus:ring-indigo-400/40 focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-4 text-xs text-gray-900 transition-colors placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40 sm:text-sm"
               />
             </div>
           </DashCard>
 
           {/* ── Stocks Table ───────────────────────────────────────── */}
           <DashCard padding="none">
-            <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                Market Quotes
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Real-time stock and ETF prices
-              </p>
+            <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-800 sm:px-6 sm:py-4">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Market Quotes</h3>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Real-time stock and ETF prices</p>
             </div>
 
             {filtered.length === 0 ? (
               <div className="p-6">
-                <EmptyState
-                  variant="search"
-                  title="No stocks found"
-                  description="Try a different search term."
-                />
+                <EmptyState variant="search" title="No stocks found" description="Try a different search term." />
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-gray-50 dark:bg-gray-800/50">
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs">
                         Symbol
                       </th>
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs">
                         Name
                       </th>
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                      <th className="px-4 py-3 text-right text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs">
                         Price
                       </th>
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                      <th className="px-4 py-3 text-right text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs">
                         Change
                       </th>
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right hidden sm:table-cell">
+                      <th className="hidden px-4 py-3 text-right text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:table-cell sm:text-xs">
                         Market Cap
                       </th>
-                      <th className="px-4 py-3 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
+                      <th className="px-4 py-3 text-right text-[10px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs">
                         Action
                       </th>
                     </tr>
@@ -192,34 +165,28 @@ const StocksETFs: React.FC = () => {
                       return (
                         <tr
                           key={stock.symbol ?? idx}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/30"
                         >
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                          <td className="whitespace-nowrap px-4 py-3">
+                            <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
                               {stock.symbol}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                             {stock.name}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap text-right">
+                          <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                             {fmt(stock.price ?? 0)}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-right">
+                          <td className="whitespace-nowrap px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1">
                               {positive ? (
-                                <TrendingUp
-                                  size={12}
-                                  className="text-emerald-500 dark:text-emerald-400"
-                                />
+                                <TrendingUp size={12} className="text-emerald-500 dark:text-emerald-400" />
                               ) : (
-                                <TrendingDown
-                                  size={12}
-                                  className="text-rose-500 dark:text-rose-400"
-                                />
+                                <TrendingDown size={12} className="text-rose-500 dark:text-rose-400" />
                               )}
                               <span
-                                className={`text-xs sm:text-sm font-medium ${
+                                className={`text-xs font-medium sm:text-sm ${
                                   positive
                                     ? "text-emerald-600 dark:text-emerald-400"
                                     : "text-rose-600 dark:text-rose-400"
@@ -230,14 +197,12 @@ const StocksETFs: React.FC = () => {
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap text-right hidden sm:table-cell">
-                            {stock.marketCap
-                              ? fmtCompact(stock.marketCap)
-                              : "—"}
+                          <td className="hidden whitespace-nowrap px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400 sm:table-cell sm:text-sm">
+                            {stock.marketCap ? fmtCompact(stock.marketCap) : "—"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap text-right">
+                          <td className="whitespace-nowrap px-4 py-3 text-right">
                             <motion.button
-                              className="px-3 py-1.5 bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-400 text-white text-[10px] sm:text-xs font-medium rounded-lg transition-colors"
+                              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 sm:text-xs"
                               whileHover={{ scale: 1.03 }}
                               whileTap={{ scale: 0.97 }}
                             >

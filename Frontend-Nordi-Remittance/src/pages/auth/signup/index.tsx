@@ -27,14 +27,10 @@ import {
 } from "./SignupSteps";
 
 // Schema
-import {
-  signupSchema,
-  signupInitialValues,
-  type SignupFormValues,
-} from "@utils/validators/auth.validators";
+import { signupSchema, signupInitialValues, type SignupFormValues } from "@utils/validators/auth.validators";
 
 // Hooks
-import { useRegisterFullKyc } from "@hooks/queries/useAuth";
+import { useRegisterFullKyc } from "@hooks/api-queries/useAuth";
 
 // Types
 
@@ -101,23 +97,14 @@ const Signup = () => {
     // Setup banks
     const bankOptions: SelectOption[] = Banks.banks
       .map((bank: string) => ({ value: bank, label: bank }))
-      .sort((a: SelectOption, b: SelectOption) =>
-        a.label.localeCompare(b.label),
-      );
+      .sort((a: SelectOption, b: SelectOption) => a.label.localeCompare(b.label));
     setBanks(bankOptions);
   }, []);
 
   // Get fields for current step
   const getStepFields = (currentStep: number): (keyof SignupFormValues)[] => {
     const stepFieldsMap: Record<number, (keyof SignupFormValues)[]> = {
-      1: [
-        "firstName",
-        "lastName",
-        "dateOfBirth",
-        "gender",
-        "nationality",
-        "countryOfResidence",
-      ],
+      1: ["firstName", "lastName", "dateOfBirth", "gender", "nationality", "countryOfResidence"],
       2: [
         "profilePicture",
         "governmentId",
@@ -128,15 +115,7 @@ const Signup = () => {
         "addressDocType",
         "taxIdentificationNumber",
       ],
-      3: [
-        "email",
-        "mobileNumber",
-        "homeAddress",
-        "city",
-        "stateProvince",
-        "zipCode",
-        "country",
-      ],
+      3: ["email", "mobileNumber", "homeAddress", "city", "stateProvince", "zipCode", "country"],
       4: [
         "accountType",
         "currency",
@@ -146,13 +125,7 @@ const Signup = () => {
         "employmentStatus",
         "occupation",
       ],
-      5: [
-        "accountName",
-        "accountNumber",
-        "bankName",
-        "bankAddress",
-        "swiftBic",
-      ],
+      5: ["accountName", "accountNumber", "bankName", "bankAddress", "swiftBic"],
       6: ["password", "confirmPassword", "securityQuestion", "securityAnswer"],
       7: ["agreeToTerms", "agreeToPrivacy", "selfieWithId"],
     };
@@ -320,11 +293,8 @@ const Signup = () => {
       }}
     >
       <FormContainer step={step} totalSteps={TOTAL_STEPS}>
-        <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-white shadow-sm dark:bg-neutral-900 dark:shadow-neutral-900/50 dark:border dark:border-neutral-800">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full rounded-lg bg-white p-4 md:p-6 dark:bg-neutral-900"
-          >
+        <div className="mx-auto flex h-auto w-full flex-col items-center justify-center rounded-lg bg-white shadow-sm dark:border dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-neutral-900/50">
+          <form onSubmit={handleSubmit(onSubmit)} className="w-full rounded-lg bg-white p-4 dark:bg-neutral-900 md:p-6">
             {/* Step Content */}
             <div className="w-full">{renderStep()}</div>
 
@@ -377,8 +347,7 @@ const Signup = () => {
             {/* Error Display */}
             {registerMutation.error && (
               <div className="mt-4 rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-600">
-                {registerMutation.error.message ||
-                  "Registration failed. Please try again."}
+                {registerMutation.error.message || "Registration failed. Please try again."}
               </div>
             )}
           </form>
@@ -399,8 +368,8 @@ const Signup = () => {
               <Check className="h-8 w-8 text-success-600" />
             </div>
             <p className="mb-6 text-neutral-600 dark:text-neutral-300">
-              Your account has been created successfully. Please check your
-              email to verify your account before logging in.
+              Your account has been created successfully. Please check your email to verify your account before logging
+              in.
             </p>
             <Button
               variant="primary"
@@ -415,19 +384,13 @@ const Signup = () => {
         </Modal>
 
         {/* Error Modal */}
-        <Modal
-          isOpen={showError}
-          onClose={() => setShowError(false)}
-          title="Registration Failed"
-          size="md"
-        >
+        <Modal isOpen={showError} onClose={() => setShowError(false)} title="Registration Failed" size="md">
           <div className="py-6 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-error-100">
               <span className="text-2xl">❌</span>
             </div>
             <p className="mb-6 text-neutral-600 dark:text-neutral-300">
-              We couldn't complete your registration. Please check your
-              information and try again.
+              We couldn't complete your registration. Please check your information and try again.
             </p>
             <Button variant="primary" onClick={() => setShowError(false)}>
               Try Again

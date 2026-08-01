@@ -30,8 +30,8 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAllUsers } from "../../domain/useAllUsers";
-import type { UserStatusFilter, KycStatusFilter } from "../../domain/useAllUsers";
+import { useAllUsers } from "../../admin-usecase/useAllUsers";
+import type { UserStatusFilter, KycStatusFilter } from "../../admin-usecase/useAllUsers";
 
 const statusFilterOptions = [
   { value: "all", label: "All Statuses" },
@@ -77,16 +77,29 @@ const OverviewUsers: React.FC = () => {
     if (action === "block") {
       updateStatus.mutate(
         { userId: userId as any, data: { status: "banned" as any, reason: "Blocked by admin" } },
-        { onSuccess: () => { setConfirmModal(null); refetch(); } },
+        {
+          onSuccess: () => {
+            setConfirmModal(null);
+            refetch();
+          },
+        },
       );
     } else if (action === "restrict") {
       updateStatus.mutate(
         { userId: userId as any, data: { status: "suspended" as any, reason: "Restricted by admin" } },
-        { onSuccess: () => { setConfirmModal(null); refetch(); } },
+        {
+          onSuccess: () => {
+            setConfirmModal(null);
+            refetch();
+          },
+        },
       );
     } else if (action === "delete") {
       deleteUser.mutate(userId as any, {
-        onSuccess: () => { setConfirmModal(null); refetch(); },
+        onSuccess: () => {
+          setConfirmModal(null);
+          refetch();
+        },
       });
     }
   };
@@ -98,10 +111,7 @@ const OverviewUsers: React.FC = () => {
         title="User Management"
         subtitle={`${pagination.total} total users`}
         size="sm"
-        breadcrumbs={[
-          { label: "Admin", href: "/admin" },
-          { label: "Users" },
-        ]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Users" }]}
         actions={
           <div className="flex gap-2">
             <ActionButton
@@ -190,7 +200,7 @@ const OverviewUsers: React.FC = () => {
                       {["Name", "Email", "Account Type", "KYC", "Status", "Last Login", "Actions"].map((h) => (
                         <th
                           key={h}
-                          className="px-4 py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
+                          className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs"
                         >
                           {h}
                         </th>
@@ -202,37 +212,35 @@ const OverviewUsers: React.FC = () => {
                       users.map((user, i) => (
                         <motion.tr
                           key={user.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.03, duration: 0.25 }}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          <td className="whitespace-nowrap px-4 py-3">
+                            <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                               {user.firstName} {user.lastName}
                             </p>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.email}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 capitalize whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs capitalize text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.accountType}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={user.kycStatus === "approved" ? "approved" : user.kycStatus} />
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={user.status} />
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {user.lastLogin
-                              ? new Date(user.lastLogin).toLocaleDateString()
-                              : "Never"}
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                            {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <div className="flex items-center gap-1">
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-indigo-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => navigate(`/admin/users/${user.id}`)}
@@ -241,7 +249,7 @@ const OverviewUsers: React.FC = () => {
                                 <Eye size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-amber-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-amber-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => navigate(`/admin/users/${user.id}/edit`)}
@@ -250,28 +258,46 @@ const OverviewUsers: React.FC = () => {
                                 <Edit size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-orange-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-orange-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "restrict" })}
+                                onClick={() =>
+                                  setConfirmModal({
+                                    userId: user.id,
+                                    userName: `${user.firstName} ${user.lastName}`,
+                                    action: "restrict",
+                                  })
+                                }
                                 title="Restrict User"
                               >
                                 <ShieldOff size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-rose-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-rose-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "block" })}
+                                onClick={() =>
+                                  setConfirmModal({
+                                    userId: user.id,
+                                    userName: `${user.firstName} ${user.lastName}`,
+                                    action: "block",
+                                  })
+                                }
                                 title="Block User"
                               >
                                 <Ban size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-red-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => setConfirmModal({ userId: user.id, userName: `${user.firstName} ${user.lastName}`, action: "delete" })}
+                                onClick={() =>
+                                  setConfirmModal({
+                                    userId: user.id,
+                                    userName: `${user.firstName} ${user.lastName}`,
+                                    action: "delete",
+                                  })
+                                }
                                 title="Delete User"
                               >
                                 <Trash2 size={15} />
@@ -296,13 +322,13 @@ const OverviewUsers: React.FC = () => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-800">
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                     Page {pagination.page} of {pagination.totalPages} · {pagination.total} users
                   </p>
                   <div className="flex items-center gap-1">
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page - 1)}
@@ -324,10 +350,10 @@ const OverviewUsers: React.FC = () => {
                       return (
                         <motion.button
                           key={pageNum}
-                          className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors sm:h-8 sm:w-8 ${
                             pagination.page === pageNum
-                              ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                              : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                              : "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                           }`}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -338,7 +364,7 @@ const OverviewUsers: React.FC = () => {
                       );
                     })}
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page + 1)}
@@ -355,19 +381,19 @@ const OverviewUsers: React.FC = () => {
       </motion.div>
       {/* Confirmation Modal */}
       {confirmModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <motion.div
-            className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-md w-full mx-4 border border-gray-200 dark:border-gray-700"
+            className="mx-4 w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-900"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">
               {confirmModal.action === "block" && "Block User"}
               {confirmModal.action === "restrict" && "Restrict User"}
               {confirmModal.action === "delete" && "Delete User"}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
               {confirmModal.action === "block" &&
                 `Are you sure you want to block ${confirmModal.userName}? They will be banned from the platform.`}
               {confirmModal.action === "restrict" &&
@@ -377,13 +403,13 @@ const OverviewUsers: React.FC = () => {
             </p>
             <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 onClick={() => setConfirmModal(null)}
               >
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium rounded-lg text-white ${
+                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${
                   confirmModal.action === "delete"
                     ? "bg-red-600 hover:bg-red-700"
                     : confirmModal.action === "block"

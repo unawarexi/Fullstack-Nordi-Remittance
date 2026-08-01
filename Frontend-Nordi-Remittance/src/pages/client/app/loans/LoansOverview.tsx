@@ -26,22 +26,12 @@ import {
   Banknote,
 } from "@constants/icons";
 
-import {
-  PageContainer,
-  DashCard,
-  StatCard,
-  StatsGrid,
-  StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import PageHeader from "@components/shared/PageHeader";
 import EmptyState from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-  FormSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientLoans, useClientLoanProducts } from "../../domain/useLoansDomain";
+import { useClientLoans, useClientLoanProducts } from "../../client-usecase/useloans-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -69,30 +59,20 @@ const loanStatusMap: Record<string, { label: string; variant: string }> = {
   overdue: { label: "Overdue", variant: "error" },
 };
 
-
 const LoansOverview: React.FC = () => {
   const { loans, isLoading } = useClientLoans();
   const sidebarCollapsed = useUIStore((s) => s.sidebar.isCollapsed);
 
   const stats = useMemo(() => {
-    if (!loans.length)
-      return { totalBorrowed: 0, activeLoans: 0, nextPayment: 0, nextPaymentDate: "" };
+    if (!loans.length) return { totalBorrowed: 0, activeLoans: 0, nextPayment: 0, nextPaymentDate: "" };
 
-    const totalBorrowed = loans.reduce(
-      (sum: number, l: any) => sum + (l.principalAmount ?? l.amount ?? 0),
-      0
-    );
-    const activeLoans = loans.filter(
-      (l: any) => l.status === "active" || l.status === "approved"
-    ).length;
+    const totalBorrowed = loans.reduce((sum: number, l: any) => sum + (l.principalAmount ?? l.amount ?? 0), 0);
+    const activeLoans = loans.filter((l: any) => l.status === "active" || l.status === "approved").length;
 
     const activeLoansList = loans.filter((l: any) => l.status === "active");
     const upcoming = activeLoansList
       .filter((l: any) => l.nextPaymentDate)
-      .sort(
-        (a: any, b: any) =>
-          new Date(a.nextPaymentDate).getTime() - new Date(b.nextPaymentDate).getTime()
-      );
+      .sort((a: any, b: any) => new Date(a.nextPaymentDate).getTime() - new Date(b.nextPaymentDate).getTime());
     const nextPayment = upcoming[0]?.nextPaymentAmount ?? upcoming[0]?.emiAmount ?? 0;
     const nextPaymentDate = upcoming[0]?.nextPaymentDate ?? "";
 
@@ -116,12 +96,7 @@ const LoansOverview: React.FC = () => {
           <TableSkeleton rows={5} />
         </>
       ) : (
-        <motion.div
-          variants={dashboardItemVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-6"
-        >
+        <motion.div variants={dashboardItemVariants} initial="hidden" animate="visible" className="space-y-6">
           {/* Stats */}
           <StatsGrid cols={3}>
             <StatCard
@@ -146,11 +121,9 @@ const LoansOverview: React.FC = () => {
 
           {/* Loans Table */}
           <DashCard padding="none">
-            <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                Your Loans
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-800 sm:px-6 sm:py-4">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Your Loans</h3>
+              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                 All loan accounts and their current status
               </p>
             </div>
@@ -168,22 +141,22 @@ const LoansOverview: React.FC = () => {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-gray-50 dark:bg-gray-800/50">
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Loan ID
                       </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Type
                       </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Amount
                       </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         EMI
                       </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Tenure
                       </th>
-                      <th className="px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Status
                       </th>
                     </tr>
@@ -197,24 +170,24 @@ const LoansOverview: React.FC = () => {
                       return (
                         <tr
                           key={loan.id ?? idx}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/30"
                         >
-                          <td className="px-4 py-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                             {loan.loanId ?? loan.id ?? `LN-${idx + 1}`}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                             {loan.loanType ?? loan.type ?? "Personal"}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-900 dark:text-white sm:text-sm">
                             {fmt(loan.principalAmount ?? loan.amount ?? 0)}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-900 dark:text-white sm:text-sm">
                             {loan.emiAmount ? fmt(loan.emiAmount) : "—"}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
                             {loan.tenure ? `${loan.tenure} mo` : "—"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={status.label} />
                           </td>
                         </tr>

@@ -30,7 +30,7 @@ import {
   StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
-import { useTransactionManagement } from "../../domain/useTransactionManagement";
+import { useTransactionManagement } from "../../admin-usecase/useTransactionManagement";
 import { formatCurrency } from "@core/algo/financial";
 
 const statusOptions = [
@@ -91,10 +91,7 @@ export default function AdminTransactions() {
       <PageHeader
         title="Transaction Management"
         subtitle="Monitor, review, and manage all platform transactions"
-        breadcrumbs={[
-          { label: "Admin", href: "/admin/dashboard" },
-          { label: "Transactions" },
-        ]}
+        breadcrumbs={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Transactions" }]}
         actions={
           <div className="flex gap-2">
             <ActionButton
@@ -108,14 +105,46 @@ export default function AdminTransactions() {
       />
 
       <StatsGrid>
-        <StatCard label="Total Transactions" value={stats.total.toLocaleString()} icon={<Activity size={18} />} iconColor="from-blue-500 to-blue-600" change={`${stats.processing} processing`} positive index={0} />
-        <StatCard label="Total Volume" value={formatCurrency(stats.volume, "EUR")} icon={<DollarSign size={18} />} iconColor="from-emerald-500 to-emerald-600" change={`${stats.completed} completed`} positive index={1} />
-        <StatCard label="Completed" value={stats.completed} icon={<CheckCircle size={18} />} iconColor="from-green-500 to-green-600" change="" positive index={2} />
-        <StatCard label="Pending Review" value={stats.pending} icon={<Clock size={18} />} iconColor="from-amber-500 to-amber-600" change={`${stats.failed} failed`} positive={false} index={3} />
+        <StatCard
+          label="Total Transactions"
+          value={stats.total.toLocaleString()}
+          icon={<Activity size={18} />}
+          iconColor="from-blue-500 to-blue-600"
+          change={`${stats.processing} processing`}
+          positive
+          index={0}
+        />
+        <StatCard
+          label="Total Volume"
+          value={formatCurrency(stats.volume, "EUR")}
+          icon={<DollarSign size={18} />}
+          iconColor="from-emerald-500 to-emerald-600"
+          change={`${stats.completed} completed`}
+          positive
+          index={1}
+        />
+        <StatCard
+          label="Completed"
+          value={stats.completed}
+          icon={<CheckCircle size={18} />}
+          iconColor="from-green-500 to-green-600"
+          change=""
+          positive
+          index={2}
+        />
+        <StatCard
+          label="Pending Review"
+          value={stats.pending}
+          icon={<Clock size={18} />}
+          iconColor="from-amber-500 to-amber-600"
+          change={`${stats.failed} failed`}
+          positive={false}
+          index={3}
+        />
       </StatsGrid>
 
       {/* Time Filters */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
         {timeFilters.map((t) => (
           <FilterPill
             key={t}
@@ -127,7 +156,11 @@ export default function AdminTransactions() {
       </div>
 
       {/* Search & Filters */}
-      <FilterBar searchValue={filters.search} onSearchChange={(v) => updateFilter("search", v)} searchPlaceholder="Search by user, email, or reference...">
+      <FilterBar
+        searchValue={filters.search}
+        onSearchChange={(v) => updateFilter("search", v)}
+        searchPlaceholder="Search by user, email, or reference..."
+      >
         <FilterSelect value={filters.status} onChange={(v) => updateFilter("status", v)} options={statusOptions} />
         <FilterSelect value={filters.type} onChange={(v) => updateFilter("type", v)} options={typeOptions} />
         {hasActiveFilters && (
@@ -135,7 +168,7 @@ export default function AdminTransactions() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={resetFilters}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 flex items-center gap-1"
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 dark:text-gray-400"
           >
             <RotateCcw size={12} /> Reset
           </motion.button>
@@ -146,7 +179,7 @@ export default function AdminTransactions() {
       {isLoading ? (
         <DashCard>
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 size={24} className="animate-spin text-blue-500 mb-2" />
+            <Loader2 size={24} className="mb-2 animate-spin text-blue-500" />
             <p className="text-xs text-gray-500 dark:text-gray-400">Loading transactions...</p>
           </div>
         </DashCard>
@@ -158,7 +191,12 @@ export default function AdminTransactions() {
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
                   {["Transaction", "User", "Type", "Amount", "Status", "Date", "Actions"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs"
+                    >
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -176,14 +214,16 @@ export default function AdminTransactions() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0, transition: { delay: i * 0.02 } }}
                         exit={{ opacity: 0, x: -20 }}
-                        className="border-b border-gray-100 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors"
+                        className="border-b border-gray-100 transition-colors hover:bg-gray-50 dark:border-gray-800/50 dark:hover:bg-gray-800/30"
                       >
                         <td className="px-4 py-3">
-                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{tx.reference ?? tx.id}</p>
-                          <p className="text-[10px] text-gray-400 font-mono">{tx.id?.substring(0, 12)}...</p>
+                          <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
+                            {tx.reference ?? tx.id}
+                          </p>
+                          <p className="font-mono text-[10px] text-gray-400">{tx.id?.substring(0, 12)}...</p>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="text-xs sm:text-sm text-gray-900 dark:text-white">{userName}</p>
+                          <p className="text-xs text-gray-900 dark:text-white sm:text-sm">{userName}</p>
                           <p className="text-[10px] text-gray-400">{userEmail}</p>
                         </td>
                         <td className="px-4 py-3">
@@ -192,7 +232,9 @@ export default function AdminTransactions() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`text-xs sm:text-sm font-semibold ${txType === "deposit" ? "text-emerald-600 dark:text-emerald-400" : txType === "withdrawal" ? "text-rose-600 dark:text-rose-400" : "text-gray-900 dark:text-white"}`}>
+                          <span
+                            className={`text-xs font-semibold sm:text-sm ${txType === "deposit" ? "text-emerald-600 dark:text-emerald-400" : txType === "withdrawal" ? "text-rose-600 dark:text-rose-400" : "text-gray-900 dark:text-white"}`}
+                          >
                             {txType === "deposit" ? "+" : txType === "withdrawal" ? "-" : ""}
                             {currencySymbol(currency)}
                             {(tx.amount ?? 0).toLocaleString()}
@@ -202,21 +244,45 @@ export default function AdminTransactions() {
                           <StatusBadge status={tx.status} />
                         </td>
                         <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(tx.createdAt ?? tx.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                          {new Date(tx.createdAt ?? tx.date).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
                           <br />
-                          <span className="text-[10px]">{new Date(tx.createdAt ?? tx.date).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+                          <span className="text-[10px]">
+                            {new Date(tx.createdAt ?? tx.date).toLocaleTimeString("en-GB", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">
-                            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => setSelectedTxId(tx.id)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => setSelectedTxId(tx.id)}
+                              className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                            >
                               <Eye size={14} />
                             </motion.button>
                             {tx.status === "pending" && (
                               <>
-                                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => approveTransaction(tx.id)} className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  onClick={() => approveTransaction(tx.id)}
+                                  className="rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/50"
+                                >
                                   <CheckCircle size={14} />
                                 </motion.button>
-                                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => rejectTransaction(tx.id, "Rejected by admin")} className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+                                <motion.button
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  onClick={() => rejectTransaction(tx.id, "Rejected by admin")}
+                                  className="rounded-lg p-1.5 text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50"
+                                >
                                   <XCircle size={14} />
                                 </motion.button>
                               </>
@@ -235,29 +301,46 @@ export default function AdminTransactions() {
             <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
               <AlertTriangle size={32} className="mb-2" />
               <p className="text-sm">No transactions found</p>
-              <p className="text-xs mt-1">Try adjusting your filters</p>
+              <p className="mt-1 text-xs">Try adjusting your filters</p>
             </div>
           )}
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-800">
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
               Showing {pagination.items.length} of {pagination.total} transactions
             </p>
             <div className="flex items-center gap-1">
-              <motion.button whileTap={{ scale: 0.95 }} onClick={() => setPage(page - 1)} disabled={!pagination.hasPrev} className="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setPage(page - 1)}
+                disabled={!pagination.hasPrev}
+                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
                 Previous
               </motion.button>
               {pageNumbers.map((p, idx) =>
                 p === "..." ? (
-                  <span key={`e-${idx}`} className="px-1 text-xs text-gray-400">...</span>
+                  <span key={`e-${idx}`} className="px-1 text-xs text-gray-400">
+                    ...
+                  </span>
                 ) : (
-                  <motion.button key={p} whileTap={{ scale: 0.95 }} onClick={() => setPage(p as number)} className={`px-2.5 py-1.5 text-xs rounded-lg border ${page === p ? "border-blue-500 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-medium" : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
+                  <motion.button
+                    key={p}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setPage(p as number)}
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs ${page === p ? "border-blue-500 bg-blue-50 font-medium text-blue-600 dark:bg-blue-950/50 dark:text-blue-400" : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"}`}
+                  >
                     {p}
                   </motion.button>
                 ),
               )}
-              <motion.button whileTap={{ scale: 0.95 }} onClick={() => setPage(page + 1)} disabled={!pagination.hasNext} className="px-3 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setPage(page + 1)}
+                disabled={!pagination.hasNext}
+                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
                 Next
               </motion.button>
             </div>

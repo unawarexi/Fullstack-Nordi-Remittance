@@ -6,20 +6,34 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  Target, Plus, TrendingUp, PiggyBank, Calendar, Clock,
-  DollarSign, ArrowUpRight, Repeat, Percent, BarChart3,
-  Sparkles, ChevronRight, Trash2, Edit3, ToggleLeft, ToggleRight,
+  Target,
+  Plus,
+  TrendingUp,
+  PiggyBank,
+  Calendar,
+  Clock,
+  DollarSign,
+  ArrowUpRight,
+  Repeat,
+  Percent,
+  BarChart3,
+  Sparkles,
+  ChevronRight,
+  Trash2,
+  Edit3,
+  ToggleLeft,
+  ToggleRight,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, ProgressBar,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, ProgressBar } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useClientSavingsGoals, useCreateSavingsGoal, useClientSavingsGoalProgress,
-} from "../../domain/useSavingsDomain";
+  useClientSavingsGoals,
+  useCreateSavingsGoal,
+  useClientSavingsGoalProgress,
+} from "../../client-usecase/usesavinga-client-usecase";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
 
@@ -29,14 +43,12 @@ import { useToastStore } from "@store/toast.store";
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const pct = (saved: number, target: number) =>
-  target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
+const pct = (saved: number, target: number) => (target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0);
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
 
-const labelCls =
-  "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
 const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "🏖️", "📱", "🎮", "🩺", "🐶"];
 
@@ -102,17 +114,13 @@ const AutoSaveRules: React.FC = () => {
   const { showToast } = useToastStore();
 
   const toggle = (id: string) => {
-    setRules((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r)),
-    );
+    setRules((prev) => prev.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r)));
     const rule = rules.find((r) => r.id === id);
     showToast(`${rule?.name} ${rule?.enabled ? "disabled" : "enabled"}`, "success");
   };
 
   const activeCount = rules.filter((r) => r.enabled).length;
-  const totalAutoSave = rules
-    .filter((r) => r.enabled && r.amount)
-    .reduce((s, r) => s + (r.amount ?? 0), 0);
+  const totalAutoSave = rules.filter((r) => r.enabled && r.amount).reduce((s, r) => s + (r.amount ?? 0), 0);
 
   return (
     <PageContainer>
@@ -130,16 +138,16 @@ const AutoSaveRules: React.FC = () => {
 
       {/* Summary strip */}
       <DashCard className="mb-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
               {activeCount} Active Rule{activeCount !== 1 && "s"}
             </h3>
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
               Estimated auto-save: {fmt(totalAutoSave)}/mo from scheduled rules
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
             <Sparkles size={14} />
             Saving on autopilot
           </div>
@@ -150,30 +158,20 @@ const AutoSaveRules: React.FC = () => {
       <div className="space-y-4">
         {rules.map((rule) => (
           <motion.div key={rule.id} variants={dashboardItemVariants}>
-            <DashCard
-              className={`transition-colors ${
-                rule.enabled
-                  ? "border-indigo-200 dark:border-indigo-800"
-                  : ""
-              }`}
-            >
+            <DashCard className={`transition-colors ${rule.enabled ? "border-indigo-200 dark:border-indigo-800" : ""}`}>
               <div className="flex items-start gap-4">
                 {/* Icon */}
-                <div
-                  className={`p-2.5 rounded-xl bg-gradient-to-br ${rule.color} text-white shrink-0`}
-                >
+                <div className={`rounded-xl bg-gradient-to-br p-2.5 ${rule.color} shrink-0 text-white`}>
                   {rule.icon}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                      {rule.name}
-                    </h4>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">{rule.name}</h4>
                     <button
                       onClick={() => toggle(rule.id)}
-                      className="shrink-0 ml-3"
+                      className="ml-3 shrink-0"
                       aria-label={`Toggle ${rule.name}`}
                     >
                       {rule.enabled ? (
@@ -183,27 +181,25 @@ const AutoSaveRules: React.FC = () => {
                       )}
                     </button>
                   </div>
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    {rule.description}
-                  </p>
+                  <p className="mb-2 text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">{rule.description}</p>
 
                   {/* Meta badges */}
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 sm:text-xs">
                       {rule.type === "round-up" && "Round-Up"}
                       {rule.type === "scheduled" && rule.frequency}
                       {rule.type === "percentage" && `${rule.percentage}%`}
                     </span>
                     {rule.amount != null && (
-                      <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 sm:text-xs">
                         <DollarSign size={10} /> {rule.amount}
                       </span>
                     )}
                     <span
-                      className={`inline-flex items-center text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium sm:text-xs ${
                         rule.enabled
-                          ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
+                          : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
                       {rule.enabled ? "Active" : "Paused"}

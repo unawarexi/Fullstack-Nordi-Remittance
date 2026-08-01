@@ -26,22 +26,12 @@ import {
   Banknote,
 } from "@constants/icons";
 
-import {
-  PageContainer,
-  DashCard,
-  StatCard,
-  StatsGrid,
-  StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import PageHeader from "@components/shared/PageHeader";
 import EmptyState from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-  FormSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientLoans, useClientLoanProducts } from "../../domain/useLoansDomain";
+import { useClientLoans, useClientLoanProducts } from "../../client-usecase/useloans-client-usecase";
 import { useUIStore } from "@store/ui.store";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -68,7 +58,6 @@ const loanStatusMap: Record<string, { label: string; variant: string }> = {
   closed: { label: "Closed", variant: "default" },
   overdue: { label: "Overdue", variant: "error" },
 };
-
 
 const LoanCalculator: React.FC = () => {
   const sidebarCollapsed = useUIStore((s) => s.sidebar.isCollapsed);
@@ -106,25 +95,19 @@ const LoanCalculator: React.FC = () => {
         variants={dashboardItemVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6"
+        className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-5"
       >
         {/* Input Panel */}
         <div className="lg:col-span-3">
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-6">
-              Loan Parameters
-            </h3>
+            <h3 className="mb-6 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Loan Parameters</h3>
 
             <div className="space-y-6">
               {/* Amount Slider */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Loan Amount
-                  </label>
-                  <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
-                    {fmt(amount)}
-                  </span>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm">Loan Amount</label>
+                  <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">{fmt(amount)}</span>
                 </div>
                 <input
                   type="range"
@@ -135,28 +118,22 @@ const LoanCalculator: React.FC = () => {
                   onChange={(e) => {
                     setAmount(Number(e.target.value));
                   }}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-200 dark:bg-gray-700 accent-blue-600"
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-blue-600 dark:bg-gray-700"
                 />
-                <div className="flex justify-between mt-1">
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {fmt(1000)}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {fmt(100000)}
-                  </span>
+                <div className="mt-1 flex justify-between">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">{fmt(1000)}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">{fmt(100000)}</span>
                 </div>
               </div>
 
               {/* Tenure Slider */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Loan Tenure
-                  </label>
-                  <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm">Loan Tenure</label>
+                  <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
                     {tenure} months
                     {tenure >= 12 && (
-                      <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">
+                      <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
                         ({(tenure / 12).toFixed(1)} yrs)
                       </span>
                     )}
@@ -171,9 +148,9 @@ const LoanCalculator: React.FC = () => {
                   onChange={(e) => {
                     setTenure(Number(e.target.value));
                   }}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-200 dark:bg-gray-700 accent-blue-600"
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-blue-600 dark:bg-gray-700"
                 />
-                <div className="flex justify-between mt-1">
+                <div className="mt-1 flex justify-between">
                   <span className="text-xs text-gray-400 dark:text-gray-500">6 mo</span>
                   <span className="text-xs text-gray-400 dark:text-gray-500">360 mo</span>
                 </div>
@@ -181,7 +158,7 @@ const LoanCalculator: React.FC = () => {
 
               {/* Interest Rate Input */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm">
                   Interest Rate (% per annum)
                 </label>
                 <div className="relative">
@@ -194,15 +171,15 @@ const LoanCalculator: React.FC = () => {
                     onChange={(e) => {
                       setInterestRate(Number(e.target.value));
                     }}
-                    className="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-400"
                   />
-                  <Percent className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <Percent className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 </div>
               </div>
 
               {/* Info */}
-              <div className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-sm font-medium">
-                <Calculator className="w-4 h-4" />
+              <div className="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
+                <Calculator className="h-4 w-4" />
                 EMI updates automatically
               </div>
             </div>
@@ -210,58 +187,42 @@ const LoanCalculator: React.FC = () => {
         </div>
 
         {/* Results Panel */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6 lg:col-span-2">
           {/* EMI Result */}
           <DashCard>
             <div className="text-center">
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                Monthly EMI
-              </p>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-                {fmt(displayEmi)}
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                Estimated
-              </p>
+              <p className="mb-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Monthly EMI</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">{fmt(displayEmi)}</p>
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Estimated</p>
             </div>
           </DashCard>
 
           {/* Breakdown */}
           <DashCard>
-            <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-4">
-              Payment Breakdown
-            </h4>
+            <h4 className="mb-4 text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">Payment Breakdown</h4>
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between border-b border-gray-100 py-2 dark:border-gray-800">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                  <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Principal Amount
-                  </span>
+                  <DollarSign className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Principal Amount</span>
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                  {fmt(amount)}
-                </span>
+                <span className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{fmt(amount)}</span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between border-b border-gray-100 py-2 dark:border-gray-800">
                 <div className="flex items-center gap-2">
-                  <Percent className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-                  <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Total Interest
-                  </span>
+                  <Percent className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Total Interest</span>
                 </div>
-                <span className="text-xs sm:text-sm font-medium text-amber-600 dark:text-amber-400">
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400 sm:text-sm">
                   {fmt(displayTotalInterest)}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
-                  <Banknote className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                  <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Total Payment
-                  </span>
+                  <Banknote className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Total Payment</span>
                 </div>
-                <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
                   {fmt(displayTotalPayment)}
                 </span>
               </div>
@@ -270,45 +231,36 @@ const LoanCalculator: React.FC = () => {
 
           {/* Ratio Visual */}
           <DashCard>
-            <h4 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-3">
+            <h4 className="mb-3 text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
               Principal vs Interest
             </h4>
-            <div className="w-full h-4 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 flex">
+            <div className="flex h-4 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
               <div
-                className="h-full bg-blue-500 dark:bg-blue-400 transition-all duration-500"
+                className="h-full bg-blue-500 transition-all duration-500 dark:bg-blue-400"
                 style={{
                   width: `${displayTotalPayment > 0 ? (amount / displayTotalPayment) * 100 : 50}%`,
                 }}
               />
               <div
-                className="h-full bg-amber-500 dark:bg-amber-400 transition-all duration-500"
+                className="h-full bg-amber-500 transition-all duration-500 dark:bg-amber-400"
                 style={{
-                  width: `${
-                    displayTotalPayment > 0
-                      ? (displayTotalInterest / displayTotalPayment) * 100
-                      : 50
-                  }%`,
+                  width: `${displayTotalPayment > 0 ? (displayTotalInterest / displayTotalPayment) * 100 : 50}%`,
                 }}
               />
             </div>
-            <div className="flex items-center justify-between mt-2">
+            <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-blue-400" />
+                <div className="h-2.5 w-2.5 rounded-full bg-blue-500 dark:bg-blue-400" />
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Principal (
-                  {displayTotalPayment > 0
-                    ? ((amount / displayTotalPayment) * 100).toFixed(1)
-                    : "50"}
+                  Principal ({displayTotalPayment > 0 ? ((amount / displayTotalPayment) * 100).toFixed(1) : "50"}
                   %)
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+                <div className="h-2.5 w-2.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   Interest (
-                  {displayTotalPayment > 0
-                    ? ((displayTotalInterest / displayTotalPayment) * 100).toFixed(1)
-                    : "50"}
+                  {displayTotalPayment > 0 ? ((displayTotalInterest / displayTotalPayment) * 100).toFixed(1) : "50"}
                   %)
                 </span>
               </div>

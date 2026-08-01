@@ -9,3 +9,4 @@ export * from "./pagination";
 export * from "./financial";
 export * from "./fraud";
 export * from "./structures";
+export * from "./parsers";

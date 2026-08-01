@@ -20,11 +20,8 @@ import {
   Info,
   Lock,
 } from "@constants/icons";
-import { useClientWallets } from "../../domain/useAccountsDomain";
-import {
-  useTransferToUser,
-  useClientRecentRecipients,
-} from "../../domain/useTransactionsDomain";
+import { useClientWallets } from "../../client-usecase/useaccounts-client-usecase";
+import { useTransferToUser, useClientRecentRecipients } from "../../client-usecase/usetransaction-client-usecase";
 import {
   TransferLayout,
   StepIndicator,
@@ -43,11 +40,7 @@ import {
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const STEPS: WizardStep[] = [
-  { label: "Recipient" },
-  { label: "Payment" },
-  { label: "Review" },
-];
+const STEPS: WizardStep[] = [{ label: "Recipient" }, { label: "Payment" }, { label: "Review" }];
 
 const P2P_NETWORKS = [
   { value: "zelle", label: "Zelle", fee: "Free", eta: "Instant" },
@@ -60,9 +53,7 @@ const LIMITS = { perTransaction: 2000, daily: 5000, remaining: 4500 };
 
 // ─── Validation ──────────────────────────────────────────────────────────────
 const schema = Yup.object({
-  recipientMethod: Yup.string()
-    .oneOf(["contact", "phone", "email"])
-    .required(),
+  recipientMethod: Yup.string().oneOf(["contact", "phone", "email"]).required(),
   recipientId: Yup.string().when("recipientMethod", {
     is: "contact",
     then: (s) => s.required("Select a contact"),
@@ -70,10 +61,7 @@ const schema = Yup.object({
   }),
   recipientPhone: Yup.string().when("recipientMethod", {
     is: "phone",
-    then: (s) =>
-      s
-        .required("Phone number is required")
-        .matches(/^\+?[1-9]\d{9,14}$/, "Invalid phone number"),
+    then: (s) => s.required("Phone number is required").matches(/^\+?[1-9]\d{9,14}$/, "Invalid phone number"),
     otherwise: (s) => s.notRequired(),
   }),
   recipientEmail: Yup.string().when("recipientMethod", {
@@ -104,8 +92,7 @@ const QuickTransfer: React.FC = () => {
 
   // Hooks
   const { wallets: walletsArr, isLoading: walletsLoading } = useClientWallets();
-  const { recipients: recentArr, isLoading: recipientsLoading } =
-    useClientRecentRecipients(20);
+  const { recipients: recentArr, isLoading: recipientsLoading } = useClientRecentRecipients(20);
   const transferToUser = useTransferToUser();
 
   const wallets: AccountOption[] = walletsArr;
@@ -116,9 +103,7 @@ const QuickTransfer: React.FC = () => {
       contactSearch
         ? recentContacts.filter(
             (c: any) =>
-              (c.firstName || c.name || "")
-                .toLowerCase()
-                .includes(contactSearch.toLowerCase()) ||
+              (c.firstName || c.name || "").toLowerCase().includes(contactSearch.toLowerCase()) ||
               (c.email || c.phone || "").includes(contactSearch),
           )
         : recentContacts,
@@ -141,9 +126,7 @@ const QuickTransfer: React.FC = () => {
     validationSchema: schema,
     onSubmit: (values) => {
       const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
-      const contact = recentContacts.find(
-        (c: any) => c.id === values.recipientId,
-      );
+      const contact = recentContacts.find((c: any) => c.id === values.recipientId);
       const email =
         values.recipientMethod === "email"
           ? values.recipientEmail
@@ -164,10 +147,7 @@ const QuickTransfer: React.FC = () => {
           onSuccess: (data: any) => {
             setResult({
               success: true,
-              reference:
-                data?.referenceNumber ||
-                data?.id ||
-                `QT${Date.now().toString().slice(-9)}`,
+              reference: data?.referenceNumber || data?.id || `QT${Date.now().toString().slice(-9)}`,
             });
           },
           onError: () => {
@@ -178,16 +158,7 @@ const QuickTransfer: React.FC = () => {
     },
   });
 
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setTouched,
-  } = formik;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur, handleSubmit, setTouched } = formik;
 
   const goNext = async () => {
     const fieldsByStep: Record<number, string[]> = {
@@ -212,16 +183,12 @@ const QuickTransfer: React.FC = () => {
 
   // Derived
   const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
-  const selectedContact = recentContacts.find(
-    (c: any) => c.id === values.recipientId,
-  );
+  const selectedContact = recentContacts.find((c: any) => c.id === values.recipientId);
   const networkInfo = P2P_NETWORKS.find((n) => n.value === values.network);
 
   const recipientDisplay =
     values.recipientMethod === "contact"
-      ? selectedContact?.firstName ||
-        selectedContact?.name ||
-        "—"
+      ? selectedContact?.firstName || selectedContact?.name || "—"
       : values.recipientMethod === "phone"
         ? values.recipientPhone
         : values.recipientEmail;
@@ -268,12 +235,8 @@ const QuickTransfer: React.FC = () => {
   return (
     <TransferLayout>
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          Quick Transfer
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Send money instantly to friends and family.
-        </p>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Quick Transfer</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Send money instantly to friends and family.</p>
       </div>
 
       <TCard>
@@ -286,7 +249,7 @@ const QuickTransfer: React.FC = () => {
           <div className="space-y-6">
             <TCard title="Choose Recipient" icon={<Users size={18} />}>
               {/* Method tabs */}
-              <div className="flex gap-2 mb-5">
+              <div className="mb-5 flex gap-2">
                 {[
                   { key: "contact" as const, label: "Contacts", icon: <Users size={14} /> },
                   { key: "phone" as const, label: "Phone", icon: <Phone size={14} /> },
@@ -301,10 +264,10 @@ const QuickTransfer: React.FC = () => {
                       setFieldValue("recipientPhone", "");
                       setFieldValue("recipientEmail", "");
                     }}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                    className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                       values.recipientMethod === t.key
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400"
-                        : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
                     }`}
                   >
                     {t.icon} {t.label}
@@ -315,66 +278,49 @@ const QuickTransfer: React.FC = () => {
               {values.recipientMethod === "contact" && (
                 <div className="space-y-3">
                   <div className="relative">
-                    <Search
-                      size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       value={contactSearch}
                       onChange={(e) => setContactSearch(e.target.value)}
                       placeholder="Search contacts…"
-                      className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
                     />
                   </div>
 
                   {recipientsLoading ? (
                     <div className="grid gap-2 sm:grid-cols-2">
                       {[1, 2, 3, 4].map((i) => (
-                        <div
-                          key={i}
-                          className="h-14 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"
-                        />
+                        <div key={i} className="h-14 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
                       ))}
                     </div>
                   ) : filteredContacts.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
-                      No contacts found
-                    </p>
+                    <p className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">No contacts found</p>
                   ) : (
-                    <div className="grid gap-2 sm:grid-cols-2 max-h-72 overflow-y-auto pr-1">
+                    <div className="grid max-h-72 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
                       {filteredContacts.map((c: any) => (
                         <button
                           key={c.id}
                           type="button"
                           onClick={() => setFieldValue("recipientId", c.id)}
-                          className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                          className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
                             values.recipientId === c.id
                               ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
-                              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                           }`}
                         >
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-                            {(c.firstName || c.name || "?")
-                              .charAt(0)
-                              .toUpperCase()}
+                          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 text-xs font-bold text-white">
+                            {(c.firstName || c.name || "?").charAt(0).toUpperCase()}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {`${c.firstName || ""} ${c.lastName || ""}`.trim() ||
-                                c.name ||
-                                "—"}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                              {`${c.firstName || ""} ${c.lastName || ""}`.trim() || c.name || "—"}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                               {c.email || c.phone || "—"}
                             </p>
                           </div>
-                          {c.isFavorite && (
-                            <Star
-                              size={12}
-                              className="text-amber-400 flex-shrink-0"
-                            />
-                          )}
+                          {c.isFavorite && <Star size={12} className="flex-shrink-0 text-amber-400" />}
                         </button>
                       ))}
                     </div>
@@ -434,14 +380,10 @@ const QuickTransfer: React.FC = () => {
               ].map((l) => (
                 <div
                   key={l.label}
-                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center"
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-center dark:border-gray-800 dark:bg-gray-900"
                 >
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {l.label}
-                  </p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">
-                    {l.value}
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{l.label}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{l.value}</p>
                 </div>
               ))}
             </div>
@@ -466,14 +408,10 @@ const QuickTransfer: React.FC = () => {
                   icon={<DollarSign size={16} />}
                 />
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Sending to
-                  </label>
-                  <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Sending to</label>
+                  <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 dark:border-gray-700 dark:bg-gray-800">
                     <User size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-900 dark:text-white truncate">
-                      {recipientDisplay}
-                    </span>
+                    <span className="truncate text-sm text-gray-900 dark:text-white">{recipientDisplay}</span>
                   </div>
                 </div>
               </div>
@@ -487,9 +425,7 @@ const QuickTransfer: React.FC = () => {
                 loading={walletsLoading}
               />
               {errors.fromAccount && touched.fromAccount && (
-                <p className="text-xs text-red-500 mt-2">
-                  {errors.fromAccount}
-                </p>
+                <p className="mt-2 text-xs text-red-500">{errors.fromAccount}</p>
               )}
             </TCard>
 
@@ -500,22 +436,16 @@ const QuickTransfer: React.FC = () => {
                     key={n.value}
                     type="button"
                     onClick={() => setFieldValue("network", n.value)}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`rounded-lg border p-3 text-left transition-all ${
                       values.network === n.value
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/50"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        ? "border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500/50 dark:bg-indigo-950/30"
+                        : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                     }`}
                   >
-                    <span className="text-sm font-medium text-gray-900 dark:text-white block">
-                      {n.label}
-                    </span>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Fee: {n.fee}
-                      </span>
-                      <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                        {n.eta}
-                      </span>
+                    <span className="block text-sm font-medium text-gray-900 dark:text-white">{n.label}</span>
+                    <div className="mt-1 flex items-center gap-3">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Fee: {n.fee}</span>
+                      <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">{n.eta}</span>
                     </div>
                   </button>
                 ))}
@@ -540,20 +470,11 @@ const QuickTransfer: React.FC = () => {
         {step === 2 && (
           <div className="space-y-6">
             <ReviewSection title="Transfer Summary" icon={<Send size={16} />}>
-              <ReviewRow
-                label="Amount"
-                value={formatCurrency(values.amount)}
-                highlight
-              />
-              <ReviewRow
-                label="Network"
-                value={networkInfo?.label || "—"}
-              />
+              <ReviewRow label="Amount" value={formatCurrency(values.amount)} highlight />
+              <ReviewRow label="Network" value={networkInfo?.label || "—"} />
               <ReviewRow label="Fee" value={networkInfo?.fee || "Free"} />
               <ReviewRow label="ETA" value={networkInfo?.eta || "—"} />
-              {values.memo && (
-                <ReviewRow label="Memo" value={values.memo} />
-              )}
+              {values.memo && <ReviewRow label="Memo" value={values.memo} />}
             </ReviewSection>
 
             <ReviewSection title="Recipient" icon={<User size={16} />}>
@@ -570,25 +491,11 @@ const QuickTransfer: React.FC = () => {
               />
             </ReviewSection>
 
-            <ReviewSection
-              title="Payment Source"
-              icon={<CreditCard size={16} />}
-            >
-              <ReviewRow
-                label="Account"
-                value={
-                  selectedAccount?.name ||
-                  selectedAccount?.walletType ||
-                  "—"
-                }
-              />
+            <ReviewSection title="Payment Source" icon={<CreditCard size={16} />}>
+              <ReviewRow label="Account" value={selectedAccount?.name || selectedAccount?.walletType || "—"} />
               <ReviewRow
                 label="Balance"
-                value={
-                  typeof selectedAccount?.balance === "number"
-                    ? formatCurrency(selectedAccount.balance)
-                    : "—"
-                }
+                value={typeof selectedAccount?.balance === "number" ? formatCurrency(selectedAccount.balance) : "—"}
               />
             </ReviewSection>
 
@@ -621,7 +528,7 @@ const QuickTransfer: React.FC = () => {
         loading={transferToUser.isPending}
       />
 
-      <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 justify-center pb-4">
+      <div className="flex items-center justify-center gap-2 pb-4 text-xs text-gray-400 dark:text-gray-500">
         <Info size={12} />
         <span>Quick transfers are instant and secure.</span>
       </div>

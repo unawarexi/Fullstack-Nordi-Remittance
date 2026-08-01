@@ -19,14 +19,8 @@ import {
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-} from "@components/skeletons";
-import {
-  useClientLoans,
-  useClientLoanProducts,
-} from "../../domain/useLoansDomain";
+import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
+import { useClientLoans, useClientLoanProducts } from "../../client-usecase/useloans-client-usecase";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -64,14 +58,20 @@ const Loans_Credits: React.FC = () => {
         <PageHeader
           title="Loans & Credit"
           subtitle="Manage your loans, credit lines, and applications"
-          breadcrumbs={[
-            { label: "Dashboard", href: "/customer/dashboard" },
-            { label: "Loans & Credit" },
-          ]}
+          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Loans & Credit" }]}
           actions={
             <div className="flex gap-2 sm:gap-3">
-              <ActionButton label="Calculator" icon={<Calculator size={16} />} variant="secondary" onClick={() => navigate("/customer/loans/calculator")} />
-              <ActionButton label="Apply for Loan" icon={<Plus size={16} />} onClick={() => navigate("/customer/loans/apply")} />
+              <ActionButton
+                label="Calculator"
+                icon={<Calculator size={16} />}
+                variant="secondary"
+                onClick={() => navigate("/customer/loans/calculator")}
+              />
+              <ActionButton
+                label="Apply for Loan"
+                icon={<Plus size={16} />}
+                onClick={() => navigate("/customer/loans/apply")}
+              />
             </div>
           }
         />
@@ -82,14 +82,38 @@ const Loans_Credits: React.FC = () => {
         <StatsGridSkeleton count={4} />
       ) : (
         <StatsGrid cols={4}>
-          <StatCard label="Active Loans" value={activeLoans.length} icon={<Briefcase size={20} />} iconColor="from-indigo-500 to-purple-500" index={0} />
-          <StatCard label="Total Borrowed" value={showBalances ? formatCurrency(totalBorrowed) : "••••••"} icon={<DollarSign size={20} />} iconColor="from-emerald-500 to-teal-500" index={1} />
-          <StatCard label="Outstanding" value={showBalances ? formatCurrency(totalOutstanding) : "••••••"} icon={<BarChart3 size={20} />} iconColor="from-amber-500 to-orange-500" index={2} />
-          <StatCard label="Credit Score" value="750" icon={<Shield size={20} />} iconColor="from-violet-500 to-purple-500" index={3} />
+          <StatCard
+            label="Active Loans"
+            value={activeLoans.length}
+            icon={<Briefcase size={20} />}
+            iconColor="from-indigo-500 to-purple-500"
+            index={0}
+          />
+          <StatCard
+            label="Total Borrowed"
+            value={showBalances ? formatCurrency(totalBorrowed) : "••••••"}
+            icon={<DollarSign size={20} />}
+            iconColor="from-emerald-500 to-teal-500"
+            index={1}
+          />
+          <StatCard
+            label="Outstanding"
+            value={showBalances ? formatCurrency(totalOutstanding) : "••••••"}
+            icon={<BarChart3 size={20} />}
+            iconColor="from-amber-500 to-orange-500"
+            index={2}
+          />
+          <StatCard
+            label="Credit Score"
+            value="750"
+            icon={<Shield size={20} />}
+            iconColor="from-violet-500 to-purple-500"
+            index={3}
+          />
         </StatsGrid>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Active Loans */}
         <motion.div className="lg:col-span-2" variants={dashboardItemVariants}>
           {isLoading ? (
@@ -102,11 +126,11 @@ const Loans_Credits: React.FC = () => {
             />
           ) : (
             <DashCard padding="none">
-              <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">My Loans</h3>
+              <div className="flex items-center justify-between border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">My Loans</h3>
                 <motion.button
                   onClick={() => navigate("/customer/loans/overview")}
-                  className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1 hover:text-indigo-700 dark:hover:text-indigo-300"
+                  className="flex items-center gap-1 text-[10px] font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 sm:text-xs"
                   whileHover={{ x: 2 }}
                 >
                   View All <ChevronRight size={14} />
@@ -123,34 +147,34 @@ const Loans_Credits: React.FC = () => {
                   return (
                     <motion.div
                       key={loan._id || loan.id || i}
-                      className="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                      className="cursor-pointer p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:p-4"
                       custom={i}
                       variants={listItemRevealVariants}
                       initial="hidden"
                       animate="visible"
                       onClick={() => navigate("/customer/loans/overview")}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="mb-2 flex items-center justify-between">
                         <div>
-                          <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                             {loan.name || loan.loanType || loan.productName || "Personal Loan"}
                           </h4>
-                          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                             {loan.reference || loan.loanId || `Loan #${i + 1}`}
                           </p>
                         </div>
                         <StatusBadge status={status} />
                       </div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-base font-bold text-gray-900 dark:text-white sm:text-lg">
                           {showBalances ? formatCurrency(loan.amount || loan.principal || 0) : "••••••"}
                         </span>
-                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                           {loan.interestRate || loan.rate || "0"}% APR
                         </span>
                       </div>
                       <ProgressBar value={Math.min(progress, 100)} color="from-indigo-500 to-purple-500" />
-                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="mt-1 text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                         {progress.toFixed(0)}% repaid
                       </p>
                     </motion.div>
@@ -164,7 +188,7 @@ const Loans_Credits: React.FC = () => {
         {/* Loan Products */}
         <motion.div variants={dashboardItemVariants} className="space-y-3 sm:space-y-4">
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+            <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white sm:mb-4 sm:text-base">
               Available Products
             </h3>
             <div className="space-y-2 sm:space-y-3">
@@ -179,21 +203,21 @@ const Loans_Credits: React.FC = () => {
               ).map((p: any, i: number) => (
                 <motion.div
                   key={i}
-                  className="p-2.5 sm:p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-all"
+                  className="cursor-pointer rounded-lg border border-gray-100 p-2.5 transition-all hover:border-indigo-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:border-indigo-800 dark:hover:bg-gray-800/50 sm:p-3"
                   whileHover={{ x: 3 }}
                   onClick={() => navigate("/customer/loans/apply")}
                 >
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                       {p.name || p.productName}
                     </h4>
                     <ArrowRight size={14} className="text-indigo-400 dark:text-indigo-500" />
                   </div>
-                  <div className="flex gap-3 sm:gap-4 mt-1">
-                    <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                  <div className="mt-1 flex gap-3 sm:gap-4">
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                       From {p.rate || p.interestRate || "—"}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                       Up to {formatCurrency(p.maxAmount || p.maximumAmount || 0)}
                     </span>
                   </div>
@@ -209,15 +233,20 @@ const Loans_Credits: React.FC = () => {
               { label: "Credit Score", icon: <TrendingUp size={16} />, route: "/customer/loans/credit-score" },
               { label: "Application Status", icon: <FileText size={16} />, route: "/customer/loans/overview" },
             ].map((link) => (
-              <DashCard key={link.label} padding="sm" className="cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-700 transition-all" hover>
+              <DashCard
+                key={link.label}
+                padding="sm"
+                className="cursor-pointer transition-all hover:border-indigo-300 dark:hover:border-indigo-700"
+                hover
+              >
                 <motion.div
                   className="flex items-center gap-2.5 sm:gap-3"
                   onClick={() => navigate(link.route)}
                   whileHover={{ x: 3 }}
                 >
                   <span className="text-indigo-500 dark:text-indigo-400">{link.icon}</span>
-                  <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">{link.label}</span>
-                  <ChevronRight size={14} className="text-gray-400 dark:text-gray-500 ml-auto" />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 sm:text-sm">{link.label}</span>
+                  <ChevronRight size={14} className="ml-auto text-gray-400 dark:text-gray-500" />
                 </motion.div>
               </DashCard>
             ))}

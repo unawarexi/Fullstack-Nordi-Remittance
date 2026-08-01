@@ -21,15 +21,12 @@ import {
 } from "lucide-react";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  StatsGridSkeleton,
-  TableSkeleton,
-} from "@components/skeletons";
+import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import {
   useClientInvestments,
   useClientPortfolio,
   useClientInvestmentProducts,
-} from "../../domain/useInvestmentsDomain";
+} from "../../client-usecase/useinvestments-client-usecase";
 import { useUIStore } from "@store/ui.store";
 import {
   PageContainer,
@@ -58,7 +55,8 @@ const Investments: React.FC = () => {
   const formatCurrency = (amount: number, currency = "USD") =>
     new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(amount);
 
-  const totalValue = portfolio?.totalValue || investments.reduce((a: number, inv: any) => a + (inv.currentValue || inv.amount || 0), 0);
+  const totalValue =
+    portfolio?.totalValue || investments.reduce((a: number, inv: any) => a + (inv.currentValue || inv.amount || 0), 0);
   const totalReturns = portfolio?.totalReturns || 0;
   const returnPercentage = portfolio?.returnPercentage || 0;
 
@@ -69,14 +67,20 @@ const Investments: React.FC = () => {
         <PageHeader
           title="Investments"
           subtitle="Track and grow your investment portfolio"
-          breadcrumbs={[
-            { label: "Dashboard", href: "/customer/dashboard" },
-            { label: "Investments" },
-          ]}
+          breadcrumbs={[{ label: "Dashboard", href: "/customer/dashboard" }, { label: "Investments" }]}
           actions={
             <div className="flex gap-2 sm:gap-3">
-              <ActionButton label="" icon={showBalances ? <EyeOff size={16} /> : <Eye size={16} />} variant="secondary" onClick={() => toggleShowBalances()} />
-              <ActionButton label="New Investment" icon={<Plus size={16} />} onClick={() => navigate("/customer/investments/overview")} />
+              <ActionButton
+                label=""
+                icon={showBalances ? <EyeOff size={16} /> : <Eye size={16} />}
+                variant="secondary"
+                onClick={() => toggleShowBalances()}
+              />
+              <ActionButton
+                label="New Investment"
+                icon={<Plus size={16} />}
+                onClick={() => navigate("/customer/investments/overview")}
+              />
             </div>
           }
         />
@@ -87,14 +91,40 @@ const Investments: React.FC = () => {
         <StatsGridSkeleton count={4} />
       ) : (
         <StatsGrid cols={4}>
-          <StatCard label="Portfolio Value" value={showBalances ? formatCurrency(totalValue) : "••••••"} icon={<Briefcase size={20} />} iconColor="from-indigo-500 to-purple-500" change={returnPercentage > 0 ? `+${returnPercentage.toFixed(1)}%` : `${returnPercentage.toFixed(1)}%`} positive={returnPercentage >= 0} index={0} />
-          <StatCard label="Total Returns" value={showBalances ? formatCurrency(totalReturns) : "••••••"} icon={returnPercentage >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />} iconColor={returnPercentage >= 0 ? "from-emerald-500 to-teal-500" : "from-rose-500 to-pink-500"} index={1} />
-          <StatCard label="Active Investments" value={investments.length} icon={<PieChart size={20} />} iconColor="from-amber-500 to-orange-500" index={2} />
-          <StatCard label="Products Available" value={products.length || "12"} icon={<Target size={20} />} iconColor="from-violet-500 to-purple-500" index={3} />
+          <StatCard
+            label="Portfolio Value"
+            value={showBalances ? formatCurrency(totalValue) : "••••••"}
+            icon={<Briefcase size={20} />}
+            iconColor="from-indigo-500 to-purple-500"
+            change={returnPercentage > 0 ? `+${returnPercentage.toFixed(1)}%` : `${returnPercentage.toFixed(1)}%`}
+            positive={returnPercentage >= 0}
+            index={0}
+          />
+          <StatCard
+            label="Total Returns"
+            value={showBalances ? formatCurrency(totalReturns) : "••••••"}
+            icon={returnPercentage >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+            iconColor={returnPercentage >= 0 ? "from-emerald-500 to-teal-500" : "from-rose-500 to-pink-500"}
+            index={1}
+          />
+          <StatCard
+            label="Active Investments"
+            value={investments.length}
+            icon={<PieChart size={20} />}
+            iconColor="from-amber-500 to-orange-500"
+            index={2}
+          />
+          <StatCard
+            label="Products Available"
+            value={products.length || "12"}
+            icon={<Target size={20} />}
+            iconColor="from-violet-500 to-purple-500"
+            index={3}
+          />
         </StatsGrid>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Investment Holdings */}
         <motion.div className="lg:col-span-2" variants={dashboardItemVariants}>
           {isLoading ? (
@@ -107,11 +137,11 @@ const Investments: React.FC = () => {
             />
           ) : (
             <DashCard padding="none">
-              <div className="p-3 sm:p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Holdings</h3>
+              <div className="flex items-center justify-between border-b border-gray-100 p-3 dark:border-gray-800 sm:p-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Holdings</h3>
                 <motion.button
                   onClick={() => navigate("/customer/investments/overview")}
-                  className="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1 hover:text-indigo-700 dark:hover:text-indigo-300"
+                  className="flex items-center gap-1 text-[10px] font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 sm:text-xs"
                   whileHover={{ x: 2 }}
                 >
                   View All <ChevronRight size={14} />
@@ -126,30 +156,35 @@ const Investments: React.FC = () => {
                   return (
                     <motion.div
                       key={inv._id || inv.id || i}
-                      className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                      className="flex cursor-pointer items-center gap-3 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:gap-4 sm:p-4"
                       custom={i}
                       variants={listItemRevealVariants}
                       initial="hidden"
                       animate="visible"
                       onClick={() => navigate("/customer/investments/overview")}
                     >
-                      <div className={`p-2 sm:p-2.5 rounded-xl ${isPositive ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" : "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400"}`}>
+                      <div
+                        className={`rounded-xl p-2 sm:p-2.5 ${isPositive ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" : "bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400"}`}
+                      >
                         {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                           {inv.name || inv.productName || "Investment"}
                         </h4>
-                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 capitalize">
+                        <p className="text-[10px] capitalize text-gray-500 dark:text-gray-400 sm:text-xs">
                           {inv.type || inv.category || "Mutual Fund"}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
                           {showBalances ? formatCurrency(inv.currentValue || inv.amount || 0) : "••••••"}
                         </p>
-                        <p className={`text-[10px] sm:text-xs font-medium ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                          {isPositive ? "+" : ""}{returnPct.toFixed(2)}%
+                        <p
+                          className={`text-[10px] font-medium sm:text-xs ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                        >
+                          {isPositive ? "+" : ""}
+                          {returnPct.toFixed(2)}%
                         </p>
                       </div>
                     </motion.div>
@@ -164,24 +199,48 @@ const Investments: React.FC = () => {
         <motion.div className="space-y-3 sm:space-y-4" variants={dashboardItemVariants}>
           {/* Investment Categories */}
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Explore</h3>
+            <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white sm:mb-4 sm:text-base">Explore</h3>
             <div className="space-y-1.5 sm:space-y-2">
               {[
-                { label: "Mutual Funds", desc: "Diversified portfolios", icon: <PieChart size={16} />, route: "/customer/investments/mutual-funds", color: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400" },
-                { label: "Stocks & ETFs", desc: "Trade equities", icon: <BarChart3 size={16} />, route: "/customer/investments/stocks", color: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" },
-                { label: "Fixed Income", desc: "Bonds & treasuries", icon: <Shield size={16} />, route: "/customer/investments/fixed-income", color: "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400" },
-                { label: "Market Insights", desc: "Analysis & research", icon: <Lightbulb size={16} />, route: "/customer/investments/insights", color: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400" },
+                {
+                  label: "Mutual Funds",
+                  desc: "Diversified portfolios",
+                  icon: <PieChart size={16} />,
+                  route: "/customer/investments/mutual-funds",
+                  color: "bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400",
+                },
+                {
+                  label: "Stocks & ETFs",
+                  desc: "Trade equities",
+                  icon: <BarChart3 size={16} />,
+                  route: "/customer/investments/stocks",
+                  color: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400",
+                },
+                {
+                  label: "Fixed Income",
+                  desc: "Bonds & treasuries",
+                  icon: <Shield size={16} />,
+                  route: "/customer/investments/fixed-income",
+                  color: "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400",
+                },
+                {
+                  label: "Market Insights",
+                  desc: "Analysis & research",
+                  icon: <Lightbulb size={16} />,
+                  route: "/customer/investments/insights",
+                  color: "bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400",
+                },
               ].map((item) => (
                 <motion.button
                   key={item.label}
                   onClick={() => navigate(item.route)}
-                  className="w-full flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-left"
+                  className="flex w-full items-center gap-2.5 rounded-lg p-2.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:gap-3 sm:p-3"
                   whileHover={{ x: 3 }}
                 >
-                  <div className={`p-1.5 sm:p-2 rounded-lg ${item.color}`}>{item.icon}</div>
+                  <div className={`rounded-lg p-1.5 sm:p-2 ${item.color}`}>{item.icon}</div>
                   <div className="flex-1">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{item.label}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
+                    <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{item.label}</p>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">{item.desc}</p>
                   </div>
                   <ChevronRight size={14} className="text-gray-400 dark:text-gray-500" />
                 </motion.button>
@@ -190,14 +249,14 @@ const Investments: React.FC = () => {
           </DashCard>
 
           {/* CTA */}
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl border border-indigo-500/20 p-4 sm:p-5 text-white">
-            <h3 className="text-sm sm:text-base font-semibold mb-1.5 sm:mb-2">Start Investing</h3>
-            <p className="text-[10px] sm:text-sm text-indigo-200 mb-3 sm:mb-4">
+          <div className="rounded-xl border border-indigo-500/20 bg-gradient-to-br from-indigo-600 to-purple-700 p-4 text-white sm:p-5">
+            <h3 className="mb-1.5 text-sm font-semibold sm:mb-2 sm:text-base">Start Investing</h3>
+            <p className="mb-3 text-[10px] text-indigo-200 sm:mb-4 sm:text-sm">
               Grow your wealth with as little as $10. Diversified portfolios managed by experts.
             </p>
             <motion.button
               onClick={() => navigate("/customer/investments/overview")}
-              className="w-full py-2 sm:py-2.5 bg-white text-indigo-700 rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-50 transition-colors"
+              className="w-full rounded-lg bg-white py-2 text-xs font-medium text-indigo-700 transition-colors hover:bg-indigo-50 sm:py-2.5 sm:text-sm"
               whileTap={{ scale: 0.98 }}
             >
               Get Started

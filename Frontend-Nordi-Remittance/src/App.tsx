@@ -5,6 +5,7 @@ import { lazy, Suspense } from "react";
 import MainLayout from "@layout/MainLayout";
 import ToastContainer from "@components/ui/ToastContainer";
 import { ErrorBoundary } from "@components/shared/ErrorBoundary";
+import { NetworkStatusBanner } from "@components/shared/NetworkStatusBanner";
 import { PageLoader } from "@components/ui/Spinner";
 import ThemeProvider from "@contexts/ThemeProvider";
 import { ProtectedRoute } from "@components/shared/ProtectedRoute";
@@ -27,6 +28,9 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
+        {/* Global Network Status Banner */}
+        <NetworkStatusBanner />
+
         <Router basename="/">
           {/* Global Toast Notifications */}
           <ToastContainer />

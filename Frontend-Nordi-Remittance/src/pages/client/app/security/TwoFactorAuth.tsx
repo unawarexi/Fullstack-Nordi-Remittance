@@ -6,20 +6,29 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Shield, Lock, Fingerprint, Eye, EyeOff, Clock,
-  Smartphone, AlertTriangle, CheckCircle2, XCircle,
-  Key, RefreshCw, MonitorSmartphone, Mail, Bell,
+  Shield,
+  Lock,
+  Fingerprint,
+  Eye,
+  EyeOff,
+  Clock,
+  Smartphone,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  Key,
+  RefreshCw,
+  MonitorSmartphone,
+  Mail,
+  Bell,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, StatusBadge } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientSecuritySettings, useEnable2FA } from "../../domain/useSecurityDomain";
+import { useClientSecuritySettings, useEnable2FA } from "../../client-usecase/usesecurity-client-usecase";
 import { useToastStore } from "@store/toast.store";
-
 
 const TwoFactorAuth: React.FC = () => {
   const { settings: securityData } = useClientSecuritySettings();
@@ -60,11 +69,13 @@ const TwoFactorAuth: React.FC = () => {
         <DashCard className="mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`p-2.5 rounded-xl ${is2FAEnabled ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400" : "bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400"}`}>
+              <div
+                className={`rounded-xl p-2.5 ${is2FAEnabled ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" : "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"}`}
+              >
                 <Shield size={20} />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
                   2FA is {is2FAEnabled ? "Enabled" : "Disabled"}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -82,18 +93,18 @@ const TwoFactorAuth: React.FC = () => {
               <DashCard>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                    <div className="rounded-xl bg-indigo-50 p-2 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                       <m.icon size={16} />
                     </div>
                     <div>
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{m.label}</h4>
-                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">{m.desc}</p>
+                      <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{m.label}</h4>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">{m.desc}</p>
                     </div>
                   </div>
                   <motion.button
                     onClick={handle2FA}
                     disabled={enable2FA.isPending}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-colors disabled:opacity-50"
+                    className="rounded-lg border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

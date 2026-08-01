@@ -1,16 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  FileCheck,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-} from "lucide-react";
+import { FileCheck, Clock, CheckCircle, XCircle, Eye, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import {
   PageContainer,
   StatsGrid,
@@ -23,7 +14,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useKycPendingUsers } from "../../domain/useKycPendingUsers";
+import { useKycPendingUsers } from "../../admin-usecase/useKycPendingUsers";
 
 const KycPending: React.FC = () => {
   const navigate = useNavigate();
@@ -63,12 +54,7 @@ const KycPending: React.FC = () => {
           { label: "KYC Pending" },
         ]}
         actions={
-          <ActionButton
-            label="Refresh"
-            icon={<RefreshCw size={14} />}
-            onClick={() => refetch()}
-            variant="secondary"
-          />
+          <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => refetch()} variant="secondary" />
         }
       />
 
@@ -120,7 +106,7 @@ const KycPending: React.FC = () => {
                       {["Name", "Email", "Nationality", "Level", "Documents", "Submitted", "Actions"].map((h) => (
                         <th
                           key={h}
-                          className="px-4 py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
+                          className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs"
                         >
                           {h}
                         </th>
@@ -132,37 +118,35 @@ const KycPending: React.FC = () => {
                       pendingUsers.map((user, i) => (
                         <motion.tr
                           key={user.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.03, duration: 0.25 }}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          <td className="whitespace-nowrap px-4 py-3">
+                            <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                               {user.firstName} {user.lastName}
                             </p>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.email}
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.nationality || "—"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={user.level} />
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.documentsCount} doc{user.documentsCount !== 1 ? "s" : ""}
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {user.submittedAt
-                              ? new Date(user.submittedAt).toLocaleDateString()
-                              : "—"}
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                            {user.submittedAt ? new Date(user.submittedAt).toLocaleDateString() : "—"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <div className="flex items-center gap-1">
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-indigo-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => navigate(`/admin/users/${user.id}`)}
@@ -171,7 +155,7 @@ const KycPending: React.FC = () => {
                                 <Eye size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-emerald-600 disabled:opacity-40 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-emerald-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => approveUser(user.id)}
@@ -181,7 +165,7 @@ const KycPending: React.FC = () => {
                                 <CheckCircle size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-rose-600 disabled:opacity-40 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-rose-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => setRejectModal(user.id)}
@@ -198,9 +182,7 @@ const KycPending: React.FC = () => {
                       <tr>
                         <td colSpan={7} className="px-4 py-12 text-center">
                           <FileCheck size={32} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            No pending KYC reviews.
-                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">No pending KYC reviews.</p>
                         </td>
                       </tr>
                     )}
@@ -210,13 +192,13 @@ const KycPending: React.FC = () => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-800">
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                     Page {pagination.page} of {pagination.totalPages}
                   </p>
                   <div className="flex items-center gap-1">
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page - 1)}
@@ -233,10 +215,10 @@ const KycPending: React.FC = () => {
                       return (
                         <motion.button
                           key={pageNum}
-                          className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors sm:h-8 sm:w-8 ${
                             pagination.page === pageNum
-                              ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                              : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                              : "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                           }`}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -247,7 +229,7 @@ const KycPending: React.FC = () => {
                       );
                     })}
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page + 1)}
@@ -274,16 +256,14 @@ const KycPending: React.FC = () => {
             onClick={() => setRejectModal(null)}
           >
             <motion.div
-              className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 w-full max-w-md mx-4"
+              className="mx-4 w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                Reject KYC Verification
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <h3 className="mb-1 text-base font-semibold text-gray-900 dark:text-white">Reject KYC Verification</h3>
+              <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">
                 Please provide a reason for rejection. The user will be notified.
               </p>
               <textarea
@@ -291,9 +271,9 @@ const KycPending: React.FC = () => {
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Reason for rejection..."
                 rows={3}
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none"
+                className="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
               />
-              <div className="flex justify-end gap-2 mt-4">
+              <div className="mt-4 flex justify-end gap-2">
                 <ActionButton
                   label="Cancel"
                   onClick={() => {
@@ -303,7 +283,7 @@ const KycPending: React.FC = () => {
                   variant="secondary"
                 />
                 <motion.button
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-40 transition-colors"
+                  className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-40"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleReject}

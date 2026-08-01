@@ -14,14 +14,11 @@ import { Button, Input, Spinner } from "@components/ui";
 import AuthLayout from "@components/auth_components/AuthLayout";
 
 // Auth hooks and store
-import { useForgotPassword } from "@hooks/queries/useAuth";
+import { useForgotPassword } from "@hooks/api-queries/useAuth";
 
 // Validation
 const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
 });
 
 type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
@@ -68,17 +65,12 @@ const ForgotPassword = () => {
 
           <div className="space-y-2">
             <p className="text-sm text-neutral-600">
-              We've sent a password reset link to your email address. It will
-              expire in 1 hour.
+              We've sent a password reset link to your email address. It will expire in 1 hour.
             </p>
           </div>
 
           <div className="w-full space-y-4 pt-6">
-            <Button
-              variant="outline"
-              fullWidth
-              onClick={() => navigate("/auth/login")}
-            >
+            <Button variant="outline" fullWidth onClick={() => navigate("/auth/login")}>
               Back to Login
             </Button>
           </div>
@@ -109,8 +101,7 @@ const ForgotPassword = () => {
 
         {forgotPasswordMutation.error && (
           <div className="rounded-lg border border-error-200 bg-error-50 p-3 text-sm text-error-600">
-            {forgotPasswordMutation.error.message ||
-              "Failed to send reset link. Please try again."}
+            {forgotPasswordMutation.error.message || "Failed to send reset link. Please try again."}
           </div>
         )}
 

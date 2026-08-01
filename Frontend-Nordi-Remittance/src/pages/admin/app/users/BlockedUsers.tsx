@@ -1,14 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  ShieldOff,
-  ShieldCheck,
-  Eye,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-} from "lucide-react";
+import { ShieldOff, ShieldCheck, Eye, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import {
   PageContainer,
   DashCard,
@@ -20,7 +13,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useBlockedUsers } from "../../domain/useBlockedUsers";
+import { useBlockedUsers } from "../../admin-usecase/useBlockedUsers";
 
 const BlockedUsers: React.FC = () => {
   const navigate = useNavigate();
@@ -49,21 +42,12 @@ const BlockedUsers: React.FC = () => {
           { label: "Blocked" },
         ]}
         actions={
-          <ActionButton
-            label="Refresh"
-            icon={<RefreshCw size={14} />}
-            onClick={() => refetch()}
-            variant="secondary"
-          />
+          <ActionButton label="Refresh" icon={<RefreshCw size={14} />} onClick={() => refetch()} variant="secondary" />
         }
       />
 
       {/* Status Filter Pills */}
-      <FilterBar
-        searchValue={filters.search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search blocked users..."
-      >
+      <FilterBar searchValue={filters.search} onSearchChange={setSearch} searchPlaceholder="Search blocked users...">
         <div className="flex gap-2">
           {(["all", "suspended", "banned"] as const).map((s) => (
             <FilterPill
@@ -92,7 +76,7 @@ const BlockedUsers: React.FC = () => {
                       {["Name", "Email", "Status", "KYC", "Reason", "Blocked Date", "Actions"].map((h) => (
                         <th
                           key={h}
-                          className="px-4 py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
+                          className="whitespace-nowrap px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:text-xs"
                         >
                           {h}
                         </th>
@@ -104,37 +88,35 @@ const BlockedUsers: React.FC = () => {
                       users.map((user, i) => (
                         <motion.tr
                           key={user.id}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.03, duration: 0.25 }}
                         >
-                          <td className="px-4 py-3 whitespace-nowrap">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                          <td className="whitespace-nowrap px-4 py-3">
+                            <p className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">
                               {user.firstName} {user.lastName}
                             </p>
                           </td>
-                          <td className="px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                             {user.email}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={user.status} />
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <StatusBadge status={user.kycStatus} />
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 max-w-[200px] truncate">
+                          <td className="max-w-[200px] truncate px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
                             {user.reason}
                           </td>
-                          <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                            {user.blockedAt
-                              ? new Date(user.blockedAt).toLocaleDateString()
-                              : "—"}
+                          <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                            {user.blockedAt ? new Date(user.blockedAt).toLocaleDateString() : "—"}
                           </td>
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="whitespace-nowrap px-4 py-3">
                             <div className="flex items-center gap-1">
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-indigo-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => navigate(`/admin/users/${user.id}`)}
@@ -143,7 +125,7 @@ const BlockedUsers: React.FC = () => {
                                 <Eye size={15} />
                               </motion.button>
                               <motion.button
-                                className="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40"
+                                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-emerald-600 disabled:opacity-40 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-emerald-400"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => unblockUser(user.id)}
@@ -160,9 +142,7 @@ const BlockedUsers: React.FC = () => {
                       <tr>
                         <td colSpan={7} className="px-4 py-12 text-center">
                           <ShieldOff size={32} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            No blocked users found.
-                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">No blocked users found.</p>
                         </td>
                       </tr>
                     )}
@@ -172,13 +152,13 @@ const BlockedUsers: React.FC = () => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-800">
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                     Page {pagination.page} of {pagination.totalPages}
                   </p>
                   <div className="flex items-center gap-1">
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page - 1)}
@@ -195,10 +175,10 @@ const BlockedUsers: React.FC = () => {
                       return (
                         <motion.button
                           key={pageNum}
-                          className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors sm:h-8 sm:w-8 ${
                             pagination.page === pageNum
-                              ? "bg-indigo-600 dark:bg-indigo-500 text-white"
-                              : "border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                              : "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                           }`}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -209,7 +189,7 @@ const BlockedUsers: React.FC = () => {
                       );
                     })}
                     <motion.button
-                      className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 disabled:opacity-40"
+                      className="rounded-lg border border-gray-200 p-1.5 text-gray-500 disabled:opacity-40 dark:border-gray-700 dark:text-gray-400"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setPage(pagination.page + 1)}

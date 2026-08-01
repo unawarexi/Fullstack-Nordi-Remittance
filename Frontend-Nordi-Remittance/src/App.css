@@ -91,3 +91,217 @@ z-index: 30;
     font-size: 12px !important;
   }
 }
+
+/* ============================================================================
+   NETWORK STATUS BANNER
+   ============================================================================ */
+
+.nsb-root {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  overflow: hidden;
+  width: 100%;
+}
+
+.nsb-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.nsb-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nsb-message {
+  flex: 1;
+}
+
+.nsb-dismiss {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.nsb-dismiss:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Banner variants */
+.nsb-offline {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+.nsb-text-offline {
+  color: #fff;
+}
+
+.nsb-poor {
+  background: linear-gradient(135deg, #d97706, #b45309);
+}
+.nsb-text-poor {
+  color: #fff;
+}
+
+.nsb-slow {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+.nsb-text-slow {
+  color: #fff;
+}
+
+.nsb-recovered {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+.nsb-text-recovered {
+  color: #fff;
+}
+
+/* ============================================================================
+   QUERY SECTION — Section-level error / loading / stale wrappers
+   ============================================================================ */
+
+.qs-root {
+  position: relative;
+}
+
+/* Skeleton loading */
+.qs-skeleton {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qs-skeleton-bar {
+  height: 14px;
+  border-radius: 6px;
+  background: rgba(156, 163, 175, 0.15);
+  animation: qs-pulse 1.5s ease-in-out infinite;
+}
+
+.qs-skeleton-bar--wide {
+  width: 90%;
+}
+
+.qs-skeleton-bar--medium {
+  width: 65%;
+}
+
+.qs-skeleton-bar--narrow {
+  width: 40%;
+}
+
+@keyframes qs-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Inline error card */
+.qs-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.qs-error-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.qs-error-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.qs-error-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ef4444;
+  margin: 0;
+}
+
+.qs-error-msg {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 2px 0 0;
+}
+
+.qs-error-retry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.qs-error-retry:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Stale data badge */
+.qs-stale-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  margin-bottom: 8px;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .qs-skeleton-bar {
+    background: rgba(156, 163, 175, 0.1);
+  }
+
+  .qs-error {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .qs-error-msg {
+    color: #6b7280;
+  }
+
+  .qs-stale-badge {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+  }
+}

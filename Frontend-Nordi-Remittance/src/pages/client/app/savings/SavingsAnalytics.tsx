@@ -6,20 +6,34 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  Target, Plus, TrendingUp, PiggyBank, Calendar, Clock,
-  DollarSign, ArrowUpRight, Repeat, Percent, BarChart3,
-  Sparkles, ChevronRight, Trash2, Edit3, ToggleLeft, ToggleRight,
+  Target,
+  Plus,
+  TrendingUp,
+  PiggyBank,
+  Calendar,
+  Clock,
+  DollarSign,
+  ArrowUpRight,
+  Repeat,
+  Percent,
+  BarChart3,
+  Sparkles,
+  ChevronRight,
+  Trash2,
+  Edit3,
+  ToggleLeft,
+  ToggleRight,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, ProgressBar,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, ProgressBar } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useClientSavingsGoals, useCreateSavingsGoal, useClientSavingsGoalProgress,
-} from "../../domain/useSavingsDomain";
+  useClientSavingsGoals,
+  useCreateSavingsGoal,
+  useClientSavingsGoalProgress,
+} from "../../client-usecase/usesavinga-client-usecase";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
 
@@ -29,14 +43,12 @@ import { useToastStore } from "@store/toast.store";
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const pct = (saved: number, target: number) =>
-  target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
+const pct = (saved: number, target: number) => (target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0);
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
 
-const labelCls =
-  "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
 const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "🏖️", "📱", "🎮", "🩺", "🐶"];
 
@@ -49,10 +61,7 @@ const SavingsAnalytics: React.FC = () => {
     () => goals.reduce((s: number, g: any) => s + (g.currentAmount ?? g.savedAmount ?? 0), 0),
     [goals],
   );
-  const totalTarget = useMemo(
-    () => goals.reduce((s: number, g: any) => s + (g.targetAmount ?? 0), 0),
-    [goals],
-  );
+  const totalTarget = useMemo(() => goals.reduce((s: number, g: any) => s + (g.targetAmount ?? 0), 0), [goals]);
   const completedGoals = goals.filter((g: any) => g.status === "completed").length;
   const savingsRate = totalTarget > 0 ? pct(totalSaved, totalTarget) : 0;
 
@@ -134,41 +143,33 @@ const SavingsAnalytics: React.FC = () => {
 
       {/* ── Monthly savings chart ── */}
       <DashCard className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-              Monthly Savings
-            </h3>
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-              Your savings trend this year
-            </p>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Monthly Savings</h3>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">Your savings trend this year</p>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400">
             <TrendingUp size={14} />
             {fmt(avgMonthlySaving)}/mo avg
           </div>
         </div>
 
         {/* Bar chart */}
-        <div className="flex items-end gap-1.5 sm:gap-2 h-40 sm:h-48">
+        <div className="flex h-40 items-end gap-1.5 sm:h-48 sm:gap-2">
           {monthlyData.map((val, idx) => {
             const heightPct = maxMonthly > 0 ? (val / maxMonthly) * 100 : 0;
             const isCurrent = idx === new Date().getMonth();
             return (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+              <div key={idx} className="flex flex-1 flex-col items-center gap-1">
                 <motion.div
                   className={`w-full rounded-t-md ${
-                    isCurrent
-                      ? "bg-gradient-to-t from-indigo-600 to-purple-500"
-                      : "bg-indigo-200 dark:bg-indigo-900/60"
+                    isCurrent ? "bg-gradient-to-t from-indigo-600 to-purple-500" : "bg-indigo-200 dark:bg-indigo-900/60"
                   }`}
                   initial={{ height: 0 }}
                   animate={{ height: `${heightPct}%` }}
                   transition={{ duration: 0.6, delay: idx * 0.04, ease: "easeOut" }}
                 />
-                <span className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400">
-                  {MONTH_LABELS[idx]}
-                </span>
+                <span className="text-[8px] text-gray-500 dark:text-gray-400 sm:text-[10px]">{MONTH_LABELS[idx]}</span>
               </div>
             );
           })}
@@ -176,12 +177,10 @@ const SavingsAnalytics: React.FC = () => {
       </DashCard>
 
       {/* ── Savings breakdown & projection ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Breakdown */}
         <DashCard>
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
-            Goal Breakdown
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Goal Breakdown</h3>
           {goals.length === 0 ? (
             <p className="text-xs text-gray-500 dark:text-gray-400">No goals to display.</p>
           ) : (
@@ -194,14 +193,12 @@ const SavingsAnalytics: React.FC = () => {
 
                 return (
                   <div key={g._id || g.id || i}>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="mb-1 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="text-base">{emoji}</span>
-                        <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                          {g.name}
-                        </span>
+                        <span className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{g.name}</span>
                       </div>
-                      <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                         {fmt(saved)} / {fmt(target)}
                       </span>
                     </div>
@@ -224,26 +221,26 @@ const SavingsAnalytics: React.FC = () => {
 
         {/* Projection */}
         <DashCard>
-          <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
-            Savings Projection
-          </h3>
+          <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Savings Projection</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Current savings</span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(totalSaved)}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Current savings</span>
+              <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">{fmt(totalSaved)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Monthly average</span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(avgMonthlySaving)}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Monthly average</span>
+              <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">
+                {fmt(avgMonthlySaving)}
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Target total</span>
-              <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">{fmt(totalTarget)}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Target total</span>
+              <span className="text-xs font-semibold text-gray-900 dark:text-white sm:text-sm">{fmt(totalTarget)}</span>
             </div>
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+            <div className="border-t border-gray-200 pt-3 dark:border-gray-800">
               <div className="flex items-center justify-between">
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Year-end projection</span>
-                <span className="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400">
+                <span className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Year-end projection</span>
+                <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 sm:text-base">
                   {fmt(endOfYearProjection)}
                 </span>
               </div>
@@ -253,7 +250,7 @@ const SavingsAnalytics: React.FC = () => {
                 color="bg-gradient-to-r from-cyan-500 to-blue-500"
                 className="mt-2"
               />
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="mt-2 text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                 {endOfYearProjection >= totalTarget
                   ? "🎉 You're projected to meet your savings target by year-end!"
                   : `You'll need to increase monthly savings by ${fmt(
@@ -263,17 +260,17 @@ const SavingsAnalytics: React.FC = () => {
             </div>
 
             {/* Mini milestones */}
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-3 space-y-2">
+            <div className="space-y-2 border-t border-gray-200 pt-3 dark:border-gray-800">
               <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300">Milestones</h4>
               {[25, 50, 75, 100].map((milestone) => {
                 const reached = savingsRate >= milestone;
                 return (
                   <div key={milestone} className="flex items-center gap-2">
                     <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
                         reached
-                          ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500"
+                          ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
+                          : "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500"
                       }`}
                     >
                       {reached ? "✓" : milestone}
@@ -281,7 +278,7 @@ const SavingsAnalytics: React.FC = () => {
                     <span
                       className={`text-[10px] sm:text-xs ${
                         reached
-                          ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                          ? "font-medium text-emerald-600 dark:text-emerald-400"
                           : "text-gray-500 dark:text-gray-400"
                       }`}
                     >

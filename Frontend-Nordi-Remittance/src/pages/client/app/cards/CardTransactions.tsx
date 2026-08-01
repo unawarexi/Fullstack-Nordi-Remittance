@@ -1,76 +1,54 @@
 // ============================================================================
-// CARDS SUB-PAGES — Overview, Transactions, Apply, Security, Virtual
-// Dark mode + DashboardPrimitives + grey borders + responsive typography
+// CARDS SUB-PAGE — Card Transactions
+// Strictly consumes domain hook without raw logic in UI component
 // ============================================================================
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import {
-  CreditCard, Eye, EyeOff, Lock, Plus, Shield, Smartphone,
-  ArrowUpRight, ArrowDownLeft, Settings, CheckCircle2, AlertTriangle,
-  Globe, Wifi, ShoppingBag, TrendingUp,
-} from "@constants/icons";
+import { ShoppingBag, CreditCard, ArrowDownLeft, Landmark, Receipt } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, StatusBadge,
-} from "@components/shared/DashboardPrimitives";
-import {
-  CreditCardSkeleton, TransactionListSkeleton, FormSkeleton, StatsGridSkeleton,
-} from "@components/skeletons";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
+import { TransactionListSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientCards, useClientCardTransactions } from "../../domain/useCardsDomain";
-import { useUIStore } from "@store/ui.store";
+import { useCardTransactionsPageDomain } from "../../client-usecase/useCards-client-usecase";
+import { fmt, fmtDate, isCreditTxn, txnTypeLabel } from "@pages/client/components/card-ui-utils";
+import type { CardTransactionType, CardTransactionStatus } from "@domain/types/Card.types";
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* ─── Shared card visual ─── */
-const CardVisual: React.FC<{ card: any; show: boolean; gradient?: string }> = ({
-  card, show, gradient = "from-indigo-600 via-purple-600 to-fuchsia-600",
-}) => (
-  <div className={`relative bg-gradient-to-br ${gradient} rounded-2xl p-5 sm:p-6 text-white overflow-hidden`}>
-    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10" />
-    <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-6 -mb-6" />
-    <div className="flex justify-between items-start mb-8">
-      <div>
-        <p className="text-xs text-white/70">{card.type || "Premium"}</p>
-        <p className="text-sm font-medium">{card.name || "Nordi Card"}</p>
-      </div>
-      <Wifi size={24} className="text-white/60" />
-    </div>
-    <p className="text-lg sm:text-xl font-mono tracking-widest mb-4">
-      {show ? (card.number || "•••• •••• •••• ••••") : "•••• •••• •••• ••••"}
-    </p>
-    <div className="flex justify-between items-end">
-      <div>
-        <p className="text-[10px] text-white/60">BALANCE</p>
-        <p className="text-base sm:text-lg font-bold">{show ? fmt(card.balance || card.limit || 0) : "••••••"}</p>
-      </div>
-      <div className="text-right">
-        <p className="text-[10px] text-white/60">EXPIRES</p>
-        <p className="text-sm font-medium">{card.expiry || "12/28"}</p>
-      </div>
-    </div>
-  </div>
-);
+const TXN_ICON: Record<CardTransactionType, any> = {
+  purchase: ShoppingBag,
+  refund: ArrowDownLeft,
+  withdrawal: Landmark,
+  cash_advance: ArrowDownLeft,
+  fee: Receipt,
+  interest: Receipt,
+};
 
+const STATUS_STYLE: Record<CardTransactionStatus, string> = {
+  completed: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  pending: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  declined: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+  reversed: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+};
 
 const CardTransactions: React.FC = () => {
-  const show = useUIStore((s) => s.preferences.showBalances);
-  const { cards } = useClientCards();
-  const selectedCardId = cards?.[0]?.id ?? (cards?.[0] as any)?._id ?? "";
-  const { transactions: txns, isLoading } = useClientCardTransactions(selectedCardId);
-
-  const txnIcon = (t: string) =>
-    (t || "").toLowerCase().includes("online") ? <Globe size={16} /> : <ShoppingBag size={16} />;
+  const {
+    cards,
+    activeCardId,
+    setSelectedCardId,
+    transactions: txns,
+    isLoading,
+    showBalances,
+  } = useCardTransactionsPageDomain();
 
   return (
     <PageContainer>
       <motion.div variants={dashboardItemVariants}>
         <PageHeader
           title="Card Transactions"
-          subtitle="Review all transactions made with your cards"
+          subtitle="Review financial activity and point-of-sale expenditures made with your cards"
           breadcrumbs={[
             { label: "Dashboard", href: "/customer/dashboard" },
             { label: "Cards", href: "/customer/cards" },
@@ -79,36 +57,92 @@ const CardTransactions: React.FC = () => {
         />
       </motion.div>
 
+      {/* Card Selector Bar if multiple cards exist */}
+      {cards.length > 1 && (
+        <div className="my-4 flex items-center gap-3 overflow-x-auto pb-2">
+          {cards.map((c: any) => {
+            const isSelected = c.id === activeCardId;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setSelectedCardId(c.id)}
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
+                  isSelected
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "dark:hover:bg-gray-750 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                }`}
+              >
+                <CreditCard size={15} /> {(c.cardType || "CARD").toUpperCase()} (•••• {c.last4})
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {isLoading ? (
         <TransactionListSkeleton count={8} />
       ) : txns.length === 0 ? (
-        <EmptyState title="No Card Transactions" description="Transactions made with your cards will appear here." />
+        <EmptyState
+          title="No Card Transactions"
+          description="Transactions and POS purchases made with your selected card will appear right here."
+        />
       ) : (
-        <DashCard padding="none">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">All Card Transactions</h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{txns.length} total</span>
+        <DashCard padding="none" className="shadow-xs mt-4 border border-gray-100 dark:border-gray-800/80">
+          <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50/50 p-4 dark:border-gray-800 dark:bg-gray-800/40">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
+              <CreditCard size={18} className="text-indigo-600 dark:text-indigo-400" /> Card Expenditure History
+            </h3>
+            <span className="dark:bg-gray-750 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-bold text-gray-600 dark:text-gray-300">
+              {txns.length} records
+            </span>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {txns.map((tx: any, i: number) => (
-              <div key={i} className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
-                    {txnIcon(tx.channel || "")}
+            {txns.map((tx: any, i: number) => {
+              const type: CardTransactionType = tx.transactionType || "purchase";
+              const Icon = TXN_ICON[type] || ShoppingBag;
+              const credit = isCreditTxn(type);
+              return (
+                <div
+                  key={tx._id || i}
+                  className="flex items-center justify-between p-3.5 transition-colors hover:bg-gray-50/70 dark:hover:bg-gray-800/60 sm:p-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3.5">
+                    <div className="shadow-2xs shrink-0 rounded-xl bg-indigo-50 p-2.5 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                      <Icon size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="truncate text-xs font-bold text-gray-900 dark:text-white sm:text-sm">
+                        {tx.merchantName || txnTypeLabel[type]}
+                      </h4>
+                      <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 sm:text-xs">
+                        {fmtDate(tx.createdAt)}
+                        {tx.status && tx.status !== "completed" && (
+                          <span
+                            className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${STATUS_STYLE[tx.status as CardTransactionStatus] || ""}`}
+                          >
+                            {tx.status}
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{tx.description || tx.merchant || "Card Transaction"}</h4>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-                      {tx.date ? new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
-                      {tx.cardLast4 && ` • •••• ${tx.cardLast4}`}
-                    </p>
-                  </div>
+                  <p className="shrink-0 pl-3 text-xs font-extrabold text-gray-900 dark:text-white sm:text-sm">
+                    {showBalances ? (
+                      <span
+                        className={
+                          credit ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                        }
+                      >
+                        {credit ? "+" : "-"}
+                        {fmt(Math.abs(tx.amount || 0), tx.currency)}
+                      </span>
+                    ) : (
+                      "••••••"
+                    )}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm font-bold text-red-600 dark:text-red-400">
-                  {show ? `-${fmt(Math.abs(tx.amount || 0))}` : "••••••"}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </DashCard>
       )}

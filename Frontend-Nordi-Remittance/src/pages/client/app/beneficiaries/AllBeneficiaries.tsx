@@ -5,20 +5,14 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Users, UserPlus, FolderOpen, Search, Trash2, Star,
-  Building2, User, Globe, Phone,
-} from "@constants/icons";
+import { Users, UserPlus, FolderOpen, Search, Trash2, Star, Building2, User, Globe, Phone } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useClientBeneficiaries, useRemoveBeneficiary } from "../../domain/useAccountsDomain";
+import { useClientBeneficiaries, useRemoveBeneficiary } from "../../client-usecase/useaccounts-client-usecase";
 import { useToastStore } from "@store/toast.store";
-
 
 const AllBeneficiaries: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -31,7 +25,7 @@ const AllBeneficiaries: React.FC = () => {
       !search ||
       (b.name || "").toLowerCase().includes(search.toLowerCase()) ||
       (b.accountNumber || "").includes(search) ||
-      (b.bankName || "").toLowerCase().includes(search.toLowerCase())
+      (b.bankName || "").toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleRemove = async (id: string) => {
@@ -82,29 +76,32 @@ const AllBeneficiaries: React.FC = () => {
         />
       ) : (
         <DashCard padding="none">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-            <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">Beneficiaries</h3>
+          <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Beneficiaries</h3>
             <span className="text-xs text-gray-500 dark:text-gray-400">{filtered.length} total</span>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {filtered.map((b: any, i: number) => (
-              <div key={b._id || b.id || i} className="flex items-center justify-between p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+              <div
+                key={b._id || b.id || i}
+                className="flex items-center justify-between p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:p-4"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-sm font-bold text-white">
                     {(b.name || "?")[0].toUpperCase()}
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{b.name}</h4>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                    <h4 className="text-xs font-medium text-gray-900 dark:text-white sm:text-sm">{b.name}</h4>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                       {b.bankName || "Bank"} • {b.accountNumber ? `•••• ${b.accountNumber.slice(-4)}` : ""}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {b.isFavorite && <Star size={14} className="text-amber-500 fill-amber-500" />}
+                  {b.isFavorite && <Star size={14} className="fill-amber-500 text-amber-500" />}
                   <button
                     onClick={() => handleRemove(b._id || b.id)}
-                    className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/50 text-gray-400 hover:text-red-500 transition-colors"
+                    className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/50"
                   >
                     <Trash2 size={14} />
                   </button>

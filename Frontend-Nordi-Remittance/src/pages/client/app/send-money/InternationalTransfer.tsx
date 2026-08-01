@@ -18,14 +18,14 @@ import {
   Info,
   AlertTriangle,
 } from "@constants/icons";
-import { useClientWallets } from "../../domain/useAccountsDomain";
+import { useClientWallets } from "../../client-usecase/useaccounts-client-usecase";
 import {
   useSendRemittance,
   useRemittanceQuote,
   useClientRemittanceCountries,
   useClientRecipients,
   useCreateRecipient,
-} from "../../domain/useTransactionsDomain";
+} from "../../client-usecase/usetransaction-client-usecase";
 import {
   TransferLayout,
   StepIndicator,
@@ -45,12 +45,7 @@ import {
 import type { WizardStep, AccountOption } from "@components/shared/TransferPrimitives";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const STEPS: WizardStep[] = [
-  { label: "Account" },
-  { label: "Recipient" },
-  { label: "Amount" },
-  { label: "Review" },
-];
+const STEPS: WizardStep[] = [{ label: "Account" }, { label: "Recipient" }, { label: "Amount" }, { label: "Review" }];
 
 const CURRENCIES = [
   { value: "USD", label: "🇺🇸 USD — US Dollar" },
@@ -109,9 +104,7 @@ const schema = Yup.object({
   swiftCode: Yup.string().when("recipientType", {
     is: "new",
     then: (s) =>
-      s
-        .required("SWIFT/BIC is required")
-        .matches(/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i, "Invalid SWIFT code"),
+      s.required("SWIFT/BIC is required").matches(/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i, "Invalid SWIFT code"),
     otherwise: (s) => s.notRequired(),
   }),
   country: Yup.string().when("recipientType", {
@@ -119,10 +112,7 @@ const schema = Yup.object({
     then: (s) => s.required("Country is required"),
     otherwise: (s) => s.notRequired(),
   }),
-  amount: Yup.number()
-    .required("Enter an amount")
-    .positive("Must be positive")
-    .max(50000, "Max $50,000 per transfer"),
+  amount: Yup.number().required("Enter an amount").positive("Must be positive").max(50000, "Max $50,000 per transfer"),
   currency: Yup.string().required("Select a currency"),
   purpose: Yup.string().required("Select a purpose"),
   deliveryMethod: Yup.string().required("Select delivery method"),
@@ -157,9 +147,7 @@ const InternationalTransfer: React.FC = () => {
       recipientSearch
         ? recipients.filter(
             (r: any) =>
-              (r.firstName || r.name || "")
-                .toLowerCase()
-                .includes(recipientSearch.toLowerCase()) ||
+              (r.firstName || r.name || "").toLowerCase().includes(recipientSearch.toLowerCase()) ||
               (r.country || "").toLowerCase().includes(recipientSearch.toLowerCase()),
           )
         : recipients,
@@ -249,10 +237,7 @@ const InternationalTransfer: React.FC = () => {
           onSuccess: (data: any) => {
             setResult({
               success: true,
-              reference:
-                data?.referenceNumber ||
-                data?.id ||
-                `INTL${Date.now().toString().slice(-7)}`,
+              reference: data?.referenceNumber || data?.id || `INTL${Date.now().toString().slice(-7)}`,
             });
           },
           onError: () => {
@@ -263,16 +248,7 @@ const InternationalTransfer: React.FC = () => {
     },
   });
 
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    setTouched,
-  } = formik;
+  const { values, errors, touched, setFieldValue, handleChange, handleBlur, handleSubmit, setTouched } = formik;
 
   // Per-step validation
   const goNext = async () => {
@@ -281,13 +257,7 @@ const InternationalTransfer: React.FC = () => {
       1:
         values.recipientType === "existing"
           ? ["recipientId"]
-          : [
-              "recipientName",
-              "recipientAccount",
-              "bankName",
-              "swiftCode",
-              "country",
-            ],
+          : ["recipientName", "recipientAccount", "bankName", "swiftCode", "country"],
       2: ["amount", "currency", "purpose", "deliveryMethod"],
       3: ["agreeTos", "agreeCompliance"],
     };
@@ -316,12 +286,8 @@ const InternationalTransfer: React.FC = () => {
 
   // Derived
   const selectedAccount = wallets.find((w) => w.id === values.fromAccount);
-  const selectedRecipient = recipients.find(
-    (r: any) => r.id === values.recipientId,
-  );
-  const deliveryInfo = DELIVERY_OPTS.find(
-    (d) => d.value === values.deliveryMethod,
-  );
+  const selectedRecipient = recipients.find((r: any) => r.id === values.recipientId);
+  const deliveryInfo = DELIVERY_OPTS.find((d) => d.value === values.deliveryMethod);
   const fee = deliveryInfo?.fee ?? 15;
   const total = (Number(values.amount) || 0) + fee;
   const quoteData = quote.data as any;
@@ -334,11 +300,7 @@ const InternationalTransfer: React.FC = () => {
         <TCard>
           <TransferResult
             success={result.success}
-            title={
-              result.success
-                ? "Remittance Submitted!"
-                : "Transfer Failed"
-            }
+            title={result.success ? "Remittance Submitted!" : "Transfer Failed"}
             subtitle={
               result.success
                 ? "Your international transfer is being processed."
@@ -364,11 +326,7 @@ const InternationalTransfer: React.FC = () => {
                     { label: "ETA", value: deliveryInfo?.eta || "—" },
                     {
                       label: "Recipient",
-                      value:
-                        selectedRecipient?.firstName ||
-                        selectedRecipient?.name ||
-                        values.recipientName ||
-                        "—",
+                      value: selectedRecipient?.firstName || selectedRecipient?.name || values.recipientName || "—",
                     },
                   ]
                 : undefined
@@ -389,10 +347,8 @@ const InternationalTransfer: React.FC = () => {
     <TransferLayout>
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          International Transfer
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">International Transfer</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Send money abroad securely and at competitive rates.
         </p>
       </div>
@@ -412,7 +368,7 @@ const InternationalTransfer: React.FC = () => {
               loading={walletsLoading}
             />
             {errors.fromAccount && touched.fromAccount && (
-              <p className="text-xs text-red-500 mt-2">{errors.fromAccount}</p>
+              <p className="mt-2 text-xs text-red-500">{errors.fromAccount}</p>
             )}
           </TCard>
         )}
@@ -422,7 +378,7 @@ const InternationalTransfer: React.FC = () => {
           <div className="space-y-6">
             <TCard title="Recipient" icon={<User size={18} />}>
               {/* Toggle */}
-              <div className="flex gap-2 mb-4">
+              <div className="mb-4 flex gap-2">
                 {(["existing", "new"] as const).map((t) => (
                   <button
                     key={t}
@@ -431,10 +387,10 @@ const InternationalTransfer: React.FC = () => {
                       setFieldValue("recipientType", t);
                       setFieldValue("recipientId", "");
                     }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                    className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-colors ${
                       values.recipientType === t
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400"
-                        : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ? "border-indigo-500 bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
                     }`}
                   >
                     {t === "existing" ? "Saved Recipient" : "New Recipient"}
@@ -445,34 +401,26 @@ const InternationalTransfer: React.FC = () => {
               {values.recipientType === "existing" ? (
                 <div className="space-y-3">
                   <div className="relative">
-                    <Search
-                      size={16}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       value={recipientSearch}
                       onChange={(e) => setRecipientSearch(e.target.value)}
                       placeholder="Search recipients…"
-                      className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
                     />
                   </div>
 
                   {recipientsLoading ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="h-14 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"
-                        />
+                        <div key={i} className="h-14 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
                       ))}
                     </div>
                   ) : filteredRecipients.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 py-6 text-center">
-                      No recipients found
-                    </p>
+                    <p className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">No recipients found</p>
                   ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                    <div className="max-h-60 space-y-2 overflow-y-auto">
                       {filteredRecipients.map((r: any) => (
                         <button
                           key={r.id}
@@ -481,30 +429,24 @@ const InternationalTransfer: React.FC = () => {
                             setFieldValue("recipientId", r.id);
                             setFieldValue("country", r.country || "");
                           }}
-                          className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
+                          className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all ${
                             values.recipientId === r.id
                               ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
-                              : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                           }`}
                         >
-                          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">
-                            {(r.firstName || r.name || "?")
-                              .charAt(0)
-                              .toUpperCase()}
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                            {(r.firstName || r.name || "?").charAt(0).toUpperCase()}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                              {`${r.firstName || ""} ${r.lastName || ""}`.trim() ||
-                                r.name ||
-                                "—"}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                              {`${r.firstName || ""} ${r.lastName || ""}`.trim() || r.name || "—"}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               {r.country || "—"} · {r.currency || "—"}
                             </p>
                           </div>
-                          {r.isFavorite && (
-                            <span className="text-amber-400 text-xs">★</span>
-                          )}
+                          {r.isFavorite && <span className="text-xs text-amber-400">★</span>}
                         </button>
                       ))}
                     </div>
@@ -607,15 +549,12 @@ const InternationalTransfer: React.FC = () => {
 
               {/* Exchange rate info */}
               {exchangeRate && (
-                <div className="mt-4 flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/40">
-                  <RefreshCw size={16} className="text-blue-500 flex-shrink-0" />
+                <div className="mt-4 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800/40 dark:bg-blue-950/20">
+                  <RefreshCw size={16} className="flex-shrink-0 text-blue-500" />
                   <div className="text-sm">
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Exchange Rate:{" "}
-                    </span>
+                    <span className="text-gray-700 dark:text-gray-300">Exchange Rate: </span>
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      1 {selectedAccount?.currency || "USD"} ={" "}
-                      {Number(exchangeRate).toFixed(4)} {values.currency}
+                      1 {selectedAccount?.currency || "USD"} = {Number(exchangeRate).toFixed(4)} {values.currency}
                     </span>
                   </div>
                 </div>
@@ -643,19 +582,15 @@ const InternationalTransfer: React.FC = () => {
                     key={d.value}
                     type="button"
                     onClick={() => setFieldValue("deliveryMethod", d.value)}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`rounded-lg border p-3 text-left transition-all ${
                       values.deliveryMethod === d.value
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/50"
-                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        ? "border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500/50 dark:bg-indigo-950/30"
+                        : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
                     }`}
                   >
-                    <span className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
-                      {d.label}
-                    </span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {d.eta}
-                    </p>
-                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-1">
+                    <span className="mb-1 block text-sm font-medium text-gray-900 dark:text-white">{d.label}</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{d.eta}</p>
+                    <p className="mt-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                       ${d.fee.toFixed(2)} fee
                     </p>
                   </button>
@@ -709,11 +644,7 @@ const InternationalTransfer: React.FC = () => {
         {step === 3 && (
           <div className="space-y-6">
             <ReviewSection title="Transfer Details" icon={<Send size={16} />}>
-              <ReviewRow
-                label="Amount"
-                value={formatCurrency(values.amount)}
-                highlight
-              />
+              <ReviewRow label="Amount" value={formatCurrency(values.amount)} highlight />
               <ReviewRow label="Currency" value={values.currency} />
               {exchangeRate && (
                 <ReviewRow
@@ -721,47 +652,18 @@ const InternationalTransfer: React.FC = () => {
                   value={`≈ ${(Number(values.amount) * Number(exchangeRate)).toFixed(2)} ${values.currency}`}
                 />
               )}
-              <ReviewRow
-                label="Delivery"
-                value={deliveryInfo?.label || "—"}
-              />
-              <ReviewRow
-                label="Fee"
-                value={formatCurrency(fee)}
-              />
-              <ReviewRow
-                label="Total"
-                value={formatCurrency(total)}
-                highlight
-              />
-              <ReviewRow
-                label="Purpose"
-                value={PURPOSES.find((p) => p.value === values.purpose)?.label || "—"}
-              />
-              {values.reference && (
-                <ReviewRow label="Reference" value={values.reference} />
-              )}
+              <ReviewRow label="Delivery" value={deliveryInfo?.label || "—"} />
+              <ReviewRow label="Fee" value={formatCurrency(fee)} />
+              <ReviewRow label="Total" value={formatCurrency(total)} highlight />
+              <ReviewRow label="Purpose" value={PURPOSES.find((p) => p.value === values.purpose)?.label || "—"} />
+              {values.reference && <ReviewRow label="Reference" value={values.reference} />}
             </ReviewSection>
 
-            <ReviewSection
-              title="From Account"
-              icon={<Building2 size={16} />}
-            >
-              <ReviewRow
-                label="Account"
-                value={
-                  selectedAccount?.name ||
-                  selectedAccount?.walletType ||
-                  "—"
-                }
-              />
+            <ReviewSection title="From Account" icon={<Building2 size={16} />}>
+              <ReviewRow label="Account" value={selectedAccount?.name || selectedAccount?.walletType || "—"} />
               <ReviewRow
                 label="Balance"
-                value={
-                  typeof selectedAccount?.balance === "number"
-                    ? formatCurrency(selectedAccount.balance)
-                    : "—"
-                }
+                value={typeof selectedAccount?.balance === "number" ? formatCurrency(selectedAccount.balance) : "—"}
               />
             </ReviewSection>
 
@@ -776,10 +678,7 @@ const InternationalTransfer: React.FC = () => {
                       "—"
                     }
                   />
-                  <ReviewRow
-                    label="Country"
-                    value={selectedRecipient?.country || "—"}
-                  />
+                  <ReviewRow label="Country" value={selectedRecipient?.country || "—"} />
                 </>
               ) : (
                 <>
@@ -793,16 +692,12 @@ const InternationalTransfer: React.FC = () => {
             </ReviewSection>
 
             {/* Warnings */}
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40">
-              <AlertTriangle
-                size={16}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
-              <div className="text-xs text-amber-700 dark:text-amber-400 space-y-1">
+            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/40 dark:bg-amber-950/20">
+              <AlertTriangle size={16} className="mt-0.5 flex-shrink-0 text-amber-500" />
+              <div className="space-y-1 text-xs text-amber-700 dark:text-amber-400">
                 <p>
-                  International transfers may take up to 5 business days.
-                  Exchange rates are indicative and may vary at time of
-                  processing.
+                  International transfers may take up to 5 business days. Exchange rates are indicative and may vary at
+                  time of processing.
                 </p>
               </div>
             </div>
@@ -838,11 +733,9 @@ const InternationalTransfer: React.FC = () => {
         disabled={step === 3 && (!values.agreeTos || !values.agreeCompliance)}
       />
 
-      <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 justify-center pb-4">
+      <div className="flex items-center justify-center gap-2 pb-4 text-xs text-gray-400 dark:text-gray-500">
         <Shield size={12} />
-        <span>
-          Protected by bank-grade encryption. Regulated international transfer.
-        </span>
+        <span>Protected by bank-grade encryption. Regulated international transfer.</span>
       </div>
     </TransferLayout>
   );

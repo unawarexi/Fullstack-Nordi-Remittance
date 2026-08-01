@@ -33,7 +33,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
-import { useAccountsManagement } from "../../domain/useAccountsManagement";
+import { useAccountsManagement } from "../../admin-usecase/useAccountsManagement";
 
 const accountTypeIcons: Record<string, React.ReactNode> = {
   savings: <PiggyBank size={16} />,
@@ -74,10 +74,7 @@ export default function AccountsManagement() {
       <PageHeader
         title="Bank Accounts"
         subtitle="Manage customer savings, current, fixed deposit accounts and wallets"
-        breadcrumbs={[
-          { label: "Admin", href: "/admin/dashboard" },
-          { label: "Accounts" },
-        ]}
+        breadcrumbs={[{ label: "Admin", href: "/admin/dashboard" }, { label: "Accounts" }]}
         actions={
           <div className="flex gap-2">
             <ActionButton label="Export" icon={<Download size={14} />} onClick={() => {}} variant="secondary" />
@@ -87,19 +84,48 @@ export default function AccountsManagement() {
       />
 
       <StatsGrid>
-        <StatCard label="Total Balance (AUM)" value={`€${(stats.totalBalance / 1000).toFixed(0)}K`} icon={<Wallet size={18} />} iconColor="from-indigo-500 to-indigo-600" index={0} />
-        <StatCard label="Active Accounts" value={stats.activeAccounts} icon={<CreditCard size={18} />} iconColor="from-emerald-500 to-emerald-600" positive index={1} />
-        <StatCard label="Dormant Accounts" value={stats.dormantAccounts} icon={<Clock size={18} />} iconColor="from-amber-500 to-amber-600" index={2} />
-        <StatCard label="Total Accounts" value={stats.totalAccounts} icon={<Building2 size={18} />} iconColor="from-blue-500 to-blue-600" index={3} />
+        <StatCard
+          label="Total Balance (AUM)"
+          value={`€${(stats.totalBalance / 1000).toFixed(0)}K`}
+          icon={<Wallet size={18} />}
+          iconColor="from-indigo-500 to-indigo-600"
+          index={0}
+        />
+        <StatCard
+          label="Active Accounts"
+          value={stats.activeAccounts}
+          icon={<CreditCard size={18} />}
+          iconColor="from-emerald-500 to-emerald-600"
+          positive
+          index={1}
+        />
+        <StatCard
+          label="Dormant Accounts"
+          value={stats.dormantAccounts}
+          icon={<Clock size={18} />}
+          iconColor="from-amber-500 to-amber-600"
+          index={2}
+        />
+        <StatCard
+          label="Total Accounts"
+          value={stats.totalAccounts}
+          icon={<Building2 size={18} />}
+          iconColor="from-blue-500 to-blue-600"
+          index={3}
+        />
       </StatsGrid>
 
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
         {statusFilters.map((s) => (
           <FilterPill key={s} label={s} active={activeStatus === s} onClick={() => setActiveStatus(s as any)} />
         ))}
       </div>
 
-      <FilterBar searchValue={search} onSearchChange={setSearch} searchPlaceholder="Search by name, email, or account number...">
+      <FilterBar
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, email, or account number..."
+      >
         <FilterSelect
           value={typeFilter}
           onChange={setTypeFilter}
@@ -120,44 +146,92 @@ export default function AccountsManagement() {
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800">
                 {["Account", "Owner", "Type", "Balance", "Interest", "Status", "Last Activity", "Actions"].map((h) => (
-                  <th key={h} className="text-left py-3 px-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{h}</th>
+                  <th
+                    key={h}
+                    className="px-2 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-400"
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               <AnimatePresence>
                 {filtered.map((acc, i) => (
-                  <motion.tr key={acc.id} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: i * 0.03 } }} exit={{ opacity: 0 }} className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                    <td className="py-3 px-2">
+                  <motion.tr
+                    key={acc.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { delay: i * 0.03 } }}
+                    exit={{ opacity: 0 }}
+                    className="border-b border-gray-50 transition-colors hover:bg-gray-50/50 dark:border-gray-800/50 dark:hover:bg-gray-800/30"
+                  >
+                    <td className="px-2 py-3">
                       <p className="font-mono text-gray-900 dark:text-white">{acc.accountNumber}</p>
                       <p className="text-[10px] text-gray-400">{acc.id}</p>
                     </td>
-                    <td className="py-3 px-2">
+                    <td className="px-2 py-3">
                       <p className="font-medium text-gray-900 dark:text-white">{acc.owner}</p>
                       <p className="text-[10px] text-gray-400">{acc.email}</p>
                     </td>
-                    <td className="py-3 px-2">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium capitalize ${accountTypeColors[acc.type]}`}>
+                    <td className="px-2 py-3">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-medium capitalize ${accountTypeColors[acc.type]}`}
+                      >
                         {accountTypeIcons[acc.type]}
                         {acc.type.replace("-", " ")}
                       </span>
                     </td>
-                    <td className="py-3 px-2 font-semibold text-gray-900 dark:text-white">€{acc.balance.toLocaleString()}</td>
-                    <td className="py-3 px-2 text-gray-600 dark:text-gray-300">{acc.interestRate > 0 ? `${acc.interestRate}%` : "—"}</td>
-                    <td className="py-3 px-2"><StatusBadge status={acc.status} /></td>
-                    <td className="py-3 px-2 text-gray-400">{new Date(acc.lastActivity).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</td>
-                    <td className="py-3 px-2">
+                    <td className="px-2 py-3 font-semibold text-gray-900 dark:text-white">
+                      €{acc.balance.toLocaleString()}
+                    </td>
+                    <td className="px-2 py-3 text-gray-600 dark:text-gray-300">
+                      {acc.interestRate > 0 ? `${acc.interestRate}%` : "—"}
+                    </td>
+                    <td className="px-2 py-3">
+                      <StatusBadge status={acc.status} />
+                    </td>
+                    <td className="px-2 py-3 text-gray-400">
+                      {new Date(acc.lastActivity).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-2 py-3">
                       <div className="flex items-center gap-1">
-                        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors" title="View Details">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                          title="View Details"
+                        >
                           <Eye size={14} />
                         </motion.button>
                         {acc.status === "active" && (
-                          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => { freezeAccount(acc.id); toast.warning(`Account ${acc.accountNumber} frozen`); }} className="p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/20 text-amber-500 transition-colors" title="Freeze">
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              freezeAccount(acc.id);
+                              toast.warning(`Account ${acc.accountNumber} frozen`);
+                            }}
+                            className="rounded-lg p-1.5 text-amber-500 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/20"
+                            title="Freeze"
+                          >
                             <Lock size={14} />
                           </motion.button>
                         )}
                         {acc.status === "frozen" && (
-                          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => { unfreezeAccount(acc.id); toast.success(`Account ${acc.accountNumber} unfrozen`); }} className="p-1.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-500 transition-colors" title="Unfreeze">
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              unfreezeAccount(acc.id);
+                              toast.success(`Account ${acc.accountNumber} unfrozen`);
+                            }}
+                            className="rounded-lg p-1.5 text-emerald-500 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                            title="Unfreeze"
+                          >
                             <Unlock size={14} />
                           </motion.button>
                         )}
@@ -172,7 +246,7 @@ export default function AccountsManagement() {
       </DashCard>
 
       {filtered.length === 0 && (
-        <DashCard className="text-center py-12">
+        <DashCard className="py-12 text-center">
           <Search size={32} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" />
           <p className="text-sm text-gray-500 dark:text-gray-400">No accounts match your filters</p>
         </DashCard>

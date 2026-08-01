@@ -26,12 +26,8 @@ import {
 } from "@core/data/FormData";
 import useThemeStore from "@store/theme.store";
 import { lightTheme, darkTheme } from "@constants/colors";
-import { useCreateUser, type Country } from "../../domain/useCreateUser";
-import {
-  signupSchema,
-  signupInitialValues,
-  type SignupFormValues,
-} from "@utils/validators/auth.validators";
+import { useCreateUser, type Country } from "../../admin-usecase/useCreateUser";
+import { signupSchema, signupInitialValues, type SignupFormValues } from "@utils/validators/auth.validators";
 
 // ============================================================================
 // COMPONENT
@@ -152,34 +148,26 @@ const CreateUser: React.FC = () => {
                 </h2>
 
                 <div>
-                  <label htmlFor="firstName" style={{ color: theme.text.secondary }}>First Name*</label>
-                  <input
-                    {...register("firstName")}
-                    className="form__div"
-                    placeholder="As per ID"
-                    style={inputStyle}
-                  />
-                  {errors.firstName && (
-                    <div className="error-class">{errors.firstName.message}</div>
-                  )}
+                  <label htmlFor="firstName" style={{ color: theme.text.secondary }}>
+                    First Name*
+                  </label>
+                  <input {...register("firstName")} className="form__div" placeholder="As per ID" style={inputStyle} />
+                  {errors.firstName && <div className="error-class">{errors.firstName.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="middleName" style={{ color: theme.text.secondary }}>Middle Name (Optional)</label>
+                  <label htmlFor="middleName" style={{ color: theme.text.secondary }}>
+                    Middle Name (Optional)
+                  </label>
                   <input {...register("middleName")} className="form__div" style={inputStyle} />
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="lastName" style={{ color: theme.text.secondary }}>Last Name*</label>
-                  <input
-                    {...register("lastName")}
-                    className="form__div"
-                    placeholder="As per ID"
-                    style={inputStyle}
-                  />
-                  {errors.lastName && (
-                    <div className="error-class">{errors.lastName.message}</div>
-                  )}
+                  <label htmlFor="lastName" style={{ color: theme.text.secondary }}>
+                    Last Name*
+                  </label>
+                  <input {...register("lastName")} className="form__div" placeholder="As per ID" style={inputStyle} />
+                  {errors.lastName && <div className="error-class">{errors.lastName.message}</div>}
                 </div>
 
                 <div className="mt-4 grid">
@@ -192,37 +180,39 @@ const CreateUser: React.FC = () => {
                     selected={values.dateOfBirth}
                     onChange={(date: Date | null) => setValue("dateOfBirth", date as any, { shouldValidate: true })}
                   />
-                  {errors.dateOfBirth && (
-                    <div className="error-class">{errors.dateOfBirth.message}</div>
-                  )}
+                  {errors.dateOfBirth && <div className="error-class">{errors.dateOfBirth.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="gender" style={{ color: theme.text.secondary }}>Gender*</label>
+                  <label htmlFor="gender" style={{ color: theme.text.secondary }}>
+                    Gender*
+                  </label>
                   <Select
                     options={genders}
                     value={genders.find((g) => g.value === values.gender)}
-                    onChange={(option) => setValue("gender", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("gender", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.gender && (
-                    <div className="error-class">{errors.gender.message}</div>
-                  )}
+                  {errors.gender && <div className="error-class">{errors.gender.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="nationality" style={{ color: theme.text.secondary }}>Nationality*</label>
+                  <label htmlFor="nationality" style={{ color: theme.text.secondary }}>
+                    Nationality*
+                  </label>
                   <Select
                     options={countries}
                     value={countries.find((c) => c.value === values.nationality)}
-                    onChange={(option) => setValue("nationality", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("nationality", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.nationality && (
-                    <div className="error-class">{errors.nationality.message}</div>
-                  )}
+                  {errors.nationality && <div className="error-class">{errors.nationality.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -232,13 +222,13 @@ const CreateUser: React.FC = () => {
                   <Select
                     options={countries}
                     value={countries.find((c) => c.value === values.countryOfResidence)}
-                    onChange={(option) => setValue("countryOfResidence", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("countryOfResidence", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.countryOfResidence && (
-                    <div className="error-class">{errors.countryOfResidence.message}</div>
-                  )}
+                  {errors.countryOfResidence && <div className="error-class">{errors.countryOfResidence.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -280,9 +270,7 @@ const CreateUser: React.FC = () => {
                       <img src={filePreviews.profilePicture} alt="Profile Preview" className="h-24 w-24 object-cover" />
                     </div>
                   )}
-                  {errors.profilePicture && (
-                    <div className="error-class">{errors.profilePicture.message}</div>
-                  )}
+                  {errors.profilePicture && <div className="error-class">{errors.profilePicture.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -302,49 +290,49 @@ const CreateUser: React.FC = () => {
                       <img src={filePreviews.governmentId} alt="ID Preview" className="h-24 w-auto object-cover" />
                     </div>
                   )}
-                  {errors.governmentId && (
-                    <div className="error-class">{errors.governmentId.message}</div>
-                  )}
+                  {errors.governmentId && <div className="error-class">{errors.governmentId.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="idType" style={{ color: theme.text.secondary }}>ID Type*</label>
+                  <label htmlFor="idType" style={{ color: theme.text.secondary }}>
+                    ID Type*
+                  </label>
                   <Select
                     options={idTypes}
                     value={idTypes.find((type) => type.value === values.idType)}
-                    onChange={(option) => setValue("idType", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("idType", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.idType && (
-                    <div className="error-class">{errors.idType.message}</div>
-                  )}
+                  {errors.idType && <div className="error-class">{errors.idType.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="idNumber" style={{ color: theme.text.secondary }}>ID Number*</label>
+                  <label htmlFor="idNumber" style={{ color: theme.text.secondary }}>
+                    ID Number*
+                  </label>
                   <input
                     {...register("idNumber")}
                     className="form__div"
                     placeholder="As shown on your ID"
                     style={inputStyle}
                   />
-                  {errors.idNumber && (
-                    <div className="error-class">{errors.idNumber.message}</div>
-                  )}
+                  {errors.idNumber && <div className="error-class">{errors.idNumber.message}</div>}
                 </div>
 
                 <div className="mt-4 grid">
-                  <label htmlFor="idExpiryDate" style={{ color: theme.text.secondary }}>ID Expiry Date*</label>
+                  <label htmlFor="idExpiryDate" style={{ color: theme.text.secondary }}>
+                    ID Expiry Date*
+                  </label>
                   <DatePicker
                     className="form__div"
                     style={inputStyle}
                     selected={values.idExpiryDate}
                     onChange={(date: Date | null) => setValue("idExpiryDate", date as any, { shouldValidate: true })}
                   />
-                  {errors.idExpiryDate && (
-                    <div className="error-class">{errors.idExpiryDate.message}</div>
-                  )}
+                  {errors.idExpiryDate && <div className="error-class">{errors.idExpiryDate.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -361,12 +349,14 @@ const CreateUser: React.FC = () => {
                   />
                   {filePreviews.proofOfAddress && filePreviews.proofOfAddress.startsWith("data:image") && (
                     <div className="mt-2">
-                      <img src={filePreviews.proofOfAddress} alt="Address Proof Preview" className="h-24 w-auto object-cover" />
+                      <img
+                        src={filePreviews.proofOfAddress}
+                        alt="Address Proof Preview"
+                        className="h-24 w-auto object-cover"
+                      />
                     </div>
                   )}
-                  {errors.proofOfAddress && (
-                    <div className="error-class">{errors.proofOfAddress.message}</div>
-                  )}
+                  {errors.proofOfAddress && <div className="error-class">{errors.proofOfAddress.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -376,13 +366,13 @@ const CreateUser: React.FC = () => {
                   <Select
                     options={addressDocTypes}
                     value={addressDocTypes.find((type) => type.value === values.addressDocType)}
-                    onChange={(option) => setValue("addressDocType", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("addressDocType", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.addressDocType && (
-                    <div className="error-class">{errors.addressDocType.message}</div>
-                  )}
+                  {errors.addressDocType && <div className="error-class">{errors.addressDocType.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -412,7 +402,9 @@ const CreateUser: React.FC = () => {
                 </h2>
 
                 <div className="mt-4">
-                  <label htmlFor="email" style={{ color: theme.text.secondary }}>Email Address*</label>
+                  <label htmlFor="email" style={{ color: theme.text.secondary }}>
+                    Email Address*
+                  </label>
                   <input
                     {...register("email")}
                     type="email"
@@ -420,22 +412,20 @@ const CreateUser: React.FC = () => {
                     placeholder="For verification"
                     style={inputStyle}
                   />
-                  {errors.email && (
-                    <div className="error-class">{errors.email.message}</div>
-                  )}
+                  {errors.email && <div className="error-class">{errors.email.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="mobileNumber" style={{ color: theme.text.secondary }}>Phone Number*</label>
+                  <label htmlFor="mobileNumber" style={{ color: theme.text.secondary }}>
+                    Phone Number*
+                  </label>
                   <input
                     {...register("mobileNumber")}
                     className="form__div"
                     placeholder="With country code"
                     style={inputStyle}
                   />
-                  {errors.mobileNumber && (
-                    <div className="error-class">{errors.mobileNumber.message}</div>
-                  )}
+                  {errors.mobileNumber && <div className="error-class">{errors.mobileNumber.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -446,44 +436,41 @@ const CreateUser: React.FC = () => {
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="homeAddress" style={{ color: theme.text.secondary }}>Residential Address*</label>
-                  <textarea
-                    {...register("homeAddress")}
-                    rows={3}
-                    className="form__div"
-                    style={inputStyle}
-                  />
-                  {errors.homeAddress && (
-                    <div className="error-class">{errors.homeAddress.message}</div>
-                  )}
+                  <label htmlFor="homeAddress" style={{ color: theme.text.secondary }}>
+                    Residential Address*
+                  </label>
+                  <textarea {...register("homeAddress")} rows={3} className="form__div" style={inputStyle} />
+                  {errors.homeAddress && <div className="error-class">{errors.homeAddress.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="city" style={{ color: theme.text.secondary }}>City*</label>
+                  <label htmlFor="city" style={{ color: theme.text.secondary }}>
+                    City*
+                  </label>
                   <input {...register("city")} className="form__div" style={inputStyle} />
-                  {errors.city && (
-                    <div className="error-class">{errors.city.message}</div>
-                  )}
+                  {errors.city && <div className="error-class">{errors.city.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="stateProvince" style={{ color: theme.text.secondary }}>State/Province*</label>
+                  <label htmlFor="stateProvince" style={{ color: theme.text.secondary }}>
+                    State/Province*
+                  </label>
                   <input {...register("stateProvince")} className="form__div" style={inputStyle} />
-                  {errors.stateProvince && (
-                    <div className="error-class">{errors.stateProvince.message}</div>
-                  )}
+                  {errors.stateProvince && <div className="error-class">{errors.stateProvince.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="zipCode" style={{ color: theme.text.secondary }}>ZIP/Postal Code*</label>
+                  <label htmlFor="zipCode" style={{ color: theme.text.secondary }}>
+                    ZIP/Postal Code*
+                  </label>
                   <input {...register("zipCode")} className="form__div" style={inputStyle} />
-                  {errors.zipCode && (
-                    <div className="error-class">{errors.zipCode.message}</div>
-                  )}
+                  {errors.zipCode && <div className="error-class">{errors.zipCode.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="country" style={{ color: theme.text.secondary }}>Country*</label>
+                  <label htmlFor="country" style={{ color: theme.text.secondary }}>
+                    Country*
+                  </label>
                   <Select
                     className="form__div"
                     options={countries}
@@ -496,9 +483,7 @@ const CreateUser: React.FC = () => {
                     }}
                     styles={selectStyles}
                   />
-                  {errors.country && (
-                    <div className="error-class">{errors.country.message}</div>
-                  )}
+                  {errors.country && <div className="error-class">{errors.country.message}</div>}
                 </div>
               </section>
             )}
@@ -511,7 +496,9 @@ const CreateUser: React.FC = () => {
                 </h2>
 
                 <div className="form__div mt-4 grid">
-                  <label htmlFor="accountType" style={{ color: theme.text.secondary }}>Type of Account*</label>
+                  <label htmlFor="accountType" style={{ color: theme.text.secondary }}>
+                    Type of Account*
+                  </label>
                   <select {...register("accountType")} className="form__div" style={inputStyle}>
                     <option value="">Select Account Type</option>
                     <option value="savings">Savings</option>
@@ -520,37 +507,39 @@ const CreateUser: React.FC = () => {
                     <option value="joint">Joint</option>
                     <option value="fixed deposit">Fixed Deposit</option>
                   </select>
-                  {errors.accountType && (
-                    <div className="error-class">{errors.accountType.message}</div>
-                  )}
+                  {errors.accountType && <div className="error-class">{errors.accountType.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="currency" style={{ color: theme.text.secondary }}>Currency*</label>
+                  <label htmlFor="currency" style={{ color: theme.text.secondary }}>
+                    Currency*
+                  </label>
                   <Select
                     options={currencies}
                     value={currencies.find((c) => c.value === values.currency)}
-                    onChange={(option) => setValue("currency", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("currency", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.currency && (
-                    <div className="error-class">{errors.currency.message}</div>
-                  )}
+                  {errors.currency && <div className="error-class">{errors.currency.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="sourceOfIncome" style={{ color: theme.text.secondary }}>Source of Income*</label>
+                  <label htmlFor="sourceOfIncome" style={{ color: theme.text.secondary }}>
+                    Source of Income*
+                  </label>
                   <Select
                     options={incomeSources}
                     value={incomeSources.find((s) => s.value === values.sourceOfIncome)}
-                    onChange={(option) => setValue("sourceOfIncome", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("sourceOfIncome", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.sourceOfIncome && (
-                    <div className="error-class">{errors.sourceOfIncome.message}</div>
-                  )}
+                  {errors.sourceOfIncome && <div className="error-class">{errors.sourceOfIncome.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -560,13 +549,13 @@ const CreateUser: React.FC = () => {
                   <Select
                     options={incomeRanges}
                     value={incomeRanges.find((r) => r.value === values.monthlyIncomeRange)}
-                    onChange={(option) => setValue("monthlyIncomeRange", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("monthlyIncomeRange", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.monthlyIncomeRange && (
-                    <div className="error-class">{errors.monthlyIncomeRange.message}</div>
-                  )}
+                  {errors.monthlyIncomeRange && <div className="error-class">{errors.monthlyIncomeRange.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -580,9 +569,7 @@ const CreateUser: React.FC = () => {
                     className="form__div"
                     style={inputStyle}
                   />
-                  {errors.initialDeposit && (
-                    <div className="error-class">{errors.initialDeposit.message}</div>
-                  )}
+                  {errors.initialDeposit && <div className="error-class">{errors.initialDeposit.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -592,13 +579,13 @@ const CreateUser: React.FC = () => {
                   <Select
                     options={employmentStatuses}
                     value={employmentStatuses.find((s) => s.value === values.employmentStatus)}
-                    onChange={(option) => setValue("employmentStatus", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("employmentStatus", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.employmentStatus && (
-                    <div className="error-class">{errors.employmentStatus.message}</div>
-                  )}
+                  {errors.employmentStatus && <div className="error-class">{errors.employmentStatus.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -612,17 +599,15 @@ const CreateUser: React.FC = () => {
                     style={inputStyle}
                     disabled={!["employed", "self-employed"].includes(values.employmentStatus || "")}
                   />
-                  {errors.employerName && (
-                    <div className="error-class">{errors.employerName.message}</div>
-                  )}
+                  {errors.employerName && <div className="error-class">{errors.employerName.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="occupation" style={{ color: theme.text.secondary }}>Occupation*</label>
+                  <label htmlFor="occupation" style={{ color: theme.text.secondary }}>
+                    Occupation*
+                  </label>
                   <input {...register("occupation")} className="form__div" style={inputStyle} />
-                  {errors.occupation && (
-                    <div className="error-class">{errors.occupation.message}</div>
-                  )}
+                  {errors.occupation && <div className="error-class">{errors.occupation.message}</div>}
                 </div>
               </section>
             )}
@@ -635,50 +620,52 @@ const CreateUser: React.FC = () => {
                 </h2>
 
                 <div className="mt-4">
-                  <label htmlFor="accountName" style={{ color: theme.text.secondary }}>Account Name*</label>
+                  <label htmlFor="accountName" style={{ color: theme.text.secondary }}>
+                    Account Name*
+                  </label>
                   <input
                     {...register("accountName")}
                     placeholder="Pay Account Name"
                     className="form__div"
                     style={inputStyle}
                   />
-                  {errors.accountName && (
-                    <div className="error-class">{errors.accountName.message}</div>
-                  )}
+                  {errors.accountName && <div className="error-class">{errors.accountName.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="accountNumber" style={{ color: theme.text.secondary }}>Account Number*</label>
+                  <label htmlFor="accountNumber" style={{ color: theme.text.secondary }}>
+                    Account Number*
+                  </label>
                   <input
                     {...register("accountNumber")}
                     placeholder="**************"
                     className="form__div"
                     style={inputStyle}
                   />
-                  {errors.accountNumber && (
-                    <div className="error-class">{errors.accountNumber.message}</div>
-                  )}
+                  {errors.accountNumber && <div className="error-class">{errors.accountNumber.message}</div>}
                 </div>
 
                 <div className="form__div">
-                  <label htmlFor="bankName" style={{ color: theme.text.secondary }}>Bank Name*</label>
+                  <label htmlFor="bankName" style={{ color: theme.text.secondary }}>
+                    Bank Name*
+                  </label>
                   <Select
                     options={banks}
                     value={banks.find((b) => b.value === values.bankName)}
-                    onChange={(option) => setValue("bankName", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("bankName", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     styles={selectStyles}
                   />
-                  {errors.bankName && (
-                    <div className="error-class">{errors.bankName.message}</div>
-                  )}
+                  {errors.bankName && <div className="error-class">{errors.bankName.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="bankAddress" style={{ color: theme.text.secondary }}>Bank Address*</label>
+                  <label htmlFor="bankAddress" style={{ color: theme.text.secondary }}>
+                    Bank Address*
+                  </label>
                   <input {...register("bankAddress")} className="form__div" style={inputStyle} />
-                  {errors.bankAddress && (
-                    <div className="error-class">{errors.bankAddress.message}</div>
-                  )}
+                  {errors.bankAddress && <div className="error-class">{errors.bankAddress.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -701,9 +688,7 @@ const CreateUser: React.FC = () => {
                       opacity: RoutingCountries.includes(selectedCountry || "") ? 0.5 : 1,
                     }}
                   />
-                  {errors.ibanNumber && (
-                    <div className="error-class">{errors.ibanNumber.message}</div>
-                  )}
+                  {errors.ibanNumber && <div className="error-class">{errors.ibanNumber.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -726,17 +711,15 @@ const CreateUser: React.FC = () => {
                       opacity: !RoutingCountries.includes(selectedCountry || "") ? 0.5 : 1,
                     }}
                   />
-                  {errors.routingNumber && (
-                    <div className="error-class">{errors.routingNumber.message}</div>
-                  )}
+                  {errors.routingNumber && <div className="error-class">{errors.routingNumber.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="swiftBic" style={{ color: theme.text.secondary }}>SWIFT/BIC*</label>
+                  <label htmlFor="swiftBic" style={{ color: theme.text.secondary }}>
+                    SWIFT/BIC*
+                  </label>
                   <input {...register("swiftBic")} className="form__div" style={inputStyle} />
-                  {errors.swiftBic && (
-                    <div className="error-class">{errors.swiftBic.message}</div>
-                  )}
+                  {errors.swiftBic && <div className="error-class">{errors.swiftBic.message}</div>}
                 </div>
               </section>
             )}
@@ -749,7 +732,9 @@ const CreateUser: React.FC = () => {
                 </h2>
 
                 <div className="mt-4">
-                  <label htmlFor="password" style={{ color: theme.text.secondary }}>Create Password*</label>
+                  <label htmlFor="password" style={{ color: theme.text.secondary }}>
+                    Create Password*
+                  </label>
                   <input
                     {...register("password")}
                     type="password"
@@ -757,22 +742,15 @@ const CreateUser: React.FC = () => {
                     placeholder="Min 8 characters"
                     style={inputStyle}
                   />
-                  {errors.password && (
-                    <div className="error-class">{errors.password.message}</div>
-                  )}
+                  {errors.password && <div className="error-class">{errors.password.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="confirmPassword" style={{ color: theme.text.secondary }}>Confirm Password*</label>
-                  <input
-                    {...register("confirmPassword")}
-                    type="password"
-                    className="form__div"
-                    style={inputStyle}
-                  />
-                  {errors.confirmPassword && (
-                    <div className="error-class">{errors.confirmPassword.message}</div>
-                  )}
+                  <label htmlFor="confirmPassword" style={{ color: theme.text.secondary }}>
+                    Confirm Password*
+                  </label>
+                  <input {...register("confirmPassword")} type="password" className="form__div" style={inputStyle} />
+                  {errors.confirmPassword && <div className="error-class">{errors.confirmPassword.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -782,21 +760,21 @@ const CreateUser: React.FC = () => {
                   <Select
                     options={securityQuestions}
                     value={securityQuestions.find((q) => q.value === values.securityQuestion)}
-                    onChange={(option) => setValue("securityQuestion", option ? (option as any).value : "", { shouldValidate: true })}
+                    onChange={(option) =>
+                      setValue("securityQuestion", option ? (option as any).value : "", { shouldValidate: true })
+                    }
                     className="form__div"
                     styles={selectStyles}
                   />
-                  {errors.securityQuestion && (
-                    <div className="error-class">{errors.securityQuestion.message}</div>
-                  )}
+                  {errors.securityQuestion && <div className="error-class">{errors.securityQuestion.message}</div>}
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="securityAnswer" style={{ color: theme.text.secondary }}>Security Answer*</label>
+                  <label htmlFor="securityAnswer" style={{ color: theme.text.secondary }}>
+                    Security Answer*
+                  </label>
                   <input {...register("securityAnswer")} className="form__div" style={inputStyle} />
-                  {errors.securityAnswer && (
-                    <div className="error-class">{errors.securityAnswer.message}</div>
-                  )}
+                  {errors.securityAnswer && <div className="error-class">{errors.securityAnswer.message}</div>}
                 </div>
 
                 <div className="mt-4 flex items-center">
@@ -820,13 +798,13 @@ const CreateUser: React.FC = () => {
                     <Select
                       options={twoFactorMethods}
                       value={twoFactorMethods.find((m) => m.value === values.twoFactorMethod)}
-                      onChange={(option) => setValue("twoFactorMethod", option ? (option as any).value : "", { shouldValidate: true })}
+                      onChange={(option) =>
+                        setValue("twoFactorMethod", option ? (option as any).value : "", { shouldValidate: true })
+                      }
                       className="form__div"
                       styles={selectStyles}
                     />
-                    {errors.twoFactorMethod && (
-                      <div className="error-class">{errors.twoFactorMethod.message}</div>
-                    )}
+                    {errors.twoFactorMethod && <div className="error-class">{errors.twoFactorMethod.message}</div>}
                   </div>
                 )}
               </section>
@@ -853,12 +831,14 @@ const CreateUser: React.FC = () => {
                   />
                   {filePreviews.selfieWithId && (
                     <div className="mt-2">
-                      <img src={filePreviews.selfieWithId} alt="Selfie with ID Preview" className="h-24 w-auto object-cover" />
+                      <img
+                        src={filePreviews.selfieWithId}
+                        alt="Selfie with ID Preview"
+                        className="h-24 w-auto object-cover"
+                      />
                     </div>
                   )}
-                  {errors.selfieWithId && (
-                    <div className="error-class">{errors.selfieWithId.message}</div>
-                  )}
+                  {errors.selfieWithId && <div className="error-class">{errors.selfieWithId.message}</div>}
                 </div>
 
                 <div className="mt-4">
@@ -875,7 +855,11 @@ const CreateUser: React.FC = () => {
                   />
                   {filePreviews.signature && (
                     <div className="mt-2">
-                      <img src={filePreviews.signature} alt="Signature Preview" className="h-12 w-auto object-contain" />
+                      <img
+                        src={filePreviews.signature}
+                        alt="Signature Preview"
+                        className="h-12 w-auto object-contain"
+                      />
                     </div>
                   )}
                 </div>
@@ -888,40 +872,28 @@ const CreateUser: React.FC = () => {
                 </div>
 
                 <div className="mt-4">
-                  <label htmlFor="inviteCode" style={{ color: theme.text.secondary }}>Invite Code (Optional)</label>
+                  <label htmlFor="inviteCode" style={{ color: theme.text.secondary }}>
+                    Invite Code (Optional)
+                  </label>
                   <input {...register("inviteCode")} className="form__div" style={inputStyle} />
                 </div>
 
                 <div className="mt-6">
                   <div className="mb-4 flex items-center">
-                    <input
-                      type="checkbox"
-                      id="agreeToTerms"
-                      {...register("agreeToTerms")}
-                      className="mr-2"
-                    />
+                    <input type="checkbox" id="agreeToTerms" {...register("agreeToTerms")} className="mr-2" />
                     <label htmlFor="agreeToTerms" style={{ color: theme.text.secondary }}>
                       I agree to the Terms and Conditions*
                     </label>
                   </div>
-                  {errors.agreeToTerms && (
-                    <div className="error-class">{errors.agreeToTerms.message}</div>
-                  )}
+                  {errors.agreeToTerms && <div className="error-class">{errors.agreeToTerms.message}</div>}
 
                   <div className="mb-4 flex items-center">
-                    <input
-                      type="checkbox"
-                      id="agreeToPrivacy"
-                      {...register("agreeToPrivacy")}
-                      className="mr-2"
-                    />
+                    <input type="checkbox" id="agreeToPrivacy" {...register("agreeToPrivacy")} className="mr-2" />
                     <label htmlFor="agreeToPrivacy" style={{ color: theme.text.secondary }}>
                       I agree to the Privacy Policy*
                     </label>
                   </div>
-                  {errors.agreeToPrivacy && (
-                    <div className="error-class">{errors.agreeToPrivacy.message}</div>
-                  )}
+                  {errors.agreeToPrivacy && <div className="error-class">{errors.agreeToPrivacy.message}</div>}
 
                   <div className="mb-4 flex items-center">
                     <input
@@ -951,7 +923,11 @@ const CreateUser: React.FC = () => {
             <button
               type="button"
               className="w-full rounded-md px-4 py-1 text-sm font-normal md:py-2 md:text-base"
-              style={{ backgroundColor: theme.surface.secondary, color: theme.text.primary, border: `1px solid ${theme.border.primary}` }}
+              style={{
+                backgroundColor: theme.surface.secondary,
+                color: theme.text.primary,
+                border: `1px solid ${theme.border.primary}`,
+              }}
               onClick={prevStep}
             >
               Previous

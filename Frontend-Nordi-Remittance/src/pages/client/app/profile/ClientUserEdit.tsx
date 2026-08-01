@@ -7,17 +7,20 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import {
-  User, MapPin, Briefcase, Loader2, Check, Trash2, Edit3,
-} from "@constants/icons";
+import { User, MapPin, Briefcase, Loader2, Check, Trash2, Edit3 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { PageContainer, DashCard } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useClientProfile, useClientAddress, useClientEmployment,
-  useUpdateProfile, useUpdateAddress, useUpdateEmployment,
-  useUpdateAvatar, useDeleteAvatar,
-} from "../../domain/useProfileDomain";
+  useClientProfile,
+  useClientAddress,
+  useClientEmployment,
+  useUpdateProfile,
+  useUpdateAddress,
+  useUpdateEmployment,
+  useUpdateAvatar,
+  useDeleteAvatar,
+} from "../../client-usecase/useprofile-client-usecase";
 
 /* ── Helpers ─────────────────────────────────────────────────────────── */
 const inputCls =
@@ -49,54 +52,69 @@ const ClientUserEdit: React.FC = () => {
   const updateAvatar = useUpdateAvatar();
   const deleteAvatar = useDeleteAvatar();
 
-  const p = ((profileData ?? {}) as Record<string, any>);
-  const a = ((addressData ?? {}) as Record<string, any>);
-  const e = ((employmentData ?? {}) as Record<string, any>);
+  const p = (profileData ?? {}) as Record<string, any>;
+  const a = (addressData ?? {}) as Record<string, any>;
+  const e = (employmentData ?? {}) as Record<string, any>;
 
   /* ── Form State ── */
   const [personal, setPersonal] = useState({
-    firstName: "", lastName: "", middleName: "", phone: "",
-    dateOfBirth: "", gender: "" as string,
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "" as string,
   });
   const [address, setAddress] = useState({
-    street: "", city: "", state: "", country: "", postalCode: "",
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    postalCode: "",
   });
   const [employment, setEmployment] = useState({
-    status: "" as string, employer: "", jobTitle: "",
-    industry: "", annualIncome: "", sourceOfFunds: "",
+    status: "" as string,
+    employer: "",
+    jobTitle: "",
+    industry: "",
+    annualIncome: "",
+    sourceOfFunds: "",
   });
 
   /* Seed form from API data */
   useEffect(() => {
-    if (p.firstName) setPersonal({
-      firstName: p.firstName || "",
-      lastName: p.lastName || "",
-      middleName: p.middleName || "",
-      phone: p.phone || "",
-      dateOfBirth: p.dateOfBirth ? p.dateOfBirth.split("T")[0] : "",
-      gender: p.gender || "",
-    });
+    if (p.firstName)
+      setPersonal({
+        firstName: p.firstName || "",
+        lastName: p.lastName || "",
+        middleName: p.middleName || "",
+        phone: p.phone || "",
+        dateOfBirth: p.dateOfBirth ? p.dateOfBirth.split("T")[0] : "",
+        gender: p.gender || "",
+      });
   }, [profileData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (a.street || a.city) setAddress({
-      street: a.street || "",
-      city: a.city || "",
-      state: a.state || "",
-      country: a.country || "",
-      postalCode: a.postalCode || "",
-    });
+    if (a.street || a.city)
+      setAddress({
+        street: a.street || "",
+        city: a.city || "",
+        state: a.state || "",
+        country: a.country || "",
+        postalCode: a.postalCode || "",
+      });
   }, [addressData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (e.status || e.employer) setEmployment({
-      status: e.status || "",
-      employer: e.employer || "",
-      jobTitle: e.jobTitle || "",
-      industry: e.industry || "",
-      annualIncome: e.annualIncome ? String(e.annualIncome) : "",
-      sourceOfFunds: e.sourceOfFunds || "",
-    });
+    if (e.status || e.employer)
+      setEmployment({
+        status: e.status || "",
+        employer: e.employer || "",
+        jobTitle: e.jobTitle || "",
+        industry: e.industry || "",
+        annualIncome: e.annualIncome ? String(e.annualIncome) : "",
+        sourceOfFunds: e.sourceOfFunds || "",
+      });
   }, [employmentData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Handlers ── */
@@ -138,11 +156,12 @@ const ClientUserEdit: React.FC = () => {
   };
 
   const avatarSrc = p.profilePicture || p.avatar;
-  const initials = [p.firstName, p.lastName]
-    .filter(Boolean)
-    .map((n: string) => n[0])
-    .join("")
-    .toUpperCase() || "?";
+  const initials =
+    [p.firstName, p.lastName]
+      .filter(Boolean)
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase() || "?";
 
   return (
     <PageContainer>
@@ -166,23 +185,21 @@ const ClientUserEdit: React.FC = () => {
         <DashCard>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold overflow-hidden">
-                {avatarSrc ? (
-                  <img src={avatarSrc} alt="" className="w-full h-full object-cover" />
-                ) : initials}
+              <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white">
+                {avatarSrc ? <img src={avatarSrc} alt="" className="h-full w-full object-cover" /> : initials}
               </div>
-              <label className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-indigo-600 text-white cursor-pointer hover:bg-indigo-700 transition-colors">
+              <label className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-indigo-600 p-1.5 text-white transition-colors hover:bg-indigo-700">
                 <Edit3 size={11} />
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
               </label>
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Profile Photo</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">JPG, PNG or GIF, max 5MB</p>
+              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">JPG, PNG or GIF, max 5MB</p>
               {avatarSrc && (
                 <button
                   onClick={() => deleteAvatar.mutate()}
-                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-medium"
+                  className="flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600"
                 >
                   <Trash2 size={12} /> Remove photo
                 </button>
@@ -194,15 +211,15 @@ const ClientUserEdit: React.FC = () => {
 
       {/* ── Tab Navigation ── */}
       <motion.div variants={dashboardItemVariants} className="mb-4 sm:mb-6">
-        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+        <div className="flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
-              className={`flex items-center gap-1.5 flex-1 px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              className={`flex flex-1 items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all sm:text-sm ${
                 activeTab === t.key
-                  ? "bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border border-gray-200 dark:border-gray-700"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                  ? "border border-gray-200 bg-white text-indigo-600 dark:border-gray-700 dark:bg-gray-900 dark:text-indigo-400"
+                  : "text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               }`}
             >
               {t.icon} {t.label}
@@ -216,10 +233,8 @@ const ClientUserEdit: React.FC = () => {
         {/* PERSONAL TAB */}
         {activeTab === "personal" && (
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
-              Personal Details
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">Personal Details</h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>First Name</label>
                 <input
@@ -280,11 +295,11 @@ const ClientUserEdit: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className="flex justify-end mt-6">
+            <div className="mt-6 flex justify-end">
               <motion.button
                 onClick={savePersonal}
                 disabled={updateProfile.isPending}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 sm:text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -298,10 +313,10 @@ const ClientUserEdit: React.FC = () => {
         {/* ADDRESS TAB */}
         {activeTab === "address" && (
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
               Address Information
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className={labelCls}>Street Address</label>
                 <input
@@ -348,11 +363,11 @@ const ClientUserEdit: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end mt-6">
+            <div className="mt-6 flex justify-end">
               <motion.button
                 onClick={saveAddress}
                 disabled={updateAddress.isPending}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 sm:text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -366,10 +381,10 @@ const ClientUserEdit: React.FC = () => {
         {/* EMPLOYMENT TAB */}
         {activeTab === "employment" && (
           <DashCard>
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
               Employment & Financial
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>Employment Status</label>
                 <select
@@ -432,11 +447,11 @@ const ClientUserEdit: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end mt-6">
+            <div className="mt-6 flex justify-end">
               <motion.button
                 onClick={saveEmployment}
                 disabled={updateEmployment.isPending}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium rounded-xl transition-colors"
+                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 sm:text-sm"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >

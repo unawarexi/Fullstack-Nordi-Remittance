@@ -6,20 +6,34 @@
 import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  Target, Plus, TrendingUp, PiggyBank, Calendar, Clock,
-  DollarSign, ArrowUpRight, Repeat, Percent, BarChart3,
-  Sparkles, ChevronRight, Trash2, Edit3, ToggleLeft, ToggleRight,
+  Target,
+  Plus,
+  TrendingUp,
+  PiggyBank,
+  Calendar,
+  Clock,
+  DollarSign,
+  ArrowUpRight,
+  Repeat,
+  Percent,
+  BarChart3,
+  Sparkles,
+  ChevronRight,
+  Trash2,
+  Edit3,
+  ToggleLeft,
+  ToggleRight,
 } from "@constants/icons";
 import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
-import {
-  PageContainer, DashCard, StatCard, StatsGrid, ProgressBar,
-} from "@components/shared/DashboardPrimitives";
+import { PageContainer, DashCard, StatCard, StatsGrid, ProgressBar } from "@components/shared/DashboardPrimitives";
 import { StatsGridSkeleton, AccountListSkeleton, FormSkeleton } from "@components/skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
 import {
-  useClientSavingsGoals, useCreateSavingsGoal, useClientSavingsGoalProgress,
-} from "../../domain/useSavingsDomain";
+  useClientSavingsGoals,
+  useCreateSavingsGoal,
+  useClientSavingsGoalProgress,
+} from "../../client-usecase/usesavinga-client-usecase";
 import { useUIStore } from "@store/ui.store";
 import { useToastStore } from "@store/toast.store";
 
@@ -29,14 +43,12 @@ import { useToastStore } from "@store/toast.store";
 const fmt = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
-const pct = (saved: number, target: number) =>
-  target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0;
+const pct = (saved: number, target: number) => (target > 0 ? Math.min(Math.round((saved / target) * 100), 100) : 0);
 
 const inputCls =
   "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors";
 
-const labelCls =
-  "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
+const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
 const GOAL_EMOJIS = ["🎯", "🏠", "✈️", "🚗", "💍", "🎓", "💰", "🏖️", "📱", "🎮", "🩺", "🐶"];
 
@@ -111,10 +123,10 @@ const CreateGoal: React.FC = () => {
                     key={em}
                     type="button"
                     onClick={() => setForm((p) => ({ ...p, emoji: em }))}
-                    className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center transition-all ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-all ${
                       form.emoji === em
-                        ? "ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-950/50"
-                        : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
+                        ? "bg-indigo-50 ring-2 ring-indigo-500 dark:bg-indigo-950/50"
+                        : "border border-gray-200 bg-gray-100 hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
                     }`}
                   >
                     {em}
@@ -152,15 +164,10 @@ const CreateGoal: React.FC = () => {
             </div>
 
             {/* Target date & category */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={labelCls}>Target Date</label>
-                <input
-                  type="date"
-                  value={form.targetDate}
-                  onChange={set("targetDate")}
-                  className={inputCls}
-                />
+                <input type="date" value={form.targetDate} onChange={set("targetDate")} className={inputCls} />
               </div>
               <div>
                 <label className={labelCls}>Category</label>
@@ -192,7 +199,7 @@ const CreateGoal: React.FC = () => {
                   className={`${inputCls} pl-10`}
                 />
               </div>
-              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="mt-1 text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                 Set an amount to auto-save each month toward this goal.
               </p>
             </div>
@@ -201,7 +208,7 @@ const CreateGoal: React.FC = () => {
             <motion.button
               type="submit"
               disabled={createMutation.isPending}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs sm:text-sm font-medium disabled:opacity-50 mt-2"
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-xs font-medium text-white disabled:opacity-50 sm:text-sm"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >

@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLogout } from "../domain/useAuthDomain";
+import { useLogout } from "../client-usecase/useauth-client-usecase";
 import { useAuth } from "@store/auth.store";
-import { useClientProfile } from "../domain/useProfileDomain";
+import { useClientProfile } from "../client-usecase/useprofile-client-usecase";
 import {
   LayoutDashboard,
   Wallet,
@@ -38,58 +38,58 @@ import {
 
 // Expanded menu structure with more banking options
 const menuItems = [
-  { 
-    title: "Dashboard", 
-    icon: <LayoutDashboard size={20} />, 
-    route: "/customer/dashboard" 
+  {
+    title: "Dashboard",
+    icon: <LayoutDashboard size={20} />,
+    route: "/customer/dashboard",
   },
-  { 
-    title: "My Accounts", 
-    icon: <Wallet size={20} />, 
+  {
+    title: "My Accounts",
+    icon: <Wallet size={20} />,
     route: "/customer/accounts",
     children: [
       { title: "Savings Account", route: "/customer/accounts/savings" },
       { title: "Current Account", route: "/customer/accounts/current" },
       { title: "Fixed Deposits", route: "/customer/accounts/fixed-deposits" },
       { title: "Account Statements", route: "/customer/accounts/statements" },
-    ]
+    ],
   },
-  { 
-    title: "Transactions", 
-    icon: <Repeat size={20} />, 
+  {
+    title: "Transactions",
+    icon: <Repeat size={20} />,
     route: "/customer/transactions",
     children: [
       { title: "Recent Activity", route: "/customer/transactions/recent" },
       { title: "Scheduled Transfers", route: "/customer/transactions/scheduled" },
       { title: "Transaction History", route: "/customer/transactions/history" },
       { title: "Download Statement", route: "/customer/transactions/download" },
-    ]
+    ],
   },
-  { 
-    title: "Send Money", 
-    icon: <Send size={20} />, 
+  {
+    title: "Send Money",
+    icon: <Send size={20} />,
     route: "/customer/send",
     children: [
       { title: "Domestic Transfer", route: "/customer/send/domestic" },
       { title: "International Wire", route: "/customer/send/international" },
       { title: "Quick Transfer", route: "/customer/send/quick" },
       { title: "Instant Payment", route: "/customer/send/instant" },
-    ]
+    ],
   },
-  { 
-    title: "Beneficiaries", 
-    icon: <Users size={20} />, 
+  {
+    title: "Beneficiaries",
+    icon: <Users size={20} />,
     route: "/customer/beneficiaries",
     children: [
       { title: "All Beneficiaries", route: "/customer/beneficiaries/all" },
       { title: "Add New", route: "/customer/beneficiaries/add" },
       { title: "Manage Categories", route: "/customer/beneficiaries/categories" },
       { title: "Recent Recipients", route: "/customer/beneficiaries/recent" },
-    ]
+    ],
   },
-  { 
-    title: "Cards", 
-    icon: <CreditCard size={20} />, 
+  {
+    title: "Cards",
+    icon: <CreditCard size={20} />,
     route: "/customer/cards",
     children: [
       { title: "My Cards", route: "/customer/cards/overview" },
@@ -97,22 +97,22 @@ const menuItems = [
       { title: "Apply for New Card", route: "/customer/cards/apply" },
       { title: "Card Security", route: "/customer/cards/security" },
       { title: "Virtual Cards", route: "/customer/cards/virtual" },
-    ]
+    ],
   },
-  { 
-    title: "Loans & Credit", 
-    icon: <Briefcase size={20} />, 
+  {
+    title: "Loans & Credit",
+    icon: <Briefcase size={20} />,
     route: "/customer/loans",
     children: [
       { title: "My Loans", route: "/customer/loans/overview" },
       { title: "Apply for Loan", route: "/customer/loans/apply" },
       { title: "Loan Calculator", route: "/customer/loans/calculator" },
       { title: "Credit Score", route: "/customer/loans/credit-score" },
-    ]
+    ],
   },
-  { 
-    title: "Investments", 
-    icon: <LineChart size={20} />, 
+  {
+    title: "Investments",
+    icon: <LineChart size={20} />,
     route: "/customer/investments",
     children: [
       { title: "Portfolio Overview", route: "/customer/investments/overview" },
@@ -120,29 +120,29 @@ const menuItems = [
       { title: "Stocks & ETFs", route: "/customer/investments/stocks" },
       { title: "Fixed Income", route: "/customer/investments/fixed-income" },
       { title: "Market Insights", route: "/customer/investments/insights" },
-    ]
+    ],
   },
-  { 
-    title: "Savings Goals", 
-    icon: <PiggyBank size={20} />, 
+  {
+    title: "Savings Goals",
+    icon: <PiggyBank size={20} />,
     route: "/customer/savings",
     children: [
       { title: "My Goals", route: "/customer/savings/goals" },
       { title: "Create New Goal", route: "/customer/savings/create" },
       { title: "Auto-Save Rules", route: "/customer/savings/auto-save" },
       { title: "Savings Analytics", route: "/customer/savings/analytics" },
-    ]
+    ],
   },
-  { 
-    title: "Bill Payments", 
-    icon: <Receipt size={20} />, 
+  {
+    title: "Bill Payments",
+    icon: <Receipt size={20} />,
     route: "/customer/bills",
     children: [
       { title: "Pay Bills", route: "/customer/bills/pay" },
       { title: "Scheduled Payments", route: "/customer/bills/scheduled" },
       { title: "Utilities & Services", route: "/customer/bills/utilities" },
       { title: "Autopay Setup", route: "/customer/bills/autopay" },
-    ]
+    ],
   },
   {
     title: "Foreign Exchange",
@@ -153,7 +153,7 @@ const menuItems = [
       { title: "Live Rates", route: "/customer/forex/rates" },
       { title: "Currency Alerts", route: "/customer/forex/alerts" },
       { title: "Exchange History", route: "/customer/forex/history" },
-    ]
+    ],
   },
   {
     title: "Mobile Banking",
@@ -164,7 +164,7 @@ const menuItems = [
       { title: "Device Management", route: "/customer/mobile/devices" },
       { title: "QR Payments", route: "/customer/mobile/qr" },
       { title: "Push Notifications", route: "/customer/mobile/notifications" },
-    ]
+    ],
   },
   {
     title: "Rewards & Offers",
@@ -175,22 +175,22 @@ const menuItems = [
       { title: "Redeem Points", route: "/customer/rewards/redeem" },
       { title: "Special Offers", route: "/customer/rewards/offers" },
       { title: "Partner Discounts", route: "/customer/rewards/partners" },
-    ]
+    ],
   },
-  { 
-    title: "Support", 
-    icon: <HelpCircle size={20} />, 
+  {
+    title: "Support",
+    icon: <HelpCircle size={20} />,
     route: "/customer/support",
     children: [
       { title: "Contact Us", route: "/customer/support/contact" },
       { title: "Live Chat", route: "/customer/support/chat" },
       { title: "FAQs", route: "/customer/support/faqs" },
       { title: "Schedule Appointment", route: "/customer/support/appointment" },
-    ]
+    ],
   },
-  { 
-    title: "Security Center", 
-    icon: <Shield size={20} />, 
+  {
+    title: "Security Center",
+    icon: <Shield size={20} />,
     route: "/customer/security",
     children: [
       { title: "Security Settings", route: "/customer/security/settings" },
@@ -198,23 +198,23 @@ const menuItems = [
       { title: "Biometric Access", route: "/customer/security/biometric" },
       { title: "Activity Logs", route: "/customer/security/logs" },
       { title: "Security Alerts", route: "/customer/security/alerts" },
-    ]
+    ],
   },
-  { 
-    title: "Profile & Preferences", 
-    icon: <Settings size={20} />, 
+  {
+    title: "Profile & Preferences",
+    icon: <Settings size={20} />,
     route: "/customer/profile",
     children: [
       { title: "Personal Information", route: "/customer/profile/personal" },
       { title: "Communication Preferences", route: "/customer/profile/communication" },
       { title: "Language & Region", route: "/customer/profile/language" },
       { title: "Document Center", route: "/customer/profile/documents" },
-    ]
+    ],
   },
-  { 
-    title: "Logout", 
-    icon: <LogOut size={20} />, 
-    route: "/customer/logout" 
+  {
+    title: "Logout",
+    icon: <LogOut size={20} />,
+    route: "/customer/logout",
   },
 ];
 
@@ -222,30 +222,30 @@ const menuItems = [
 const sidebarVariants = {
   expanded: {
     width: "280px",
-    transition: { duration: 0.3, ease: "easeInOut" }
+    transition: { duration: 0.3, ease: "easeInOut" },
   },
   collapsed: {
     width: "80px",
-    transition: { duration: 0.3, ease: "easeInOut" }
-  }
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, x: -10 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
-    transition: { duration: 0.2 }
-  }
+    transition: { duration: 0.2 },
+  },
 };
 
 const dropdownVariants = {
   hidden: { height: 0, opacity: 0 },
-  visible: { 
-    height: "auto", 
+  visible: {
+    height: "auto",
     opacity: 1,
-    transition: { duration: 0.3, ease: "easeOut" }
-  }
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
 };
 
 const UserLeftContainer: React.FC = () => {
@@ -264,10 +264,17 @@ const UserLeftContainer: React.FC = () => {
   const displayName = userName || `${profileUser.firstName || ""} ${profileUser.lastName || ""}`.trim() || "User";
   const initials = user
     ? `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`.toUpperCase()
-    : displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "U";
+    : displayName
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "U";
   const memberTier = profileUser.accountType
     ? `${(profileUser.accountType as string).charAt(0).toUpperCase()}${(profileUser.accountType as string).slice(1)} Account`
-    : user?.kycStatus === "verified" ? "Verified Member" : "Member";
+    : user?.kycStatus === "verified"
+      ? "Verified Member"
+      : "Member";
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -277,13 +284,13 @@ const UserLeftContainer: React.FC = () => {
       },
     });
   };
-  
+
   // Automatically open dropdown for active route on mount
   useEffect(() => {
-    const currentParentRoute = menuItems.find(item => 
-      item.children && item.children.some(child => location.pathname === child.route)
+    const currentParentRoute = menuItems.find(
+      (item) => item.children && item.children.some((child) => location.pathname === child.route),
     );
-    
+
     if (currentParentRoute && currentParentRoute.route) {
       setOpenDropdowns([currentParentRoute.route]);
     }
@@ -294,17 +301,12 @@ const UserLeftContainer: React.FC = () => {
   };
 
   const handleDropdown = (route: string) => {
-    setOpenDropdowns((prev) =>
-      prev.includes(route)
-        ? prev.filter((r) => r !== route)
-        : [...prev, route]
-    );
+    setOpenDropdowns((prev) => (prev.includes(route) ? prev.filter((r) => r !== route) : [...prev, route]));
   };
 
   const isActive = (route: string) =>
-    location.pathname === route ||
-    (route !== '/' && location.pathname.startsWith(route));
-    
+    location.pathname === route || (route !== "/" && location.pathname.startsWith(route));
+
   const handleNavigation = (route: string) => {
     navigate(route);
     if (collapsed) {
@@ -317,32 +319,29 @@ const UserLeftContainer: React.FC = () => {
       variants={sidebarVariants}
       initial="expanded"
       animate={collapsed ? "collapsed" : "expanded"}
-      className="h-screen bg-gradient-to-b from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-900 shadow-lg dark:shadow-gray-950/50 flex flex-col py-6 relative transition-colors duration-200"
+      className="relative flex h-screen flex-col bg-gradient-to-b from-indigo-50 to-purple-50 py-6 shadow-lg transition-colors duration-200 dark:from-gray-900 dark:to-gray-900 dark:shadow-gray-950/50"
     >
       {/* Toggle button */}
-      <button 
+      <button
         onClick={toggleSidebar}
-        className="absolute -right-3 top-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-1 rounded-full shadow-lg z-10"
+        className="absolute -right-3 top-12 z-10 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 p-1 text-white shadow-lg"
       >
-        <motion.div
-          animate={{ rotate: collapsed ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div animate={{ rotate: collapsed ? 180 : 0 }} transition={{ duration: 0.3 }}>
           <ChevronDown size={16} />
         </motion.div>
       </button>
 
       {/* Logo and User Info */}
-      <motion.div 
-        className="font-bold text-xl mb-6 px-4 flex items-center"
+      <motion.div
+        className="mb-6 flex items-center px-4 text-xl font-bold"
         animate={{ justifyContent: collapsed ? "center" : "flex-start" }}
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 flex items-center justify-center text-white font-bold text-lg shadow-md overflow-hidden">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-400 text-lg font-bold text-white shadow-md">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
@@ -351,64 +350,56 @@ const UserLeftContainer: React.FC = () => {
           ) : null}
           <span className={avatarUrl ? "hidden" : ""}>{initials}</span>
         </div>
-        
+
         {!collapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="ml-3"
-          >
-            <div className="font-semibold text-indigo-900 dark:text-indigo-200 text-sm truncate max-w-[180px]">{displayName}</div>
-            <div className="text-xs text-purple-500 dark:text-purple-400 font-medium">{memberTier}</div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="ml-3">
+            <div className="max-w-[180px] truncate text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+              {displayName}
+            </div>
+            <div className="text-xs font-medium text-purple-500 dark:text-purple-400">{memberTier}</div>
           </motion.div>
         )}
       </motion.div>
 
       {/* Quick Links */}
       {!collapsed && (
-        <motion.div 
-          className="px-4 mb-6"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
-            <div className="flex justify-between items-center mb-2">
+        <motion.div className="mb-6 px-4" variants={itemVariants} initial="hidden" animate="visible">
+          <div className="rounded-xl bg-white p-3 shadow-sm dark:bg-gray-800">
+            <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Quick Actions</span>
               <Zap size={14} className="text-purple-500 dark:text-purple-400" />
             </div>
             <div className="grid grid-cols-4 gap-2">
-              <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-indigo-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-gray-600 cursor-pointer"
+              <motion.div
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg bg-indigo-50 p-2 hover:bg-indigo-100 dark:bg-gray-700 dark:hover:bg-gray-600"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Send size={16} className="text-indigo-600 dark:text-indigo-400 mb-1" />
+                <Send size={16} className="mb-1 text-indigo-600 dark:text-indigo-400" />
                 <span className="text-xs text-indigo-700 dark:text-indigo-300">Send</span>
               </motion.div>
-              <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-purple-50 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-gray-600 cursor-pointer"
+              <motion.div
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg bg-purple-50 p-2 hover:bg-purple-100 dark:bg-gray-700 dark:hover:bg-gray-600"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <QrCode size={16} className="text-purple-600 dark:text-purple-400 mb-1" />
+                <QrCode size={16} className="mb-1 text-purple-600 dark:text-purple-400" />
                 <span className="text-xs text-purple-700 dark:text-purple-300">Scan</span>
               </motion.div>
-              <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-pink-50 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-gray-600 cursor-pointer"
+              <motion.div
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg bg-pink-50 p-2 hover:bg-pink-100 dark:bg-gray-700 dark:hover:bg-gray-600"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <BanknoteIcon size={16} className="text-pink-600 dark:text-pink-400 mb-1" />
+                <BanknoteIcon size={16} className="mb-1 text-pink-600 dark:text-pink-400" />
                 <span className="text-xs text-pink-700 dark:text-pink-300">Pay</span>
               </motion.div>
-              <motion.div 
-                className="flex flex-col items-center justify-center p-2 rounded-lg bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 cursor-pointer"
+              <motion.div
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg bg-blue-50 p-2 hover:bg-blue-100 dark:bg-gray-700 dark:hover:bg-gray-600"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Globe size={16} className="text-blue-600 dark:text-blue-400 mb-1" />
+                <Globe size={16} className="mb-1 text-blue-600 dark:text-blue-400" />
                 <span className="text-xs text-blue-700 dark:text-blue-300">Forex</span>
               </motion.div>
             </div>
@@ -418,14 +409,14 @@ const UserLeftContainer: React.FC = () => {
 
       {/* Notifications & Alerts */}
       {!collapsed && (
-        <motion.div 
-          className="px-4 mb-6 flex flex-col gap-2"
+        <motion.div
+          className="mb-6 flex flex-col gap-2 px-4"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div 
-            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+          <motion.div
+            className="flex cursor-pointer items-center justify-between rounded-lg bg-white px-3 py-2 shadow-sm hover:shadow dark:bg-gray-800"
             whileHover={{ x: 3 }}
           >
             <div className="flex items-center gap-2">
@@ -433,14 +424,14 @@ const UserLeftContainer: React.FC = () => {
               <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Notifications</span>
             </div>
             {notificationCount > 0 && (
-              <div className="bg-purple-600 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-600 text-xs text-white">
                 {notificationCount}
               </div>
             )}
           </motion.div>
-          
-          <motion.div 
-            className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 flex items-center justify-between shadow-sm hover:shadow cursor-pointer"
+
+          <motion.div
+            className="flex cursor-pointer items-center justify-between rounded-lg bg-white px-3 py-2 shadow-sm hover:shadow dark:bg-gray-800"
             whileHover={{ x: 3 }}
           >
             <div className="flex items-center gap-2">
@@ -448,7 +439,7 @@ const UserLeftContainer: React.FC = () => {
               <span className="text-xs font-medium text-gray-800 dark:text-gray-200">Security Alerts</span>
             </div>
             {alertCount > 0 && (
-              <div className="bg-amber-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs text-white">
                 {alertCount}
               </div>
             )}
@@ -456,25 +447,17 @@ const UserLeftContainer: React.FC = () => {
         </motion.div>
       )}
 
-    
-
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2">
         <AnimatePresence>
-          <ul className="list-none p-0 m-0 space-y-1">
+          <ul className="m-0 list-none space-y-1 p-0">
             {menuItems.map((item) => {
               const active = isActive(item.route);
               const hasChildren = !!item.children;
               const open = openDropdowns.includes(item.route);
-              
+
               return (
-                <motion.li 
-                  key={item.title}
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                >
+                <motion.li key={item.title} variants={itemVariants} initial="hidden" animate="visible" exit="hidden">
                   <motion.div
                     onClick={() => {
                       if (item.title === "Logout") {
@@ -489,33 +472,35 @@ const UserLeftContainer: React.FC = () => {
                       }
                     }}
                     className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition
-                      ${item.title === "Logout"
-                        ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium'
-                        : active
-                          ? 'bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 text-indigo-800 dark:text-indigo-200 font-semibold'
-                          : 'text-gray-700 dark:text-gray-300 font-medium hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-700 dark:hover:text-indigo-300'}
+                      flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition
+                      ${
+                        item.title === "Logout"
+                          ? "font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                          : active
+                            ? "bg-gradient-to-r from-indigo-100 to-purple-100 font-semibold text-indigo-800 dark:from-indigo-900/40 dark:to-purple-900/40 dark:text-indigo-200"
+                            : "font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-indigo-300"
+                      }
                     `}
                     whileHover={{ x: collapsed ? 0 : 3 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <motion.div
-                      className={item.title === "Logout"
-                        ? "text-rose-500 dark:text-rose-400"
-                        : active ? "text-indigo-600 dark:text-indigo-400" : "text-purple-500 dark:text-purple-400"}
-                      animate={{ 
-                        scale: active ? 1.1 : 1 
+                      className={
+                        item.title === "Logout"
+                          ? "text-rose-500 dark:text-rose-400"
+                          : active
+                            ? "text-indigo-600 dark:text-indigo-400"
+                            : "text-purple-500 dark:text-purple-400"
+                      }
+                      animate={{
+                        scale: active ? 1.1 : 1,
                       }}
                     >
                       {item.icon}
                     </motion.div>
-                    
-                    {!collapsed && (
-                      <motion.span className="flex-1">
-                        {item.title}
-                      </motion.span>
-                    )}
-                    
+
+                    {!collapsed && <motion.span className="flex-1">{item.title}</motion.span>}
+
                     {hasChildren && !collapsed && (
                       <motion.div
                         initial={{ rotate: 0 }}
@@ -526,13 +511,13 @@ const UserLeftContainer: React.FC = () => {
                       </motion.div>
                     )}
                   </motion.div>
-                  
+
                   {/* Dropdown menu */}
                   {hasChildren && !collapsed && (
                     <AnimatePresence>
                       {open && (
                         <motion.ul
-                          className="list-none pl-8 mt-1 mb-1 overflow-hidden"
+                          className="mb-1 mt-1 list-none overflow-hidden pl-8"
                           variants={dropdownVariants}
                           initial="hidden"
                           animate="visible"
@@ -541,17 +526,13 @@ const UserLeftContainer: React.FC = () => {
                           {item.children.map((child) => {
                             const childActive = isActive(child.route);
                             return (
-                              <motion.li 
-                                key={child.title}
-                                variants={itemVariants}
-                                className="mb-1"
-                              >
+                              <motion.li key={child.title} variants={itemVariants} className="mb-1">
                                 <motion.div
                                   onClick={() => navigate(child.route)}
                                   className={`
-                                    px-3 py-2 rounded-lg cursor-pointer text-sm transition
-                                    ${childActive ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold' : 'text-gray-700 dark:text-gray-400 font-normal'}
-                                    ${!childActive ? 'hover:bg-indigo-50 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-300' : ''}
+                                    cursor-pointer rounded-lg px-3 py-2 text-sm transition
+                                    ${childActive ? "bg-indigo-100 font-semibold text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300" : "font-normal text-gray-700 dark:text-gray-400"}
+                                    ${!childActive ? "hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-gray-800 dark:hover:text-indigo-300" : ""}
                                   `}
                                   whileHover={{ x: 3 }}
                                   whileTap={{ scale: 0.98 }}
@@ -559,7 +540,7 @@ const UserLeftContainer: React.FC = () => {
                                   {child.title}
                                   {childActive && (
                                     <motion.div
-                                      className="w-1 h-full absolute right-0 top-0 bg-indigo-600 rounded-l"
+                                      className="absolute right-0 top-0 h-full w-1 rounded-l bg-indigo-600"
                                       layoutId="activeIndicator"
                                     />
                                   )}
@@ -580,21 +561,22 @@ const UserLeftContainer: React.FC = () => {
 
       {/* Upcoming events */}
       {!collapsed && (
-        <motion.div 
-          className="mt-auto border-t border-indigo-100 dark:border-gray-700 pt-4 px-4 mb-4"
+        <motion.div
+          className="mb-4 mt-auto border-t border-indigo-100 px-4 pt-4 dark:border-gray-700"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm">
-            <div className="flex justify-between items-center mb-2">
+          <div className="rounded-xl bg-white p-3 shadow-sm dark:bg-gray-800">
+            <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-semibold text-indigo-900 dark:text-indigo-200">Coming Up</span>
               <Calendar size={14} className="text-purple-500 dark:text-purple-400" />
             </div>
-            <motion.div className="flex items-center gap-3 mb-2 bg-indigo-50 dark:bg-gray-700 p-2 rounded-lg"
+            <motion.div
+              className="mb-2 flex items-center gap-3 rounded-lg bg-indigo-50 p-2 dark:bg-gray-700"
               whileHover={{ x: 2 }}
             >
-              <div className="h-8 w-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400">
                 <Clock size={16} />
               </div>
               <div>
@@ -602,11 +584,12 @@ const UserLeftContainer: React.FC = () => {
                 <div className="text-xs text-gray-500 dark:text-gray-400">Tomorrow, 9:00 AM</div>
               </div>
             </motion.div>
-            
-            <motion.div className="flex items-center gap-3 bg-purple-50 dark:bg-gray-700 p-2 rounded-lg"
+
+            <motion.div
+              className="flex items-center gap-3 rounded-lg bg-purple-50 p-2 dark:bg-gray-700"
               whileHover={{ x: 2 }}
             >
-              <div className="h-8 w-8 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-900/50 dark:text-purple-400">
                 <FileText size={16} />
               </div>
               <div>
@@ -620,17 +603,12 @@ const UserLeftContainer: React.FC = () => {
 
       {/* Customer Support */}
       {!collapsed && (
-        <motion.div 
-          className="px-4 mb-4"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div 
-            className="bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/40 dark:to-purple-900/40 rounded-xl p-3 flex items-center gap-3 cursor-pointer"
+        <motion.div className="mb-4 px-4" variants={itemVariants} initial="hidden" animate="visible">
+          <motion.div
+            className="flex cursor-pointer items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-100 to-purple-100 p-3 dark:from-indigo-900/40 dark:to-purple-900/40"
             whileHover={{ y: -2, boxShadow: "0 4px 6px rgba(79, 70, 229, 0.1)" }}
           >
-            <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white">
               <MessageSquare size={16} />
             </div>
             <div>
@@ -642,11 +620,11 @@ const UserLeftContainer: React.FC = () => {
       )}
 
       {/* Footer */}
-      <motion.div 
-        className="mt-2 py-3 px-4 text-xs text-center"
-        animate={{ 
+      <motion.div
+        className="mt-2 px-4 py-3 text-center text-xs"
+        animate={{
           justifyContent: collapsed ? "center" : "space-between",
-          opacity: 1
+          opacity: 1,
         }}
       >
         {!collapsed ? (
@@ -654,7 +632,7 @@ const UserLeftContainer: React.FC = () => {
             &copy; {new Date().getFullYear()} Remit Digital Banking
           </div>
         ) : (
-          <Heart size={16} className="text-purple-400 mx-auto" />
+          <Heart size={16} className="mx-auto text-purple-400" />
         )}
       </motion.div>
     </motion.aside>

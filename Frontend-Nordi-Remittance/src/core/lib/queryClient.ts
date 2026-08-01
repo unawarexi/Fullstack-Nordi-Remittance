@@ -2,8 +2,24 @@
 // QUERY CLIENT - TanStack Query configuration
 // ============================================================================
 
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, onlineManager, keepPreviousData } from '@tanstack/react-query';
 import axios from 'axios';
+import { networkDetector } from '@core/network/network';
+
+// ============================================================================
+// ONLINE MANAGER — Bridge NetworkDetector ↔ TanStack Query
+// ============================================================================
+
+// Tell TanStack Query to use our NetworkDetector for online/offline state
+// instead of relying on navigator.onLine alone.
+onlineManager.setEventListener((setOnline) => {
+  const unsubscribe = networkDetector.subscribe(() => {
+    setOnline(networkDetector.isOnline);
+  });
+  // Set initial state
+  setOnline(networkDetector.isOnline);
+  return unsubscribe;
+});
 
 // ============================================================================
 // RETRY FILTER — Never retry 401/403 (auth errors handled by interceptor)
@@ -30,8 +46,8 @@ export const queryClient = new QueryClient({
       // Data is considered fresh for 5 minutes
       staleTime: 5 * 60 * 1000,
       
-      // Cache data for 30 minutes
-      gcTime: 30 * 60 * 1000,
+      // Cache data for 60 minutes (extended from 30 for offline resilience)
+      gcTime: 60 * 60 * 1000,
       
       // Smart retry: skip auth errors, retry server errors up to 3x
       retry: shouldRetry,
@@ -42,8 +58,14 @@ export const queryClient = new QueryClient({
       // Don't refetch on window focus for better UX
       refetchOnWindowFocus: false,
       
-      // Refetch on reconnect
-      refetchOnReconnect: true,
+      // Always refetch on reconnect (even if data isn't stale yet)
+      refetchOnReconnect: 'always',
+
+      // Offline-first: resolve from cache when offline instead of pausing
+      networkMode: 'offlineFirst',
+
+      // Show previous data while refetching to prevent flickers
+      placeholderData: keepPreviousData,
     },
     mutations: {
       // Smart retry for mutations too
@@ -51,9 +73,13 @@ export const queryClient = new QueryClient({
       
       // Retry delay
       retryDelay: 1000,
+
+      // Mutations should wait for network
+      networkMode: 'offlineFirst',
     },
   },
 });
+
 
 // ============================================================================
 // QUERY KEYS FACTORY
@@ -226,6 +252,7 @@ export const queryKeys = {
     investmentPerformance: (filters?: Record<string, unknown>) => 
       [...queryKeys.statistics.all, 'investmentPerformance', filters] as const,
     insights: () => [...queryKeys.statistics.all, 'insights'] as const,
+    platform: () => [...queryKeys.statistics.all, 'platform'] as const,
   },
 
   // Attachments
