@@ -7,7 +7,7 @@
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { AdminUsers, AdminPermissions } from '../models/AdminModel.js';
+import { AdminUsers, AdminPermissions } from '../modules/admin/admin.model.js';
 import { env } from '../config/env.config.js';
 
 /**
@@ -123,7 +123,7 @@ export async function seedSuperAdmin(): Promise<void> {
  * Creates default system settings if they don't exist
  */
 export async function seedSystemSettings(): Promise<void> {
-  const { SystemSettings } = await import('../models/AdminModel.js');
+  const { SystemSettings } = await import('../modules/admin/admin.model.js');
   
   const defaultSettings = [
     {

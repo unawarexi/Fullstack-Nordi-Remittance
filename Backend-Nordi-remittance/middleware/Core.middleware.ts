@@ -15,7 +15,7 @@ import {
   sendError,
   sendInternalError,
 } from "../core/helpers/response.helper.js";
-import { AuditLogs } from "../models/AuditModels.js";
+import { AuditLogs } from "../modules/audit/audit.model.js";
 import onHeaders from "on-headers";
 import Logger from "../logs/logger.js";
 

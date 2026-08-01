@@ -3,8 +3,8 @@
 // Combines signals into actionable risk decisions
 // ============================================================================
 
-import { BehaviorProfiles } from '../../models/FraudSecurityModel.js';
-import Transactions from '../../models/TransactionModel.js';
+import { BehaviorProfiles } from '../../modules/fraud-security/fraud-security.model.js';
+import Transactions from '../../modules/transactions/transactions.model.js';
 import Logger from '../../logs/logger.js';
 
 // ============================================================================

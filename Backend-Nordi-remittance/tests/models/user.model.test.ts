@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import Users from '../../models/UserModel.js';
+import Users from '../../modules/users/users.model.js';
 import { generateMockUser } from '../helpers/test-utils.js';
 
 describe('User Model', () => {

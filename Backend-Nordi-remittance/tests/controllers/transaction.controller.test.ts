@@ -12,9 +12,9 @@ import {
   createTestUserWithWallet,
   createTestWallet,
 } from '../helpers/test-utils.js';
-import * as TransactionController from '../../controllers/Transaction.controller.js';
-import Transactions from '../../models/TransactionModel.js';
-import { Wallets } from '../../models/AccountsModel.js';
+import * as TransactionController from '../../modules/transactions/transactions.controller.js';
+import Transactions from '../../modules/transactions/transactions.model.js';
+import { Wallets } from '../../modules/accounts/accounts.model.js';
 
 describe('Transaction Controller', () => {
   describe('internalTransfer', () => {

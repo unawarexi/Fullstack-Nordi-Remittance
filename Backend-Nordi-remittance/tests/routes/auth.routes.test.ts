@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { describe, it, expect } from 'vitest';
-import AuthRoutes from '../../routes/Auth.routes.js';
+import AuthRoutes from '../../modules/auth/auth.routes.js';
 
 describe('Auth Routes', () => {
   describe('Route Structure', () => {

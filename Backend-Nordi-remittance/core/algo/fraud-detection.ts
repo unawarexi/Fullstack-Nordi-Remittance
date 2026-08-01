@@ -3,8 +3,8 @@
 // Evaluates signals, checks velocity rules, and scores risk
 // ============================================================================
 
-import { FraudSignals, VelocityRules, BehaviorProfiles } from '../../models/FraudSecurityModel.js';
-import Transactions from '../../models/TransactionModel.js';
+import { FraudSignals, VelocityRules, BehaviorProfiles } from '../../modules/fraud-security/fraud-security.model.js';
+import Transactions from '../../modules/transactions/transactions.model.js';
 import Logger from '../../logs/logger.js';
 
 // ============================================================================

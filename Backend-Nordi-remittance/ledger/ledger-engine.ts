@@ -7,8 +7,8 @@ import {
   AccountBalances,
   LedgerEntries,
   AccountLimits,
-} from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
+} from '../modules/accounts/accounts.model.js';
+import Transactions from '../modules/transactions/transactions.model.js';
 import RedisService from '../services/redis.service.js';
 import { getKafkaService, KafkaTopics } from '../services/kafka.service.js';
 import { generateReferenceNumber } from '../core/helpers/generator.js';

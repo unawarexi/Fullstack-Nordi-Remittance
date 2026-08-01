@@ -6,8 +6,8 @@ import {
   LedgerEntries,
   AccountBalances,
   Wallets,
-} from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
+} from '../modules/accounts/accounts.model.js';
+import Transactions from '../modules/transactions/transactions.model.js';
 import { Journal } from './journal.js';
 import logger from '../logs/logger.js';
 

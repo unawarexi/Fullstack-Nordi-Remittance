@@ -2,8 +2,8 @@
 // JOURNAL — Structured journal entries for audit, reporting, end-of-day
 // ============================================================================
 import mongoose from 'mongoose';
-import { LedgerEntries, AccountBalances, Wallets } from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
+import { LedgerEntries, AccountBalances, Wallets } from '../modules/accounts/accounts.model.js';
+import Transactions from '../modules/transactions/transactions.model.js';
 
 // ============================================================================
 // TYPES

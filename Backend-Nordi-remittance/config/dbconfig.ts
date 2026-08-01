@@ -1,13 +1,13 @@
-import mongoose, { ConnectOptions } from "mongoose";
+import mongoose, { ConnectOptions } from 'mongoose';
 
 const connectDB = async (): Promise<void> => {
   try {
     const uri = process.env.MONGODB_URI as string;
     if (!uri) {
-      throw new Error("MONGODB_URI is not defined in environment variables");
+      throw new Error('MONGODB_URI is not defined in environment variables');
     }
 
-    const isProduction = process.env.NODE_ENV === "production";
+    const isProduction = process.env.NODE_ENV === 'production';
 
     await mongoose.connect(uri, {
       // Connection pool — tune based on expected concurrency
@@ -29,7 +29,7 @@ const connectDB = async (): Promise<void> => {
       retryWrites: true,
       retryReads: true,
       // Write concern for financial data integrity
-      w: "majority",
+      w: 'majority',
     } as ConnectOptions);
 
     console.log(
@@ -37,22 +37,22 @@ const connectDB = async (): Promise<void> => {
     );
 
     // Connection event handlers
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err);
+    mongoose.connection.on('error', (err) => {
+      console.error('❌ MongoDB connection error:', err);
     });
 
-    mongoose.connection.on("disconnected", () => {
-      console.warn("⚠️ MongoDB disconnected. Attempting to reconnect...");
+    mongoose.connection.on('disconnected', () => {
+      console.warn('⚠️ MongoDB disconnected. Attempting to reconnect...');
     });
 
-    mongoose.connection.on("reconnected", () => {
-      console.log("✅ MongoDB reconnected");
+    mongoose.connection.on('reconnected', () => {
+      console.log('✅ MongoDB reconnected');
     });
 
     // Log slow queries in development
     if (!isProduction) {
-      mongoose.set("debug", (collectionName: string, method: string, query: any) => {
-        if (process.env.MONGOOSE_DEBUG === "true") {
+      mongoose.set('debug', (collectionName: string, method: string, query: any) => {
+        if (process.env.MONGOOSE_DEBUG === 'true') {
           console.log(`🔍 Mongoose: ${collectionName}.${method}`, JSON.stringify(query));
         }
       });
@@ -66,9 +66,9 @@ const connectDB = async (): Promise<void> => {
 const disconnectDB = async (): Promise<void> => {
   try {
     await mongoose.connection.close();
-    console.log("MongoDB connection closed");
+    console.log('MongoDB connection closed');
   } catch (error) {
-    console.error("Error closing MongoDB connection:", error);
+    console.error('Error closing MongoDB connection:', error);
     throw error;
   }
 };

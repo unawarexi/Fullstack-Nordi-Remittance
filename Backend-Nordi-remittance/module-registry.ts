@@ -40,118 +40,118 @@ const ROUTE_MODULES: RouteModule[] = [
   {
     name: 'Auth',
     prefix: '/auth',
-    loader: () => import('./routes/Auth.routes.js'),
+    loader: () => import('./modules/auth/auth.routes.js'),
   },
   {
     name: 'Users',
     prefix: '/users',
-    loader: () => import('./routes/User.routes.js'),
+    loader: () => import('./modules/users/users.routes.js'),
   },
   {
     name: 'KYC',
     prefix: '/kyc',
-    loader: () => import('./routes/Kyc.routes.js'),
+    loader: () => import('./modules/kyc/kyc.routes.js'),
   },
 
   // ── Core Banking ──────────────────────────────────────────────────────
   {
     name: 'Accounts',
     prefix: '/accounts',
-    loader: () => import('./routes/Account.routes.js'),
+    loader: () => import('./modules/accounts/accounts.routes.js'),
   },
   {
     name: 'Transactions',
     prefix: '/transactions',
-    loader: () => import('./routes/Transaction.routes.js'),
+    loader: () => import('./modules/transactions/transactions.routes.js'),
   },
   {
     name: 'Secure Transfer',
     prefix: '/transactions/secure-transfer',
-    loader: () => import('./routes/TransferVerification.routes.js'),
+    loader: () => import('./modules/transfer-verification/transfer-verification.routes.js'),
   },
   {
     name: 'Cards',
     prefix: '/cards',
-    loader: () => import('./routes/Card.routes.js'),
+    loader: () => import('./modules/cards/cards.routes.js'),
   },
 
   // ── Financial Products ────────────────────────────────────────────────
   {
     name: 'Loans',
     prefix: '/loans',
-    loader: () => import('./routes/Loan.routes.js'),
+    loader: () => import('./modules/loans/loans.routes.js'),
   },
   {
     name: 'Investments',
     prefix: '/investments',
-    loader: () => import('./routes/Investment.routes.js'),
+    loader: () => import('./modules/investments/investments.routes.js'),
   },
 
   // ── Administration ────────────────────────────────────────────────────
   {
     name: 'Admin',
     prefix: '/admin',
-    loader: () => import('./routes/Admin.routes.js'),
+    loader: () => import('./modules/admin/admin.routes.js'),
   },
   {
     name: 'Admin Operations',
     prefix: '/admin/operations',
-    loader: () => import('./routes/AdminOperations.routes.js'),
+    loader: () => import('./modules/admin/admin-operations.routes.js'),
   },
   {
     name: 'Statistics',
     prefix: '/statistics',
-    loader: () => import('./routes/Statistics.routes.js'),
+    loader: () => import('./modules/statistics/statistics.routes.js'),
   },
 
   // ── Security & Compliance ─────────────────────────────────────────────
   {
     name: 'Fraud Detection',
     prefix: '/fraud',
-    loader: () => import('./routes/Fraud.routes.js'),
+    loader: () => import('./modules/fraud-security/fraud.routes.js'),
   },
   {
     name: 'Security',
     prefix: '/security',
-    loader: () => import('./routes/Security.routes.js'),
+    loader: () => import('./modules/fraud-security/security.routes.js'),
   },
 
   // ── Communication ─────────────────────────────────────────────────────
   {
     name: 'Notifications',
     prefix: '/notifications',
-    loader: () => import('./routes/Notification.routes.js'),
+    loader: () => import('./modules/notifications/notifications.routes.js'),
   },
 
   // ── Content & Documents ───────────────────────────────────────────────
   {
     name: 'Attachments',
     prefix: '/attachments',
-    loader: () => import('./routes/Attachment.routes.js'),
+    loader: () => import('./modules/attachments/attachments.routes.js'),
   },
   {
     name: 'Legal',
     prefix: '/legal',
-    loader: () => import('./routes/Legal.routes.js'),
+    loader: () => import('./modules/legal/legal.routes.js'),
   },
 
   // ── Integrations & AI ─────────────────────────────────────────────────
   {
     name: 'Integrations',
     prefix: '/integrations',
-    loader: () => import('./routes/Integrations.routes.js'),
+    loader: () => import('./modules/integrations/integrations.routes.js'),
   },
   {
     name: 'AI Agent',
     prefix: '/ai',
-    loader: () => import('./routes/AiAgent.routes.js'),
+    loader: () => import('./modules/ai-agent/ai-agent.routes.js'),
   },
 
   // ── Disabled modules (uncomment to enable) ────────────────────────────
   // {
   //   name: 'Permissions',
   //   prefix: '/permissions',
-  //   loader: () => import('./routes/Permission.routes.js'),
+  //   loader: () => import('./modules/permissions/permissions.routes.js'),
   //   enabled: false,
   // },
 ];

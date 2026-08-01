@@ -2,10 +2,10 @@
 // AGENT TOOL REGISTRY — Banking operations available to the LLM
 // ============================================================================
 import type { AgentToolDefinition, AgentState } from '../types.js';
-import { Wallets, AccountBalances, LedgerEntries } from '../../models/AccountsModel.js';
-import Transactions from '../../models/TransactionModel.js';
-import Users from '../../models/UserModel.js';
-import { FraudCases, FraudSignals } from '../../models/FraudSecurityModel.js';
+import { Wallets, AccountBalances, LedgerEntries } from '../../modules/accounts/accounts.model.js';
+import Transactions from '../../modules/transactions/transactions.model.js';
+import Users from '../../modules/users/users.model.js';
+import { FraudCases, FraudSignals } from '../../modules/fraud-security/fraud-security.model.js';
 import { LedgerEngine } from '../../ledger/ledger-engine.js';
 import { Journal } from '../../ledger/journal.js';
 import { FraudDetectionEngine } from '../../core/algo/fraud-detection.js';

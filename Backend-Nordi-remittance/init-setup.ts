@@ -218,6 +218,56 @@ export async function gracefulShutdown(
 // ============================================================================
 
 /**
+ * Determine if an uncaught exception is recoverable (the process can continue)
+ * or fatal (the process should shut down).
+ *
+ * Recoverable: transient external service failures that escaped their try/catch
+ * Fatal: memory corruption, stack overflow, corrupted process state
+ */
+function isRecoverableException(error: Error): boolean {
+  const message = (error.message || '').toLowerCase();
+  const name = (error.name || '').toLowerCase();
+
+  // Known recoverable patterns — transient external service failures
+  const recoverablePatterns = [
+    'timeout',                    // Cloudinary, HTTP, or DB query timeouts
+    'econnrefused',               // Redis/Kafka/external service connection refused
+    'econnreset',                 // Connection reset by peer
+    'epipe',                      // Broken pipe (client disconnected)
+    'enotfound',                  // DNS resolution failure
+    'etimedout',                  // TCP connection timeout
+    'request timeout',            // HTTP request timeout
+    'cloudinary',                 // Cloudinary-specific errors
+    'has been aborted',           // MongoDB transaction abort (often from timeout cascade)
+    'socket hang up',             // Upstream service dropped connection
+    'kafka',                      // Kafka producer/consumer errors
+    'redis',                      // Redis connection errors
+    'rate limit',                 // External API rate limiting
+    'fetch failed',               // Network fetch failures
+  ];
+
+  if (recoverablePatterns.some((p) => message.includes(p) || name.includes(p))) {
+    return true;
+  }
+
+  // Known FATAL patterns — process state is corrupted, must exit
+  const fatalPatterns = [
+    'out of memory',
+    'heap out of memory',
+    'maximum call stack',
+    'stack overflow',
+    'allocation failed',
+  ];
+
+  if (fatalPatterns.some((p) => message.includes(p))) {
+    return false;
+  }
+
+  // Default: treat unknown uncaught exceptions as fatal (conservative)
+  return false;
+}
+
+/**
  * Wire up process-level signal and error handlers.
  * Call once during server startup.
  */
@@ -226,14 +276,29 @@ export function registerProcessHandlers(server: Server): void {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM', server));
   process.on('SIGINT', () => gracefulShutdown('SIGINT', server));
 
-  // Uncaught exceptions — attempt graceful shutdown then exit
+  // Uncaught exceptions — classify before deciding whether to shut down
   process.on('uncaughtException', (error: Error) => {
-    Logger.error('Uncaught Exception', { error: error.message, stack: error.stack });
-    gracefulShutdown('uncaughtException', server);
+    if (isRecoverableException(error)) {
+      Logger.error('Recoverable uncaught exception (process continues)', {
+        error: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+      // Do NOT shut down — the error is transient and the process is still healthy
+    } else {
+      Logger.error('FATAL uncaught exception — shutting down', {
+        error: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+      gracefulShutdown('uncaughtException', server);
+    }
   });
 
   // Unhandled rejections — log but don't kill the process
   process.on('unhandledRejection', (reason: unknown) => {
-    Logger.error('Unhandled Rejection', { reason });
+    const message = reason instanceof Error ? reason.message : String(reason);
+    const stack = reason instanceof Error ? reason.stack : undefined;
+    Logger.error('Unhandled Rejection (process continues)', { reason: message, stack });
   });
 }

@@ -203,7 +203,7 @@ async function processNotificationJob(job: Job<NotificationJobData>): Promise<vo
   const { userId, type, title, message, priority, actionUrl, actionLabel, relatedResource, metadata } = job.data;
 
   // Dynamic import avoids circular dependency: workers → model → (nothing)
-  const { Notifications } = await import("../models/NotificationModel.js");
+  const { Notifications } = await import("../modules/notifications/notifications.model.js");
 
   await Notifications.create({
     user: userId,

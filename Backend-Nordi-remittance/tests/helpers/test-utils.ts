@@ -7,8 +7,8 @@ import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import Users from '../../models/UserModel.js';
-import { Wallets } from '../../models/AccountsModel.js';
+import Users from '../../modules/users/users.model.js';
+import { Wallets } from '../../modules/accounts/accounts.model.js';
 import type { AuthenticatedRequest, UserRole } from '../../types/index.js';
 import { env } from '../../config/env.config.js';
 

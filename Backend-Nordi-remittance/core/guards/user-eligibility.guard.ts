@@ -4,7 +4,7 @@
 // Checks KYC status, account lock state, and account status.
 // ============================================================================
 
-import Users from "../../models/UserModel.js";
+import Users from "../../modules/users/users.model.js";
 import {
   KycNotVerifiedError,
   AccountLockedError,

@@ -12,10 +12,10 @@ import {
   generateMockUser,
   generateTestToken,
 } from '../helpers/test-utils.js';
-import * as AuthController from '../../controllers/Auth.controller.js';
-import Users from '../../models/UserModel.js';
-import { Wallets } from '../../models/AccountsModel.js';
-import { ConfirmationToken } from '../../models/ConfirmModel.js';
+import * as AuthController from '../../modules/auth/auth.controller.js';
+import Users from '../../modules/users/users.model.js';
+import { Wallets } from '../../modules/accounts/accounts.model.js';
+import { ConfirmationToken } from '../../modules/auth/confirm.model.js';
 import bcrypt from 'bcryptjs';
 
 describe('Auth Controller', () => {

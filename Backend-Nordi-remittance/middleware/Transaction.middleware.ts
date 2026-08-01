@@ -5,8 +5,8 @@
 import { Response, NextFunction } from 'express';
 import type { AuthenticatedRequest } from '../types/index.js';
 import { TransactionType } from '../types/index.js';
-import { Wallets, AccountBalances } from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
+import { Wallets, AccountBalances } from '../modules/accounts/accounts.model.js';
+import Transactions from '../modules/transactions/transactions.model.js';
 import { 
   ValidationError, 
   InsufficientBalanceError, 

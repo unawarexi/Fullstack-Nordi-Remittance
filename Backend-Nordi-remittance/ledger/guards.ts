@@ -2,8 +2,8 @@
 // LEDGER GUARDS — Pre-flight validation before every posting
 // ============================================================================
 import mongoose from 'mongoose';
-import { AccountLimits } from '../models/AccountsModel.js';
-import Transactions from '../models/TransactionModel.js';
+import { AccountLimits } from '../modules/accounts/accounts.model.js';
+import Transactions from '../modules/transactions/transactions.model.js';
 
 // ============================================================================
 // TYPES

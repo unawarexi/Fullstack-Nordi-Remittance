@@ -5,8 +5,8 @@
 import { Response, NextFunction } from 'express';
 import { KycStatus } from '../types/index.js';
 import type { AuthenticatedRequest } from '../types/index.js';
-import Users from '../models/UserModel.js';
-import Permissions from '../models/PermissionsModel.js';
+import Users from '../modules/users/users.model.js';
+import Permissions from '../modules/permissions/permissions.model.js';
 import { 
   KycNotVerifiedError, 
   ForbiddenError,

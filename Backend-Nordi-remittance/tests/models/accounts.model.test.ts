@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import mongoose from 'mongoose';
-import { Wallets, AccountBalances, LedgerEntries, AccountLimits, AccountStatusHistories } from '../../models/AccountsModel.js';
-import Users from '../../models/UserModel.js';
+import { Wallets, AccountBalances, LedgerEntries, AccountLimits, AccountStatusHistories } from '../../modules/accounts/accounts.model.js';
+import Users from '../../modules/users/users.model.js';
 import { createTestUser, generateMockWallet } from '../helpers/test-utils.js';
 
 describe('Accounts Models', () => {

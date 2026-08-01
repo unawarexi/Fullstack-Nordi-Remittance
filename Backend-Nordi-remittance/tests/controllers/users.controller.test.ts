@@ -11,8 +11,8 @@ import {
   createTestUserWithWallet,
   generateTestToken,
 } from '../helpers/test-utils.js';
-import * as UsersController from '../../controllers/Users.controller.js';
-import Users from '../../models/UserModel.js';
+import * as UsersController from '../../modules/users/users.controller.js';
+import Users from '../../modules/users/users.model.js';
 import bcrypt from 'bcryptjs';
 
 describe('Users Controller', () => {
