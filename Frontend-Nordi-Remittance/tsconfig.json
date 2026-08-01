@@ -11,6 +11,7 @@
       "@components/*": ["components/*"],
       "@container/*": ["container/*"],
       "@contexts/*": ["contexts/*"],
+      "@domain/*": ["domain/*"],
       "@pages/*": ["pages/*"],
       "@layout/*": ["layout/*"],
       "@assets/*": ["assets/*"],
