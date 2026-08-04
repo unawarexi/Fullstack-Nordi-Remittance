@@ -65,8 +65,21 @@ const LoanSchema = new Schema({
   approvedAt: { type: Date },
   rejectedReason: { type: String },
   closedAt: { type: Date },
+  walletLocked: { type: Boolean, default: false }, // once true, wallet ref becomes immutable
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+});
+
+// Immutability guard: once a loan is bound to a wallet, it cannot be moved
+LoanSchema.pre('save', function (this: any, next: any) {
+  if (this.walletLocked && this.isModified('wallet')) {
+    return next(new Error('Cannot change wallet on a locked loan. Loan-wallet binding is immutable.'));
+  }
+  // Lock the wallet on first save if wallet is set
+  if (this.wallet && !this.walletLocked) {
+    this.walletLocked = true;
+  }
+  next();
 });
 
 const LoanApplicationSchema = new Schema({

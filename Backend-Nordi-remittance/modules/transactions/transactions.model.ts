@@ -64,6 +64,8 @@ const TransactionSchema = new Schema({
   channel: { type: String, enum: ["web", "mobile", "api", "branch", "atm"] },
   ipAddress: { type: String },
   userAgent: { type: String },
+  sourceWalletType: { type: String, enum: ["personal", "business", "savings", "current", "fixed_deposit"] },
+  policyOverride: { type: Boolean, default: false }, // true if admin overrode a policy check
 });
 
 // ==========================================================================

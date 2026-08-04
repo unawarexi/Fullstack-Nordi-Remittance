@@ -56,6 +56,21 @@ const StatisticsSchema: Schema = new Schema({
     transactions: { type: Number, default: 0 }
   },
   
+  accounts: {
+    totalActive: { type: Number, default: 0 },
+    totalClosed: { type: Number, default: 0 },
+    newThisPeriod: { type: Number, default: 0 },
+    totalBalance: { type: Number, default: 0 },
+    averageBalance: { type: Number, default: 0 },
+    byType: {
+      personal: { type: Number, default: 0 },
+      business: { type: Number, default: 0 },
+      savings: { type: Number, default: 0 },
+      current: { type: Number, default: 0 },
+      fixed_deposit: { type: Number, default: 0 }
+    }
+  },
+  
   security: {
     fraudSignals: { type: Number, default: 0 },
     fraudCases: { type: Number, default: 0 },

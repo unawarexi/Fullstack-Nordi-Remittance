@@ -71,7 +71,14 @@ const PermissionsSchema = new Schema({
   customThemes: { type: Boolean, default: false },
   supportChat: { type: Boolean, default: false },
   promotionalEmails: { type: Boolean, default: false },
-  feedbackSubmission: { type: Boolean, default: false }
+  feedbackSubmission: { type: Boolean, default: false },
+
+  // 9. Account Type Permissions
+  canOpenSavingsAccount: { type: Boolean, default: true },
+  canOpenCurrentAccount: { type: Boolean, default: true },
+  canOpenFixedDeposit: { type: Boolean, default: true },
+  canOpenBusinessAccount: { type: Boolean, default: false },
+  maxAccountsPerType: { type: Number, default: 3 },
 }, { timestamps: true });
 
 // Indexes

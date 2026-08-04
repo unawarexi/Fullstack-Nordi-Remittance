@@ -8,7 +8,7 @@
 // ============================================================================
 
 import { Router } from "express";
-import KycController from "./kyc.controller.js";
+import * as KycController from "./kyc.controller.js";
 import {
   authenticate,
   requireAdmin,
