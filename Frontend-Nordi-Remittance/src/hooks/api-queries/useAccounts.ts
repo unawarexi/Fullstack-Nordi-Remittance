@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountsRepository } from "../../domain/repository/accounts.repository";
+import { AccountsRepository, BalanceHistoryFilters } from "../../domain/repository/accounts.repository";
 import { useToastStore } from "../../store/toast.store";
 import { queryKeys } from "../../core/lib/queryClient";
 
@@ -12,7 +12,7 @@ export const useWallets = () => {
     queryKey: ["accounts", "wallets"],
     queryFn: async () => {
       const response = await AccountsRepository.getWallets();
-      return response.data || [];
+      return response.data;
     },
   });
 };
@@ -28,12 +28,20 @@ export const useWallet = (walletId: UUID) => {
   });
 };
 
-export const useBalanceHistory = (walletId: UUID, params?: { page?: number; limit?: number }) => {
+/**
+ * NOTE: previously this returned `response.data` where `response` was already
+ * the unwrapped PaginatedResponse — that dropped `.pagination` (total/page/limit)
+ * on the floor, so any UI trying to paginate the ledger had nothing to work with.
+ * Now returns the full paginated envelope. Also accepts startDate/endDate/type,
+ * which the backend controller has always read off req.query but nothing on the
+ * frontend ever sent.
+ */
+export const useBalanceHistory = (walletId: UUID, params?: BalanceHistoryFilters) => {
   return useQuery({
     queryKey: ["accounts", "wallets", walletId, "history", params],
     queryFn: async () => {
-      const response = await AccountsRepository.getBalanceHistory(walletId, params);
-      return response.data;
+      const paginated = await AccountsRepository.getBalanceHistory(walletId, params);
+      return paginated;
     },
     enabled: !!walletId,
   });
@@ -44,7 +52,7 @@ export const useAccountLimits = () => {
     queryKey: ["accounts", "limits"],
     queryFn: async () => {
       const response = await AccountsRepository.getAccountLimits();
-      return response.data || [];
+      return response.data;
     },
   });
 };
@@ -68,7 +76,7 @@ export const useBeneficiaries = () => {
     queryKey: ["accounts", "beneficiaries"],
     queryFn: async () => {
       const response = await AccountsRepository.getBeneficiaries();
-      return response.data || [];
+      return response.data;
     },
   });
 };
@@ -78,7 +86,7 @@ export const useAddBeneficiary = () => {
   const { showToast } = typeof useToastStore === "function" ? useToastStore() : { showToast: (m: string) => alert(m) };
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Parameters<typeof AccountsRepository.addBeneficiary>[0]) => {
       const response = await AccountsRepository.addBeneficiary(data);
       return response.data;
     },
@@ -87,6 +95,9 @@ export const useAddBeneficiary = () => {
         queryKey: ["accounts", "beneficiaries"],
       });
       showToast("Beneficiary added successfully", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Couldn't add beneficiary", "error");
     },
   });
 };
@@ -106,6 +117,9 @@ export const useRemoveBeneficiary = () => {
       });
       showToast("Beneficiary removed", "success");
     },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Couldn't remove beneficiary", "error");
+    },
   });
 };
 
@@ -124,7 +138,11 @@ export const useCreateWallet = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts", "wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts", "summary"] });
       showToast("Wallet created successfully", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Couldn't create wallet", "error");
     },
   });
 };
@@ -145,6 +163,9 @@ export const useUpdateWallet = () => {
       });
       showToast("Wallet updated successfully", "success");
     },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Couldn't update wallet", "error");
+    },
   });
 };
 
@@ -160,6 +181,9 @@ export const useCloseWallet = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts", "wallets"] });
       showToast("Wallet closed successfully", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Couldn't close wallet", "error");
     },
   });
 };

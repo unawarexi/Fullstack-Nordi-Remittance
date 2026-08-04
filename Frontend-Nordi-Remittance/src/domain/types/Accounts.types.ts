@@ -1,6 +1,13 @@
 // ============================================================================
 // ACCOUNTS TYPES — Mirrors AccountsModel.ts
 // Wallet, AccountBalance, LedgerEntry, AccountLimit, AccountStatusHistory
+//
+// ADDED in this pass:
+//  - Beneficiary          (was pushed into Users.beneficiaries by BeneficiaryService,
+//                           but had no matching frontend type at all)
+//  - AccountLimitBand      + AccountLimitsSummary  (shape returned by
+//                           AccountAnalyticsService.getAccountLimits)
+//  - AccountSummaryResponse (shape returned by AccountAnalyticsService.getAccountSummary)
 // ============================================================================
 
 declare global {
@@ -22,6 +29,8 @@ declare global {
     freezeReason?: string;
     closedAt?: ISO8601Date;
     notes?: string;
+    /** Present only on list responses from WalletService.getWallets */
+    recentTransactionsCount?: number;
   }
 
   interface AccountBalance extends Timestamps {
@@ -39,7 +48,7 @@ declare global {
     id: UUID;
     transaction: UUID;
     wallet: UUID;
-    entryType: 'debit' | 'credit';
+    entryType: "debit" | "credit";
     amount: number;
     currency: string;
     balance: number;
@@ -53,8 +62,8 @@ declare global {
   interface AccountLimit extends Timestamps {
     id: UUID;
     wallet: UUID;
-    limitType: 'daily' | 'monthly' | 'yearly' | 'per_transaction';
-    category: 'withdrawal' | 'transfer' | 'payment' | 'all';
+    limitType: "daily" | "monthly" | "yearly" | "per_transaction";
+    category: "withdrawal" | "transfer" | "payment" | "all";
     amount: number;
     currency: string;
     usedAmount: number;
@@ -72,6 +81,52 @@ declare global {
     metadata?: Record<string, unknown>;
     effectiveDate: ISO8601Date;
     createdAt: ISO8601Date;
+  }
+
+  /** Sub-document on Users.beneficiaries, surfaced through the accounts BeneficiaryService. */
+  interface Beneficiary {
+    id: UUID;
+    accountNumber?: string;
+    email?: string;
+    name: string;
+    nickname?: string;
+    bankName?: string;
+    bankCode?: string;
+    type: "internal" | "external";
+    createdAt: ISO8601Date;
+  }
+
+  interface AccountLimitBand {
+    limit: number;
+    used: number;
+    remaining: number;
+  }
+
+  interface AccountSummaryTransaction {
+    id: UUID;
+    reference: string;
+    type: string;
+    amount: number;
+    currency: string;
+    status: string;
+    direction: "in" | "out";
+    createdAt: ISO8601Date;
+  }
+
+  interface AccountSummaryResponse {
+    summary: {
+      totalBalance: number;
+      primaryCurrency: string;
+      walletsCount: number;
+      monthlyStats: {
+        incoming: number;
+        outgoing: number;
+        netFlow: number;
+        transactionCount: number;
+      };
+    };
+    wallets: Array<Pick<Wallet, "walletNumber" | "balances" | "walletType" | "isPrimary"> & { id?: UUID }>;
+    recentTransactions: AccountSummaryTransaction[];
   }
 }
 
