@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 const NotificationSchema: Schema = new Schema({
   notificationId: { type: String, required: true, unique: true, default: uuidv4 },
   user: { type: String, ref: 'Users', required: true },
+  wallet: { type: Schema.Types.ObjectId, ref: 'Wallets' }, // optional — ties notification to specific account
   type: { 
     type: String, 
     enum: ['transaction', 'security', 'kyc', 'card', 'loan', 'investment', 'account', 'system', 'promotional'], 

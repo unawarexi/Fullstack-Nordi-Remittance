@@ -38,7 +38,7 @@ const CardApplicationSchema = new Schema({
 // Schemas
 const CardSchema = new Schema({
   cardId: { type: String, required: true, unique: true, default: uuidv4 },
-  wallet: { type: Schema.Types.ObjectId, ref: 'Wallets', required: true },
+  wallet: { type: Schema.Types.ObjectId, ref: 'Wallets', required: true }, // primary wallet (backward compat)
   user: { type: String, ref: 'Users', required: true },
   cardNumber: { type: String, required: true, unique: true }, // Store encrypted
   cardholderName: { type: String, required: true },
@@ -79,7 +79,18 @@ const CardSchema = new Schema({
   currency: { type: String, required: true, default: 'USD' },
   metadata: { type: Schema.Types.Mixed },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+
+  // ======================================================================
+  // MULTI-WALLET LINKING — card can draw from multiple accounts
+  // ======================================================================
+  linkedWallets: [{
+    wallet: { type: Schema.Types.ObjectId, ref: 'Wallets', required: true },
+    addedAt: { type: Date, default: Date.now },
+    addedBy: { type: String }, // userId or adminId
+    isActive: { type: Boolean, default: true },
+  }],
+  fundingSource: { type: Schema.Types.ObjectId, ref: 'Wallets' }, // active funding wallet; defaults to primary
 });
 
 const CardTokenSchema = new Schema({

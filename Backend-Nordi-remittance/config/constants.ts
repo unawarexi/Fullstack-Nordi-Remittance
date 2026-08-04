@@ -62,4 +62,5 @@ export const BullQueues = {
   FRAUD: "nordi-fraud",
   AUDIT: "nordi-audit",
   CLEANUP: "nordi-cleanup",
+  DOCUMENT: "nordi-document",
 } as const;

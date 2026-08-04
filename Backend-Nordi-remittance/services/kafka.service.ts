@@ -42,6 +42,11 @@ export const KafkaTopics = {
   // Notifications
   NOTIFICATIONS_PUSH: "nordi.notifications.push",
   NOTIFICATIONS_EMAIL: "nordi.notifications.email",
+
+  // Documents and Audit
+  DOCUMENT_EVENTS: "nordi.document.events",
+  AUDIT_EVENTS: "nordi.audit.events",
+  ANALYTICS_EVENTS: "nordi.analytics.events",
   NOTIFICATIONS_SMS: "nordi.notifications.sms",
 
   // Dead letter queue

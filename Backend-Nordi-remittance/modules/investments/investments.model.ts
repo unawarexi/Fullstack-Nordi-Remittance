@@ -92,9 +92,21 @@ const InvestmentAccountSchema = new Schema({
     enum: ["conservative", "moderate", "aggressive"],
     required: true,
   },
+  walletLocked: { type: Boolean, default: false }, // once true, wallet ref becomes immutable
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   closedAt: { type: Date },
+});
+
+// Immutability guard: once an investment is bound to a wallet, it cannot be moved
+InvestmentAccountSchema.pre('save', function (this: any, next: any) {
+  if (this.walletLocked && this.isModified('wallet')) {
+    return next(new Error('Cannot change wallet on a locked investment. Investment-wallet binding is immutable.'));
+  }
+  if (this.wallet && !this.walletLocked) {
+    this.walletLocked = true;
+  }
+  next();
 });
 
 const AssetSchema = new Schema({

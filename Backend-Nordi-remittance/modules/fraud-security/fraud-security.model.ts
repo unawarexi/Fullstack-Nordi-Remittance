@@ -7,6 +7,7 @@ const { Schema } = mongoose;
 const FraudSignalSchema = new Schema({
   signalId: { type: String, required: true, unique: true, default: uuidv4 },
   user: { type: String, ref: 'Users', required: true },
+  wallet: { type: Schema.Types.ObjectId, ref: 'Wallets' }, // ties fraud signal to specific account
   transaction: { type: Schema.Types.ObjectId, ref: 'Transactions' },
   signalType: { 
     type: String, 
@@ -112,6 +113,7 @@ const BehaviorProfileSchema = new Schema({
   }],
   commonIpRanges: [{ type: String }],
   riskLevel: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
+  walletType: { type: String, enum: ['personal', 'business', 'savings', 'current', 'fixed_deposit'] }, // per-wallet behavior baselines
   lastUpdated: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }
 });
