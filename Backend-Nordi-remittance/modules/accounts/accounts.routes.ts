@@ -4,6 +4,7 @@
 
 import { Router } from "express";
 import AccountsController from "./accounts.controller.js";
+import AccountApplicationsController from "./account-applications.controller.js";
 import {
   authenticate,
   requireAdmin,
@@ -146,6 +147,101 @@ router.patch(
   auditLogMiddleware,
   AccountsController.updateWalletStatus,
 );
+
+// ============================================================================
+// ACCOUNT APPLICATIONS ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/accounts/applications
+ * @desc    Get user's account applications
+ * @access  Private
+ */
+router.get("/applications", AccountApplicationsController.getUserApplications);
+
+/**
+ * @route   POST /api/accounts/applications/apply
+ * @desc    Submit a new account application
+ * @access  Private
+ */
+router.post(
+  "/applications/apply",
+  verifyAccountStatus,
+  rateLimit({ maxRequests: 5, windowMs: 3600000 }),
+  AccountApplicationsController.applyForAccount,
+);
+
+/**
+ * @route   DELETE /api/accounts/applications/:id/cancel
+ * @desc    Cancel a pending application
+ * @access  Private
+ */
+router.delete("/applications/:id/cancel", AccountApplicationsController.cancelApplication);
+
+// ============================================================================
+// CARD-WALLET LINKING ROUTES
+// ============================================================================
+
+/**
+ * @route   POST /api/accounts/wallets/:walletId/cards/:cardId/link
+ * @desc    Link a card to an additional wallet
+ * @access  Private
+ */
+router.post("/wallets/:walletId/cards/:cardId/link", AccountsController.linkCardToWallet);
+
+/**
+ * @route   DELETE /api/accounts/wallets/:walletId/cards/:cardId/unlink
+ * @desc    Unlink a card from a wallet
+ * @access  Private
+ */
+router.delete("/wallets/:walletId/cards/:cardId/unlink", AccountsController.unlinkCardFromWallet);
+
+/**
+ * @route   PATCH /api/accounts/cards/:cardId/funding-source
+ * @desc    Set which wallet funds a card
+ * @access  Private
+ */
+router.patch("/cards/:cardId/funding-source", AccountsController.setCardFundingSource);
+
+// ============================================================================
+// WALLET PRODUCT LINKING ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/accounts/wallets/:walletId/products
+ * @desc    Get all products (cards, loans, investments) linked to a wallet
+ * @access  Private
+ */
+router.get("/wallets/:walletId/products", AccountsController.getWalletProducts);
+
+// ============================================================================
+// CLOSED WALLETS / HISTORY
+// ============================================================================
+
+/**
+ * @route   GET /api/accounts/wallets/closed
+ * @desc    Get user's closed/deleted wallets for history viewing
+ * @access  Private
+ */
+router.get("/wallets/closed", AccountsController.getClosedWallets);
+
+// ============================================================================
+// WALLET LIFECYCLE / POLICIES
+// ============================================================================
+
+/**
+ * @route   GET /api/accounts/consolidated-limits
+ * @desc    Get consolidated limits across all user wallets
+ * @access  Private
+ */
+router.get("/consolidated-limits", AccountsController.getConsolidatedLimits);
+
+/**
+ * @route   GET /api/accounts/credit-score
+ * @desc    Calculate and return user's credit score
+ * @access  Private
+ */
+router.get("/credit-score", AccountsController.getCreditScore);
 
 // ============================================================================
 // EXPORT

@@ -7,6 +7,8 @@ import { generateReferenceNumber } from '../../core/helpers/generator.js';
 import { ValidationError, NotFoundError, ForbiddenError } from '../../core/errors/AppError.js';
 import { queueTemplatedMail } from '../../services/workers.js';
 import { validateUserEligibility } from '../../core/guards/user-eligibility.guard.js';
+import EmailContentGenerator from '../../core/mail/Mail-content.js';
+const emailGenerator = new EmailContentGenerator();
 import {
   hasPermission,
   logAdminAction,
@@ -115,25 +117,18 @@ export class OpsLoanService {
         );
 
         try {
-          await queueTemplatedMail(String(user.email), {
-            EMAIL_TITLE: 'Loan Application Approved',
-            GREETING: `Hello ${user.firstName},`,
-            MAIN_CONTENT: `
-              <p>Great news! Your loan application has been <strong>approved</strong>.</p>
-              <p><strong>Loan Details:</strong></p>
-              <ul>
-                <li>Principal Amount: USD ${finalAmount.toFixed(2)}</li>
-                <li>Interest Rate: ${finalRate}% APR</li>
-                <li>Term: ${finalTerm} months</li>
-                <li>Monthly Payment: USD ${monthlyPayment.toFixed(2)}</li>
-                <li>Total Repayment: USD ${totalRepayment.toFixed(2)}</li>
-              </ul>
-              <p>The loan will be disbursed to your wallet shortly.</p>
-            `,
-            COMPANY_NAME: 'Nordea Remittance',
-            YEAR: new Date().getFullYear(),
-            FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
-          } as any);
+          const emailContent = emailGenerator.loanApplicationEmail({
+            applicantName: user.firstName,
+            status: 'approved',
+            currency: loan.currency || 'USD',
+            amount: String(finalAmount),
+            requestedAmount: String(application.requestedAmount),
+            loanType: application.loanType || 'Personal Loan',
+            term: finalTerm,
+            applicationId: String(application._id),
+            loanId: String(loan._id)
+          });
+          await queueTemplatedMail(String(user.email), emailContent);
         } catch (emailError) {
           console.error('Failed to send loan approval email:', emailError);
         }
@@ -202,19 +197,17 @@ export class OpsLoanService {
       );
 
       try {
-        await queueTemplatedMail(String(user.email), {
-          EMAIL_TITLE: 'Loan Application Update',
-          GREETING: `Hello ${user.firstName},`,
-          MAIN_CONTENT: `
-            <p>We have reviewed your loan application for <strong>USD ${application.requestedAmount.toFixed(2)}</strong>.</p>
-            <p>Unfortunately, we are unable to approve your application at this time.</p>
-            <p><strong>Reason:</strong> ${reason}</p>
-            <p>If you have any questions or would like to discuss this decision, please contact our support team.</p>
-          `,
-          COMPANY_NAME: 'Nordea Remittance',
-          YEAR: new Date().getFullYear(),
-          FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
-        } as any);
+        const emailContent = emailGenerator.loanApplicationEmail({
+          applicantName: user.firstName,
+          status: 'rejected',
+          currency: application.currency || 'USD',
+          amount: String(application.requestedAmount),
+          requestedAmount: String(application.requestedAmount),
+          loanType: application.loanType || 'Personal Loan',
+          term: application.termMonths,
+          applicationId: String(application._id)
+        });
+        await queueTemplatedMail(String(user.email), emailContent);
       } catch (emailError) {
         console.error('Failed to send loan rejection email:', emailError);
       }

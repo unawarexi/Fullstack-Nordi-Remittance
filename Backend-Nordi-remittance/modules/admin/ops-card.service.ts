@@ -5,6 +5,9 @@ import { Cards, CardApplications } from '../cards/cards.model.js';
 import { ValidationError, NotFoundError, ForbiddenError } from '../../core/errors/AppError.js';
 import { queueTemplatedMail } from '../../services/workers.js';
 import { validateUserEligibility } from '../../core/guards/user-eligibility.guard.js';
+import EmailContentGenerator from '../../core/mail/Mail-content.js';
+
+const emailGenerator = new EmailContentGenerator();
 import {
   hasPermission,
   logAdminAction,
@@ -110,26 +113,16 @@ export class OpsCardService {
         { cardId: card._id }
       );
 
-      try {
-        await queueTemplatedMail(String(user.email), {
-          EMAIL_TITLE: 'Card Application Approved',
-          GREETING: `Hello ${user.firstName},`,
-          MAIN_CONTENT: `
-            <p>Your <strong>${card.cardType}</strong> card application has been approved!</p>
-            <p><strong>Card Details:</strong></p>
-            <ul>
-              <li>Card Type: ${card.cardType}</li>
-              <li>Card Number: **** **** **** ${cardNumber.slice(-4)}</li>
-              <li>Expiry: ${String(expiryMonth).padStart(2, '0')}/${expiryYear}</li>
-              ${card.creditLimit ? `<li>Credit Limit: ${application.currency || 'USD'} ${card.creditLimit.toFixed(2)}</li>` : ''}
-            </ul>
-            <p>Your card will need to be activated before use.</p>
-          `,
-          COMPANY_NAME: 'Nordea Remittance',
-          YEAR: new Date().getFullYear(),
-          FOOTER_TEXT: 'This is an automated notification from Nordea Remittance.',
-        } as any);
-      } catch (emailError) {
+        try {
+          const emailContent = emailGenerator.adminCardApprovedEmail({
+            firstName: user.firstName,
+            cardType: card.cardType,
+            cardBrand: card.cardBrand || 'Visa',
+            lastFour: cardNumber.slice(-4),
+            expiry: `${String(expiryMonth).padStart(2, '0')}/${expiryYear}`
+          });
+          await queueTemplatedMail(String(user.email), emailContent);
+        } catch (emailError) {
         console.error('Failed to send card approval email:', emailError);
       }
     }

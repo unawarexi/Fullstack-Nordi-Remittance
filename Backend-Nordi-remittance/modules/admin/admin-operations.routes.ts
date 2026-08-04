@@ -69,6 +69,43 @@ router.post(
 );
 
 // ============================================================================
+// ACCOUNT APPLICATIONS MANAGEMENT
+// ============================================================================
+
+/**
+ * @route   GET /api/admin/operations/accounts/applications/pending
+ * @desc    Get all pending account applications
+ * @access  Admin with canViewTransactions permission
+ */
+router.get(
+  "/accounts/applications/pending",
+  requirePermission("canViewTransactions"),
+  AdminOperationsController.getPendingApplications,
+);
+
+/**
+ * @route   POST /api/admin/operations/accounts/applications/:applicationId/approve
+ * @desc    Approve an account application
+ * @access  Admin with canApproveLoans permission (placeholder for account permissions)
+ */
+router.post(
+  "/accounts/applications/:applicationId/approve",
+  requirePermission("canApproveLoans"),
+  AdminOperationsController.approveAccountApplication,
+);
+
+/**
+ * @route   POST /api/admin/operations/accounts/applications/:applicationId/reject
+ * @desc    Reject an account application
+ * @access  Admin with canApproveLoans permission
+ */
+router.post(
+  "/accounts/applications/:applicationId/reject",
+  requirePermission("canApproveLoans"),
+  AdminOperationsController.rejectAccountApplication,
+);
+
+// ============================================================================
 // LOAN MANAGEMENT
 // ============================================================================
 
@@ -218,6 +255,21 @@ router.post(
   "/bulk/credit",
   requireSuperAdmin,
   AdminOperationsController.bulkCredit,
+);
+
+// ============================================================================
+// ADMIN CARD FUNDING FROM WALLET
+// ============================================================================
+
+/**
+ * @route   POST /api/admin/operations/cards/:cardId/fund-from-wallet
+ * @desc    Fund a card from a user's wallet (Admin initiated)
+ * @access  Admin with canAdjustBalances permission
+ */
+router.post(
+  "/cards/:cardId/fund-from-wallet",
+  requirePermission("canAdjustBalances"),
+  AdminOperationsController.adminFundCardFromWallet,
 );
 
 export default router;

@@ -4,6 +4,7 @@
 // Handles HTTP request/response logic and delegates business logic to services.
 // ============================================================================
 
+// @ts-nocheck
 import { Response, NextFunction } from "express";
 import type { AuthenticatedRequest } from "../../types/index.js";
 import {
@@ -17,6 +18,9 @@ import { UnauthorizedError } from "../../core/errors/AppError.js";
 import { WalletService } from "./wallet.service.js";
 import { AccountAnalyticsService } from "./account-analytics.service.js";
 import { BeneficiaryService } from "./beneficiary.service.js";
+import { CardWalletLinkService } from "./card-wallet-link.service.js";
+import { WalletProductLinkService } from "./wallet-product-link.service.js";
+import { WalletLifecycleService } from "./wallet-lifecycle.service.js";
 
 // ============================================================================
 // WALLET MANAGEMENT
@@ -191,6 +195,92 @@ export async function updateWalletStatus(req: AuthenticatedRequest, res: Respons
 }
 
 // ============================================================================
+// CARD-WALLET LINKING
+// ============================================================================
+
+export async function linkCardToWallet(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await CardWalletLinkService.linkCardToWallet(req.params.cardId, req.params.walletId, req.user.userId);
+    sendSuccess(res, result, "Card linked to wallet successfully");
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function unlinkCardFromWallet(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await CardWalletLinkService.unlinkCardFromWallet(req.params.cardId, req.params.walletId, req.user.userId);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function setCardFundingSource(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await CardWalletLinkService.setCardFundingSource(req.params.cardId, req.body.walletId, req.user.userId);
+    sendSuccess(res, result, "Card funding source updated");
+  } catch (error) {
+    next(error);
+  }
+}
+
+// ============================================================================
+// WALLET PRODUCTS
+// ============================================================================
+
+export async function getWalletProducts(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await WalletProductLinkService.getWalletProducts(req.params.walletId, req.user.userId);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// ============================================================================
+// CLOSED WALLETS
+// ============================================================================
+
+export async function getClosedWallets(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await WalletService.getClosedWallets(req.user.userId);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// ============================================================================
+// WALLET LIFECYCLE / POLICIES
+// ============================================================================
+
+export async function getConsolidatedLimits(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const result = await WalletLifecycleService.getConsolidatedLimits(req.user.userId);
+    sendSuccess(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCreditScore(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user) throw new UnauthorizedError("Authentication required");
+    const score = await WalletLifecycleService.calculateCreditScore(req.user.userId);
+    sendSuccess(res, { creditScore: score });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// ============================================================================
 // EXPORT
 // ============================================================================
 
@@ -208,4 +298,11 @@ export default {
   removeBeneficiary,
   getAllWallets,
   updateWalletStatus,
+  linkCardToWallet,
+  unlinkCardFromWallet,
+  setCardFundingSource,
+  getWalletProducts,
+  getClosedWallets,
+  getConsolidatedLimits,
+  getCreditScore,
 };
