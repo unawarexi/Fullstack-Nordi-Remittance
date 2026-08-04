@@ -467,3 +467,95 @@ export const useCancelLoanApplication = () => {
     },
   });
 };
+
+// ============================================================================
+// USER — APPLICATIONS & ELIGIBILITY
+// ============================================================================
+
+/** Get current user's loan applications  GET /loans/applications */
+export const useUserApplications = () => {
+  return useQuery({
+    queryKey: [...queryKeys.loans.all, "user-applications"],
+    queryFn: async () => {
+      const response = await LoansRepository.getUserApplications();
+      return response;
+    },
+  });
+};
+
+/** Check eligibility for current user  GET /loans/eligibility/check */
+export const useEligibilityCheck = () => {
+  return useQuery({
+    queryKey: [...queryKeys.loans.all, "eligibility-check"],
+    queryFn: async () => {
+      const response = await LoansRepository.checkEligibilityStatus();
+      return response;
+    },
+    retry: false,
+  });
+};
+
+// ============================================================================
+// ADMIN — LOAN APPLICATIONS
+// ============================================================================
+
+/** Admin: list all loan applications  GET /loans/admin/applications */
+export const useAdminLoanApplications = (params?: {
+  status?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  return useQuery({
+    queryKey: ["admin", "loans", "applications", params],
+    queryFn: async () => {
+      const response = await LoansRepository.getAdminApplications(params);
+      return response;
+    },
+  });
+};
+
+/** Admin: approve or reject a loan application */
+export const useReviewLoanApplication = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+  return useMutation({
+    mutationFn: async ({
+      applicationId,
+      data,
+    }: {
+      applicationId: UUID;
+      data: { decision: "approve" | "reject"; approvedAmount?: number; notes?: string; reason?: string };
+    }) => {
+      const response = await LoansRepository.reviewAdminApplication(applicationId, data);
+      return response.data;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "loans"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
+      showToast(`Application ${vars.data.decision}d successfully`, "success");
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Review failed", "error");
+    },
+  });
+};
+
+/** Admin: disburse an approved loan  POST /loans/admin/:loanId/disburse */
+export const useDisburseAdminLoan = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+  return useMutation({
+    mutationFn: async (loanId: UUID) => {
+      const response = await LoansRepository.disburseAdminLoan(loanId);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "loans"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
+      showToast("Loan disbursed successfully", "success");
+    },
+    onError: (error: Error) => {
+      showToast(error.message || "Disbursement failed", "error");
+    },
+  });
+};

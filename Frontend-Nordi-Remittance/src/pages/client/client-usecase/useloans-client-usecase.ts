@@ -26,6 +26,8 @@ import {
   useUploadLoanDocuments,
   useGetPayoffQuote,
   useCancelLoanApplication,
+  useUserApplications,
+  useEligibilityCheck,
 } from "@hooks/api-queries/useLoans";
 import { multiKeySort, formatCurrency, monthlyLoanPayment } from "@core/algo";
 
@@ -165,6 +167,72 @@ export function calculateEmiLocal(principal: number, annualRate: number, termMon
 /** Format loan amount */
 export function formatLoanAmount(amount: number, currency = "USD") {
   return formatCurrency(amount, currency);
+}
+
+// ============================================================================
+// USER APPLICATIONS
+// ============================================================================
+
+/** User's own loan applications (draft/submitted/approved/rejected) */
+export function useClientApplications() {
+  const { data: raw, isLoading, error, refetch } = useUserApplications();
+
+  const applications = useMemo(() => {
+    const list = extractArray(raw, "applications");
+    return multiKeySort(list, [
+      { getter: (a: any) => new Date(a.createdAt || 0), direction: "desc" },
+    ]);
+  }, [raw]);
+
+  return { applications, isLoading, error, refetch };
+}
+
+// ============================================================================
+// ELIGIBILITY & CREDIT
+// ============================================================================
+
+/** Check current user's loan eligibility (credit score, max amount) */
+export function useClientEligibility() {
+  const { data: raw, isLoading, error, refetch } = useEligibilityCheck();
+
+  const eligibility = useMemo(() => {
+    const obj = extractObject(raw, "eligibility");
+    return {
+      eligible: obj.eligible ?? false,
+      creditScore: obj.creditScore ?? 0,
+      maxAmount: obj.maxAmount ?? 0,
+      monthlyIncome: obj.monthlyIncome ?? 0,
+      outstandingDebt: obj.outstandingDebt ?? 0,
+      accountAgeDays: obj.accountAgeDays ?? 0,
+      reason: obj.reason ?? null,
+    };
+  }, [raw]);
+
+  return { eligibility, isLoading, error, refetch };
+}
+
+// ============================================================================
+// LOAN DETAIL (loan + schedule)
+// ============================================================================
+
+/** Single loan with its repayment schedule */
+export function useClientLoanDetailFull(loanId: UUID) {
+  const { data: rawLoan, isLoading: loanLoading, error: loanError } = useLoan(loanId);
+  const { data: rawSchedule, isLoading: scheduleLoading } = useLoanSchedule(loanId);
+
+  const loan = useMemo(() => extractObject(rawLoan, "loan"), [rawLoan]);
+  const schedule = useMemo(() => {
+    const obj = extractObject(rawSchedule, "schedule", "repaymentSchedule");
+    const installments = extractArray(obj, "installments");
+    return { schedule: obj, installments };
+  }, [rawSchedule]);
+
+  return {
+    loan,
+    ...schedule,
+    isLoading: loanLoading || scheduleLoading,
+    error: loanError,
+  };
 }
 
 // ============================================================================

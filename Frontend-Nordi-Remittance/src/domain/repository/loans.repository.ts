@@ -1,8 +1,8 @@
+import { ApiEndpoints } from "../../core/api/endpoint";
 // ============================================================================
 // LOANS API - Loan management endpoints
 // ============================================================================
 
-import { ApiEndpoints } from "../../core/api/endpoint";
 import apiClient, { ApiResponse, PaginatedResponse } from "@core/api/client";
 
 // ============================================================================
@@ -255,7 +255,7 @@ export const LoansRepository = {
   // ==========================================================================
 
   /**
-   * Make loan payment
+   * Make loan payment — posts to /loans/:loanId/pay
    */
   makePayment: async (
     data: LoanPaymentRequest,
@@ -265,12 +265,13 @@ export const LoansRepository = {
       loan: Loan;
     }>
   > => {
+    const { loanId, amount, sourceAccountId } = data;
     const response = await apiClient.post<
       ApiResponse<{
         payment: LoanPayment;
         loan: Loan;
       }>
-    >(ApiEndpoints.loansPayments, data);
+    >(ApiEndpoints.loanPay(loanId), { amount, walletId: sourceAccountId });
     return response.data;
   },
 
@@ -308,10 +309,7 @@ export const LoansRepository = {
       dayOfMonth: number;
     },
   ): Promise<ApiResponse<{ message: string }>> => {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      ApiEndpoints.loanAutoPayment(loanId),
-      data,
-    );
+    const response = await apiClient.post<ApiResponse<{ message: string }>>(ApiEndpoints.loanAutoPayment(loanId), data);
     return response.data;
   },
 
@@ -449,6 +447,69 @@ export const LoansRepository = {
         "Content-Type": "multipart/form-data",
       },
     });
+    return response.data;
+  },
+
+  // ==========================================================================
+  // USER — APPLICATION & ELIGIBILITY
+  // ==========================================================================
+
+  /**
+   * Get user's own loan applications  GET /loans/applications
+   */
+  getUserApplications: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.loansApplications);
+    return response.data;
+  },
+
+  /**
+   * Check eligibility for current user  GET /loans/eligibility/check
+   */
+  checkEligibilityStatus: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.loansEligibility);
+    return response.data;
+  },
+
+  // ==========================================================================
+  // ADMIN OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Get all loan applications (admin)  GET /loans/admin/applications
+   */
+  getAdminApplications: async (params?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<any>> => {
+    const response = await apiClient.get<PaginatedResponse<any>>(ApiEndpoints.loansAdminApplications, { params });
+    return response.data;
+  },
+
+  /**
+   * Review a loan application — approve or reject  POST /loans/admin/applications/:id/review
+   */
+  reviewAdminApplication: async (
+    applicationId: UUID,
+    data: {
+      decision: "approve" | "reject";
+      approvedAmount?: number;
+      notes?: string;
+      reason?: string;
+    },
+  ): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(
+      ApiEndpoints.loanAdminReview(applicationId),
+      data,
+    );
+    return response.data;
+  },
+
+  /**
+   * Disburse an approved loan  POST /loans/admin/:loanId/disburse
+   */
+  disburseAdminLoan: async (loanId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.loanAdminDisburse(loanId));
     return response.data;
   },
 };

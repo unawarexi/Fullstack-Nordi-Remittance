@@ -1,5 +1,9 @@
 import { useState, useMemo, useCallback } from "react";
-import { useLoans, useApproveLoan, useRejectLoan } from "@hooks/api-queries";
+import {
+  useAdminLoanApplications,
+  useReviewLoanApplication,
+  useDisburseAdminLoan,
+} from "@hooks/api-queries/useLoans";
 import { applyFilterPipeline, textSearchFilter, enumFilter } from "@core/algo/filter";
 import { multiKeySort } from "@core/algo/sort";
 import { paginate, getPageNumbers } from "@core/algo/pagination";
@@ -7,10 +11,10 @@ import { paginate, getPageNumbers } from "@core/algo/pagination";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // ============================================================================
-// useLoansManagement — Aggregates loan listing, filters, stats & admin actions
+// useLoansManagement — Admin loan applications: list, filter, stats & actions
 // ============================================================================
 
-export type LoanStatusFilter = "all" | "pending" | "approved" | "active" | "rejected" | "overdue" | "paid";
+export type LoanStatusFilter = "all" | "submitted" | "under_review" | "approved" | "rejected" | "cancelled" | "active" | "overdue";
 export type LoanTypeFilter = "all" | "personal" | "business" | "mortgage" | "education" | "auto";
 
 const PAGE_SIZE = 20;
@@ -22,42 +26,48 @@ export function useLoansManagement() {
   const [page, setPage] = useState(1);
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
 
-  const { data: loansRaw, isLoading, refetch } = useLoans({ limit: 500 } as any);
-  const approveMutation = useApproveLoan();
-  const rejectMutation = useRejectLoan();
+  // Fetch all admin loan applications (large page to allow client-side filtering)
+  const { data: applicationsRaw, isLoading, refetch } = useAdminLoanApplications({ limit: 500 });
+  const reviewMutation = useReviewLoanApplication();
+  const disburseMutation = useDisburseAdminLoan();
 
-  // --- Normalize raw loan data ---
+  // --- Normalize raw application data (backend populates user as { firstName, lastName, email }) ---
   const rawLoans = useMemo(() => {
-    const outer: any = loansRaw || {};
+    const outer: any = applicationsRaw || {};
     const raw: any[] = Array.isArray(outer)
       ? outer
       : Array.isArray(outer?.data?.data)
         ? outer.data.data
         : Array.isArray(outer?.data)
           ? outer.data
-          : outer?.loans || [];
-    return raw.map((l: any) => ({
-      id: l._id || l.loanId || l.id || "",
+          : outer?.applications || [];
+
+    return raw.map((a: any) => ({
+      id: a._id || a.applicationId || a.id || "",
+      applicationId: a.applicationId || a._id || "",
+      loanId: a.loan?._id || a.loan || "",
       applicant:
-        l.borrowerName ||
-        l.userName ||
-        (l.user?.firstName && l.user?.lastName ? `${l.user.firstName} ${l.user.lastName}` : "Applicant"),
-      email: l.user?.email || l.email || "",
-      type: l.loanType || l.type || "personal",
-      amount: l.principalAmount || l.amount || 0,
-      interestRate: l.interestRate ?? 0,
-      term: l.term ?? 0,
-      monthlyPayment: l.monthlyPayment ?? 0,
-      outstanding: l.outstandingBalance ?? l.remainingAmount ?? l.principalAmount ?? 0,
-      status: l.status || "pending",
-      appliedDate: l.createdAt || l.applicationDate || "",
-      startDate: l.startDate || "",
-      maturityDate: l.maturityDate || l.endDate || "",
-      purpose: l.purpose || "",
-      collateral: l.collateral || "",
-      currency: l.currency || "EUR",
+        a.user?.firstName && a.user?.lastName
+          ? `${a.user.firstName} ${a.user.lastName}`
+          : a.borrowerName || a.userName || "Applicant",
+      email: a.user?.email || a.email || "",
+      type: a.loanType || a.type || "personal",
+      amount: a.requestedAmount || a.approvedAmount || a.principalAmount || a.amount || 0,
+      approvedAmount: a.approvedAmount || 0,
+      interestRate: a.interestRate ?? 0,
+      term: a.term ?? 0,
+      monthlyPayment: a.monthlyPayment ?? 0,
+      outstanding: a.outstandingBalance ?? a.approvedAmount ?? a.requestedAmount ?? 0,
+      status: a.status || "submitted",
+      appliedDate: a.createdAt || a.submittedAt || "",
+      reviewedAt: a.reviewedAt || "",
+      purpose: a.purpose || "",
+      rejectionReason: a.rejectionReason || a.reviewNotes || "",
+      currency: a.currency || "USD",
+      // disbursed loan sub-object if present
+      disbursed: a.loan ? true : false,
     }));
-  }, [loansRaw]);
+  }, [applicationsRaw]);
 
   // --- Filter Pipeline ---
   const filtered = useMemo(() => {
@@ -68,6 +78,7 @@ export function useLoansManagement() {
           (l) => l.applicant ?? "",
           (l) => l.email ?? "",
           (l) => l.id ?? "",
+          (l) => l.applicationId ?? "",
           (l) => l.purpose ?? "",
         ]),
       );
@@ -92,24 +103,33 @@ export function useLoansManagement() {
   // --- Stats ---
   const stats = useMemo(() => {
     const totalDisbursed = rawLoans
-      .filter((l: any) => l.status === "active" || l.status === "paid")
-      .reduce((sum: number, l: any) => sum + l.amount, 0);
+      .filter((l: any) => l.status === "approved" || l.disbursed)
+      .reduce((sum: number, l: any) => sum + (l.approvedAmount || l.amount), 0);
     return {
       totalLoans: rawLoans.length,
-      pendingApplications: rawLoans.filter((l: any) => l.status === "pending" || l.status === "under_review").length,
-      activeLoans: rawLoans.filter((l: any) => l.status === "active").length,
-      overdueLoans: rawLoans.filter((l: any) => l.status === "overdue").length,
+      pendingApplications: rawLoans.filter((l: any) =>
+        l.status === "submitted" || l.status === "under_review",
+      ).length,
+      activeLoans: rawLoans.filter((l: any) => l.disbursed).length,
+      overdueLoans: 0,
       totalDisbursed,
       averageAmount:
-        rawLoans.length > 0 ? Math.round(rawLoans.reduce((s: number, l: any) => s + l.amount, 0) / rawLoans.length) : 0,
+        rawLoans.length > 0
+          ? Math.round(rawLoans.reduce((s: number, l: any) => s + l.amount, 0) / rawLoans.length)
+          : 0,
     };
   }, [rawLoans]);
 
   // --- Actions ---
   const approveLoan = useCallback(
-    (loanId: string, callbacks?: { onSuccess?: () => void; onError?: (err: any) => void }) => {
-      approveMutation.mutate(
-        { loanId: loanId as any, data: { status: "approved" } },
+    (
+      applicationId: string,
+      approvedAmount?: number,
+      notes?: string,
+      callbacks?: { onSuccess?: () => void; onError?: (err: any) => void },
+    ) => {
+      reviewMutation.mutate(
+        { applicationId: applicationId as any, data: { decision: "approve", approvedAmount, notes } },
         {
           onSuccess: () => {
             refetch();
@@ -119,13 +139,17 @@ export function useLoansManagement() {
         },
       );
     },
-    [approveMutation, refetch],
+    [reviewMutation, refetch],
   );
 
   const rejectLoan = useCallback(
-    (loanId: string, reason?: string, callbacks?: { onSuccess?: () => void; onError?: (err: any) => void }) => {
-      rejectMutation.mutate(
-        { loanId: loanId as any, reason },
+    (
+      applicationId: string,
+      reason?: string,
+      callbacks?: { onSuccess?: () => void; onError?: (err: any) => void },
+    ) => {
+      reviewMutation.mutate(
+        { applicationId: applicationId as any, data: { decision: "reject", reason } },
         {
           onSuccess: () => {
             refetch();
@@ -135,7 +159,20 @@ export function useLoansManagement() {
         },
       );
     },
-    [rejectMutation, refetch],
+    [reviewMutation, refetch],
+  );
+
+  const disburseLoan = useCallback(
+    (loanId: string, callbacks?: { onSuccess?: () => void; onError?: (err: any) => void }) => {
+      disburseMutation.mutate(loanId as any, {
+        onSuccess: () => {
+          refetch();
+          callbacks?.onSuccess?.();
+        },
+        onError: (err) => callbacks?.onError?.(err),
+      });
+    },
+    [disburseMutation, refetch],
   );
 
   const handleSearch = useCallback((value: string) => {
@@ -154,7 +191,7 @@ export function useLoansManagement() {
     page,
     selectedLoanId,
     isLoading,
-    isMutating: approveMutation.isPending || rejectMutation.isPending,
+    isMutating: reviewMutation.isPending || disburseMutation.isPending,
     pagination: paginatedResult,
     pageNumbers,
     setSearch: handleSearch,
@@ -170,6 +207,7 @@ export function useLoansManagement() {
     setSelectedLoanId,
     approveLoan,
     rejectLoan,
+    disburseLoan,
     refetch,
   };
 }
