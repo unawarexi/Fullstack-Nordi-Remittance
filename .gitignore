@@ -86,4 +86,6 @@ env/
 *.tmp
 *.temp
 .node_repl_history
-tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo*.mov
+
+*.mov

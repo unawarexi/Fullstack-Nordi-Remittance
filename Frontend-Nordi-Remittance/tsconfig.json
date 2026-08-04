@@ -5,6 +5,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": "src",
     "paths": {
       "@core/*": ["core/*"],
@@ -20,7 +21,7 @@
       "@hooks/index": ["hooks/index"],
       "@store/*": ["store/*"],
       "@constants/*": ["constants/*"],
-      "@types": ["types/index"],
+      // "@types": ["types/index"],
       "@types/*": ["types/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
