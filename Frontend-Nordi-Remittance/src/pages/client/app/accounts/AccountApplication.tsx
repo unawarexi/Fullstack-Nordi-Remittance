@@ -13,14 +13,10 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import { PageContainer, FilterPill } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAccountApplicationsStore, SHOW_APPLICATION_DEV_PREVIEW } from "@store/accountApplications.store";
-import {
-  ACCOUNT_TYPE_LABELS,
-  type AccountApplication,
-  type AccountApplicationStatus,
-  type AccountApplicationType,
-} from "../../types/AccountApplications.types";
-import { ApplicationStatusCard } from "./components/ApplicationStatusCard";
+import { SHOW_APPLICATION_DEV_PREVIEW } from "@store/account.store";
+import { ACCOUNT_TYPE_LABELS } from "@domain/types/Accounts.types";
+import { useClientAccountApplications } from "../../client-usecase/useaccounts-client-usecase";
+import { ApplicationStatusCard } from "../../components/application-status-card";
 
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
@@ -61,7 +57,7 @@ function fieldsFor(app: AccountApplication): Array<{ label: string; value: strin
 
 const AccountApplications: React.FC = () => {
   const navigate = useNavigate();
-  const applications = useAccountApplicationsStore((s) => s.applications);
+  const { applications = [] } = useClientAccountApplications();
   const [statusFilter, setStatusFilter] = useState<"all" | AccountApplicationStatus>("all");
 
   const filtered = useMemo(

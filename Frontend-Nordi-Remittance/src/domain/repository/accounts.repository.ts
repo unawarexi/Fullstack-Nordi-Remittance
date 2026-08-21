@@ -69,6 +69,37 @@ export const AccountsRepository = {
     return response.data;
   },
 
+  getConsolidatedLimits: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.accountConsolidatedLimits);
+    return response.data;
+  },
+
+  getCreditScore: async (): Promise<ApiResponse<{ score: number }>> => {
+    const response = await apiClient.get<ApiResponse<{ score: number }>>(ApiEndpoints.accountCreditScore);
+    return response.data;
+  },
+
+  // ==========================================================================
+  // ACCOUNT APPLICATIONS ROUTES
+  // ==========================================================================
+
+  getUserApplications: async (): Promise<ApiResponse<any[]>> => {
+    const response = await apiClient.get<ApiResponse<any[]>>(ApiEndpoints.accountApplications);
+    return response.data;
+  },
+
+  applyForAccount: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.accountApplicationsApply, data);
+    return response.data;
+  },
+
+  cancelApplication: async (applicationId: string): Promise<ApiResponse<{ message: string }>> => {
+    const response = await apiClient.delete<ApiResponse<{ message: string }>>(
+      ApiEndpoints.accountApplicationCancel(applicationId)
+    );
+    return response.data;
+  },
+
   // ==========================================================================
   // BENEFICIARY ROUTES
   // ==========================================================================
@@ -87,6 +118,30 @@ export const AccountsRepository = {
     const response = await apiClient.delete<ApiResponse<{ message: string }>>(
       ApiEndpoints.accountBeneficiary(beneficiaryId),
     );
+    return response.data;
+  },
+
+  // ==========================================================================
+  // WALLET / PRODUCT LINKING
+  // ==========================================================================
+
+  getWalletProducts: async (walletId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.accountWalletProducts(walletId));
+    return response.data;
+  },
+
+  linkCardToWallet: async (walletId: UUID, cardId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.accountWalletCardLink(walletId, cardId));
+    return response.data;
+  },
+
+  unlinkCardFromWallet: async (walletId: UUID, cardId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.delete<ApiResponse<any>>(ApiEndpoints.accountWalletCardUnlink(walletId, cardId));
+    return response.data;
+  },
+
+  setCardFundingSource: async (cardId: UUID, data: { walletId: UUID }): Promise<ApiResponse<any>> => {
+    const response = await apiClient.patch<ApiResponse<any>>(ApiEndpoints.accountCardFundingSource(cardId), data);
     return response.data;
   },
 

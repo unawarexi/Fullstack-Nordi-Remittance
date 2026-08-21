@@ -228,3 +228,55 @@ export const useAdminUpdateWalletStatus = () => {
     },
   });
 };
+
+// ============================================================================
+// ACCOUNT APPLICATIONS
+// ============================================================================
+
+export const useAccountApplications = () => {
+  return useQuery({
+    queryKey: ["accounts", "applications"],
+    queryFn: async () => {
+      const response = await AccountsRepository.getUserApplications();
+      return response.data;
+    },
+  });
+};
+
+export const useApplyForAccount = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = typeof useToastStore === "function" ? useToastStore() : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const response = await AccountsRepository.applyForAccount(data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "applications"] });
+      showToast("Application submitted successfully", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to submit application", "error");
+    },
+  });
+};
+
+export const useCancelApplication = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = typeof useToastStore === "function" ? useToastStore() : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async (applicationId: string) => {
+      const response = await AccountsRepository.cancelApplication(applicationId);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "applications"] });
+      showToast("Application canceled", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to cancel application", "error");
+    },
+  });
+};

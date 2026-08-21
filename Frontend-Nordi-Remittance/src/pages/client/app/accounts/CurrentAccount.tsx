@@ -11,9 +11,13 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import { PageContainer, DashCard, StatCard, StatsGrid } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAccountApplicationsStore, SHOW_APPLICATION_DEV_PREVIEW } from "@store/accountApplications.store";
-import { SUPPORTED_WALLET_CURRENCIES } from "../../client-usecase/useaccounts-client-usecase";
-import { ApplicationStatusCard } from "./components/ApplicationStatusCard";
+import { SHOW_APPLICATION_DEV_PREVIEW } from "@store/account.store";
+import {
+  SUPPORTED_WALLET_CURRENCIES,
+  useClientAccountApplications,
+  useApplyForAccount,
+} from "../../client-usecase/useaccounts-client-usecase";
+import { ApplicationStatusCard } from "../../components/application-status-card";
 
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
@@ -23,7 +27,7 @@ const inputCls =
 const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
 const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const applyForCurrent = useAccountApplicationsStore((s) => s.applyForCurrent);
+  const { mutate: applyForCurrent } = useApplyForAccount();
   const [form, setForm] = useState({
     nickname: "",
     currency: "USD",
@@ -37,6 +41,7 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const submit = () => {
     applyForCurrent({
+      type: "current",
       currency: form.currency,
       nickname: form.nickname || undefined,
       purpose: form.purpose,
@@ -162,7 +167,8 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const CurrentAccount: React.FC = () => {
   const [applying, setApplying] = useState(false);
-  const applications = useAccountApplicationsStore((s) => s.getByType("current"));
+  const { applications: allApplications = [] } = useClientAccountApplications();
+  const applications = allApplications.filter((a) => a.type === "current");
   const approved = applications.filter((a) => a.status === "approved");
 
   return (

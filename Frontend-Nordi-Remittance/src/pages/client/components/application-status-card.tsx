@@ -5,8 +5,8 @@
 import React from "react";
 import { Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { DashCard } from "@components/shared/DashboardPrimitives";
-import { useAccountApplicationsStore } from "@store/account-application.store";
-import type { AccountApplication } from "../../../types/account-application.types";
+import { useCancelApplication } from "../../client-usecase/useaccounts-client-usecase";
+import type { AccountApplication } from "../../../../domain/types/Accounts.types";
 
 const statusStyles: Record<
   AccountApplication["status"],
@@ -40,8 +40,8 @@ interface Props {
 }
 
 export const ApplicationStatusCard: React.FC<Props> = ({ application, fields, showDevPreview }) => {
-  const cancelApplication = useAccountApplicationsStore((s) => s.cancelApplication);
-  const devSetStatus = useAccountApplicationsStore((s) => s._devPreviewSetStatus);
+  const { mutate: cancelApplication } = useCancelApplication();
+  const devSetStatus = () => alert("Dev preview status update is disabled when using real backend APIs.");
   const style = statusStyles[application.status];
 
   return (

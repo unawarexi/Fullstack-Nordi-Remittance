@@ -95,12 +95,30 @@ export class ApiEndpoints {
   static accountWalletHistory(id: string) {
     return `/accounts/wallets/${id}/history`;
   }
+  static readonly accountWalletsClosed = "/accounts/wallets/closed"; // GET
+  
+  // Wallet Products / Linking
+  static accountWalletProducts(walletId: string) { return `/accounts/wallets/${walletId}/products`; }
+  static accountWalletCardLink(walletId: string, cardId: string) { return `/accounts/wallets/${walletId}/cards/${cardId}/link`; }
+  static accountWalletCardUnlink(walletId: string, cardId: string) { return `/accounts/wallets/${walletId}/cards/${cardId}/unlink`; }
+  static accountCardFundingSource(cardId: string) { return `/accounts/cards/${cardId}/funding-source`; }
+
+  // Limits / Score
   static readonly accountLimits = "/accounts/limits";
+  static readonly accountConsolidatedLimits = "/accounts/consolidated-limits";
+  static readonly accountCreditScore = "/accounts/credit-score";
+  
   static readonly accountSummary = "/accounts/summary";
   static readonly accountBeneficiaries = "/accounts/beneficiaries"; // GET / POST
   static accountBeneficiary(id: string) {
     return `/accounts/beneficiaries/${id}`;
   } // DELETE
+  
+  // Applications
+  static readonly accountApplications = "/accounts/applications";
+  static readonly accountApplicationsApply = "/accounts/applications/apply";
+  static accountApplicationCancel(id: string) { return `/accounts/applications/${id}/cancel`; }
+
   // Admin
   static readonly accountAdminWallets = "/accounts/admin/wallets";
   static accountAdminWalletStatus(id: string) {

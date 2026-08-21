@@ -37,6 +37,7 @@ import {
   useCreateWallet,
   useUpdateWallet,
   useCloseWallet,
+  useAccountApplications,
 } from "@hooks/api-queries/useAccounts";
 import { formatCurrency, maskSensitive } from "@core/algo";
 
@@ -249,11 +250,26 @@ export function useClientBeneficiaries() {
   return { beneficiaries, isLoading, error, refetch };
 }
 
+/** Account Applications list */
+export function useClientAccountApplications() {
+  const { data: raw, isLoading, error, refetch } = useAccountApplications();
+  const applications = useMemo(() => extractArray(raw, "applications") as any[], [raw]);
+  return { applications, isLoading, error, refetch };
+}
+
 // ============================================================================
 // MUTATIONS (pass-through with same API — mutations don't need normalization)
 // ============================================================================
 
-export { useAddBeneficiary, useRemoveBeneficiary, useCreateWallet, useUpdateWallet, useCloseWallet };
+export { 
+  useAddBeneficiary, 
+  useRemoveBeneficiary, 
+  useCreateWallet, 
+  useUpdateWallet, 
+  useCloseWallet,
+  useApplyForAccount,
+  useCancelApplication
+};
 
 // ============================================================================
 // COMPUTED HELPERS

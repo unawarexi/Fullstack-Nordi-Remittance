@@ -11,10 +11,14 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import { PageContainer, DashCard, StatCard, StatsGrid } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAccountApplicationsStore, SHOW_APPLICATION_DEV_PREVIEW } from "@store/accountApplications.store";
-import { FIXED_DEPOSIT_RATES, FixedDepositApplication } from "../../types/AccountApplications.types";
-import { SUPPORTED_WALLET_CURRENCIES } from "../../client-usecase/useaccounts-client-usecase";
-import { ApplicationStatusCard } from "./components/ApplicationStatusCard";
+import { SHOW_APPLICATION_DEV_PREVIEW } from "@store/account.store";
+import { FIXED_DEPOSIT_RATES } from "@domain/types/Accounts.types";
+import {
+  SUPPORTED_WALLET_CURRENCIES,
+  useClientAccountApplications,
+  useApplyForAccount,
+} from "../../client-usecase/useaccounts-client-usecase";
+import { ApplicationStatusCard } from "../../components/application-status-card";
 
 const fmt = (n: number, c = "USD") =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: c, minimumFractionDigits: 2 }).format(n);
@@ -26,7 +30,7 @@ const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-g
 const TERM_OPTIONS: FixedDepositApplication["termMonths"][] = [3, 6, 12, 24, 36];
 
 const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const applyForFixedDeposit = useAccountApplicationsStore((s) => s.applyForFixedDeposit);
+  const { mutate: applyForFixedDeposit } = useApplyForAccount();
   const [form, setForm] = useState({
     nickname: "",
     currency: "USD",
@@ -51,6 +55,7 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const submit = () => {
     applyForFixedDeposit({
+      type: "fixed_deposit",
       currency: form.currency,
       nickname: form.nickname || undefined,
       principal: principalNum,
@@ -185,7 +190,8 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const FixedDeposits: React.FC = () => {
   const [applying, setApplying] = useState(false);
-  const applications = useAccountApplicationsStore((s) => s.getByType("fixed_deposit")) as FixedDepositApplication[];
+  const { applications: allApplications = [] } = useClientAccountApplications();
+  const applications = allApplications.filter((a) => a.type === "fixed_deposit") as FixedDepositApplication[];
   const approved = applications.filter((a) => a.status === "approved");
 
   return (

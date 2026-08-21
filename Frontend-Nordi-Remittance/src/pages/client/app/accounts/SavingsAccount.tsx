@@ -13,9 +13,9 @@ import PageHeader from "@components/shared/PageHeader";
 import { EmptyState } from "@components/shared/EmptyState";
 import { PageContainer, DashCard, StatCard, StatsGrid } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAccountApplicationsStore, SHOW_APPLICATION_DEV_PREVIEW } from "@store/account-application.store";
-import { SAVINGS_INTEREST_RATE } from "../../../../types/account-application.types";
-import { SUPPORTED_WALLET_CURRENCIES } from "../../client-usecase/useaccounts-client-usecase";
+import { SHOW_APPLICATION_DEV_PREVIEW } from "@store/account.store";
+import { SAVINGS_INTEREST_RATE } from "../../../../domain/types/Accounts.types";
+import { SUPPORTED_WALLET_CURRENCIES, useClientAccountApplications, useApplyForAccount } from "../../client-usecase/useaccounts-client-usecase";
 import { ApplicationStatusCard } from "../../components/application-status-card";
 
 const fmt = (n: number, c = "USD") =>
@@ -26,7 +26,7 @@ const inputCls =
 const labelCls = "block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5";
 
 const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const applyForSavings = useAccountApplicationsStore((s) => s.applyForSavings);
+  const { mutate: applyForSavings } = useApplyForAccount();
   const [form, setForm] = useState({
     nickname: "",
     currency: "USD",
@@ -40,6 +40,7 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const submit = () => {
     applyForSavings({
+      type: "savings",
       currency: form.currency,
       nickname: form.nickname || undefined,
       initialDeposit: Number(form.initialDeposit) || 0,
@@ -153,7 +154,8 @@ const ApplyForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const SavingsAccount: React.FC = () => {
   const [applying, setApplying] = useState(false);
-  const applications = useAccountApplicationsStore((s) => s.getByType("savings"));
+  const { applications: allApplications = [] } = useClientAccountApplications();
+  const applications = allApplications.filter((a) => a.type === "savings");
   const approved = applications.filter((a) => a.status === "approved");
 
   return (

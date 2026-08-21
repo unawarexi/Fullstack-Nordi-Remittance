@@ -128,6 +128,70 @@ declare global {
     wallets: Array<Pick<Wallet, "walletNumber" | "balances" | "walletType" | "isPrimary"> & { id?: UUID }>;
     recentTransactions: AccountSummaryTransaction[];
   }
+  // ============================================================================
+  // ACCOUNT APPLICATIONS — types for the client-side account-opening flow
+  // ============================================================================
+
+  type AccountApplicationType = "savings" | "current" | "fixed_deposit";
+  type AccountApplicationStatus = "pending" | "approved" | "rejected";
+
+  interface BaseAccountApplication {
+    id: string;
+    type: AccountApplicationType;
+    status: AccountApplicationStatus;
+    currency: string;
+    nickname?: string;
+    submittedAt: string;
+    reviewedAt?: string;
+    rejectionReason?: string;
+  }
+
+  interface SavingsAccountApplication extends BaseAccountApplication {
+    type: "savings";
+    initialDeposit: number;
+    goal?: string;
+    autoSave: boolean;
+    autoSaveAmount?: number;
+  }
+
+  interface CurrentAccountApplication extends BaseAccountApplication {
+    type: "current";
+    purpose: "personal" | "business";
+    businessName?: string;
+    expectedMonthlyVolume?: number;
+    overdraftRequested: boolean;
+  }
+
+  interface FixedDepositApplication extends BaseAccountApplication {
+    type: "fixed_deposit";
+    principal: number;
+    termMonths: 3 | 6 | 12 | 24 | 36;
+    interestRate: number;
+    maturityDate: string;
+    autoRenew: boolean;
+  }
+
+  type AccountApplication = SavingsAccountApplication | CurrentAccountApplication | FixedDepositApplication;
 }
 
 export {};
+// ============================================================================
+// ACCOUNT APPLICATIONS CONSTANTS
+// ============================================================================
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountApplicationType, string> = {
+  savings: "Savings Account",
+  current: "Current Account",
+  fixed_deposit: "Fixed Deposit",
+};
+
+/** Simple, editable-in-one-place indicative rates until the backend owns pricing. */
+export const FIXED_DEPOSIT_RATES: Record<FixedDepositApplication["termMonths"], number> = {
+  3: 3.5,
+  6: 4.25,
+  12: 5.25,
+  24: 5.75,
+  36: 6.1,
+};
+
+export const SAVINGS_INTEREST_RATE = 2.75;
