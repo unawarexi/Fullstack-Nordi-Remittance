@@ -1,8 +1,11 @@
 // ============================================================================
-// PERMISSIONS TYPES — Mirrors PermissionsModel.ts
+// PERMISSIONS TYPES — Mirrors PermissionsModel.ts and admin.model.ts
 // ============================================================================
 
 declare global {
+  // --------------------------------------------------------------------------
+  // USER PERMISSIONS (managed by admin)
+  // --------------------------------------------------------------------------
   interface UserPermissions {
     userId: UUID;
     // 1. User Account Status
@@ -65,8 +68,53 @@ declare global {
     supportChat: boolean;
     promotionalEmails: boolean;
     feedbackSubmission: boolean;
-    createdAt: ISO8601Date;
-    updatedAt: ISO8601Date;
+    // 9. Account Type Permissions
+    canOpenSavingsAccount?: boolean;
+    canOpenCurrentAccount?: boolean;
+    canOpenFixedDeposit?: boolean;
+    canOpenBusinessAccount?: boolean;
+    maxAccountsPerType?: number;
+    createdAt?: ISO8601Date;
+    updatedAt?: ISO8601Date;
+  }
+
+  // --------------------------------------------------------------------------
+  // ADMIN PERMISSIONS (admin roles)
+  // --------------------------------------------------------------------------
+  interface AdminPermissions {
+    admin: string;
+    permissionId: string;
+    // User Management
+    canViewUsers: boolean;
+    canEditUsers: boolean;
+    canSuspendUsers: boolean;
+    canDeleteUsers: boolean;
+    canVerifyKyc: boolean;
+    // Transaction Management
+    canViewTransactions: boolean;
+    canReverseTransactions: boolean;
+    canRefundTransactions: boolean;
+    canAdjustBalances: boolean;
+    // Financial Operations
+    canManageLoans: boolean;
+    canApproveLoans: boolean;
+    canManageInvestments: boolean;
+    canManageCards: boolean;
+    // Fraud & Security
+    canViewFraudCases: boolean;
+    canManageFraudCases: boolean;
+    canBlockAccounts: boolean;
+    canAccessSecurityLogs: boolean;
+    // System Configuration
+    canManageSettings: boolean;
+    canManageAdmins: boolean;
+    canViewReports: boolean;
+    canExportData: boolean;
+    // Support
+    canManageTickets: boolean;
+    canViewCustomerData: boolean;
+    createdAt?: ISO8601Date;
+    updatedAt?: ISO8601Date;
   }
 
   // Legacy minimal permission/role interfaces
