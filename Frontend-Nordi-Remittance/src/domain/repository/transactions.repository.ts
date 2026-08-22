@@ -5,7 +5,6 @@ import { ApiEndpoints } from "../../core/api/endpoint";
 
 import apiClient, { ApiResponse, PaginatedResponse } from "@core/api/client";
 
-
 // ============================================================================
 // REQUEST TYPES
 // ============================================================================
@@ -66,6 +65,51 @@ export const TransactionsRepository = {
     });
     return response.data;
   },
+
+  // ==========================================================================
+  // ADMIN TRANSACTIONS
+  // ==========================================================================
+
+  /**
+   * Get all transactions (admin only)
+   */
+  getAllAdminTransactions: async (params?: TransactionFilters): Promise<PaginatedResponse<Transaction>> => {
+    const response = await apiClient.get<PaginatedResponse<Transaction>>(ApiEndpoints.transactionsAdminAll, { params });
+    return response.data;
+  },
+
+  /**
+   * Get all pending transactions for review
+   */
+  getPendingTransactions: async (params?: TransactionFilters): Promise<PaginatedResponse<Transaction>> => {
+    const response = await apiClient.get<PaginatedResponse<Transaction>>(ApiEndpoints.adminOpsTransactionsPending, { params });
+    return response.data;
+  },
+
+  /**
+   * Approve a pending transaction
+   */
+  approveTransaction: async (transactionId: string, data?: { note?: string }): Promise<ApiResponse<Transaction>> => {
+    const response = await apiClient.post<ApiResponse<Transaction>>(ApiEndpoints.adminOpsTransactionApprove(transactionId), data);
+    return response.data;
+  },
+
+  /**
+   * Reject a pending transaction
+   */
+  rejectTransaction: async (transactionId: string, data: { reason: string }): Promise<ApiResponse<Transaction>> => {
+    const response = await apiClient.post<ApiResponse<Transaction>>(ApiEndpoints.adminOpsTransactionReject(transactionId), data);
+    return response.data;
+  },
+
+  /**
+   * Reverse/refund a completed transaction
+   */
+  reverseTransaction: async (transactionId: string, data: { reason: string }): Promise<ApiResponse<Transaction>> => {
+    const response = await apiClient.post<ApiResponse<Transaction>>(ApiEndpoints.adminOpsTransactionReverse(transactionId), data);
+    return response.data;
+  },
+
 
   // ==========================================================================
   // TRANSFERS

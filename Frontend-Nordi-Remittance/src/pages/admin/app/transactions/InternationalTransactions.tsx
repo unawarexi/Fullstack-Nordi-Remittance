@@ -23,7 +23,7 @@ import {
   StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
-import { useInternationalTransactionManagement } from "../../admin-usecase/useTransactionManagement";
+import { useInternationalTransactionManagement } from "../../admin-usecase/useadmin-transaction-usecase";
 import { formatCurrency } from "@core/algo/financial";
 import { UserEligibilityModal } from "@components/shared/UserEligibilityModal";
 import { useEligibilityError } from "@hooks/useEligibilityError";

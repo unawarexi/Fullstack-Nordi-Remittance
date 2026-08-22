@@ -38,7 +38,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
-import { useTransactionManagement } from "../../admin-usecase/useTransactionManagement";
+import { useTransactionManagement } from "../../admin-usecase/useadmin-transaction-usecase";
 import { useSearchUsers } from "@hooks/api-queries";
 import { formatCurrency } from "@core/algo/financial";
 import { UserEligibilityModal } from "@components/shared/UserEligibilityModal";

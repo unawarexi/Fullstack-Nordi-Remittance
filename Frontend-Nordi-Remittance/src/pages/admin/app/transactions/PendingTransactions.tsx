@@ -25,7 +25,7 @@ import {
   StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
-import { usePendingTransactionManagement } from "../../admin-usecase/useTransactionManagement";
+import { usePendingTransactionManagement } from "../../admin-usecase/useadmin-transaction-usecase";
 import { UserEligibilityModal } from "@components/shared/UserEligibilityModal";
 import { useEligibilityError } from "@hooks/useEligibilityError";
 

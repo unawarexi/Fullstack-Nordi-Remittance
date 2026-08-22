@@ -23,7 +23,7 @@ import {
   StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
-import { useFailedTransactionManagement } from "../../admin-usecase/useTransactionManagement";
+import { useFailedTransactionManagement } from "../../admin-usecase/useadmin-transaction-usecase";
 import { formatCurrency } from "@core/algo/financial";
 
 const typeIcons: Record<string, React.ReactNode> = {

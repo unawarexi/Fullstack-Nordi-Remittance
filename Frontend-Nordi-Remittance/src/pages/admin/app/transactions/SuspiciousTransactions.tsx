@@ -22,7 +22,7 @@ import {
   StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
-import { useSuspiciousTransactionManagement } from "../../admin-usecase/useTransactionManagement";
+import { useSuspiciousTransactionManagement } from "../../admin-usecase/useadmin-transaction-usecase";
 import { formatCurrency } from "@core/algo/financial";
 
 const typeIcons: Record<string, React.ReactNode> = {
