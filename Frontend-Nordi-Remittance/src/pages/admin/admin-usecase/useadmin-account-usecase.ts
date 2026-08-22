@@ -50,6 +50,7 @@ export function useAccountsManagement() {
       const totalBalance = Object.values(balancesMap).reduce((sum: number, v: any) => sum + (Number(v) || 0), 0);
       return {
         id: w._id || w.walletNumber || w.id || "",
+        userId: typeof w.user === "string" ? w.user : w.user?._id || w.userId || "",
         owner:
           w.user?.firstName && w.user?.lastName ? `${w.user.firstName} ${w.user.lastName}` : w.userName || "Unknown",
         email: w.user?.email || w.email || "",
@@ -323,6 +324,7 @@ export function useWalletCombobox(value: string, accounts: any[], users: any[]) 
       const totalBalance = Object.values(balancesMap).reduce((sum: number, v: any) => sum + (Number(v) || 0), 0);
       return {
         id: w._id || w.walletNumber || w.id || "",
+        userId: typeof w.user === "string" ? w.user : w.user?._id || w.userId || "",
         owner:
           w.user?.firstName && w.user?.lastName ? `${w.user.firstName} ${w.user.lastName}` : w.userName || "Unknown",
         email: w.user?.email || w.email || "",
@@ -366,7 +368,8 @@ export function useWalletOperationForm(
   type: "credit" | "debit" | "transfer",
   endpoint: string,
   label: string,
-  onSuccess: () => void
+  onSuccess: () => void,
+  accounts: any[]
 ) {
   const toast = useToast();
   
@@ -389,17 +392,20 @@ export function useWalletOperationForm(
   const buildPayload = () => {
     const amount = parseFloat(form.amount);
     if (type === "transfer") {
+      const fromAcc = accounts.find((a) => a.id === form.fromWalletId);
+      const toAcc = accounts.find((a) => a.id === form.toWalletId);
       return {
-        fromWalletId: form.fromWalletId.trim(),
-        toWalletId: form.toWalletId.trim(),
+        fromUserId: fromAcc?.userId || form.fromWalletId.trim(),
+        toUserId: toAcc?.userId || form.toWalletId.trim(),
         amount,
         currency: form.currency,
         description: form.description.trim() || `Admin transfer of ${amount} ${form.currency}`,
         reason: form.reason.trim() || "Admin initiated transfer",
       };
     }
+    const targetAcc = accounts.find((a) => a.id === form.walletId);
     return {
-      walletId: form.walletId.trim(),
+      userId: targetAcc?.userId || form.walletId.trim(),
       amount,
       currency: form.currency,
       description: form.description.trim() || `Admin ${type} of ${amount} ${form.currency}`,
