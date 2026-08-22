@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { PageContainer, DashCard, SectionHeader } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
+import { Modal } from "@components/ui/Modal";
+import { Button } from "@components/ui/Button";
 import apiClient from "@core/api/client";
 import { ApiEndpoints } from "@core/api/endpoint";
 import { useToast } from "@store/toast.store";
@@ -173,7 +175,7 @@ function OperationForm({ type, onSuccess }: { type: OperationType; onSuccess: ()
   const { allAccounts } = useAccountsManagement();
   const { allUsers } = useAllUsers();
 
-  const { form, setForm, set, loading, lastResult, isValid, handleSubmit } = useWalletOperationForm(
+  const { form, setForm, set, loading, lastResult, isValid, handleSubmit, isConfirmOpen, setIsConfirmOpen, handleConfirm } = useWalletOperationForm(
     type,
     config.endpoint,
     config.label,
@@ -293,6 +295,47 @@ function OperationForm({ type, onSuccess }: { type: OperationType; onSuccess: ()
         {loading ? <Loader2 size={15} className="animate-spin" /> : config.icon}
         {loading ? "Processing…" : config.label}
       </motion.button>
+
+      <Modal 
+        isOpen={isConfirmOpen} 
+        onClose={() => setIsConfirmOpen(false)}
+        title={`Confirm ${config.label}`}
+        description="Please review the transaction details before confirming."
+        footer={
+          <div className="flex w-full gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => setIsConfirmOpen(false)}>Cancel</Button>
+            <Button variant="primary" className="flex-1" onClick={handleConfirm}>Confirm</Button>
+          </div>
+        }
+      >
+        <div className="space-y-3 rounded-lg bg-gray-50 p-4 text-sm dark:bg-gray-800">
+          <div className="flex justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+            <span className="text-gray-500">Operation</span>
+            <span className="font-medium capitalize text-gray-900 dark:text-white">{type}</span>
+          </div>
+          <div className="flex justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+            <span className="text-gray-500">Amount</span>
+            <span className="font-bold text-gray-900 dark:text-white">{form.amount} {form.currency}</span>
+          </div>
+          {type === "transfer" ? (
+            <>
+              <div className="flex justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                <span className="text-gray-500">From Wallet</span>
+                <span className="font-medium text-gray-900 dark:text-white">{form.fromWalletId}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                <span className="text-gray-500">To Wallet</span>
+                <span className="font-medium text-gray-900 dark:text-white">{form.toWalletId}</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+              <span className="text-gray-500">Target Wallet</span>
+              <span className="font-medium text-gray-900 dark:text-white">{form.walletId}</span>
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* Success result */}
       {lastResult && (

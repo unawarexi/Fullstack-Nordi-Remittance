@@ -8,10 +8,13 @@ import {
   PageContainer, DashCard, StatCard, StatsGrid, FilterBar, ActionButton, StatusBadge,
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
+import { Modal } from "@components/ui/Modal";
+import { Button } from "@components/ui/Button";
 import { useToast } from "@store/toast.store";
 import { useAccountsManagement } from "../../admin-usecase/useadmin-account-usecase";
 
 export default function DormantAccounts() {
+  const [accountToClose, setAccountToClose] = React.useState<string | null>(null);
   const toast = useToast();
   const { rawAccounts, isLoading, search, setSearch, unfreezeAccount, closeAccount, refetch } = useAccountsManagement();
 
@@ -91,7 +94,7 @@ export default function DormantAccounts() {
                               </motion.button>
                             )}
                             {acc.status !== "closed" && (
-                              <motion.button whileHover={{ scale: 1.1 }} title="Close permanently" onClick={() => { if (confirm("Permanently close this wallet?")) { closeAccount(acc.id); toast.error("Wallet closed"); } }} className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20">
+                              <motion.button whileHover={{ scale: 1.1 }} title="Close permanently" onClick={() => setAccountToClose(acc.id)} className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20">
                                 <Ban size={13} />
                               </motion.button>
                             )}
@@ -105,6 +108,29 @@ export default function DormantAccounts() {
         </div>
         {!isLoading && filtered.length === 0 && <div className="py-12 text-center"><Clock size={28} className="mx-auto mb-2 text-gray-300 dark:text-gray-600" /><p className="text-sm text-gray-400">No dormant or closed accounts</p></div>}
       </DashCard>
+
+      <Modal 
+        isOpen={!!accountToClose} 
+        onClose={() => setAccountToClose(null)}
+        title="Permanently Close Wallet"
+        description="Are you sure you want to permanently close this wallet? This action cannot be undone."
+        footer={
+          <div className="flex w-full gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => setAccountToClose(null)}>Cancel</Button>
+            <Button variant="primary" className="flex-1 !bg-rose-600 hover:!bg-rose-700" onClick={() => {
+              if (accountToClose) {
+                closeAccount(accountToClose);
+                toast.error("Wallet closed");
+                setAccountToClose(null);
+              }
+            }}>Close Wallet</Button>
+          </div>
+        }
+      >
+        <div className="rounded-lg bg-rose-50 p-4 text-sm text-rose-600 dark:bg-rose-900/10 dark:text-rose-400">
+          This will permanently close the selected wallet.
+        </div>
+      </Modal>
     </PageContainer>
   );
 }

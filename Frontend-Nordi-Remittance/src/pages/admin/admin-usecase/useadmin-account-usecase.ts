@@ -384,6 +384,7 @@ export function useWalletOperationForm(
   });
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<any>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const set =
     (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -423,8 +424,11 @@ export function useWalletOperationForm(
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid()) return;
-    if (!confirm(`Confirm ${label} of ${form.amount} ${form.currency}?`)) return;
+    setIsConfirmOpen(true);
+  };
 
+  const handleConfirm = async () => {
+    setIsConfirmOpen(false);
     setLoading(true);
     try {
       const res = await apiClient.post(endpoint, buildPayload());
@@ -441,11 +445,11 @@ export function useWalletOperationForm(
       });
       onSuccess();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || `${label} failed`);
+      toast.error(err.response?.data?.message || err.message || `${label} failed`);
     } finally {
       setLoading(false);
     }
   };
 
-  return { form, setForm, set, loading, lastResult, isValid, handleSubmit };
+  return { form, setForm, set, loading, lastResult, isValid, handleSubmit, isConfirmOpen, setIsConfirmOpen, handleConfirm };
 }
