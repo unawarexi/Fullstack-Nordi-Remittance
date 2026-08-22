@@ -38,6 +38,8 @@ import {
   useUpdateWallet,
   useCloseWallet,
   useAccountApplications,
+  useApplyForAccount,
+  useCancelApplication,
 } from "@hooks/api-queries/useAccounts";
 import { formatCurrency, maskSensitive } from "@core/algo";
 

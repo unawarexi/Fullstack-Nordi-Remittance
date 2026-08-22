@@ -33,7 +33,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
-import { useAdminManagement } from "../../admin-usecase/useAdminManagement";
+import { useAdminManagement } from "../../admin-usecase/useadmin-admin-usecase";
 
 const sectionTabs = [
   { id: "users", label: "Admin Users", icon: <Users size={16} /> },

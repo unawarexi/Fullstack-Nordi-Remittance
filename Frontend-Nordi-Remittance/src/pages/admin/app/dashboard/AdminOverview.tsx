@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { PageContainer } from "@components/shared/DashboardPrimitives";
 import { dashboardContainerVariants, dashboardItemVariants } from "@core/animation/Animation";
 import { FullPageSkeleton } from "@components/skeletons/Skeletons";
-import { useAdminDashboard } from "../../admin-usecase/useAdminDashboard";
+import { useAdminDashboard } from "../../admin-usecase/useadmin-dashboard-usecase";
 import DashboardStats from "./DashboardStats";
 import DashboardMain from "./DashboardMain";
 import DashboardSidebar from "./DashboardSidebar";

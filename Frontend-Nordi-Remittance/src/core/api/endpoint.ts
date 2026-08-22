@@ -124,6 +124,14 @@ export class ApiEndpoints {
   static accountAdminWalletStatus(id: string) {
     return `/accounts/admin/wallets/${id}/status`;
   }
+  // Admin — account applications (via admin-operations router)
+  static readonly accountAdminApplicationsPending = "/admin/operations/accounts/applications/pending";
+  static accountAdminApplicationApprove(id: string) {
+    return `/admin/operations/accounts/applications/${id}/approve`;
+  }
+  static accountAdminApplicationReject(id: string) {
+    return `/admin/operations/accounts/applications/${id}/reject`;
+  }
 
   // ──────────── Transactions ────────────
   static readonly transactions = "/transactions";
@@ -333,6 +341,9 @@ export class ApiEndpoints {
   }
   static adminOpsCardReject(cardId: string) {
     return `/admin/operations/cards/${cardId}/reject`;
+  }
+  static adminOpsCardFundFromWallet(cardId: string) {
+    return `/admin/operations/cards/${cardId}/fund-from-wallet`;
   }
   static adminOpsInvestmentApprove(investmentId: string) {
     return `/admin/operations/investments/${investmentId}/approve`;

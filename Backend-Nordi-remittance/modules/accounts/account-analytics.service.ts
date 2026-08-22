@@ -3,6 +3,7 @@ import { Wallets, LedgerEntries, AccountLimits } from "./accounts.model.js";
 import Transactions from "../transactions/transactions.model.js";
 import Users from "../users/users.model.js";
 import { NotFoundError } from "../../core/errors/AppError.js";
+import { buildPagination, buildDateRangeQuery } from "../../core/algo/query-builder.js";
 
 export class AccountAnalyticsService {
   /**
@@ -14,8 +15,7 @@ export class AccountAnalyticsService {
     filters: { startDate?: string; endDate?: string; type?: string },
     pagination: { page: number; limit: number }
   ) {
-    const { page, limit } = pagination;
-    const skip = (page - 1) * limit;
+    const { limit, skip, page } = buildPagination(pagination.page, pagination.limit);
 
     const wallet = await Wallets.findOne({
       _id: walletId,
@@ -28,14 +28,9 @@ export class AccountAnalyticsService {
 
     const query: Record<string, any> = { wallet: wallet._id };
 
-    if (filters.startDate || filters.endDate) {
-      query.createdAt = {};
-      if (filters.startDate) {
-        query.createdAt.$gte = new Date(filters.startDate);
-      }
-      if (filters.endDate) {
-        query.createdAt.$lte = new Date(filters.endDate);
-      }
+    const dateQuery = buildDateRangeQuery(filters.startDate, filters.endDate);
+    if (Object.keys(dateQuery).length > 0) {
+      query.createdAt = dateQuery;
     }
 
     if (filters.type) {

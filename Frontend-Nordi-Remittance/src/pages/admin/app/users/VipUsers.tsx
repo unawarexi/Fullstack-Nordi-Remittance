@@ -5,7 +5,7 @@ import { PageContainer, DashCard, FilterBar, StatusBadge, ActionButton } from "@
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAdminTeam } from "../../admin-usecase/useAdminTeam";
+import { useAdminTeam } from "../../admin-usecase/useadmin-admin-usecase";
 
 const AdminUsers: React.FC = () => {
   const { admins, pagination, search, isLoading, setPage, setSearch, refetch } = useAdminTeam();

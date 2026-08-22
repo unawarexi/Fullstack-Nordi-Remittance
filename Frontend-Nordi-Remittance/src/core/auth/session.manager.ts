@@ -19,19 +19,19 @@ import { queryClient } from "../lib/queryClient";
 // ============================================================================
 
 export type SessionExpiredReason =
-  | "token_expired"       // 401 from server / refresh failed
-  | "inactivity"          // User idle beyond threshold
-  | "session_revoked"     // Admin or user revoked session
-  | "account_locked"      // Account suspended / locked
-  | "manual_logout"       // User clicked logout
+  | "token_expired" // 401 from server / refresh failed
+  | "inactivity" // User idle beyond threshold
+  | "session_revoked" // Admin or user revoked session
+  | "account_locked" // Account suspended / locked
+  | "manual_logout" // User clicked logout
   | "concurrent_session"; // Logged in elsewhere
 
 export interface SessionEvent {
   type:
-    | "session_warning"       // Inactivity warning (60s before timeout)
-    | "session_expired"       // Session ended — show modal
-    | "session_extended"      // User interacted → timeout reset
-    | "force_logout";         // Immediate logout without modal
+    | "session_warning" // Inactivity warning (60s before timeout)
+    | "session_expired" // Session ended — show modal
+    | "session_extended" // User interacted → timeout reset
+    | "force_logout"; // Immediate logout without modal
   reason?: SessionExpiredReason;
   /** Seconds remaining until auto-logout (for warning) */
   countdown?: number;
@@ -45,21 +45,14 @@ type SessionEventListener = (event: SessionEvent) => void;
 // CONSTANTS
 // ============================================================================
 
-const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000;    // 10 minutes (banking standard)
-const WARNING_BEFORE_MS = 60 * 1000;              // Show warning 60s before logout
-const ACTIVITY_THROTTLE_MS = 30 * 1000;           // Throttle activity tracking (30s)
+const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes (banking standard)
+const WARNING_BEFORE_MS = 60 * 1000; // Show warning 60s before logout
+const ACTIVITY_THROTTLE_MS = 30 * 1000; // Throttle activity tracking (30s)
 const BROADCAST_CHANNEL_NAME = "nordi_session";
 const SESSION_EXPIRED_KEY = "nordi_session_expired"; // localStorage flag for cross-tab
 
 // User interaction events to track
-const ACTIVITY_EVENTS = [
-  "mousedown",
-  "keydown",
-  "touchstart",
-  "scroll",
-  "mousemove",
-  "click",
-] as const;
+const ACTIVITY_EVENTS = ["mousedown", "keydown", "touchstart", "scroll", "mousemove", "click"] as const;
 
 // ============================================================================
 // SESSION MANAGER SINGLETON
@@ -162,8 +155,8 @@ class SessionManager {
    * - Multi-tab sync
    */
   forceLogout(reason: SessionExpiredReason = "token_expired"): void {
-    // Prevent multiple simultaneous logouts
-    if (!this.isMonitoring && reason !== "token_expired") return;
+    // Always allow cleanup — stale guards were preventing token clearing on re-login.
+    // The stop() call below is idempotent so multiple calls are safe.
 
     this.stop();
 
@@ -171,10 +164,7 @@ class SessionManager {
 
     // Signal other tabs via localStorage (BroadcastChannel might not work in all browsers)
     try {
-      localStorage.setItem(
-        SESSION_EXPIRED_KEY,
-        JSON.stringify({ reason, timestamp: Date.now() }),
-      );
+      localStorage.setItem(SESSION_EXPIRED_KEY, JSON.stringify({ reason, timestamp: Date.now() }));
     } catch {
       // localStorage might be full or blocked
     }
@@ -408,10 +398,16 @@ class SessionManager {
       // Clear persisted Zustand auth state
       localStorage.removeItem("remit-auth-storage");
 
+      // Clear the cross-tab session expired flag to prevent stale signals
+      localStorage.removeItem("nordi_session_expired");
+
       // Disconnect socket if available
-      import("../socket/socket.client")
-        .then(({ disconnectSocket }) => disconnectSocket())
-        .catch(() => {});
+      import("../socket/socket.client").then(({ disconnectSocket }) => disconnectSocket()).catch(() => {});
+
+      // Sign out of Clerk if available so stale sessions don't cause kid mismatch on next login
+      if (typeof window !== "undefined" && (window as any).Clerk) {
+        (window as any).Clerk.signOut().catch(() => {});
+      }
     } catch (err) {
       console.error("[SessionManager] Cleanup error:", err);
     }

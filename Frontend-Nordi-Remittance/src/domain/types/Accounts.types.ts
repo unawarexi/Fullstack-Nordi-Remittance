@@ -172,6 +172,15 @@ declare global {
   }
 
   type AccountApplication = SavingsAccountApplication | CurrentAccountApplication | FixedDepositApplication;
+
+  /** Filters accepted by the balance-history (ledger) endpoint. */
+  interface BalanceHistoryFilters {
+    page?: number;
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+    type?: "debit" | "credit";
+  }
 }
 
 export {};

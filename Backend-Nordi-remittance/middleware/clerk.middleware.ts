@@ -29,6 +29,34 @@ export async function verifyClerkToken(
 
     const sessionToken = authHeader.substring(7);
 
+    if (!sessionToken) {
+      throw new UnauthorizedError("Empty session token");
+    }
+
+    // Pre-validate: Clerk JWTs must have 3 parts and a `kid` in the header.
+    // If the frontend accidentally sends a stale app JWT (HS256, no kid)
+    // instead of a Clerk session JWT (RSA, with kid), we catch it here with
+    // a clear error message rather than a cryptic JWKS kid-mismatch.
+    const parts = sessionToken.split(".");
+    if (parts.length !== 3) {
+      throw new UnauthorizedError(
+        "Malformed session token — expected a JWT with 3 parts. Ensure the frontend is sending a Clerk session token, not an app JWT.",
+      );
+    }
+
+    try {
+      const headerJson = Buffer.from(parts[0], "base64url").toString();
+      const header = JSON.parse(headerJson);
+      if (!header.kid) {
+        throw new UnauthorizedError(
+          "Session token header is missing 'kid' — this is likely an app JWT being sent instead of a Clerk session token. Clear stale tokens and retry.",
+        );
+      }
+    } catch (parseErr) {
+      if (parseErr instanceof UnauthorizedError) throw parseErr;
+      // Malformed base64 header — let Clerk SDK produce the full error below
+    }
+
     // Verify the session token with Clerk's backend SDK
     const verifiedToken = await verifyToken(sessionToken, {
       secretKey: env.CLERK_SECRET_KEY,
@@ -47,6 +75,7 @@ export async function verifyClerkToken(
     if (error instanceof UnauthorizedError) {
       return next(error);
     }
+    console.error("Clerk token verification error:", error);
     next(new UnauthorizedError("Clerk token verification failed"));
   }
 }

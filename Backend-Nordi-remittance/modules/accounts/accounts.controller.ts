@@ -18,9 +18,10 @@ import { UnauthorizedError } from "../../core/errors/AppError.js";
 import { WalletService } from "./wallet.service.js";
 import { AccountAnalyticsService } from "./account-analytics.service.js";
 import { BeneficiaryService } from "./beneficiary.service.js";
-import { CardWalletLinkService } from "./card-wallet-link.service.js";
-import { WalletProductLinkService } from "./wallet-product-link.service.js";
 import { WalletLifecycleService } from "./wallet-lifecycle.service.js";
+import { WalletProductLinkService } from "./wallet-product-link.service.js";
+import { buildPagination } from "../../core/algo/query-builder.js";
+import { CardWalletLinkService } from "./card-wallet-link.service.js";
 
 // ============================================================================
 // WALLET MANAGEMENT
@@ -84,8 +85,7 @@ export async function getBalanceHistory(req: AuthenticatedRequest, res: Response
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
     
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+    const { page, limit } = buildPagination(req.query.page as string, req.query.limit as string);
     
     const filters = {
       startDate: req.query.startDate as string,
@@ -168,13 +168,12 @@ export async function getAllWallets(req: AuthenticatedRequest, res: Response, ne
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+    const { page, limit } = buildPagination(req.query.page as string, req.query.limit as string);
     
-    const filters = {
-      status: req.query.status as string,
-      userId: req.query.userId as string
-    };
+    const filters: any = {};
+    if (req.query.status) filters.status = req.query.status as string;
+    if (req.query.userId) filters.userId = req.query.userId as string;
+    if (req.query.query) filters.query = req.query.query as string;
 
     const result = await WalletService.getAllWallets(filters, { page, limit });
     sendPaginated(res, result.wallets, { page: result.page, limit: result.limit, total: result.total });

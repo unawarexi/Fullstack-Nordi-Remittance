@@ -62,10 +62,14 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = TokenManager.getAccessToken();
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Only attach stored app JWT if the request doesn't already have an
+    // explicit Authorization header. Clerk-sync calls pass a fresh Clerk
+    // session token which must NOT be overwritten by a stale app JWT.
+    if (config.headers && !config.headers.Authorization) {
+      const token = TokenManager.getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     // Add request ID for tracking
@@ -161,7 +165,15 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+        // Backend wraps tokens as { data: { tokens: { accessToken, refreshToken } } }
+        const refreshData = response.data?.data;
+        const accessToken = refreshData?.tokens?.accessToken || refreshData?.accessToken;
+        const newRefreshToken = refreshData?.tokens?.refreshToken || refreshData?.refreshToken;
+
+        if (!accessToken) {
+          throw new Error("No access token in refresh response");
+        }
+
         TokenManager.setTokens(accessToken, newRefreshToken);
 
         processQueue(null, accessToken);

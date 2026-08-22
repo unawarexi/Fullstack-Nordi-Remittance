@@ -52,6 +52,8 @@ import SavingsAccounts from "./app/accounts/SavingsAccounts";
 import CurrentAccounts from "./app/accounts/CurrentAccounts";
 import FixedDepositAccounts from "./app/accounts/FixedDepositAccounts";
 import DormantAccounts from "./app/accounts/DormantAccounts";
+import AccountApplications from "./app/accounts/AccountApplications";
+import WalletOperations from "./app/accounts/WalletOperations";
 
 // Forex
 import ForexManagement from "./app/forex/ForexManagement";
@@ -147,6 +149,8 @@ export default function AdminRoutes() {
       <Route path="accounts/current" element={<CurrentAccounts />} />
       <Route path="accounts/fixed-deposits" element={<FixedDepositAccounts />} />
       <Route path="accounts/dormant" element={<DormantAccounts />} />
+      <Route path="accounts/applications" element={<AccountApplications />} />
+      <Route path="accounts/operations" element={<WalletOperations />} />
       {/* Foreign Exchange */}
       <Route path="forex" element={<ForexManagement />} />
       <Route path="forex/rates" element={<ForexRates />} />

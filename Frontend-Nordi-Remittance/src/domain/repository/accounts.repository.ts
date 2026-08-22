@@ -149,8 +149,10 @@ export const AccountsRepository = {
   // ADMIN ROUTES
   // ==========================================================================
 
-  getAllWallets: async (params?: { page?: number; limit?: number }): Promise<PaginatedResponse<Wallet>> => {
-    const response = await apiClient.get<PaginatedResponse<Wallet>>(ApiEndpoints.accountAdminWallets, { params });
+  getAllWallets: async (params?: { page?: number; limit?: number; query?: string }): Promise<PaginatedResponse<Wallet>> => {
+    const response = await apiClient.get<PaginatedResponse<Wallet>>(ApiEndpoints.accountAdminWallets, {
+      params,
+    });
     return response.data;
   },
 
@@ -161,6 +163,32 @@ export const AccountsRepository = {
     const response = await apiClient.patch<ApiResponse<Wallet>>(
       ApiEndpoints.accountAdminWalletStatus(walletId),
       data,
+    );
+    return response.data;
+  },
+
+  // ==========================================================================
+  // ADMIN — ACCOUNT APPLICATIONS
+  // ==========================================================================
+
+  getPendingApplications: async (): Promise<ApiResponse<any[]>> => {
+    const response = await apiClient.get<ApiResponse<any[]>>(
+      ApiEndpoints.accountAdminApplicationsPending,
+    );
+    return response.data;
+  },
+
+  approveApplication: async (applicationId: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(
+      ApiEndpoints.accountAdminApplicationApprove(applicationId),
+    );
+    return response.data;
+  },
+
+  rejectApplication: async (applicationId: string, reason: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(
+      ApiEndpoints.accountAdminApplicationReject(applicationId),
+      { reason },
     );
     return response.data;
   },

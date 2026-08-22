@@ -33,7 +33,7 @@ import {
 } from "@components/shared/DashboardPrimitives";
 import { PageHeader } from "@components/shared/PageHeader";
 import { useToast } from "@store/toast.store";
-import { useAccountsManagement } from "../../admin-usecase/useAccountsManagement";
+import { useAccountsManagement } from "../../admin-usecase/useadmin-account-usecase";
 
 const accountTypeIcons: Record<string, React.ReactNode> = {
   savings: <PiggyBank size={16} />,

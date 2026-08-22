@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Save } from "lucide-react";
-import { useUserDetail } from "../../admin-usecase/useUserDetail";
+import { useUserDetail } from "../../admin-usecase/useadmin-users-usercase";
 import useThemeStore from "@store/theme.store";
 import { Input, Select, Card, CardContent, Button, Modal } from "@components/ui";
 import { Spinner } from "@components/ui";

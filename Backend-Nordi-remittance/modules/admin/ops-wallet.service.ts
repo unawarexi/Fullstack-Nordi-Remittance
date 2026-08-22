@@ -760,6 +760,24 @@ export class OpsWalletService {
       const walletType = application.type; // savings, current, fixed_deposit
       const currency = application.currency || 'USD';
 
+      // Guard: check if user already has a wallet of this type
+      const existingWallet = await Wallets.findOne({
+        user: application.user,
+        walletType: walletType,
+        status: { $ne: 'closed' },
+      }).session(session);
+
+      if (existingWallet) {
+        // Wallet already exists — just mark the application as approved
+        // without creating a duplicate wallet
+        application.status = 'approved';
+        application.reviewedAt = new Date();
+        application.reviewedBy = currentUserId;
+        await application.save({ session });
+        await session.commitTransaction();
+        return { success: true, application, wallet: existingWallet, alreadyExisted: true };
+      }
+
       const wallet = new Wallets({
         user: application.user,
         walletNumber: `W${Date.now()}${Math.random().toString(36).substring(7)}`,
@@ -790,7 +808,7 @@ export class OpsWalletService {
             await wallet.save({ session });
 
             // Log the ledger entries
-            await LedgerEntries.create(
+            await LedgerEntries.insertMany(
               [
                 {
                   wallet: primaryWallet._id,

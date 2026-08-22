@@ -15,6 +15,7 @@ import GetLocation from "@utils/GetLocation";
 import { useAdminLogin } from "@hooks/api-queries/useAdmin";
 import { useClerkSyncAdmin } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { TokenManager } from "../../../core/api/client";
 import { processAuthSyncResponse } from "../../../core/auth/clerkSync.helper";
 import { loginSchema, type LoginFormData } from "@utils/validators/auth.validators";
 import { Logo } from "@components/shared";
@@ -68,7 +69,13 @@ const AdminLogin = () => {
     // 1. Reset loading state on mount
     setGoogleLoading(false);
 
-    // 2. Handle "back" button from cache
+    // 2. Clear any stale auth tokens/state left over from session expiry.
+    //    This ensures clerk-sync won't have its fresh Clerk token overwritten
+    //    by a stale app JWT in the request interceptor.
+    TokenManager.clearTokens();
+    localStorage.removeItem("nordi_session_expired");
+
+    // 3. Handle "back" button from cache
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         setGoogleLoading(false);
@@ -76,7 +83,7 @@ const AdminLogin = () => {
     };
     window.addEventListener("pageshow", handlePageShow);
 
-    // 3. Detect errors or cancellation from OAuth / Callback redirects
+    // 4. Detect errors or cancellation from OAuth / Callback redirects
     const params = new URLSearchParams(window.location.search);
     const errParam = params.get("error");
     if (errParam) {

@@ -18,6 +18,7 @@ import AuthLayout from "@components/auth_components/AuthLayout";
 // Auth hooks and store
 import { useLogin, useClerkSync } from "@hooks/api-queries/useAuth";
 import { useAuthStore } from "@store/auth.store";
+import { TokenManager } from "../../core/api/client";
 import { processAuthSyncResponse } from "../../core/auth/clerkSync.helper";
 
 // Validation
@@ -49,7 +50,13 @@ const Login = () => {
     // 1. Reset loading state on mount (covers standard redirect returns and browser back)
     setClerkLoading(false);
 
-    // 2. Technical: Handle "back" button from cache (Safari/Mobile)
+    // 2. Clear any stale auth tokens/state left over from session expiry.
+    //    This ensures clerk-sync won't have its fresh Clerk token overwritten
+    //    by a stale app JWT in the request interceptor.
+    TokenManager.clearTokens();
+    localStorage.removeItem("nordi_session_expired");
+
+    // 3. Technical: Handle "back" button from cache (Safari/Mobile)
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         setClerkLoading(false);
@@ -57,7 +64,7 @@ const Login = () => {
     };
     window.addEventListener("pageshow", handlePageShow);
 
-    // 3. Detect errors or cancellation from OAuth / Callback redirects
+    // 4. Detect errors or cancellation from OAuth / Callback redirects
     const params = new URLSearchParams(window.location.search);
     const errParam = params.get("error");
     if (errParam) {

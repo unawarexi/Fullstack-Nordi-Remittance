@@ -30,8 +30,7 @@ import {
 import { PageHeader } from "@components/shared/PageHeader";
 import { TableSkeleton } from "@components/skeletons/Skeletons";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAllUsers } from "../../admin-usecase/useAllUsers";
-import type { UserStatusFilter, KycStatusFilter } from "../../admin-usecase/useAllUsers";
+import { useAllUsers } from "../../admin-usecase/useadmin-users-usercase";
 
 const statusFilterOptions = [
   { value: "all", label: "All Statuses" },
@@ -171,12 +170,12 @@ const OverviewUsers: React.FC = () => {
       >
         <FilterSelect
           value={filters.status}
-          onChange={(v) => setStatusFilter(v as UserStatusFilter)}
+          onChange={(v) => setStatusFilter(v as AdminUserStatusFilter)}
           options={statusFilterOptions}
         />
         <FilterSelect
           value={filters.kycStatus}
-          onChange={(v) => setKycFilter(v as KycStatusFilter)}
+          onChange={(v) => setKycFilter(v as AdminKycStatusFilter)}
           options={kycFilterOptions}
         />
         {(filters.status !== "all" || filters.kycStatus !== "all" || filters.search) && (

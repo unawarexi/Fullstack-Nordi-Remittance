@@ -17,7 +17,7 @@ export function useKycPendingUsers() {
 
   const pendingUsers = useMemo(() => {
     const outer: any = pendingRaw || {};
-    const raw: any[] = Array.isArray(outer)
+    const raw: any[] = Array.isArray(outer) 
       ? outer
       : Array.isArray(outer?.data?.data)
         ? outer.data.data

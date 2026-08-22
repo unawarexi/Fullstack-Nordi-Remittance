@@ -12,7 +12,7 @@ declare global {
     middleName?: string;
     avatar?: string;
     dateOfBirth?: ISO8601Date;
-    gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+    gender?: "male" | "female" | "other" | "prefer_not_to_say";
     nationality?: string;
     countryOfResidence?: string;
     maritalStatus?: string;
@@ -29,10 +29,10 @@ declare global {
     referredBy?: UUID;
     // Clerk integration
     clerkUserId?: string;
-    authProvider?: 'local' | 'clerk' | 'google';
+    authProvider?: "local" | "clerk" | "google";
     isActive: boolean;
     accountNumber?: string;
-    accountStatus?: 'active' | 'suspended' | 'banned' | 'restricted';
+    accountStatus?: "active" | "suspended" | "banned" | "restricted";
     // Security
     isLocked?: boolean;
     lockReason?: string;
@@ -56,7 +56,7 @@ declare global {
   }
 
   interface EmploymentInfo {
-    status: 'employed' | 'self_employed' | 'unemployed' | 'retired' | 'student';
+    status: "employed" | "self_employed" | "unemployed" | "retired" | "student";
     employer?: string;
     jobTitle?: string;
     industry?: string;
@@ -67,7 +67,7 @@ declare global {
   interface KycDocument extends Timestamps {
     id: UUID;
     type: KycDocumentType;
-    status: 'pending' | 'approved' | 'rejected';
+    status: "pending" | "approved" | "rejected";
     frontImageUrl?: string;
     backImageUrl?: string;
     expiryDate?: ISO8601Date;
@@ -135,7 +135,7 @@ declare global {
     tempToken?: string;
     twoFactorToken?: string;
     method?: string;
-    twoFactorMethod?: 'sms' | 'email' | 'authenticator';
+    twoFactorMethod?: "sms" | "email" | "authenticator";
   }
 
   interface ClerkSyncResponse {
@@ -269,12 +269,144 @@ declare global {
 
   interface SecuritySettings {
     twoFactorEnabled: boolean;
-    twoFactorMethod?: 'sms' | 'email' | 'authenticator';
+    twoFactorMethod?: "sms" | "email" | "authenticator";
     loginNotifications: boolean;
     transactionNotifications: boolean;
     biometricEnabled: boolean;
     trustedDevices: TrustedDevice[];
   }
+
+  // ==========================================================================
+  // ADMIN USER MANAGEMENT TYPES
+  // ==========================================================================
+
+  /** Normalized row for admin user listing tables */
+  interface AdminUserRow {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    avatar?: string;
+    accountNumber: string;
+    accountType: string;
+    status: string;
+    kycStatus: string;
+    kycLevel: string;
+    lastLogin: string | null;
+    currency: string;
+    isActive: boolean;
+    isLocked: boolean;
+    emailVerified: boolean;
+    phoneVerified: boolean;
+    role: string;
+    authProvider: string;
+    createdAt: string;
+  }
+
+  /** Full user detail returned by admin getUserDetails endpoint */
+  interface AdminUserDetail {
+    _id: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    dateOfBirth: string;
+    gender: string;
+    nationality: string;
+    countryOfResidence: string;
+    maritalStatus: string;
+    profilePicture: string;
+    governmentId: string;
+    idType: string;
+    idNumber: string;
+    idExpiryDate: string;
+    proofOfAddress: string;
+    addressDocType: string;
+    socialSecurityNumber: string;
+    taxIdentificationNumber: string;
+    email: string;
+    mobileNumber: string;
+    alternativePhone: string;
+    homeAddress: string;
+    city: string;
+    stateProvince: string;
+    zipCode: string;
+    country: string;
+    accountType: string;
+    currency: string;
+    sourceOfIncome: string;
+    monthlyIncomeRange: string;
+    initialDeposit: number;
+    employmentStatus: string;
+    employerName: string;
+    occupation: string;
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    bankAddress: string;
+    ibanNumber: string;
+    routingNumber: string;
+    swiftBic: string;
+    securityQuestion: string;
+    enableTwoFactor: boolean;
+    twoFactorMethod: string;
+    referralCode: string;
+    selfieWithId: string;
+    signature: string;
+    inviteCode: string;
+    isActive: boolean;
+    status: string;
+    kycStatus: string;
+    kycLevel: string;
+    lastLogin: string | null;
+    lastLoginIp: string | null;
+    isLocked: boolean;
+    lockReason: string;
+    loginAttempts: string[];
+    mustChangePassword: boolean;
+    emailVerified: boolean;
+    phoneVerified: boolean;
+    clerkUserId: string;
+    authProvider: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  /** Stats from admin dashboard for user overview */
+  interface AdminUserStats {
+    totalUsers: number;
+    activeUsers: number;
+    pendingKyc: number;
+    blockedUsers: number;
+    newUsersToday: number;
+    verifiedUsers: number;
+  }
+
+  /** File preview state for multi-step user creation wizard */
+  interface AdminFilePreviews {
+    profilePicture: string | null;
+    governmentId: string | null;
+    proofOfAddress: string | null;
+    selfieWithId: string | null;
+    signature: string | null;
+  }
+
+  /** Country option for dropdowns */
+  interface CountryOption {
+    value: string;
+    label: string;
+    code: string;
+  }
+
+  /** Generic select option */
+  interface SelectOption {
+    value: string;
+    label: string;
+  }
+
+  type AdminUserStatusFilter = "all" | "active" | "inactive" | "suspended" | "banned";
+  type AdminKycStatusFilter = "all" | "pending" | "approved" | "rejected" | "expired";
 }
 
 export {};

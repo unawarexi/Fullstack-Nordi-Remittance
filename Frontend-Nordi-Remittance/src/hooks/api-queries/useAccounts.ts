@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AccountsRepository, BalanceHistoryFilters } from "../../domain/repository/accounts.repository";
+import { AccountsRepository } from "../../domain/repository/accounts.repository";
 import { useToastStore } from "../../store/toast.store";
 import { queryKeys } from "../../core/lib/queryClient";
 
@@ -192,7 +192,7 @@ export const useCloseWallet = () => {
 // ADMIN ROUTES
 // ============================================================================
 
-export const useAdminWallets = (params?: { page?: number; limit?: number }) => {
+export const useAdminWallets = (params?: { page?: number; limit?: number; query?: string }) => {
   return useQuery({
     queryKey: ["accounts", "admin", "wallets", params],
     queryFn: async () => {
@@ -225,6 +225,57 @@ export const useAdminUpdateWalletStatus = () => {
         queryKey: ["accounts", "wallets", walletId],
       });
       showToast("Wallet status updated", "success");
+    },
+  });
+};
+
+// Admin — account applications
+export const useAdminPendingApplications = () => {
+  return useQuery({
+    queryKey: ["accounts", "admin", "applications", "pending"],
+    queryFn: async () => {
+      const response = await AccountsRepository.getPendingApplications();
+      return response.data;
+    },
+  });
+};
+
+export const useAdminApproveApplication = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = typeof useToastStore === "function" ? useToastStore() : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async (applicationId: string) => {
+      const response = await AccountsRepository.approveApplication(applicationId);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "admin", "applications"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts", "applications"] });
+      showToast("Application approved — wallet created", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to approve application", "error");
+    },
+  });
+};
+
+export const useAdminRejectApplication = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = typeof useToastStore === "function" ? useToastStore() : { showToast: (m: string) => alert(m) };
+
+  return useMutation({
+    mutationFn: async ({ applicationId, reason }: { applicationId: string; reason: string }) => {
+      const response = await AccountsRepository.rejectApplication(applicationId, reason);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts", "admin", "applications"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts", "applications"] });
+      showToast("Application rejected", "success");
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to reject application", "error");
     },
   });
 };

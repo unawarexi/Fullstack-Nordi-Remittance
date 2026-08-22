@@ -17,6 +17,9 @@ interface AccountState {
   
   selectedWalletId: string | null;
   setSelectedWalletId: (id: string | null) => void;
+
+  cachedAccounts: Record<string, any>;
+  cacheAccounts: (accounts: any[]) => void;
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
@@ -25,4 +28,13 @@ export const useAccountStore = create<AccountState>((set) => ({
   
   selectedWalletId: null,
   setSelectedWalletId: (id) => set({ selectedWalletId: id }),
+
+  cachedAccounts: {},
+  cacheAccounts: (accounts) => set((state) => {
+    const newCache = { ...state.cachedAccounts };
+    accounts.forEach(acc => {
+      newCache[acc.id] = acc;
+    });
+    return { cachedAccounts: newCache };
+  }),
 }));

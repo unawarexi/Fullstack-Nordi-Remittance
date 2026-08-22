@@ -19,8 +19,10 @@ declare global {
     lockedAt?: ISO8601Date;
     twoFactorEnabled: boolean;
     twoFactorSecret?: string;
+    twoFactorBackupCodes?: string[];
     passwordChangedAt?: ISO8601Date;
     mustChangePassword: boolean;
+    passwordHistory?: string[];
     isSuperAdmin?: boolean;
     createdBy?: UUID;
     updatedBy?: UUID;

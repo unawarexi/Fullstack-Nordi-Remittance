@@ -3,21 +3,21 @@
 // ============================================================================
 
 // Toast store - Global notifications
-export { useToastStore, useToast, type Toast, type ToastType } from './toast.store';
+export { useToastStore, useToast, type Toast, type ToastType } from "./toast.store";
 
 // Auth store - Client-side authentication state
-export { 
-  useAuthStore, 
+export {
+  useAuthStore,
   useAuth,
   selectIsAuthenticated,
   selectUser,
   selectRequires2FA,
   selectIsLoading,
   selectIsInitialized,
-} from './auth.store';
+} from "./auth.store";
 
 // UI store - User interface state
-export { 
+export {
   useUIStore,
   useTheme,
   useSidebar,
@@ -29,7 +29,7 @@ export {
   selectIsSidebarCollapsed,
   selectIsModalOpen,
   selectModalType,
-} from './ui.store';
+} from "./ui.store";
 
 // Socket store - WebSocket connection state
 export {
@@ -38,8 +38,11 @@ export {
   selectIsSocketConnected,
   selectSocketError,
   selectReconnectAttempts,
-} from './socket.store';
+} from "./socket.store";
 
 // Theme store - Dark/light/system mode management
-export { default as useThemeStore } from './theme.store';
-export type { ThemeMode } from './theme.store';
+export { default as useThemeStore } from "./theme.store";
+export type { ThemeMode } from "./theme.store";
+
+// Admin Users store - Admin user management UI state
+export { useAdminUsersStore } from "./users.store";

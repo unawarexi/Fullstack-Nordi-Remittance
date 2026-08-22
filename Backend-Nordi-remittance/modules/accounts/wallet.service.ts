@@ -18,6 +18,7 @@ import {
 } from "../../services/redis.service.js";
 import { emitToUser } from "../../services/websocket.service.js";
 import { DEFAULT_ACCOUNT_POLICIES } from "./wallet-lifecycle.service.js";
+import { buildPagination, buildTextSearchQuery } from "../../core/algo/query-builder.js";
 
 // WebSocket event constants for wallet
 const WS_EVENTS = {
@@ -337,13 +338,29 @@ export class WalletService {
   /**
    * Get all wallets (admin)
    */
-  static async getAllWallets(filters: { status?: string; userId?: string }, pagination: { page: number; limit: number }) {
-    const { page, limit } = pagination;
-    const skip = (page - 1) * limit;
+  static async getAllWallets(filters: { status?: string; userId?: string; query?: string }, pagination: { page: number; limit: number }) {
+    const { limit, skip, page } = buildPagination(pagination.page, pagination.limit);
 
     const query: Record<string, any> = {};
     if (filters.status) query.status = filters.status;
     if (filters.userId) query.user = filters.userId;
+    
+    if (filters.query) {
+      const q = filters.query.trim();
+      const Users = (await import('./accounts.model.js')).Users || mongoose.model('Users');
+      
+      const userSearchQuery = buildTextSearchQuery(q, ["firstName", "lastName", "email", "accountNumber"]);
+      const matchingUsers = await Users.find(userSearchQuery).select('_id').lean();
+      
+      const userIds = matchingUsers.map((u: any) => u._id);
+      
+      // We combine the walletNumber search with the user search
+      const walletSearchQuery = buildTextSearchQuery(q, ["walletNumber"], "contains");
+      query.$or = [
+        ...walletSearchQuery.$or || [],
+        { user: { $in: userIds } }
+      ];
+    }
 
     const [wallets, total] = await Promise.all([
       Wallets.find(query)

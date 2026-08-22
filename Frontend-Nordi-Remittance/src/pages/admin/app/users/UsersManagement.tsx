@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Calendar, ShieldCheck, Edit, Lock, Unlock, FileCheck, FileBadge } from "lucide-react";
-import { useUserDetail } from "../../admin-usecase/useUserDetail";
+import { useUserDetail } from "../../admin-usecase/useadmin-users-usercase";
 import UserTransfer from "./UserTransfer";
 import useThemeStore from "@store/theme.store";
 

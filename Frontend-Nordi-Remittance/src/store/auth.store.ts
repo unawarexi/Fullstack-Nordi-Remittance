@@ -111,6 +111,14 @@ export const useAuthStore = create<AuthStore>()(
 
         // Clear tokens
         TokenManager.clearTokens();
+
+        // Clear cross-tab session expired flag to prevent stale re-logout signals
+        try { localStorage.removeItem('nordi_session_expired'); } catch {}
+        
+        // Sign out from Clerk to prevent stale sessions causing kid mismatch
+        if (typeof window !== "undefined" && (window as any).Clerk) {
+          (window as any).Clerk.signOut().catch(() => {});
+        }
         
         // Reset state
         set({
@@ -126,6 +134,15 @@ export const useAuthStore = create<AuthStore>()(
       clearAuth: () => {
         disconnectSocket();
         TokenManager.clearTokens();
+
+        // Clear cross-tab session expired flag to prevent stale re-logout signals
+        try { localStorage.removeItem('nordi_session_expired'); } catch {}
+        
+        // Sign out from Clerk to prevent stale sessions causing kid mismatch
+        if (typeof window !== "undefined" && (window as any).Clerk) {
+          (window as any).Clerk.signOut().catch(() => {});
+        }
+        
         set({
           isAuthenticated: false,
           user: null,
@@ -190,9 +207,9 @@ export const useAuthStore = create<AuthStore>()(
       }),
       onRehydrateStorage: () => {
         return (state) => {
-          // Mark as initialized once zustand finishes loading from localStorage
-          // Without this, ProtectedRoute shows <PageLoader /> forever
           if (state) {
+            // Mark as initialized once zustand finishes loading from localStorage
+            // Without this, ProtectedRoute shows <PageLoader /> forever
             state.setInitialized(true);
 
             // Reconnect WebSocket if user was previously authenticated
@@ -203,6 +220,10 @@ export const useAuthStore = create<AuthStore>()(
                 // Silent — socket will retry via its own reconnect logic
               }
             }
+          } else {
+            // No persisted state (e.g. after session cleanup cleared localStorage).
+            // Still mark as initialized so ProtectedRoute doesn't show infinite loader.
+            useAuthStore.setState({ isInitialized: true });
           }
         };
       },

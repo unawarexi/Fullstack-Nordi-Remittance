@@ -5,8 +5,7 @@
 import React from "react";
 import { Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { DashCard } from "@components/shared/DashboardPrimitives";
-import { useCancelApplication } from "../../client-usecase/useaccounts-client-usecase";
-import type { AccountApplication } from "../../../../domain/types/Accounts.types";
+import { useCancelApplication } from "../client-usecase/useaccounts-client-usecase";
 
 const statusStyles: Record<
   AccountApplication["status"],
@@ -41,7 +40,9 @@ interface Props {
 
 export const ApplicationStatusCard: React.FC<Props> = ({ application, fields, showDevPreview }) => {
   const { mutate: cancelApplication } = useCancelApplication();
-  const devSetStatus = () => alert("Dev preview status update is disabled when using real backend APIs.");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const devSetStatus = (_id: string, _status: AccountApplicationStatus, _reason?: string) =>
+    alert("Dev preview status update is disabled when using real backend APIs.");
   const style = statusStyles[application.status];
 
   return (

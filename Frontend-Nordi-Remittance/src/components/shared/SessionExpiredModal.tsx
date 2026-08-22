@@ -132,7 +132,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative mx-4 w-full max-w-md rounded-2xl bg-white dark:bg-neutral-800 p-8 shadow-2xl dark:bg-gray-900"
+            className="relative mx-4 w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-900"
           >
             {/* Icon */}
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-900/20">
@@ -178,7 +178,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
             </h2>
 
             {/* Message */}
-            <p className="mb-6 text-center text-sm text-gray-500 dark:text-gray-400 dark:text-neutral-500">
+            <p className="mb-6 text-center text-sm text-gray-500 dark:text-gray-400">
               {mode === "warning"
                 ? "For your security, your session will expire due to inactivity."
                 : reasonInfo.message}
@@ -197,7 +197,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="4"
-                      className="text-gray-200 dark:text-gray-700 dark:text-neutral-200"
+                      className="text-gray-200 dark:text-neutral-200"
                     />
                     <circle
                       cx="40"
@@ -224,9 +224,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
             {mode === "expired" && (
               <p className="mb-6 text-center text-xs text-gray-400 dark:text-neutral-500">
                 Redirecting to sign in page in{" "}
-                <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  {redirectCountdown}s
-                </span>
+                <span className="font-semibold text-gray-600 dark:text-gray-300">{redirectCountdown}s</span>
               </p>
             )}
 
@@ -245,10 +243,9 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
                   </button>
                   <button
                     onClick={handleSignIn}
-                    className="w-full rounded-xl px-4 py-3 text-sm font-medium text-gray-500 dark:text-neutral-400
-                      transition-all hover:bg-gray-100 dark:bg-neutral-700 hover:text-gray-700 dark:text-neutral-200
-                      focus:outline-none focus:ring-2 focus:ring-gray-300
-                      dark:text-gray-400 dark:text-neutral-500 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+                    className="w-full rounded-xl px-4 py-3 text-sm font-medium text-gray-500 transition-all
+                      hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300
+                      dark:bg-neutral-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
                   >
                     Sign Out Now
                   </button>

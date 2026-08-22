@@ -26,7 +26,7 @@ import { EmptyState } from "@components/shared/EmptyState";
 import { StatsGridSkeleton, TableSkeleton } from "@components/skeletons";
 import { PageContainer, StatCard, StatsGrid, DashCard, StatusBadge } from "@components/shared/DashboardPrimitives";
 import { dashboardItemVariants } from "@core/animation/Animation";
-import { useAdminCards } from "../../admin-usecase/useAdminCards";
+import { useAdminCards } from "../../admin-usecase/useadmin-cards-usecase";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

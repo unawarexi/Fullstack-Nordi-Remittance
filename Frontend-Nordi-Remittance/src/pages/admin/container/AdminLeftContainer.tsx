@@ -106,6 +106,8 @@ const menu = [
       { title: "Current Accounts", route: "/admin/accounts/current" },
       { title: "Fixed Deposits", route: "/admin/accounts/fixed-deposits" },
       { title: "Dormant Accounts", route: "/admin/accounts/dormant" },
+      { title: "Account Applications", route: "/admin/accounts/applications" },
+      { title: "Wallet Operations", route: "/admin/accounts/operations" },
     ],
   },
   {

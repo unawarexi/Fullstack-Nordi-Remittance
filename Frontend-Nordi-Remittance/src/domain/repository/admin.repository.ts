@@ -65,6 +65,54 @@ export const AdminRepository = {
   },
 
   // ==========================================================================
+  // ADMIN PROFILE & SECURITY
+  // ==========================================================================
+  getAdminProfile: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.adminProfile);
+    return response.data;
+  },
+  updateAdminProfile: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.put<ApiResponse<any>>(ApiEndpoints.adminProfile, data);
+    return response.data;
+  },
+  requestOtp: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.adminRequestOtp, data);
+    return response.data;
+  },
+  changeAdminPassword: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.put<ApiResponse<any>>(ApiEndpoints.adminChangePassword, data);
+    return response.data;
+  },
+  changeAdminEmail: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.put<ApiResponse<any>>(ApiEndpoints.adminChangeEmail, data);
+    return response.data;
+  },
+
+  // ==========================================================================
+  // PERMISSIONS MANAGEMENT
+  // ==========================================================================
+  getAvailablePermissions: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.adminPermissionsAvailable);
+    return response.data;
+  },
+  getAdminPermissions: async (adminId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId));
+    return response.data;
+  },
+  updateAdminPermissions: async (adminId: UUID, data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.put<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId), data);
+    return response.data;
+  },
+  setPermissionPreset: async (adminId: UUID, data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.adminAdminPermissionsPreset(adminId), data);
+    return response.data;
+  },
+  revokeAllPermissions: async (adminId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.delete<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId));
+    return response.data;
+  },
+
+  // ==========================================================================
   // ADMIN USER MANAGEMENT
   // ==========================================================================
   getAdminUsers: async (params?: any): Promise<PaginatedResponse<AdminUser>> => {
@@ -137,6 +185,22 @@ export const AdminRepository = {
   },
 
   // ==========================================================================
+  // OPERATIONS - ACCOUNT APPLICATIONS
+  // ==========================================================================
+  getPendingApplications: async (params?: any): Promise<PaginatedResponse<any>> => {
+    const response = await apiClient.get<PaginatedResponse<any>>(ApiEndpoints.accountAdminApplicationsPending, { params });
+    return response.data;
+  },
+  approveAccountApplication: async (applicationId: UUID): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.accountAdminApplicationApprove(applicationId));
+    return response.data;
+  },
+  rejectAccountApplication: async (applicationId: UUID, reason: string): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.accountAdminApplicationReject(applicationId), { reason });
+    return response.data;
+  },
+
+  // ==========================================================================
   // OPERATIONS - LOANS
   // ==========================================================================
   approveLoan: async (loanId: UUID, data: any): Promise<ApiResponse<Loan>> => {
@@ -161,6 +225,10 @@ export const AdminRepository = {
   },
   rejectCard: async (cardId: UUID, reason: string): Promise<ApiResponse<any>> => {
     const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.adminOpsCardReject(cardId), { reason });
+    return response.data;
+  },
+  fundCardFromWallet: async (cardId: UUID, data: any): Promise<ApiResponse<any>> => {
+    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.adminOpsCardFundFromWallet(cardId), data);
     return response.data;
   },
   approveInvestment: async (investmentId: UUID): Promise<ApiResponse<any>> => {

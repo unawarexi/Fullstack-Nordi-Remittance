@@ -26,7 +26,7 @@ import {
 } from "@core/data/FormData";
 import useThemeStore from "@store/theme.store";
 import { lightTheme, darkTheme } from "@constants/colors";
-import { useCreateUser, type Country } from "../../admin-usecase/useCreateUser";
+import { useCreateUser } from "../../admin-usecase/useadmin-users-usercase";
 import { signupSchema, signupInitialValues, type SignupFormValues } from "@utils/validators/auth.validators";
 
 // ============================================================================
@@ -476,7 +476,7 @@ const CreateUser: React.FC = () => {
                     options={countries}
                     value={countries.find((c) => c.value === values.country)}
                     onChange={(option) => {
-                      const sel = option as Country;
+                      const sel = option as CountryOption;
                       setValue("country", sel.value, { shouldValidate: true });
                       setValue("mobileNumber", sel.code + (values.mobileNumber || "").replace(/^\+\d+/, ""));
                       setSelectedCountry(sel.label);

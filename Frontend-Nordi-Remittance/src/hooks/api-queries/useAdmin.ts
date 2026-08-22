@@ -111,6 +111,47 @@ export const usePendingTransactions = (params?: any) => {
   });
 };
 
+export const useAdminProfile = () => {
+  return useQuery({
+    queryKey: ["admin", "profile"],
+    queryFn: async () => {
+      const response = await AdminRepository.getAdminProfile();
+      return response.data;
+    },
+  });
+};
+
+export const useAdminAvailablePermissions = () => {
+  return useQuery({
+    queryKey: ["admin", "permissions", "available"],
+    queryFn: async () => {
+      const response = await AdminRepository.getAvailablePermissions();
+      return response.data;
+    },
+  });
+};
+
+export const useAdminPermissions = (adminId: UUID) => {
+  return useQuery({
+    queryKey: ["admin", "permissions", adminId],
+    queryFn: async () => {
+      const response = await AdminRepository.getAdminPermissions(adminId);
+      return response.data;
+    },
+    enabled: !!adminId,
+  });
+};
+
+export const useAdminPendingApplicationsQuery = (params?: any) => {
+  return useQuery({
+    queryKey: ["admin", "applications", "pending", params],
+    queryFn: async () => {
+      const response = await AdminRepository.getPendingApplications(params);
+      return response;
+    },
+  });
+};
+
 // --- MUTATIONS ---
 
 export const useAdminLogin = () => {
@@ -356,4 +397,160 @@ export const useAdminOperations = () => {
   });
 
   return { creditWallet, debitWallet, transfer };
+};
+
+export const useAdminProfileOperations = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  const updateProfile = useMutation({
+    mutationFn: async (data: any) => (await AdminRepository.updateAdminProfile(data)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "profile"] });
+      showToast("Profile updated successfully", "success");
+    },
+    onError: (e: Error) => showToast(e.message || "Failed to update profile", "error"),
+  });
+
+  const requestOtp = useMutation({
+    mutationFn: async (data: any) => (await AdminRepository.requestOtp(data)).data,
+    onSuccess: () => showToast("OTP sent successfully", "success"),
+    onError: (e: Error) => showToast(e.message || "Failed to request OTP", "error"),
+  });
+
+  const changePassword = useMutation({
+    mutationFn: async (data: any) => (await AdminRepository.changeAdminPassword(data)).data,
+    onSuccess: () => showToast("Password changed successfully", "success"),
+    onError: (e: Error) => showToast(e.message || "Failed to change password", "error"),
+  });
+
+  const changeEmail = useMutation({
+    mutationFn: async (data: any) => (await AdminRepository.changeAdminEmail(data)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "profile"] });
+      showToast("Email changed successfully", "success");
+    },
+    onError: (e: Error) => showToast(e.message || "Failed to change email", "error"),
+  });
+
+  return { updateProfile, requestOtp, changePassword, changeEmail };
+};
+
+export const useAdminPermissionsOperations = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  const updatePermissions = useMutation({
+    mutationFn: async ({ adminId, data }: { adminId: UUID; data: any }) => 
+      (await AdminRepository.updateAdminPermissions(adminId, data)).data,
+    onSuccess: (_, { adminId }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
+      showToast("Permissions updated", "success");
+    },
+  });
+
+  const setPreset = useMutation({
+    mutationFn: async ({ adminId, data }: { adminId: UUID; data: any }) => 
+      (await AdminRepository.setPermissionPreset(adminId, data)).data,
+    onSuccess: (_, { adminId }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
+      showToast("Permission preset applied", "success");
+    },
+  });
+
+  const revokeAll = useMutation({
+    mutationFn: async (adminId: UUID) => (await AdminRepository.revokeAllPermissions(adminId)).data,
+    onSuccess: (_, adminId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
+      showToast("All permissions revoked", "success");
+    },
+  });
+
+  return { updatePermissions, setPreset, revokeAll };
+};
+
+export const useAdminCardOperations = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  const approveCard = useMutation({
+    mutationFn: async (cardId: UUID) => (await AdminRepository.approveCard(cardId)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "cards"] });
+      showToast("Card approved", "success");
+    },
+  });
+
+  const rejectCard = useMutation({
+    mutationFn: async ({ cardId, reason }: { cardId: UUID; reason: string }) => 
+      (await AdminRepository.rejectCard(cardId, reason)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "cards"] });
+      showToast("Card rejected", "success");
+    },
+  });
+
+  const fundFromWallet = useMutation({
+    mutationFn: async ({ cardId, data }: { cardId: UUID; data: any }) => 
+      (await AdminRepository.fundCardFromWallet(cardId, data)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+      showToast("Card funded successfully", "success");
+    },
+  });
+
+  return { approveCard, rejectCard, fundFromWallet };
+};
+
+export const useAdminInvestmentOperations = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  const approveInvestment = useMutation({
+    mutationFn: async (investmentId: UUID) => (await AdminRepository.approveInvestment(investmentId)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "investments"] });
+      showToast("Investment approved", "success");
+    },
+  });
+
+  const addReturns = useMutation({
+    mutationFn: async ({ investmentId, data }: { investmentId: UUID; data: any }) => 
+      (await AdminRepository.addInvestmentReturns(investmentId, data)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "investments"] });
+      showToast("Returns added successfully", "success");
+    },
+  });
+
+  return { approveInvestment, addReturns };
+};
+
+export const useAdminBulkOperations = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  const bulkCredit = useMutation({
+    mutationFn: async (data: any) => (await AdminRepository.bulkCredit(data)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin"] });
+      showToast("Bulk credit successful", "success");
+    },
+  });
+
+  return { bulkCredit };
+};
+
+export const useAdminReverseTransaction = () => {
+  const queryClient = useQueryClient();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: async ({ transactionId, reason }: { transactionId: UUID; reason: string }) => 
+      (await AdminRepository.reverseTransaction(transactionId, reason)).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "transactions"] });
+      showToast("Transaction reversed", "success");
+    },
+  });
 };

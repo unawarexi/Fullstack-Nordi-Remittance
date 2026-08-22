@@ -2,11 +2,11 @@
 // ENVIRONMENT CONFIGURATION
 // ============================================================================
 
-import dotenv from "dotenv";
-import path from "path";
+import dotenv from 'dotenv';
+import path from 'path';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 // ============================================================================
 // ENVIRONMENT VALIDATION
@@ -14,7 +14,7 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 interface EnvConfig {
   // Server
-  NODE_ENV: "development" | "production" | "test";
+  NODE_ENV: 'development' | 'production' | 'test';
   PORT: number;
   HOST: string;
   API_VERSION: string;
@@ -126,13 +126,13 @@ function getEnvNumber(key: string, defaultValue?: number): number {
 function getEnvBoolean(key: string, defaultValue: boolean = false): boolean {
   const value = process.env[key];
   if (value === undefined) return defaultValue;
-  return value.toLowerCase() === "true" || value === "1";
+  return value.toLowerCase() === 'true' || value === '1';
 }
 
 function getEnvArray(key: string, defaultValue: string[] = []): string[] {
   const value = process.env[key];
   if (value === undefined) return defaultValue;
-  return value.split(",").map((s) => s.trim());
+  return value.split(',').map((s) => s.trim());
 }
 
 // ============================================================================
@@ -141,70 +141,64 @@ function getEnvArray(key: string, defaultValue: string[] = []): string[] {
 
 export const env: EnvConfig = {
   // Server
-  NODE_ENV: (process.env.NODE_ENV || "development") as EnvConfig["NODE_ENV"],
-  PORT: getEnvNumber("PORT", 3000),
-  HOST: getEnvString("HOST", "0.0.0.0"),
-  API_VERSION: getEnvString("API_VERSION", "v1"),
-  BASE_URL: getEnvString("BASE_URL", "http://localhost:3000"),
-  FRONTEND_URL: getEnvString("FRONTEND_URL", "http://localhost:5173"),
+  NODE_ENV: (process.env.NODE_ENV || 'development') as EnvConfig['NODE_ENV'],
+  PORT: getEnvNumber('PORT', 3000),
+  HOST: getEnvString('HOST', '0.0.0.0'),
+  API_VERSION: getEnvString('API_VERSION', 'v1'),
+  BASE_URL: getEnvString('BASE_URL', 'http://localhost:3000'),
+  FRONTEND_URL: getEnvString('FRONTEND_URL', 'http://localhost:5173'),
 
   // Database
-  MONGODB_URI: getEnvString("MONGODB_URI"),
-  MONGOOSE_DEBUG: getEnvBoolean("MONGOOSE_DEBUG", false),
+  MONGODB_URI: getEnvString('MONGODB_URI'),
+  MONGOOSE_DEBUG: getEnvBoolean('MONGOOSE_DEBUG', false),
 
   // JWT
-  JWT_SECRET: getEnvString(
-    "JWT_SECRET",
-    "your-super-secret-jwt-key-change-in-production",
-  ),
-  JWT_ACCESS_EXPIRY: getEnvString("JWT_ACCESS_EXPIRY", "15m"),
-  JWT_REFRESH_EXPIRY: getEnvString("JWT_REFRESH_EXPIRY", "7d"),
-  JWT_ISSUER: getEnvString("JWT_ISSUER", "nordea-remittance"),
+  JWT_SECRET: getEnvString('JWT_SECRET', 'your-super-secret-jwt-key-change-in-production'),
+  JWT_ACCESS_EXPIRY: getEnvString('JWT_ACCESS_EXPIRY', '15m'),
+  JWT_REFRESH_EXPIRY: getEnvString('JWT_REFRESH_EXPIRY', '7d'),
+  JWT_ISSUER: getEnvString('JWT_ISSUER', 'nordea-remittance'),
 
   // Redis
-  REDIS_HOST: getEnvString("REDIS_HOST", "localhost"),
-  REDIS_PORT: getEnvNumber("REDIS_PORT", 6379),
-  REDIS_PASSWORD: getEnvString("REDIS_PASSWORD", ""),
-  REDIS_DB: getEnvString("REDIS_DB", "0"),
-  BULLMQ_REDIS_URL: getEnvString("BULLMQ_REDIS_URL", ""),
+  REDIS_HOST: getEnvString('REDIS_HOST', 'localhost'),
+  REDIS_PORT: getEnvNumber('REDIS_PORT', 6379),
+  REDIS_PASSWORD: getEnvString('REDIS_PASSWORD', ''),
+  REDIS_DB: getEnvString('REDIS_DB', '0'),
+  BULLMQ_REDIS_URL: getEnvString('BULLMQ_REDIS_URL', ''),
   // Cloudinary
-  CLOUDINARY_CLOUD_NAME: getEnvString("CLOUDINARY_CLOUD_NAME", ""),
-  CLOUDINARY_API_KEY: getEnvString("CLOUDINARY_API_KEY", ""),
-  CLOUDINARY_API_SECRET: getEnvString("CLOUDINARY_API_SECRET", ""),
+  CLOUDINARY_CLOUD_NAME: getEnvString('CLOUDINARY_CLOUD_NAME', ''),
+  CLOUDINARY_API_KEY: getEnvString('CLOUDINARY_API_KEY', ''),
+  CLOUDINARY_API_SECRET: getEnvString('CLOUDINARY_API_SECRET', ''),
 
   // Mail
-  SMTP_HOST: getEnvString("SMTP_HOST", "smtp.gmail.com"),
-  SMTP_PORT: getEnvNumber("SMTP_PORT", 587),
-  SMTP_SECURE: getEnvBoolean("SMTP_SECURE", false),
-  SMTP_USER: getEnvString("SMTP_USER", ""),
-  SMTP_PASS: getEnvString("SMTP_PASS", ""),
-  SMTP_FROM_NAME: getEnvString("SMTP_FROM_NAME", "Nordi Remittance"),
-  SMTP_FROM_EMAIL: getEnvString("SMTP_FROM_EMAIL", "noreply@nordi-remittance.com"),
-  SUPPORT_EMAIL: getEnvString("SUPPORT_EMAIL", "support@nordi-remittance.com"),
+  SMTP_HOST: getEnvString('SMTP_HOST', 'smtp.gmail.com'),
+  SMTP_PORT: getEnvNumber('SMTP_PORT', 587),
+  SMTP_SECURE: getEnvBoolean('SMTP_SECURE', false),
+  SMTP_USER: getEnvString('SMTP_USER', ''),
+  SMTP_PASS: getEnvString('SMTP_PASS', ''),
+  SMTP_FROM_NAME: getEnvString('SMTP_FROM_NAME', 'Nordi Remittance'),
+  SMTP_FROM_EMAIL: getEnvString('SMTP_FROM_EMAIL', 'noreply@nordi-remittance.com'),
+  SUPPORT_EMAIL: getEnvString('SUPPORT_EMAIL', 'support@nordi-remittance.com'),
 
   // Security
-  BCRYPT_ROUNDS: getEnvNumber("BCRYPT_ROUNDS", 12),
-  RATE_LIMIT_WINDOW_MS: getEnvNumber("RATE_LIMIT_WINDOW_MS", 900000), // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: getEnvNumber("RATE_LIMIT_MAX_REQUESTS", 100),
-  CORS_ORIGINS: getEnvArray("CORS_ORIGINS", [
-    "http://localhost:3000",
-    "http://localhost:5173",
-  ]),
+  BCRYPT_ROUNDS: getEnvNumber('BCRYPT_ROUNDS', 12),
+  RATE_LIMIT_WINDOW_MS: getEnvNumber('RATE_LIMIT_WINDOW_MS', 900000), // 15 minutes
+  RATE_LIMIT_MAX_REQUESTS: getEnvNumber('RATE_LIMIT_MAX_REQUESTS', 100),
+  CORS_ORIGINS: getEnvArray('CORS_ORIGINS', ['http://localhost:3000', 'http://localhost:5173']),
 
   // Admin
-  ADMIN_EMAIL: getEnvString("ADMIN_EMAIL", "admin@nordea.com"),
-  ADMIN_PASSWORD: getEnvString("ADMIN_PASSWORD", "admin123"),
+  ADMIN_EMAIL: getEnvString('ADMIN_EMAIL', 'admin@nordea.com'),
+  ADMIN_PASSWORD: getEnvString('ADMIN_PASSWORD', 'admin123'),
 
   // Feature Flags
-  ENABLE_2FA: getEnvBoolean("ENABLE_2FA", true),
-  ENABLE_KYC_VERIFICATION: getEnvBoolean("ENABLE_KYC_VERIFICATION", true),
-  ENABLE_FRAUD_DETECTION: getEnvBoolean("ENABLE_FRAUD_DETECTION", true),
+  ENABLE_2FA: getEnvBoolean('ENABLE_2FA', true),
+  ENABLE_KYC_VERIFICATION: getEnvBoolean('ENABLE_KYC_VERIFICATION', true),
+  ENABLE_FRAUD_DETECTION: getEnvBoolean('ENABLE_FRAUD_DETECTION', true),
 
   // Kafka
-  KAFKA_BROKERS: getEnvString("KAFKA_BROKERS", "localhost:9092"),
-  KAFKA_CLIENT_ID: getEnvString("KAFKA_CLIENT_ID", "nordi-remit-api"),
-  KAFKA_GROUP_ID: getEnvString("KAFKA_GROUP_ID", "nordi-remit-group"),
-  KAFKA_SSL: getEnvBoolean("KAFKA_SSL", false),
+  KAFKA_BROKERS: getEnvString('KAFKA_BROKERS', 'localhost:9092'),
+  KAFKA_CLIENT_ID: getEnvString('KAFKA_CLIENT_ID', 'nordi-remit-api'),
+  KAFKA_GROUP_ID: getEnvString('KAFKA_GROUP_ID', 'nordi-remit-group'),
+  KAFKA_SSL: getEnvBoolean('KAFKA_SSL', false),
   KAFKA_SASL_USERNAME: process.env.KAFKA_SASL_USERNAME,
   KAFKA_SASL_PASSWORD: process.env.KAFKA_SASL_PASSWORD,
 
@@ -215,22 +209,22 @@ export const env: EnvConfig = {
   ELASTICSEARCH_URL: process.env.ELASTICSEARCH_URL,
   ELASTICSEARCH_USERNAME: process.env.ELASTICSEARCH_USERNAME,
   ELASTICSEARCH_PASSWORD: process.env.ELASTICSEARCH_PASSWORD,
-  ELASTICSEARCH_INDEX: getEnvString("ELASTICSEARCH_INDEX", "nordi-logs"),
+  ELASTICSEARCH_INDEX: getEnvString('ELASTICSEARCH_INDEX', 'nordi-logs'),
   LOGSTASH_HOST: process.env.LOGSTASH_HOST,
   LOGSTASH_PORT: process.env.LOGSTASH_PORT ? parseInt(process.env.LOGSTASH_PORT, 10) : undefined,
 
   // Clerk Authentication
-  CLERK_SECRET_KEY: getEnvString("CLERK_SECRET_KEY", ""),
-  CLERK_PUBLISHABLE_KEY: getEnvString("CLERK_PUBLISHABLE_KEY", ""),
-  CLERK_WEBHOOK_SECRET: getEnvString("CLERK_WEBHOOK_SECRET", ""),
+  CLERK_SECRET_KEY: getEnvString('CLERK_SECRET_KEY', ''),
+  CLERK_PUBLISHABLE_KEY: getEnvString('CLERK_PUBLISHABLE_KEY', ''),
+  CLERK_WEBHOOK_SECRET: getEnvString('CLERK_WEBHOOK_SECRET', ''),
 
   // AI Agent
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   GOOGLE_AI_KEY: process.env.GOOGLE_AI_KEY,
   HUGGINGFACE_API_KEY: process.env.HUGGINGFACE_API_KEY,
-  ML_SERVICE_URL: getEnvString("ML_SERVICE_URL", "http://localhost:8000"),
-  ENABLE_AI_AGENT: getEnvBoolean("ENABLE_AI_AGENT", true),
+  ML_SERVICE_URL: getEnvString('ML_SERVICE_URL', 'http://localhost:8000'),
+  ENABLE_AI_AGENT: getEnvBoolean('ENABLE_AI_AGENT', true),
 };
 
 // ============================================================================
@@ -242,12 +236,12 @@ export const constants = {
   API_PREFIX: `/api/${env.API_VERSION}`,
 
   // Authentication
-  ACCESS_TOKEN_COOKIE: "access_token",
-  REFRESH_TOKEN_COOKIE: "refresh_token",
-  SESSION_COOKIE: "session_id",
+  ACCESS_TOKEN_COOKIE: 'access_token',
+  REFRESH_TOKEN_COOKIE: 'refresh_token',
+  SESSION_COOKIE: 'session_id',
 
   // Token expiry in seconds
-  ACCESS_TOKEN_EXPIRY_SECONDS: 15 * 60, // 15 minutes
+  ACCESS_TOKEN_EXPIRY_SECONDS: 24 * 60 * 60, // 24 hours
   REFRESH_TOKEN_EXPIRY_SECONDS: 7 * 24 * 60 * 60, // 7 days
   VERIFICATION_TOKEN_EXPIRY_SECONDS: 24 * 60 * 60, // 24 hours
   PASSWORD_RESET_EXPIRY_SECONDS: 60 * 60, // 1 hour
@@ -256,7 +250,8 @@ export const constants = {
   // Rate limits
   AUTH_RATE_LIMIT: {
     windowMs: 15 * 60 * 1000, // 15 minutes
-    maxRequests: 5,
+    // maxRequests: 5,
+    maxRequests: 50,
   },
   TRANSACTION_RATE_LIMIT: {
     windowMs: 60 * 1000, // 1 minute
@@ -270,8 +265,7 @@ export const constants = {
   // Password
   MIN_PASSWORD_LENGTH: 8,
   MAX_PASSWORD_LENGTH: 128,
-  PASSWORD_REGEX:
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+  PASSWORD_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
 
   // Login attempts
   MAX_LOGIN_ATTEMPTS: 5,
@@ -279,28 +273,13 @@ export const constants = {
 
   // KYC
   KYC_DOCUMENT_MAX_SIZE: 5 * 1024 * 1024, // 5MB
-  KYC_ALLOWED_MIME_TYPES: [
-    "image/jpeg",
-    "image/png",
-    "image/jpg",
-    "application/pdf",
-  ],
+  KYC_ALLOWED_MIME_TYPES: ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'],
 
   // Transactions
   MIN_TRANSACTION_AMOUNT: 0.01,
   MAX_TRANSACTION_AMOUNT: 1000000,
-  DEFAULT_CURRENCY: "USD",
-  SUPPORTED_CURRENCIES: [
-    "USD",
-    "EUR",
-    "GBP",
-    "NGN",
-    "KES",
-    "ZAR",
-    "INR",
-    "AUD",
-    "CAD",
-  ],
+  DEFAULT_CURRENCY: 'USD',
+  SUPPORTED_CURRENCIES: ['USD', 'EUR', 'GBP', 'NGN', 'KES', 'ZAR', 'INR', 'AUD', 'CAD'],
 
   // Account
   ACCOUNT_NUMBER_LENGTH: 10,
@@ -311,71 +290,71 @@ export const constants = {
   CVV_LENGTH: 3,
 
   // Headers
-  REQUEST_ID_HEADER: "x-request-id",
-  CORRELATION_ID_HEADER: "x-correlation-id",
-  CLIENT_IP_HEADER: "x-forwarded-for",
+  REQUEST_ID_HEADER: 'x-request-id',
+  CORRELATION_ID_HEADER: 'x-correlation-id',
+  CLIENT_IP_HEADER: 'x-forwarded-for',
 
   // Error codes
   ERROR_CODES: {
     // Auth errors (1xxx)
-    INVALID_CREDENTIALS: "E1001",
-    TOKEN_EXPIRED: "E1002",
-    TOKEN_INVALID: "E1003",
-    UNAUTHORIZED: "E1004",
-    FORBIDDEN: "E1005",
-    ACCOUNT_LOCKED: "E1006",
-    ACCOUNT_SUSPENDED: "E1007",
-    EMAIL_NOT_VERIFIED: "E1008",
-    TWO_FACTOR_REQUIRED: "E1009",
-    TWO_FACTOR_INVALID: "E1010",
-    SESSION_EXPIRED: "E1011",
+    INVALID_CREDENTIALS: 'E1001',
+    TOKEN_EXPIRED: 'E1002',
+    TOKEN_INVALID: 'E1003',
+    UNAUTHORIZED: 'E1004',
+    FORBIDDEN: 'E1005',
+    ACCOUNT_LOCKED: 'E1006',
+    ACCOUNT_SUSPENDED: 'E1007',
+    EMAIL_NOT_VERIFIED: 'E1008',
+    TWO_FACTOR_REQUIRED: 'E1009',
+    TWO_FACTOR_INVALID: 'E1010',
+    SESSION_EXPIRED: 'E1011',
 
     // Validation errors (2xxx)
-    VALIDATION_ERROR: "E2001",
-    INVALID_INPUT: "E2002",
-    MISSING_REQUIRED_FIELD: "E2003",
-    INVALID_FORMAT: "E2004",
+    VALIDATION_ERROR: 'E2001',
+    INVALID_INPUT: 'E2002',
+    MISSING_REQUIRED_FIELD: 'E2003',
+    INVALID_FORMAT: 'E2004',
 
     // User errors (3xxx)
-    USER_NOT_FOUND: "E3001",
-    USER_ALREADY_EXISTS: "E3002",
-    EMAIL_ALREADY_EXISTS: "E3003",
-    PHONE_ALREADY_EXISTS: "E3004",
-    KYC_NOT_VERIFIED: "E3005",
+    USER_NOT_FOUND: 'E3001',
+    USER_ALREADY_EXISTS: 'E3002',
+    EMAIL_ALREADY_EXISTS: 'E3003',
+    PHONE_ALREADY_EXISTS: 'E3004',
+    KYC_NOT_VERIFIED: 'E3005',
 
     // Transaction errors (4xxx)
-    INSUFFICIENT_BALANCE: "E4001",
-    TRANSACTION_FAILED: "E4002",
-    TRANSACTION_LIMIT_EXCEEDED: "E4003",
-    INVALID_ACCOUNT: "E4004",
-    DUPLICATE_TRANSACTION: "E4005",
-    TRANSACTION_NOT_FOUND: "E4006",
+    INSUFFICIENT_BALANCE: 'E4001',
+    TRANSACTION_FAILED: 'E4002',
+    TRANSACTION_LIMIT_EXCEEDED: 'E4003',
+    INVALID_ACCOUNT: 'E4004',
+    DUPLICATE_TRANSACTION: 'E4005',
+    TRANSACTION_NOT_FOUND: 'E4006',
 
     // Wallet errors (5xxx)
-    WALLET_NOT_FOUND: "E5001",
-    WALLET_SUSPENDED: "E5002",
-    WALLET_FROZEN: "E5003",
+    WALLET_NOT_FOUND: 'E5001',
+    WALLET_SUSPENDED: 'E5002',
+    WALLET_FROZEN: 'E5003',
 
     // Card errors (6xxx)
-    CARD_NOT_FOUND: "E6001",
-    CARD_BLOCKED: "E6002",
-    CARD_EXPIRED: "E6003",
+    CARD_NOT_FOUND: 'E6001',
+    CARD_BLOCKED: 'E6002',
+    CARD_EXPIRED: 'E6003',
 
     // Loan errors (7xxx)
-    LOAN_NOT_FOUND: "E7001",
-    LOAN_APPLICATION_REJECTED: "E7002",
+    LOAN_NOT_FOUND: 'E7001',
+    LOAN_APPLICATION_REJECTED: 'E7002',
 
     // Security errors (8xxx)
-    RATE_LIMIT_EXCEEDED: "E8001",
-    FRAUD_DETECTED: "E8002",
-    SUSPICIOUS_ACTIVITY: "E8003",
-    IP_BLOCKED: "E8004",
+    RATE_LIMIT_EXCEEDED: 'E8001',
+    FRAUD_DETECTED: 'E8002',
+    SUSPICIOUS_ACTIVITY: 'E8003',
+    IP_BLOCKED: 'E8004',
 
     // Server errors (9xxx)
-    INTERNAL_ERROR: "E9001",
-    DATABASE_ERROR: "E9002",
-    EXTERNAL_SERVICE_ERROR: "E9003",
-    SERVICE_UNAVAILABLE: "E9004",
+    INTERNAL_ERROR: 'E9001',
+    DATABASE_ERROR: 'E9002',
+    EXTERNAL_SERVICE_ERROR: 'E9003',
+    SERVICE_UNAVAILABLE: 'E9004',
   },
 } as const;
 
@@ -407,15 +386,15 @@ export const HttpStatus = {
 // ============================================================================
 
 export function isProduction(): boolean {
-  return env.NODE_ENV === "production";
+  return env.NODE_ENV === 'production';
 }
 
 export function isDevelopment(): boolean {
-  return env.NODE_ENV === "development";
+  return env.NODE_ENV === 'development';
 }
 
 export function isTest(): boolean {
-  return env.NODE_ENV === "test";
+  return env.NODE_ENV === 'test';
 }
 
 export default env;
