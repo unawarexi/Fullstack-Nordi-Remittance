@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react";
-import { useTransferHistory } from "../../admin-usecase/useTransferHistory";
+import { useTransferHistory } from "../../admin-usecase/useadmin-transaction-usecase";
 
 const TransactionHistory = () => {
   const {

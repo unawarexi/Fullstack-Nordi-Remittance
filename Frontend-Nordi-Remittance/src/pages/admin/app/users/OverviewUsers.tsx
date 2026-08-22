@@ -53,7 +53,9 @@ const OverviewUsers: React.FC = () => {
     users,
     pagination,
     stats,
-    filters,
+    search,
+    statusFilter,
+    kycFilter,
     isLoading,
     setSearch,
     setStatusFilter,
@@ -164,21 +166,21 @@ const OverviewUsers: React.FC = () => {
 
       {/* Filters */}
       <FilterBar
-        searchValue={filters.search}
+        searchValue={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search by name, email, account number..."
       >
         <FilterSelect
-          value={filters.status}
+          value={statusFilter}
           onChange={(v) => setStatusFilter(v as AdminUserStatusFilter)}
           options={statusFilterOptions}
         />
         <FilterSelect
-          value={filters.kycStatus}
+          value={kycFilter}
           onChange={(v) => setKycFilter(v as AdminKycStatusFilter)}
           options={kycFilterOptions}
         />
-        {(filters.status !== "all" || filters.kycStatus !== "all" || filters.search) && (
+        {(statusFilter !== "all" || kycFilter !== "all" || search) && (
           <ActionButton label="Reset" onClick={resetFilters} variant="secondary" />
         )}
       </FilterBar>

@@ -121,26 +121,6 @@ export const useAdminProfile = () => {
   });
 };
 
-export const useAdminAvailablePermissions = () => {
-  return useQuery({
-    queryKey: ["admin", "permissions", "available"],
-    queryFn: async () => {
-      const response = await AdminRepository.getAvailablePermissions();
-      return response.data;
-    },
-  });
-};
-
-export const useAdminPermissions = (adminId: UUID) => {
-  return useQuery({
-    queryKey: ["admin", "permissions", adminId],
-    queryFn: async () => {
-      const response = await AdminRepository.getAdminPermissions(adminId);
-      return response.data;
-    },
-    enabled: !!adminId,
-  });
-};
 
 export const useAdminPendingApplicationsQuery = (params?: any) => {
   return useQuery({
@@ -436,38 +416,6 @@ export const useAdminProfileOperations = () => {
   return { updateProfile, requestOtp, changePassword, changeEmail };
 };
 
-export const useAdminPermissionsOperations = () => {
-  const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
-
-  const updatePermissions = useMutation({
-    mutationFn: async ({ adminId, data }: { adminId: UUID; data: any }) => 
-      (await AdminRepository.updateAdminPermissions(adminId, data)).data,
-    onSuccess: (_, { adminId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
-      showToast("Permissions updated", "success");
-    },
-  });
-
-  const setPreset = useMutation({
-    mutationFn: async ({ adminId, data }: { adminId: UUID; data: any }) => 
-      (await AdminRepository.setPermissionPreset(adminId, data)).data,
-    onSuccess: (_, { adminId }) => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
-      showToast("Permission preset applied", "success");
-    },
-  });
-
-  const revokeAll = useMutation({
-    mutationFn: async (adminId: UUID) => (await AdminRepository.revokeAllPermissions(adminId)).data,
-    onSuccess: (_, adminId) => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "permissions", adminId] });
-      showToast("All permissions revoked", "success");
-    },
-  });
-
-  return { updatePermissions, setPreset, revokeAll };
-};
 
 export const useAdminCardOperations = () => {
   const queryClient = useQueryClient();

@@ -87,6 +87,7 @@ import Campaigns from "./app/communications/Campaigns";
 
 // Settings
 import SystemSettings from "./app/settings/SystemSettings";
+import PermissionsSettings from "./app/settings/PermissionsSettings";
 import GeneralSettings from "./app/settings/GeneralSettings";
 import SecuritySettings from "./app/settings/SecuritySettings";
 import NotificationSettings from "./app/settings/NotificationSettings";
@@ -178,6 +179,7 @@ export default function AdminRoutes() {
       <Route path="communications/campaigns" element={<Campaigns />} />
       {/* System Settings */}
       <Route path="settings" element={<SystemSettings />} />
+      <Route path="settings/permissions" element={<PermissionsSettings />} />
       <Route path="settings/general" element={<GeneralSettings />} />
       <Route path="settings/security" element={<SecuritySettings />} />
       <Route path="settings/notifications" element={<NotificationSettings />} />

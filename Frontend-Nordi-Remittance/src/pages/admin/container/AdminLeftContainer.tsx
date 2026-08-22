@@ -168,6 +168,7 @@ const menu = [
     icon: <Settings size={20} />,
     route: "/admin/settings",
     children: [
+      { title: "Permissions & Roles", route: "/admin/settings/permissions" },
       { title: "General", route: "/admin/settings/general" },
       { title: "Security", route: "/admin/settings/security" },
       { title: "Notifications", route: "/admin/settings/notifications" },

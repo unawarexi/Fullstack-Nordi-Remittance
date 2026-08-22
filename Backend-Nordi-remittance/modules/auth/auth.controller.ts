@@ -421,7 +421,9 @@ export async function registerFullKyc(
         idNumber: sanitizeString(idNumber),
         idExpiryDate: new Date(idExpiryDate),
         addressDocType,
-        socialSecurityNumber: socialSecurityNumber ? sanitizeString(socialSecurityNumber) : undefined,
+        socialSecurityNumber: socialSecurityNumber
+          ? sanitizeString(socialSecurityNumber)
+          : undefined,
         taxIdentificationNumber: sanitizeString(taxIdentificationNumber),
         profilePicture: profilePictureUrl,
         governmentId: governmentIdUrl,

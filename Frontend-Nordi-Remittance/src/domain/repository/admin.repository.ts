@@ -88,29 +88,6 @@ export const AdminRepository = {
     return response.data;
   },
 
-  // ==========================================================================
-  // PERMISSIONS MANAGEMENT
-  // ==========================================================================
-  getAvailablePermissions: async (): Promise<ApiResponse<any>> => {
-    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.adminPermissionsAvailable);
-    return response.data;
-  },
-  getAdminPermissions: async (adminId: UUID): Promise<ApiResponse<any>> => {
-    const response = await apiClient.get<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId));
-    return response.data;
-  },
-  updateAdminPermissions: async (adminId: UUID, data: any): Promise<ApiResponse<any>> => {
-    const response = await apiClient.put<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId), data);
-    return response.data;
-  },
-  setPermissionPreset: async (adminId: UUID, data: any): Promise<ApiResponse<any>> => {
-    const response = await apiClient.post<ApiResponse<any>>(ApiEndpoints.adminAdminPermissionsPreset(adminId), data);
-    return response.data;
-  },
-  revokeAllPermissions: async (adminId: UUID): Promise<ApiResponse<any>> => {
-    const response = await apiClient.delete<ApiResponse<any>>(ApiEndpoints.adminAdminPermissions(adminId));
-    return response.data;
-  },
 
   // ==========================================================================
   // ADMIN USER MANAGEMENT
