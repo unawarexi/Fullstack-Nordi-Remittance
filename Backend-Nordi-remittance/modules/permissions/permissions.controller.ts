@@ -93,8 +93,8 @@ export async function updatePermissionField(
   try {
     if (!req.user) throw new UnauthorizedError("Authentication required");
 
-    const { userId, field } = req.params;
-    const { value } = req.body;
+    const { userId } = req.params;
+    const { field, value } = req.body;
 
     const result = await PermissionsAdminService.updatePermissionField(
       req.user.userId,

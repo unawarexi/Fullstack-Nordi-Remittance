@@ -1,184 +1,91 @@
-// // ============================================================================
-// // PERMISSION ROUTES
-// // ============================================================================
+// ============================================================================
+// PERMISSION ROUTES
+// ============================================================================
 
-// import { Router } from 'express';
-// import PermissionController from './permissions.controller.js';
-// import { authenticate, requireAdmin, requireSuperAdmin } from '../../middleware/Auth.middleware.js';
-// import { sanitizeInput } from '../../middleware/Security.middleware.js';
-// import { requestLoggingMiddleware, auditLogMiddleware } from '../../middleware/core.middleware.js';
+import { Router } from 'express';
+import PermissionController from './permissions.controller.js';
+import { authenticate, requireAdmin, requireSuperAdmin } from '../../middleware/auth.middleware.js';
+import { sanitizeInput } from '../../middleware/security.middleware.js';
+import { requestLoggingMiddleware, auditLogMiddleware } from '../../middleware/core.middleware.js';
 
-// const router = Router();
+const router = Router();
 
-// // Apply common middleware
-// router.use(requestLoggingMiddleware);
-// router.use(sanitizeInput);
-// router.use(authenticate);
-// router.use(requireAdmin);
+// Apply common middleware
+router.use(requestLoggingMiddleware);
+router.use(sanitizeInput);
+router.use(authenticate);
+router.use(requireAdmin);
 
-// // ============================================================================
-// // PERMISSIONS
-// // ============================================================================
+// ============================================================================
+// USER PERMISSIONS (Managed by Admin)
+// ============================================================================
 
-// /**
-//  * @route   GET /api/permissions
-//  * @desc    Get all permissions
-//  * @access  Admin
-//  */
-// router.get('/', PermissionController.getPermissions);
+/**
+ * @route   GET /api/permissions/users
+ * @desc    Get all users' permissions
+ * @access  Admin
+ */
+router.get('/users', PermissionController.getAllPermissions);
 
-// /**
-//  * @route   GET /api/permissions/:permissionId
-//  * @desc    Get specific permission
-//  * @access  Admin
-//  */
-// router.get('/:permissionId', PermissionController.getPermissionById);
+/**
+ * @route   GET /api/permissions/users/:userId
+ * @desc    Get specific user's permissions
+ * @access  Admin
+ */
+router.get('/users/:userId', PermissionController.getUserPermissions);
 
-// /**
-//  * @route   POST /api/permissions
-//  * @desc    Create new permission
-//  * @access  Super Admin
-//  */
-// router.post(
-//   '/',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.createPermission
-// );
+/**
+ * @route   PUT /api/permissions/users/:userId
+ * @desc    Set or update a user's full permissions
+ * @access  Admin
+ */
+router.put('/users/:userId', auditLogMiddleware, PermissionController.setUserPermissions);
 
-// /**
-//  * @route   PUT /api/permissions/:permissionId
-//  * @desc    Update permission
-//  * @access  Super Admin
-//  */
-// router.put(
-//   '/:permissionId',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.updatePermission
-// );
+/**
+ * @route   PATCH /api/permissions/users/:userId/field
+ * @desc    Update a specific permission field for a user
+ * @access  Admin
+ */
+router.patch(
+  '/users/:userId/field',
+  auditLogMiddleware,
+  PermissionController.updatePermissionField,
+);
 
-// /**
-//  * @route   DELETE /api/permissions/:permissionId
-//  * @desc    Delete permission
-//  * @access  Super Admin
-//  */
-// router.delete(
-//   '/:permissionId',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.deletePermission
-// );
+/**
+ * @route   DELETE /api/permissions/users/:userId
+ * @desc    Reset a user's permissions to default
+ * @access  Admin
+ */
+router.delete('/users/:userId', auditLogMiddleware, PermissionController.deleteUserPermissions);
 
-// // ============================================================================
-// // PERMISSION GROUPS
-// // ============================================================================
+/**
+ * @route   POST /api/permissions/users/bulk
+ * @desc    Bulk update permissions for multiple users
+ * @access  Admin
+ */
+router.post('/users/bulk', auditLogMiddleware, PermissionController.bulkUpdatePermissions);
 
-// /**
-//  * @route   GET /api/permissions/groups
-//  * @desc    Get all permission groups
-//  * @access  Admin
-//  */
-// router.get('/groups', PermissionController.getPermissionGroups);
+// ============================================================================
+// PERMISSION CATEGORIES
+// ============================================================================
 
-// /**
-//  * @route   POST /api/permissions/groups
-//  * @desc    Create permission group
-//  * @access  Super Admin
-//  */
-// router.post(
-//   '/groups',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.createPermissionGroup
-// );
+/**
+ * @route   GET /api/permissions/categories
+ * @desc    Get available permission categories and fields
+ * @access  Admin
+ */
+router.get('/categories', PermissionController.getPermissionCategories);
 
-// /**
-//  * @route   PUT /api/permissions/groups/:groupId
-//  * @desc    Update permission group
-//  * @access  Super Admin
-//  */
-// router.put(
-//   '/groups/:groupId',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.updatePermissionGroup
-// );
+// ============================================================================
+// ADMIN PERMISSIONS (Read-only view from permissions module)
+// ============================================================================
 
-// /**
-//  * @route   DELETE /api/permissions/groups/:groupId
-//  * @desc    Delete permission group
-//  * @access  Super Admin
-//  */
-// router.delete(
-//   '/groups/:groupId',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.deletePermissionGroup
-// );
+/**
+ * @route   GET /api/permissions/admins/:adminId
+ * @desc    Get admin user's permissions
+ * @access  Admin
+ */
+router.get('/admins/:adminId', PermissionController.getAdminPermissions);
 
-// // ============================================================================
-// // ROLE PERMISSIONS
-// // ============================================================================
-
-// /**
-//  * @route   GET /api/permissions/roles
-//  * @desc    Get all role permissions
-//  * @access  Admin
-//  */
-// router.get('/roles', PermissionController.getRolePermissions);
-
-// /**
-//  * @route   GET /api/permissions/roles/:role
-//  * @desc    Get permissions for specific role
-//  * @access  Admin
-//  */
-// router.get('/roles/:role', PermissionController.getRolePermissionsByRole);
-
-// /**
-//  * @route   PUT /api/permissions/roles/:role
-//  * @desc    Set permissions for role
-//  * @access  Super Admin
-//  */
-// router.put(
-//   '/roles/:role',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.setRolePermissions
-// );
-
-// // ============================================================================
-// // ADMIN PERMISSIONS
-// // ============================================================================
-
-// /**
-//  * @route   GET /api/permissions/admins/:adminId
-//  * @desc    Get admin user's permissions
-//  * @access  Admin
-//  */
-// router.get('/admins/:adminId', PermissionController.getAdminPermissions);
-
-// /**
-//  * @route   PUT /api/permissions/admins/:adminId
-//  * @desc    Set admin user's permissions
-//  * @access  Super Admin
-//  */
-// router.put(
-//   '/admins/:adminId',
-//   requireSuperAdmin,
-//   auditLogMiddleware,
-//   PermissionController.setAdminPermissions
-// );
-
-// // ============================================================================
-// // PERMISSION CHECK
-// // ============================================================================
-
-// /**
-//  * @route   POST /api/permissions/check
-//  * @desc    Check if current user has permission
-//  * @access  Admin
-//  */
-// router.post('/check', PermissionController.checkPermission);
-
-// export default router;
+export default router;

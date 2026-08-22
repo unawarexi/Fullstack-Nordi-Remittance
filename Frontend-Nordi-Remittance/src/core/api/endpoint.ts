@@ -45,7 +45,6 @@ export class ApiEndpoints {
     return `/users/notifications/${id}/read`;
   }
 
-
   // Admin (user management — mounted under /users, requires admin role)
   static readonly userAdminList = "/users"; // GET (list all) / DELETE (delete all)
   static userAdminById(id: string) {
@@ -96,28 +95,38 @@ export class ApiEndpoints {
     return `/accounts/wallets/${id}/history`;
   }
   static readonly accountWalletsClosed = "/accounts/wallets/closed"; // GET
-  
+
   // Wallet Products / Linking
-  static accountWalletProducts(walletId: string) { return `/accounts/wallets/${walletId}/products`; }
-  static accountWalletCardLink(walletId: string, cardId: string) { return `/accounts/wallets/${walletId}/cards/${cardId}/link`; }
-  static accountWalletCardUnlink(walletId: string, cardId: string) { return `/accounts/wallets/${walletId}/cards/${cardId}/unlink`; }
-  static accountCardFundingSource(cardId: string) { return `/accounts/cards/${cardId}/funding-source`; }
+  static accountWalletProducts(walletId: string) {
+    return `/accounts/wallets/${walletId}/products`;
+  }
+  static accountWalletCardLink(walletId: string, cardId: string) {
+    return `/accounts/wallets/${walletId}/cards/${cardId}/link`;
+  }
+  static accountWalletCardUnlink(walletId: string, cardId: string) {
+    return `/accounts/wallets/${walletId}/cards/${cardId}/unlink`;
+  }
+  static accountCardFundingSource(cardId: string) {
+    return `/accounts/cards/${cardId}/funding-source`;
+  }
 
   // Limits / Score
   static readonly accountLimits = "/accounts/limits";
   static readonly accountConsolidatedLimits = "/accounts/consolidated-limits";
   static readonly accountCreditScore = "/accounts/credit-score";
-  
+
   static readonly accountSummary = "/accounts/summary";
   static readonly accountBeneficiaries = "/accounts/beneficiaries"; // GET / POST
   static accountBeneficiary(id: string) {
     return `/accounts/beneficiaries/${id}`;
   } // DELETE
-  
+
   // Applications
   static readonly accountApplications = "/accounts/applications";
   static readonly accountApplicationsApply = "/accounts/applications/apply";
-  static accountApplicationCancel(id: string) { return `/accounts/applications/${id}/cancel`; }
+  static accountApplicationCancel(id: string) {
+    return `/accounts/applications/${id}/cancel`;
+  }
 
   // Admin
   static readonly accountAdminWallets = "/accounts/admin/wallets";
@@ -314,6 +323,7 @@ export class ApiEndpoints {
   static readonly adminRequestOtp = "/admin/request-otp";
   static readonly adminChangePassword = "/admin/change-password";
   static readonly adminChangeEmail = "/admin/change-email";
+  // ──────────── Admin (Super Admin) Permissions ────────────
   static readonly adminPermissionsAvailable = "/admin/permissions/available";
   static adminAdminPermissions(adminId: string) {
     return `/admin/admins/${adminId}/permissions`;
@@ -322,6 +332,16 @@ export class ApiEndpoints {
     return `/admin/admins/${adminId}/permissions/preset`;
   } // super admin
 
+  // ──────────── User Permissions (Managed by Admin) ────────────
+  static readonly permissionsUsers = "/permissions/users"; // GET all
+  static permissionsUser(userId: string) {
+    return `/permissions/users/${userId}`;
+  } // GET / PUT / DELETE
+  static permissionsUserField(userId: string) {
+    return `/permissions/users/${userId}/field`;
+  } // PATCH
+  static readonly permissionsCategories = "/permissions/categories"; // GET
+  static readonly permissionsBulkUpdate = "/permissions/users/bulk"; // POST
 
   // ──────────── Admin Operations (admin-initiated financial ops) ────────────
   static readonly adminOpsCredit = "/admin/operations/credit";
@@ -517,37 +537,71 @@ export class ApiEndpoints {
   static readonly attachmentsMultiple = "/attachments/multiple";
 
   // Cards
-  static cardDeliveryTrack(id: string) { return `/cards/${id}/delivery/track`; }
-  static cardReplace(id: string) { return `/cards/${id}/replace`; }
-  static cardResetPin(id: string) { return `/cards/${id}/reset-pin`; }
-  static cardSetPin(id: string) { return `/cards/${id}/set-pin`; }
-  static cardSettings(id: string) { return `/cards/${id}/settings`; }
-  static cardTransactionDispute(id: string, transactionId: string) { return `/cards/${id}/transactions/${transactionId}/dispute`; }
+  static cardDeliveryTrack(id: string) {
+    return `/cards/${id}/delivery/track`;
+  }
+  static cardReplace(id: string) {
+    return `/cards/${id}/replace`;
+  }
+  static cardResetPin(id: string) {
+    return `/cards/${id}/reset-pin`;
+  }
+  static cardSetPin(id: string) {
+    return `/cards/${id}/set-pin`;
+  }
+  static cardSettings(id: string) {
+    return `/cards/${id}/settings`;
+  }
+  static cardTransactionDispute(id: string, transactionId: string) {
+    return `/cards/${id}/transactions/${transactionId}/dispute`;
+  }
   static readonly cardsPhysicalRequest = "/cards/physical/request";
   static readonly cardsVirtual = "/cards/virtual";
 
   // Integrations
-  static integrationApiKeyRegenerate(id: string) { return `/integrations/api-keys/${id}/regenerate`; }
-  static integrationApiKeyToggle(id: string) { return `/integrations/api-keys/${id}/toggle`; }
-  static integrationExternalAccount(id: string) { return `/integrations/external-accounts/${id}`; }
-  static integrationExternalAccountSync(id: string) { return `/integrations/external-accounts/${id}/sync`; }
-  static integrationWebhookTest(id: string) { return `/integrations/webhooks/${id}/test`; }
-  static integrationWebhookToggle(id: string) { return `/integrations/webhooks/${id}/toggle`; }
+  static integrationApiKeyRegenerate(id: string) {
+    return `/integrations/api-keys/${id}/regenerate`;
+  }
+  static integrationApiKeyToggle(id: string) {
+    return `/integrations/api-keys/${id}/toggle`;
+  }
+  static integrationExternalAccount(id: string) {
+    return `/integrations/external-accounts/${id}`;
+  }
+  static integrationExternalAccountSync(id: string) {
+    return `/integrations/external-accounts/${id}/sync`;
+  }
+  static integrationWebhookTest(id: string) {
+    return `/integrations/webhooks/${id}/test`;
+  }
+  static integrationWebhookToggle(id: string) {
+    return `/integrations/webhooks/${id}/toggle`;
+  }
   static readonly integrationsApiPermissions = "/integrations/api-permissions";
   static readonly integrationsWebhookEvents = "/integrations/webhooks/events";
 
   // KYC
-  static kycVerifyStatus(id: string) { return `/kyc/verify/${id}/status`; }
+  static kycVerifyStatus(id: string) {
+    return `/kyc/verify/${id}/status`;
+  }
 
   // Legal
   static readonly legalAcceptTerms = "/legal/documents/terms/accept";
   static readonly legalConsent = "/legal/consent";
   static readonly legalDisclosures = "/legal/documents/disclosures";
-  static legalDisputeCancel(id: string) { return `/legal/disputes/${id}/cancel`; }
-  static legalDisputeDocuments(id: string) { return `/legal/disputes/${id}/documents`; }
+  static legalDisputeCancel(id: string) {
+    return `/legal/disputes/${id}/cancel`;
+  }
+  static legalDisputeDocuments(id: string) {
+    return `/legal/disputes/${id}/documents`;
+  }
   static readonly legalPrivacy = "/legal/documents/privacy";
-  static legalReport(id: string) { return `/legal/reports/${id}`; }
-  static legalReportDownload(id: string) { return `/legal/reports/${id}/download`; }
+  static legalReport(id: string) {
+    return `/legal/reports/${id}`;
+  }
+  static legalReportDownload(id: string) {
+    return `/legal/reports/${id}/download`;
+  }
   static readonly legalReports = "/legal/reports";
   static readonly legalReportsHistory = "/legal/reports/transaction-history";
   static readonly legalReportsStatement = "/legal/reports/account-statement";
@@ -555,14 +609,30 @@ export class ApiEndpoints {
   static readonly legalTerms = "/legal/documents/terms";
 
   // Loans
-  static loanAutoPayment(id: string) { return `/loans/${id}/auto-payment`; }
-  static loanCancel(id: string) { return `/loans/${id}/cancel`; }
-  static loanDeferral(id: string) { return `/loans/${id}/deferral`; }
-  static loanDocuments(id: string) { return `/loans/${id}/documents`; }
-  static loanPayments(id: string) { return `/loans/${id}/payments`; }
-  static loanPayoffQuote(id: string) { return `/loans/${id}/payoff-quote`; }
-  static loanRefinance(id: string) { return `/loans/${id}/refinance`; }
-  static loanStatus(id: string) { return `/loans/${id}/status`; }
+  static loanAutoPayment(id: string) {
+    return `/loans/${id}/auto-payment`;
+  }
+  static loanCancel(id: string) {
+    return `/loans/${id}/cancel`;
+  }
+  static loanDeferral(id: string) {
+    return `/loans/${id}/deferral`;
+  }
+  static loanDocuments(id: string) {
+    return `/loans/${id}/documents`;
+  }
+  static loanPayments(id: string) {
+    return `/loans/${id}/payments`;
+  }
+  static loanPayoffQuote(id: string) {
+    return `/loans/${id}/payoff-quote`;
+  }
+  static loanRefinance(id: string) {
+    return `/loans/${id}/refinance`;
+  }
+  static loanStatus(id: string) {
+    return `/loans/${id}/status`;
+  }
   static readonly loansActive = "/loans/active";
   static readonly loansCalculate = "/loans/calculate";
   static readonly loansPayments = "/loans/payments";
@@ -596,14 +666,19 @@ export class ApiEndpoints {
   // Users
   static readonly userAddress = "/users/address";
   static readonly userAvatar = "/users/avatar";
-  static userBankAccount(id: string) { return `/users/bank-accounts/${id}`; }
-  static userBankAccountPrimary(id: string) { return `/users/bank-accounts/${id}/primary`; }
-  static userBankAccountVerify(id: string) { return `/users/bank-accounts/${id}/verify`; }
+  static userBankAccount(id: string) {
+    return `/users/bank-accounts/${id}`;
+  }
+  static userBankAccountPrimary(id: string) {
+    return `/users/bank-accounts/${id}/primary`;
+  }
+  static userBankAccountVerify(id: string) {
+    return `/users/bank-accounts/${id}/verify`;
+  }
   static readonly userBankAccounts = "/users/bank-accounts";
   static readonly userEmployment = "/users/employment";
   static readonly userExportData = "/users/export-data";
   static readonly userPreferencesNotifications = "/users/preferences/notifications";
   static readonly userReferrals = "/users/referrals";
   static readonly userReferralsList = "/users/referrals/list";
-
 }
